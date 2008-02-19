@@ -1,0 +1,7 @@
+<!ELEMENT presentation (title, author?, slide+) >
+<!ELEMENT title (#PCDATA) >
+<!ELEMENT author (#PCDATA) >
+<!ELEMENT slide (#PCDATA) >
+
+<!ATTLIST presentation type CDATA "generic">
+<!ATTLIST slide title CDATA #IMPLIED>
