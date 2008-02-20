@@ -18,6 +18,7 @@ import pygtk
 import gtk
 import gtk.gdk
 import gobject
+import os
 import os.path
 import xml.dom
 import xml.dom.minidom
@@ -103,6 +104,8 @@ class Presentation:
 		#TODO may need to check for access rights
 		tfile = title_to_filename(self.title)
 		if not isinstance(self.filename, str) or not self.filename.startswith(tfile):
+			if(self.filename):
+				os.remove("data/"+self.filename)
 			filename = tfile + ".xml"
 			index = 0
 			while os.path.exists("data/" + filename):
