@@ -54,9 +54,9 @@ menu = '''<ui>
 		<menuitem action="About" />
 	</menu>
 </menubar>
-<toolbar action="Preslist">
-	<toolitem action="pres-edit" />
-</toolbar>
+<menubar name='PresMenu'>
+	<menuitem action='pres-edit' />
+</menubar>
 </ui>'''
 
 class Main:
@@ -102,15 +102,15 @@ class Main:
 								#('Playlist', None, '_Playlist'),
 								('Help', None, '_Help'),
 								('HelpContents', gtk.STOCK_HELP),
-								('About', gtk.STOCK_ABOUT, None, None, None, self.on_about)])
+								('About', gtk.STOCK_ABOUT, None, None, None, self.on_about),
+								('PresEdit', None, "Pres Edit")])
 		uimanager.insert_action_group(actiongroup, 0)
 		uimanager.add_ui_from_string(menu)
 		
 		self.menu = uimanager.get_widget('/MenuBar')
 		win_v.pack_start(self.menu, False)
-		#pres_tb_new = uimanager.get_widget('/Preslist/pres-new')
-		#pres_tb_new.show()
-		#pres_tb_new.connect("clicked", self.on_pres_tb_new)
+		self.pres_rt_menu = uimanager.get_widget('/PresMenu')
+		print self.pres_rt_menu
 		
 		self.pres_new_submenu = gtk.Menu()
 		for (ptype, mod) in type_mods.items():
@@ -139,20 +139,21 @@ class Main:
 		#win_lft.pack1(win_lft_vb1, True, True)
 		
 		#### Presentation List
-		pres_list_tb = uimanager.get_widget('/Preslist')
-		pres_list_tb.set_tooltips(True)
-		pres_list_tb.set_style(gtk.TOOLBAR_ICONS)
+		#pres_list_tb = uimanager.get_widget('/Preslist')
+		#pres_list_tb.set_tooltips(True)
+		#pres_list_tb.set_style(gtk.TOOLBAR_ICONS)
 		#pres_list_tb.set_icon_size(gtk.ICON_SIZE_MENU)
+		#win_lft_vb2.pack_start(pres_list_tb, False, True)
 		pres_list = gtk.TreeView()
 		pres_list.set_size_request(150, 150)
 		pres_list.connect("row-activated", self.on_pres_activate)
+		pres_list.connect("button-press-event", self.on_pres_rt_click)
 		self.pres_list = PresList(pres_list)
 		self.build_pres_list()
 		pres_list_scroll = gtk.ScrolledWindow()
 		pres_list_scroll.add(pres_list)
 		pres_list_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
 		win_lft_vb2 = gtk.VBox()
-		win_lft_vb2.pack_start(pres_list_tb, False, True)
 		win_lft_vb2.pack_start(pres_list_scroll, True, True)
 		#win_lft.pack2(win_lft_vb2, True, True)
 		
@@ -245,6 +246,9 @@ class Main:
 	
 	def on_pres_activate(self, *args):
 		self.slide_list.set_slides(self.pres_list.get_active_item().slides)
+	def on_pres_rt_click(self, widget, event):
+		if(event.button == 3):
+			self.pres_rt_menu.popup(None, None, None, event.button, event.get_time())
 	def on_slide_activate(self, *args):
 		self.presentation.set_text(self.slide_list.get_active_item().get_text())
 	def on_about(self, *args):
