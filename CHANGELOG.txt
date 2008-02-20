@@ -4,28 +4,22 @@
 | Copyright (C) 2008 Fishhookweb.com |
 +------------------------------------+
 
-== 0.2+ TODO ===
- *	Speed up rendering speed (prerender next slides ?)
- *	Editing needs to include author and copyright information, and this
-	information needs to be displayed on the screen with the CCLI#
- *	Playlists: All; (Generic, Lyrics, etc); custom playlists
- *	Presentation List should have another column with the icon of the current
-	type (general, lyrics)
- *	Preferences Dialog: Presentation background, ccli#
- *	Help Contents
- *	Preview screen shows a scaled version of the actual screen when it is
-	visible, but should show a scaled version all the time to improve the look.
- *	Online retrieval of lyrics. Eventually needs to have login (generated id
-	and key) to be legal (research who we'll have to pay).
+= Changelog =
 
-=== 0.1 ===
+== 0.2 ==
+
+ *	Removed the toolbar for presentations, and created a right click menu
+	instead.
+ *	User can now delete a presentation.
+
+== 0.1 ==
  *	Save slides to disk
  *	Create new slides
  *	Editing of slides
  *	The menu's have been moved to UIManager, which is easier to maintain.
  *	Preview is a duplicate of the presentation window when possible.
 
-=== Version 0.03 ===
+== Version 0.03 ==
  *	Glade requirement removed
  *	Presentation data stored in xml.
  *	Presentation type for lyrics.
