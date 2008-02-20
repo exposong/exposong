@@ -48,7 +48,14 @@ class PresList:
 			return False
 	
 	def append(self, item):
-		self.pres_list.append(item)
+		self.pres_list.append((item, item.title))
+	
+	def remove(self, item):
+		model = self.pres_list_view.get_model()
+		iter1 = model.get_iter_first()
+		while model.get_value(iter1, 0).filename != item.filename:
+			iter1 = model.iter_next(iter1)
+		self.pres_list.remove(iter1)
 	
 	def update_selected(self):
 		#May need to pass in variable to be updated instead of just
@@ -56,4 +63,7 @@ class PresList:
 		# to just update all items.
 		(model, s_iter) = self.pres_list_view.get_selection().get_selected()
 		self.pres_list.set(s_iter, 1, model.get_value(s_iter, 0).title)
+	
+	def has_selection(self):
+		return bool(self.pres_list_view.get_selection().count_selected_rows())
 

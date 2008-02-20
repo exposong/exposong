@@ -21,7 +21,7 @@ import gtk
 import gtk.gdk
 from xml.dom import minidom
 import imp					#to dynamically load type modules
-from os import listdir
+import os
 
 from presentation import Presentation
 from preslist import PresList
@@ -46,6 +46,7 @@ menu = '''<ui>
 		<separator />
 		<menuitem action="pres-new" />
 		<menuitem action="pres-edit" />
+		<menuitem action="pres-delete" />
 		<menuitem action="pres-import" />
 		<menuitem action="pres-export" />
 	</menu>
@@ -54,9 +55,6 @@ menu = '''<ui>
 		<menuitem action="About" />
 	</menu>
 </menubar>
-<toolbar action="Preslist">
-	<toolitem action="pres-edit" />
-</toolbar>
 </ui>'''
 
 class Main:
@@ -64,7 +62,7 @@ class Main:
 	
 	def __init__(self):
 		#dynamically load all presentation types
-		for fl in listdir("ptype"):
+		for fl in os.listdir("ptype"):
 			if fl.endswith(".py") and fl != "__init__.py":
 				type_mods[fl[:-3]] = imp.load_source(fl[:-3], 'ptype/'+fl)
 		
@@ -97,7 +95,8 @@ class Main:
 								('Hide', None, '_Hide', None, None, self.presentation.hide),
 								('pres-new', gtk.STOCK_NEW, None, None, "New presentation"),
 								('pres-edit', gtk.STOCK_EDIT, None, None, "Edit presentation", self.on_pres_edit),
-								('pres-import', None, "_Import", None, "Open a presentation from file."),
+								('pres-delete', gtk.STOCK_DELETE, None, None, "Delete the presentation", self.on_pres_delete),
+								('pres-import', None, "_Import", None, "Open a presentation from file"),
 								('pres-export', None, "_Export", None, "Export presentation"),
 								#('Playlist', None, '_Playlist'),
 								('Help', None, '_Help'),
@@ -108,9 +107,10 @@ class Main:
 		
 		self.menu = uimanager.get_widget('/MenuBar')
 		win_v.pack_start(self.menu, False)
-		#pres_tb_new = uimanager.get_widget('/Preslist/pres-new')
-		#pres_tb_new.show()
-		#pres_tb_new.connect("clicked", self.on_pres_tb_new)
+		self.pres_rt_menu = gtk.Menu()
+		self.pres_rt_menu.append(actiongroup.get_action('pres-edit').create_menu_item())
+		self.pres_rt_menu.append(actiongroup.get_action('pres-delete').create_menu_item())
+		self.pres_rt_menu.show_all()
 		
 		self.pres_new_submenu = gtk.Menu()
 		for (ptype, mod) in type_mods.items():
@@ -139,20 +139,21 @@ class Main:
 		#win_lft.pack1(win_lft_vb1, True, True)
 		
 		#### Presentation List
-		pres_list_tb = uimanager.get_widget('/Preslist')
-		pres_list_tb.set_tooltips(True)
-		pres_list_tb.set_style(gtk.TOOLBAR_ICONS)
+		#pres_list_tb = uimanager.get_widget('/Preslist')
+		#pres_list_tb.set_tooltips(True)
+		#pres_list_tb.set_style(gtk.TOOLBAR_ICONS)
 		#pres_list_tb.set_icon_size(gtk.ICON_SIZE_MENU)
+		#win_lft_vb2.pack_start(pres_list_tb, False, True)
 		pres_list = gtk.TreeView()
 		pres_list.set_size_request(150, 150)
 		pres_list.connect("row-activated", self.on_pres_activate)
+		pres_list.connect("button-press-event", self.on_pres_rt_click)
 		self.pres_list = PresList(pres_list)
 		self.build_pres_list()
 		pres_list_scroll = gtk.ScrolledWindow()
 		pres_list_scroll.add(pres_list)
 		pres_list_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
 		win_lft_vb2 = gtk.VBox()
-		win_lft_vb2.pack_start(pres_list_tb, False, True)
 		win_lft_vb2.pack_start(pres_list_scroll, True, True)
 		#win_lft.pack2(win_lft_vb2, True, True)
 		
@@ -225,7 +226,7 @@ class Main:
 			return (scr_geom.width/2, scr_geom.height/2, scr_geom.width/2, scr_geom.height/2)
 	
 	def build_pres_list(self, directory="data"):
-		dir_list = listdir(directory)
+		dir_list = os.listdir(directory)
 		for filenm in dir_list:
 			if filenm.endswith(".xml"):
 				try:
@@ -238,30 +239,46 @@ class Main:
 						filetype = root_elem.getAttribute("type")
 						if filetype in type_mods:
 							obj = type_mods[filetype].Presentation(dom.documentElement, filenm)
-							self.pres_list.append(obj.get_row())
+							self.pres_list.append(obj)
 							obj = None
 					dom.unlink()
 					del dom
 	
 	def on_pres_activate(self, *args):
-		self.slide_list.set_slides(self.pres_list.get_active_item().slides)
+		if(self.pres_list.has_selection()):
+			self.slide_list.set_slides(self.pres_list.get_active_item().slides)
+		else:
+			self.slide_list.set_slides([])
+	def on_pres_rt_click(self, widget, event):
+		if(event.button == 3):
+			self.pres_rt_menu.popup(None, None, None, event.button, event.get_time())
 	def on_slide_activate(self, *args):
 		self.presentation.set_text(self.slide_list.get_active_item().get_text())
 	def on_about(self, *args):
 		About(self.window)
+	def on_pres_new(self, menuitem, ptype):
+		pres = type_mods[ptype].Presentation()
+		if(pres.edit(self.window)):
+			self.pres_list.append(pres)
 	def on_pres_edit(self, *args):
 		field = self.pres_list.get_active_item()
 		if(field):
 			if(field.edit(self.window)):
 				self.pres_list.update_selected()
 				self.on_pres_activate()
-	def on_pres_new(self, menuitem, ptype):
-		pres = type_mods[ptype].Presentation()
-		if(pres.edit(self.window)):
-			self.pres_list.append((pres, pres.title))
-	#def on_pres_tb_new(self, menuitem):
-	#	pass
+	def on_pres_delete(self, *args):
+		item = self.pres_list.get_active_item()
+		dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL,
+				gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO,
+				"Are you sure you want to delete "+item.title+"?")
+		resp = dialog.run()
+		dialog.hide()
+		if resp == gtk.RESPONSE_YES:
+			os.remove("data/"+item.filename)
+			self.pres_list.remove(item)
+			self.on_pres_activate()
 
 if __name__ == "__main__":
 	m = Main()
 	gtk.main()
+
