@@ -30,5 +30,5 @@ class About:
 		self.dialog.set_logo(gtk.gdk.pixbuf_new_from_file("images/exposong.png"))
 		self.dialog.set_website("http://exposong.org")
 		self.dialog.set_modal(False)
-		self.dialog.connect("response", self.dialog.hide_on_delete)
-		self.dialog.show()
+		self.dialog.run()
+		self.dialog.hide()
