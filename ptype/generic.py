@@ -192,7 +192,7 @@ class Edit:
 		self.dialog.vbox.pack_start(label, False, True)
 		label.show()
 		
-		self.title = gtk.Entry(32)
+		self.title = gtk.Entry(45)
 		self.title.set_text(pres.title)
 		self.dialog.vbox.pack_start(self.title, False, True)
 		self.title.show()
