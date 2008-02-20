@@ -165,7 +165,7 @@ class Main:
 		win_rt = gtk.VBox()
 		#### Slide List
 		slide_list = gtk.TreeView()
-		slide_list.connect("cursor-changed", self.on_slide_activate)
+		slide_list.connect("row-activated", self.on_slide_activate)
 		self.slide_list = SlideList(slide_list)
 		text_scroll = gtk.ScrolledWindow()
 		text_scroll.add(slide_list)
