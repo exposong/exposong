@@ -146,6 +146,7 @@ class Main:
 		pres_list = gtk.TreeView()
 		pres_list.set_size_request(150, 150)
 		pres_list.connect("row-activated", self.on_pres_activate)
+		pres_list.connect("button-press-event", self.on_pres_rt_click)
 		self.pres_list = PresList(pres_list)
 		self.build_pres_list()
 		pres_list_scroll = gtk.ScrolledWindow()
@@ -245,6 +246,8 @@ class Main:
 	
 	def on_pres_activate(self, *args):
 		self.slide_list.set_slides(self.pres_list.get_active_item().slides)
+	def on_pres_rt_click(self, widget, event):
+		print widget, event
 	def on_slide_activate(self, *args):
 		self.presentation.set_text(self.slide_list.get_active_item().get_text())
 	def on_about(self, *args):
