@@ -59,7 +59,7 @@ class Presentation:
 	
 	def set_text(self, text):
 		#self.set_background()
-		self.text = text
+		self.text = str(text)
 		self.draw()
 	
 	def draw(self):
