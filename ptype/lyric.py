@@ -28,7 +28,7 @@ from ptype.generic import get_node_text
 '''This creates lyrics for presentation.'''
 menu_name = "Lyrics"
 title_re = re.compile("(chorus|refrain|verse|bridge)", re.I)
-#icon = gtk.gdk.pixbuf_new_from_file('images/generic.png')
+icon = gtk.gdk.pixbuf_new_from_file('images/lyric.png')
 
 class Presentation(generic.Presentation):
 	'''Sets information from an xml file.
@@ -45,6 +45,9 @@ class Presentation(generic.Presentation):
 			slides = dom.getElementsByTagName("slide")
 			for sl in slides:
 				self.slides.append(Slide(sl))
+	
+	def get_icon(self):
+		return icon
 	
 	def edit(self, parent = None):
 		'''Run the edit dialog for the presentation.'''

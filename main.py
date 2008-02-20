@@ -145,7 +145,6 @@ class Main:
 		#pres_list_tb.set_icon_size(gtk.ICON_SIZE_MENU)
 		#win_lft_vb2.pack_start(pres_list_tb, False, True)
 		self.pres_list = PresList()
-		self.pres_list.set_size_request(150, 150)
 		self.pres_list.connect("row-activated", self.on_pres_activate)
 		self.pres_list.connect("button-press-event", self.on_pres_rt_click)
 		self.build_pres_list()

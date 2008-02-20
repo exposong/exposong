@@ -52,7 +52,7 @@ def title_to_filename(title):
 	return ret
 
 
-#icon = gtk.gdk.pixbuf_new_from_file('images/generic.png')
+icon = gtk.gdk.pixbuf_new_from_file('images/generic.png')
 
 class Presentation:
 	'''Sets information from an xml file.
@@ -78,6 +78,9 @@ class Presentation:
 		for sl in self.slides:
 			rval += sl.get_text() + "\n\n"
 		tbuf.set_text(rval[:-2])
+	
+	def get_icon(self):
+		return icon
 	
 	def edit(self, parent = None):
 		'''Run the edit dialog for the presentation.

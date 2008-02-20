@@ -24,16 +24,18 @@ class PresList(gtk.TreeView):
 	'''Manage the presentation list'''
 	def __init__(self):
 		gtk.TreeView.__init__(self)
-		self.set_size_request(165, 250)
+		self.set_size_request(200, 250)
 		
+		column2_rend = gtk.CellRendererPixbuf()
+		column2 = gtk.TreeViewColumn(" ", column2_rend)
+		column2.set_sort_column_id(2)
+		column2.set_resizable(False)
+		column2.set_cell_data_func(column2_rend, self._get_row_icon)
+		self.append_column(column2)
 		column1 = gtk.TreeViewColumn("Presentation", gtk.CellRendererText(), text=1)
 		column1.set_sort_column_id(1)
+		column1.set_resizable(True)
 		self.append_column(column1)
-		#TODO(?) Icon to represent the type
-		#column2 = gtk.TreeViewColumn(" ", gtk.CellRendererPixbuf(), text=2)
-		#column2.set_sort_column_id(2)
-		#column2.set_resizable(False)
-		#self.pres_list_view.append_column(column2)
 		
 		self.pres_list = gtk.ListStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING)
 		self.pres_list.set_sort_column_id(1, gtk.SORT_ASCENDING)
@@ -66,4 +68,8 @@ class PresList(gtk.TreeView):
 	
 	def has_selection(self):
 		return bool(self.get_selection().count_selected_rows())
+	
+	def _get_row_icon(self, column, cell, model, titer):
+		pres = model.get_value(titer, 0)
+		cell.set_property('pixbuf', pres.get_icon())
 
