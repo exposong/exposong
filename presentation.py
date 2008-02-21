@@ -34,7 +34,7 @@ class Presentation:
 		self.text = ''
 		self.black = self.background = False
 		self.parent = parent
-		self.config = self.parent.config.pres
+		self.config = self.parent.config
 		
 		self.window = gtk.Window(gtk.WINDOW_POPUP)
 		if(isinstance(geometry, tuple) and len(geometry)):
@@ -91,7 +91,7 @@ class Presentation:
 	
 	
 	def _set_background(self, widget):
-		color = self.config.background
+		color = self.config['pres.bg']
 		if(not widget.window):
 			return False
 		ccontext = widget.window.cairo_create()
@@ -147,7 +147,7 @@ class Presentation:
 		layout.set_attributes(attrs)
 		
 		min_sz = 0
-		max_sz = int(self.config.max_font_size)
+		max_sz = int(self.config['pres.max_font_size'])
 		#Loop through until the text is between 80% of the height and 94%, or
 		#until we get a number that is not a multiple of 4 (2,6,10,14, etc) to
 		#make it simpler... TODO Double check that it doesn't overflow
@@ -170,11 +170,11 @@ class Presentation:
 			layout.set_attributes(attrs)
 		
 		self._set_background(widget)
-		if(self.config.text_shadow):
-			ccontext.set_source_rgba(self.config.text_shadow[0], self.config.text_shadow[1], self.config.text_shadow[2], self.config.text_shadow[3])
+		if(self.config['pres.text_shadow']):
+			ccontext.set_source_rgba(self.config['pres.text_shadow'][0], self.config['pres.text_shadow'][1], self.config['pres.text_shadow'][2], self.config['pres.text_shadow'][3])
 			ccontext.move_to(bounds[0] * 0.03 + size*0.1,(bounds[1] - layout.get_pixel_size()[1])/2.0 + size*0.1)
 			ccontext.show_layout(layout)
-		ccontext.set_source_rgba(self.config.text_color[0], self.config.text_color[1], self.config.text_color[2], 1.0)
+		ccontext.set_source_rgba(self.config['pres.text_color'][0], self.config['pres.text_color'][1], self.config['pres.text_color'][2], 1.0)
 		ccontext.move_to(bounds[0] * 0.03,(bounds[1] - layout.get_pixel_size()[1])/2.0)
 		ccontext.show_layout(layout)
 
