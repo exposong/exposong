@@ -30,8 +30,7 @@ from about import About
 
 type_mods = {} #dynamically loaded presentation modules
 
-menu = '''<ui>
-<menubar name="MenuBar">
+menu = '''<menubar name="MenuBar">
 	<menu action="File">
 		<menuitem action="Quit" />
 	</menu>
@@ -54,34 +53,36 @@ menu = '''<ui>
 		<menuitem action="HelpContents" />
 		<menuitem action="About" />
 	</menu>
-</menubar>
-</ui>'''
+</menubar>'''
 
-class Main:
+class Main (gtk.Window):
 	'''Primary user interface'''
 	
 	def __init__(self):
+		gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+		self.set_title("ExpoSong")
+		self.connect("destroy", gtk.main_quit)
+		self.set_default_size(700, 500)
+		#Load config into a variable
+		self.config = imp.load_source('config', 'config.py')
+		
 		#dynamically load all presentation types
 		for fl in os.listdir("ptype"):
 			if fl.endswith(".py") and fl != "__init__.py":
 				type_mods[fl[:-3]] = imp.load_source(fl[:-3], 'ptype/'+fl)
 		
 		##	GUI
-		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-		self.window.set_title("ExpoSong")
-		self.window.connect("destroy", gtk.main_quit)
-		self.window.set_default_size(700, 500)
 		win_v = gtk.VBox()
 		
 		#These have to be initialized for the menus to render properly
 		pres_geom = self.get_pres_geometry()
 		self.pres_prev = gtk.DrawingArea()
 		self.pres_prev.set_size_request(135*pres_geom[2]/pres_geom[3], 135) # TODO set according to pres_window size
-		self.presentation = Presentation(pres_geom, self.pres_prev)
+		self.presentation = Presentation(self, pres_geom, self.pres_prev)
 		
 		## Menu
 		uimanager = gtk.UIManager()
-		self.window.add_accel_group(uimanager.get_accel_group())
+		self.add_accel_group(uimanager.get_accel_group())
 		
 		actiongroup = gtk.ActionGroup('presenter')
 		actiongroup.add_actions([('File', None, '_File'),
@@ -107,10 +108,10 @@ class Main:
 		
 		self.menu = uimanager.get_widget('/MenuBar')
 		win_v.pack_start(self.menu, False)
-		self.pres_rt_menu = gtk.Menu()
-		self.pres_rt_menu.append(actiongroup.get_action('pres-edit').create_menu_item())
-		self.pres_rt_menu.append(actiongroup.get_action('pres-delete').create_menu_item())
-		self.pres_rt_menu.show_all()
+		self.pres_list_menu = gtk.Menu()
+		self.pres_list_menu.append(actiongroup.get_action('pres-edit').create_menu_item())
+		self.pres_list_menu.append(actiongroup.get_action('pres-delete').create_menu_item())
+		self.pres_list_menu.show_all()
 		
 		self.pres_new_submenu = gtk.Menu()
 		for (ptype, mod) in type_mods.items():
@@ -204,15 +205,15 @@ class Main:
 		self.status_bar = gtk.Statusbar()
 		
 		win_v.pack_end(self.status_bar, False)
-		self.window.add(win_v)
-		self.window.show_all()
+		self.add(win_v)
+		self.show_all()
 	
 	def get_pres_geometry(self):
 		'''Finds the best location for the screen.
 		
 		If the user is using one monitor, use the bottom right corner for
 		the presentation screen, otherwise, use the 2nd monitor.'''
-		screen = self.window.get_screen()
+		screen = self.get_screen()
 		num_monitors = screen.get_n_monitors()
 		if(num_monitors > 1):
 			scr_geom = screen.get_monitor_geometry(1)
@@ -220,7 +221,7 @@ class Main:
 		else:
 			# No 2nd monitor, so preview it small in the corner of the screen
 			scr_geom = screen.get_monitor_geometry(0)
-			self.window.move(0,0)
+			self.move(0,0)
 			return (scr_geom.width/2, scr_geom.height/2, scr_geom.width/2, scr_geom.height/2)
 	
 	def build_pres_list(self, directory="data"):
@@ -249,24 +250,22 @@ class Main:
 			self.slide_list.set_slides([])
 	def on_pres_rt_click(self, widget, event):
 		if(event.button == 3):
-			self.pres_rt_menu.popup(None, None, None, event.button, event.get_time())
+			self.pres_list_menu.popup(None, None, None, event.button, event.get_time())
 	def on_slide_activate(self, *args):
 		self.presentation.set_text(self.slide_list.get_active_item().get_text())
-	def on_about(self, *args):
-		About(self.window)
 	def on_pres_new(self, menuitem, ptype):
 		pres = type_mods[ptype].Presentation()
-		if(pres.edit(self.window)):
+		if(pres.edit(self)):
 			self.pres_list.append(pres)
 	def on_pres_edit(self, *args):
 		field = self.pres_list.get_active_item()
 		if(field):
-			if(field.edit(self.window)):
+			if(field.edit(self)):
 				self.pres_list.update_selected()
 				self.on_pres_activate()
 	def on_pres_delete(self, *args):
 		item = self.pres_list.get_active_item()
-		dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL,
+		dialog = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
 				gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO,
 				"Are you sure you want to delete "+item.title+"?")
 		resp = dialog.run()
@@ -275,6 +274,9 @@ class Main:
 			os.remove("data/"+item.filename)
 			self.pres_list.remove(item)
 			self.on_pres_activate()
+	
+	def on_about(self, *args):
+		About(self)
 
 if __name__ == "__main__":
 	m = Main()

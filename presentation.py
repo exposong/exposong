@@ -20,7 +20,6 @@ import gtk
 import pango
 import cairo
 import time
-from config import pres as config
 
 #TODO make the preview use a copy of the larger screen if it is visible.
 # Otherwise, we can just render it inexact
@@ -31,9 +30,11 @@ COLOR_DEFAULT = ((0.0, 0.2, 0.3), (0.0, 0.4, 0.6))
 class Presentation:
 	"""Manage the window for presentation."""
 	
-	def __init__(self, geometry, preview):
+	def __init__(self, parent, geometry, preview):
 		self.text = ''
 		self.black = self.background = False
+		self.parent = parent
+		self.config = self.parent.config.pres
 		
 		self.window = gtk.Window(gtk.WINDOW_POPUP)
 		if(isinstance(geometry, tuple) and len(geometry)):
@@ -52,10 +53,10 @@ class Presentation:
 		
 		self.set_background()
 	
-	def set_background(self, color = config.background):
-		self._set_background(self.preview, color)
+	def set_background(self):
+		self._set_background(self.preview)
 		if(hasattr(self, "pres") and self.pres.window):
-			self._set_background(self.pres, color)
+			self._set_background(self.pres)
 	
 	def set_text(self, text):
 		#self.set_background()
@@ -89,7 +90,8 @@ class Presentation:
 		self._draw(widget)
 	
 	
-	def _set_background(self, widget, color = config.background):
+	def _set_background(self, widget):
+		color = self.config.background
 		if(not widget.window):
 			return False
 		ccontext = widget.window.cairo_create()
@@ -145,7 +147,7 @@ class Presentation:
 		layout.set_attributes(attrs)
 		
 		min_sz = 0
-		max_sz = int(config.max_font_size)
+		max_sz = int(self.config.max_font_size)
 		#Loop through until the text is between 80% of the height and 94%, or
 		#until we get a number that is not a multiple of 4 (2,6,10,14, etc) to
 		#make it simpler... TODO Double check that it doesn't overflow
@@ -168,11 +170,11 @@ class Presentation:
 			layout.set_attributes(attrs)
 		
 		self._set_background(widget)
-		if(config.text_shadow):
-			ccontext.set_source_rgba(config.text_shadow[0], config.text_shadow[1], config.text_shadow[2], config.text_shadow[3])
+		if(self.config.text_shadow):
+			ccontext.set_source_rgba(self.config.text_shadow[0], self.config.text_shadow[1], self.config.text_shadow[2], self.config.text_shadow[3])
 			ccontext.move_to(bounds[0] * 0.03 + size*0.1,(bounds[1] - layout.get_pixel_size()[1])/2.0 + size*0.1)
 			ccontext.show_layout(layout)
-		ccontext.set_source_rgba(config.text_color[0], config.text_color[1], config.text_color[2], 1.0)
+		ccontext.set_source_rgba(self.config.text_color[0], self.config.text_color[1], self.config.text_color[2], 1.0)
 		ccontext.move_to(bounds[0] * 0.03,(bounds[1] - layout.get_pixel_size()[1])/2.0)
 		ccontext.show_layout(layout)
 
