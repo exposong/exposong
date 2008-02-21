@@ -1,7 +1,10 @@
-<!ELEMENT presentation (title, author?, slide+) >
+<!ELEMENT presentation (title, author*, copyright?, comments?, slide+) >
 <!ELEMENT title (#PCDATA) >
 <!ELEMENT author (#PCDATA) >
+<!ELEMENT copyright (#PCDATA) >
+<!ELEMENT comments (#PCDATA) >
 <!ELEMENT slide (#PCDATA) >
 
 <!ATTLIST presentation type CDATA "generic">
+<!ATTLIST author type (words|music|both) "both">
 <!ATTLIST slide title CDATA #IMPLIED>
