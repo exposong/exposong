@@ -25,7 +25,6 @@ import time
 # Otherwise, we can just render it inexact
 
 COLOR_BLACK = (0.0, 0.0, 0.0)
-COLOR_DEFAULT = ((0.0, 0.2, 0.3), (0.0, 0.4, 0.6))
 
 class Presentation:
 	"""Manage the window for presentation."""
@@ -53,10 +52,10 @@ class Presentation:
 		
 		self.set_background()
 	
-	def set_background(self):
-		self._set_background(self.preview)
+	def set_background(self, color = None):
+		self._set_background(self.preview, color)
 		if(hasattr(self, "pres") and self.pres.window):
-			self._set_background(self.pres)
+			self._set_background(self.pres, color)
 	
 	def set_text(self, text):
 		#self.set_background()
@@ -90,8 +89,9 @@ class Presentation:
 		self._draw(widget)
 	
 	
-	def _set_background(self, widget):
-		color = self.config['pres.bg']
+	def _set_background(self, widget, color = None):
+		if(color == None):
+			color = self.config['pres.bg']
 		if(not widget.window):
 			return False
 		ccontext = widget.window.cairo_create()
