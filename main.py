@@ -28,6 +28,7 @@ from preslist import PresList
 from slidelist import SlideList
 from about import About
 from prefs import Prefs
+from prefs import PrefsDialog
 
 type_mods = {} #dynamically loaded presentation modules
 
@@ -64,7 +65,7 @@ class Main (gtk.Window):
 		self.set_title("ExpoSong")
 		self.connect("destroy", gtk.main_quit)
 		self.set_default_size(700, 500)
-		self.load_config()
+		self.config = Prefs()
 		
 		#dynamically load all presentation types
 		for fl in os.listdir("ptype"):
@@ -243,40 +244,6 @@ class Main (gtk.Window):
 					dom.unlink()
 					del dom
 	
-	def load_config(self):
-		options = {'pres': {'max_font_size' : 56,
-			'bg' : ((0.0, 0.2, 0.3), (0.0, 0.4, 0.6)),
-			'text_color' : (1.0, 1.0, 1.0),
-			'text_shadow': (0.0, 0.0, 0.0, 0.4)}}
-		self.config = {}
-		config = imp.load_source('config', 'config.py')
-		for k,v in options.iteritems():
-			for var,default in v.iteritems():
-				if hasattr(config, k):
-					self.config[k+'.'+var] = getattr(getattr(config, k), var, default)
-				else:
-					self.config[k+'.'+var] = default
-			
-	def save_config(self):
-		cfile = open('config.py', 'r+')
-		cnt = 0
-		for line in cfile:
-			cnt += len(line)
-			if line == '# @START_WRITE\n':
-				break
-		cfile.seek(cnt)
-		cfile.write("\n")
-		cnt += 1
-		
-		for key, value in self.config.iteritems():
-			ln = key+' = '+repr(value)+'\n'
-			cfile.write(ln)
-			cnt += len(ln)
-		
-		cfile.truncate(cnt)
-		cfile.close()
-		self.presentation.draw()
-	
 	def on_pres_activate(self, *args):
 		if(self.pres_list.has_selection()):
 			self.slide_list.set_slides(self.pres_list.get_active_item().slides)
@@ -312,7 +279,7 @@ class Main (gtk.Window):
 	def on_about(self, *args):
 		About(self)
 	def on_prefs(self, *args):
-		Prefs(self)
+		self.config.dialog(self)
 
 if __name__ == "__main__":
 	m = Main()

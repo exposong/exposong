@@ -18,10 +18,7 @@ class Cfg:
 	pass
 
 pres = Cfg()
+general = Cfg()
 
 # @START_WRITE
 
-pres.background = ((0.0, 0.2, 0.3), (0.0, 0.4, 0.6))
-pres.text_color = (1.0, 1.0, 1.0)
-pres.text_shadow = (0.0, 0.0, 0.0, 0.4)
-pres.max_font_size = 56

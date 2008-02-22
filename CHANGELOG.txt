@@ -12,6 +12,7 @@
 	instead.
  *	User can now delete a presentation.
  *	Presentation type is now denoted by an icon in the list.
+ *	Preferences dialog.
 
 == 0.1 ==
  *	Save slides to disk

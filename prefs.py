@@ -17,27 +17,92 @@
 import pygtk
 import gtk
 import gtk.gdk
+import imp
 
+class Prefs:
+	def __init__(self):
+		self.cfg = {'general.ccli': '',
+				'pres.max_font_size': 56,
+				'pres.bg': ((0.0, 0.2, 0.3), (0.0, 0.4, 0.6)),
+				'pres.text_color': (1.0, 1.0, 1.0),
+				'pres.text_shadow': (0.0, 0.0, 0.0, 0.4)}
+		self.load()
+	def __getitem__(self, key):
+		if key in self.cfg:
+			return self.cfg[key]
+		raise KeyError, 'Could not find key: '+key
+	def __setitem__(self, key, value):
+		if value == None:
+			self.__delitem__(key, value)
+		else:
+			self.cfg[key] = value
+	def __delitem__(self, key):
+		del self.cfg[key]
+	
+	def load(self):
+		try:
+			config = imp.load_source('config', 'config.py')
+		except IOError:
+			return False
+		for k,v in self.cfg.iteritems():
+			ksp = k.split(".")
+			if hasattr(config, ksp[0]) and hasattr(getattr(config, ksp[0]), ksp[1]):
+				self.cfg[k] = getattr(getattr(config, ksp[0]), ksp[1])
+			
+	def save(self):
+		cfile = open('config.py', 'r+')
+		cnt = 0
+		for line in cfile:
+			cnt += len(line)
+			if line.startswith('# @START_WRITE'):
+				break
+		cfile.seek(cnt)
+		cfile.write("\n\n")
+		cnt += 1
+		
+		for key, value in self.cfg.iteritems():
+			ln = key+' = '+repr(value)+'\n'
+			cfile.write(ln)
+			cnt += len(ln)
+		
+		cfile.truncate(cnt)
+		cfile.close()
+	
+	def dialog(self, parent):
+		if(PrefsDialog(parent, self)):
+			self.save()
+			parent.presentation.draw()
 
-class Prefs(gtk.Dialog):
-	def __init__(self, parent):
+class PrefsDialog(gtk.Dialog):
+	def __init__(self, parent, config):
 		self.widgets = {}
 		gtk.Dialog.__init__(self, "Preferences", parent, 0,
 				(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
 		notebook = gtk.Notebook()
 		self.vbox.pack_start(notebook, True, True, 5)
 		
+		#General Page
+		general = gtk.VBox()
+		general.set_spacing(10)
+		general.set_border_width(10)
+		
+		general.pack_start(self.section_title("Legal"), False, False, 0)
+		general.pack_start(self.text_pref("CCLI #", config['general.ccli'], name='ccli'), False, False, 0)
+		
+		notebook.append_page(general, gtk.Label("General"))
+		
+		#Presentation Page
 		presentation = gtk.VBox()
 		presentation.set_spacing(10)
 		presentation.set_border_width(10)
 		
 		presentation.pack_start(self.section_title("Background"), False, False, 0)
-		presentation.pack_start(self.color_pref("Gradiant Top-Left", parent.config['pres.bg'][0], name='bg_tlf'), False, False, 0)
-		presentation.pack_start(self.color_pref("Gradiant Bottom-Right", parent.config['pres.bg'][1], name='bg_brt'), False, False, 0)
+		presentation.pack_start(self.color_pref("Gradiant Top-Left", config['pres.bg'][0], name='bg_tlf'), False, False, 0)
+		presentation.pack_start(self.color_pref("Gradiant Bottom-Right", config['pres.bg'][1], name='bg_brt'), False, False, 0)
 		presentation.pack_start(self.section_title("Font"), False, False, 0)
-		presentation.pack_start(self.color_pref("Text Color", parent.config['pres.text_color'], name='txt_color'), False, False, 0)
-		presentation.pack_start(self.color_pref("Text Shadow", parent.config['pres.text_shadow'], True, name='txt_shadow'), False, False, 0)
-		presentation.pack_start(self.spinner_pref("Max Font Size", parent.config['pres.max_font_size'], name='max_font'), False, False, 0)
+		presentation.pack_start(self.color_pref("Text Color", config['pres.text_color'], name='txt_color'), False, False, 0)
+		presentation.pack_start(self.color_pref("Text Shadow", config['pres.text_shadow'], True, name='txt_shadow'), False, False, 0)
+		presentation.pack_start(self.spinner_pref("Max Font Size", config['pres.max_font_size'], name='max_font'), False, False, 0)
 		
 		notebook.append_page(presentation, gtk.Label("Presentation"))
 		
@@ -45,15 +110,17 @@ class Prefs(gtk.Dialog):
 		if(self.run() == gtk.RESPONSE_ACCEPT):
 			tlf = self.widgets['bg_tlf'].get_color()
 			brt = self.widgets['bg_brt'].get_color()
-			parent.config['pres.bg'] = ((tlf.red/65535.0, tlf.green/65535.0, tlf.blue/65535.0),
+			config['pres.bg'] = ((tlf.red/65535.0, tlf.green/65535.0, tlf.blue/65535.0),
 					(brt.red/65535.0, brt.green/65535.0, brt.blue/65535.0))
 			txtc = self.widgets['txt_color'].get_color()
-			parent.config['pres.text_color'] = (txtc.red/65535.0, txtc.green/65535.0, txtc.blue/65535.0)
+			config['pres.text_color'] = (txtc.red/65535.0, txtc.green/65535.0, txtc.blue/65535.0)
 			txts = self.widgets['txt_shadow'].get_color()
-			parent.config['pres.text_shadow'] = (txts.red/65535.0, txts.green/65535.0, txts.blue/65535.0, self.widgets['txt_shadow'].get_alpha()/65535.0)
-			parent.config['pres.max_font_size'] = self.widgets['max_font'].get_value()
+			config['pres.text_shadow'] = (txts.red/65535.0, txts.green/65535.0, txts.blue/65535.0, self.widgets['txt_shadow'].get_alpha()/65535.0)
+			config['pres.max_font_size'] = self.widgets['max_font'].get_value()
+			config['general.ccli'] = self.widgets['ccli'].get_text()
 			
-			parent.save_config()
+			config.save()
+		
 		self.hide()
 	
 	def section_title(self, title):
@@ -61,6 +128,18 @@ class Prefs(gtk.Dialog):
 		label = gtk.Label()
 		label.set_markup("<b>"+title+"</b>")
 		hbox.pack_start(label, False, False, 0)
+		return hbox
+	
+	def text_pref(self, title, value, name=None):
+		hbox = gtk.HBox()
+		label = gtk.Label(title)
+		hbox.pack_start(label, False, False, 10)
+		
+		entry = gtk.Entry(10)
+		entry.set_text(value)
+		hbox.pack_start(entry, False, False, 10)
+		if(name):
+			self.widgets[name] = entry
 		return hbox
 	
 	def color_pref(self, title, value, alpha=False, name=None):
