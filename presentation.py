@@ -24,7 +24,12 @@ import time
 #TODO make the preview use a copy of the larger screen if it is visible.
 # Otherwise, we can just render it inexact
 
-COLOR_BLACK = (0.0, 0.0, 0.0)
+COLOR_BLACK = (0, 0, 0)
+def c2dec(color):
+	if isinstance(color, tuple):
+		return tuple(c2dec(x) for x in color)
+	else:
+		return color / 65535.0
 
 class Presentation:
 	"""Manage the window for presentation."""
@@ -91,7 +96,8 @@ class Presentation:
 	
 	def _set_background(self, widget, color = None):
 		if(color == None):
-			color = self.config['pres.bg']
+			color = c2dec(self.config['pres.bg'])
+		
 		if(not widget.window):
 			return False
 		ccontext = widget.window.cairo_create()
@@ -171,10 +177,13 @@ class Presentation:
 		
 		self._set_background(widget)
 		if(self.config['pres.text_shadow']):
-			ccontext.set_source_rgba(self.config['pres.text_shadow'][0], self.config['pres.text_shadow'][1], self.config['pres.text_shadow'][2], self.config['pres.text_shadow'][3])
-			ccontext.move_to(bounds[0] * 0.03 + size*0.1,(bounds[1] - layout.get_pixel_size()[1])/2.0 + size*0.1)
+			shcol = c2dec(self.config['pres.text_shadow'])
+			ccontext.set_source_rgba(shcol[0], shcol[1], shcol[2], shcol[3])
+			ccontext.move_to(bounds[0] * 0.03 + size*0.1,
+					(bounds[1] - layout.get_pixel_size()[1])/2.0 + size*0.1)
 			ccontext.show_layout(layout)
-		ccontext.set_source_rgba(self.config['pres.text_color'][0], self.config['pres.text_color'][1], self.config['pres.text_color'][2], 1.0)
+		txcol = c2dec(self.config['pres.text_color'])
+		ccontext.set_source_rgba(txcol[0], txcol[1], txcol[2], 1.0)
 		ccontext.move_to(bounds[0] * 0.03,(bounds[1] - layout.get_pixel_size()[1])/2.0)
 		ccontext.show_layout(layout)
 

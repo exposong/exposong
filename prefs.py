@@ -23,9 +23,9 @@ class Prefs:
 	def __init__(self):
 		self.cfg = {'general.ccli': '',
 				'pres.max_font_size': 56,
-				'pres.bg': ((0.0, 0.2, 0.3), (0.0, 0.4, 0.6)),
-				'pres.text_color': (1.0, 1.0, 1.0),
-				'pres.text_shadow': (0.0, 0.0, 0.0, 0.4)}
+				'pres.bg': ((0, 13107, 19660), (0, 26214, 39321)),
+				'pres.text_color': (65535, 65535, 65535),
+				'pres.text_shadow': (0, 0, 0, 26214)}
 		self.load()
 	def __getitem__(self, key):
 		if key in self.cfg:
@@ -69,9 +69,10 @@ class Prefs:
 		cfile.close()
 	
 	def dialog(self, parent):
-		if(PrefsDialog(parent, self)):
-			self.save()
-			parent.presentation.draw()
+		PrefsDialog(parent, self)
+		parent.presentation.draw() #TODO Only draw if the user clicks OK
+
+ITEM2_SPACING = 8
 
 class PrefsDialog(gtk.Dialog):
 	def __init__(self, parent, config):
@@ -93,12 +94,11 @@ class PrefsDialog(gtk.Dialog):
 		
 		#Presentation Page
 		presentation = gtk.VBox()
-		presentation.set_spacing(10)
+		presentation.set_spacing(8)
 		presentation.set_border_width(10)
 		
 		presentation.pack_start(self.section_title("Background"), False, False, 0)
-		presentation.pack_start(self.color_pref("Gradiant Top-Left", config['pres.bg'][0], name='bg_tlf'), False, False, 0)
-		presentation.pack_start(self.color_pref("Gradiant Bottom-Right", config['pres.bg'][1], name='bg_brt'), False, False, 0)
+		presentation.pack_start(self.color_pref("Gradient", config['pres.bg'], name='bg_gradient'), False, False, 0)
 		presentation.pack_start(self.section_title("Font"), False, False, 0)
 		presentation.pack_start(self.color_pref("Text Color", config['pres.text_color'], name='txt_color'), False, False, 0)
 		presentation.pack_start(self.color_pref("Text Shadow", config['pres.text_shadow'], True, name='txt_shadow'), False, False, 0)
@@ -108,14 +108,14 @@ class PrefsDialog(gtk.Dialog):
 		
 		self.show_all()
 		if(self.run() == gtk.RESPONSE_ACCEPT):
-			tlf = self.widgets['bg_tlf'].get_color()
-			brt = self.widgets['bg_brt'].get_color()
-			config['pres.bg'] = ((tlf.red/65535.0, tlf.green/65535.0, tlf.blue/65535.0),
-					(brt.red/65535.0, brt.green/65535.0, brt.blue/65535.0))
+			tlf = self.widgets['bg_gradient'][0].get_color()
+			brt = self.widgets['bg_gradient'][1].get_color()
+			config['pres.bg'] = ((tlf.red, tlf.green, tlf.blue),
+					(brt.red, brt.green, brt.blue))
 			txtc = self.widgets['txt_color'].get_color()
-			config['pres.text_color'] = (txtc.red/65535.0, txtc.green/65535.0, txtc.blue/65535.0)
+			config['pres.text_color'] = (txtc.red, txtc.green, txtc.blue)
 			txts = self.widgets['txt_shadow'].get_color()
-			config['pres.text_shadow'] = (txts.red/65535.0, txts.green/65535.0, txts.blue/65535.0, self.widgets['txt_shadow'].get_alpha()/65535.0)
+			config['pres.text_shadow'] = (txts.red, txts.green, txts.blue, self.widgets['txt_shadow'].get_alpha())
 			config['pres.max_font_size'] = self.widgets['max_font'].get_value()
 			config['general.ccli'] = self.widgets['ccli'].get_text()
 			
@@ -133,11 +133,11 @@ class PrefsDialog(gtk.Dialog):
 	def text_pref(self, title, value, name=None):
 		hbox = gtk.HBox()
 		label = gtk.Label(title)
-		hbox.pack_start(label, False, False, 10)
+		hbox.pack_start(label, False, False, ITEM2_SPACING)
 		
 		entry = gtk.Entry(10)
 		entry.set_text(value)
-		hbox.pack_start(entry, False, False, 10)
+		hbox.pack_start(entry, False, False, ITEM2_SPACING)
 		if(name):
 			self.widgets[name] = entry
 		return hbox
@@ -145,24 +145,31 @@ class PrefsDialog(gtk.Dialog):
 	def color_pref(self, title, value, alpha=False, name=None):
 		hbox = gtk.HBox()
 		label = gtk.Label(title)
-		hbox.pack_start(label, False, False, 10)
-		
-		button = gtk.ColorButton(gtk.gdk.Color(int(value[0]*65535), int(value[1]*65535), int(value[2]*65535)))
+		hbox.pack_start(label, False, False, ITEM2_SPACING)
+		if(isinstance(value[0], tuple)):
+			self.widgets[name] = []
+			for v in value:
+				button = gtk.ColorButton(gtk.gdk.Color(int(v[0]), int(v[1]), int(v[2])))
+				hbox.pack_start(button, False, False, ITEM2_SPACING)
+				if(name):
+					self.widgets[name].append(button)
+		else:
+			button = gtk.ColorButton(gtk.gdk.Color(int(value[0]), int(value[1]), int(value[2])))
+			hbox.pack_start(button, False, False, ITEM2_SPACING)
+			if(name):
+				self.widgets[name] = button
 		if(alpha):
-			button.set_alpha(int(value[3]*65535))
+			button.set_alpha(int(value[3]))
 			button.set_use_alpha(True)
-		hbox.pack_start(button, False, False, 10)
-		if(name):
-			self.widgets[name] = button
 		return hbox
 	
 	def spinner_pref(self, title, value, name=None):
 		hbox = gtk.HBox()
 		label = gtk.Label(title)
-		hbox.pack_start(label, False, False, 5)
+		hbox.pack_start(label, False, False, ITEM2_SPACING)
 		
 		spinner = gtk.SpinButton(gtk.Adjustment(value, 0, 96, 1), 2.0, 0)
-		hbox.pack_start(spinner, False, False, 5)
+		hbox.pack_start(spinner, False, False, ITEM2_SPACING)
 		if(name):
 			self.widgets[name] = spinner
 		return hbox

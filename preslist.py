@@ -27,7 +27,7 @@ class PresList(gtk.TreeView):
 		self.set_size_request(200, 250)
 		
 		column2_rend = gtk.CellRendererPixbuf()
-		column2 = gtk.TreeViewColumn(" ", column2_rend)
+		column2 = gtk.TreeViewColumn(None, column2_rend)
 		column2.set_sort_column_id(2)
 		column2.set_resizable(False)
 		column2.set_cell_data_func(column2_rend, self._get_row_icon)
@@ -37,7 +37,8 @@ class PresList(gtk.TreeView):
 		column1.set_resizable(True)
 		self.append_column(column1)
 		
-		self.pres_list = gtk.ListStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING)
+		self.pres_list = gtk.ListStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING, gobject.TYPE_STRING)
+		# Columns: Presentation, Title, Type (for sorting)
 		self.pres_list.set_sort_column_id(1, gtk.SORT_ASCENDING)
 		
 		self.set_model(self.pres_list)
@@ -50,7 +51,7 @@ class PresList(gtk.TreeView):
 			return False
 	
 	def append(self, item):
-		self.pres_list.append((item, item.title))
+		self.pres_list.append((item, item.title, item.type))
 	
 	def remove(self, item):
 		model = self.get_model()
