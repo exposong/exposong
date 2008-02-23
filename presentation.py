@@ -132,11 +132,11 @@ class Presentation:
 		
 		if(self.black):
 			self._set_background(widget, COLOR_BLACK)
-			return
+			return True
 		elif(len(self.text) == 0 or self.background):
 			#When there's no text to render, just draw the background
 			self._set_background(widget)
-			return
+			return True
 		
 		ccontext = widget.window.cairo_create()
 		layout = ccontext.create_layout()
@@ -186,4 +186,5 @@ class Presentation:
 		ccontext.set_source_rgba(txcol[0], txcol[1], txcol[2], 1.0)
 		ccontext.move_to(bounds[0] * 0.03,(bounds[1] - layout.get_pixel_size()[1])/2.0)
 		ccontext.show_layout(layout)
+		return True
 
