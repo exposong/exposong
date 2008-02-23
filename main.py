@@ -62,6 +62,11 @@ class Main (gtk.Window):
 	
 	def __init__(self):
 		gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+		gtk.window_set_default_icon_list(gtk.gdk.pixbuf_new_from_file('images/es128.png'),
+				gtk.gdk.pixbuf_new_from_file('images/es64.png'),
+				gtk.gdk.pixbuf_new_from_file('images/es48.png'),
+				gtk.gdk.pixbuf_new_from_file('images/es32.png'),
+				gtk.gdk.pixbuf_new_from_file('images/es16.png'))
 		self.set_title("ExpoSong")
 		self.connect("destroy", gtk.main_quit)
 		self.set_default_size(700, 500)
