@@ -94,6 +94,7 @@ class Presentation:
 		self._draw(widget)
 	
 	
+	
 	def _set_background(self, widget, color = None):
 		if(color == None):
 			color = c2dec(self.config['pres.bg'])
@@ -106,7 +107,19 @@ class Presentation:
 			ccontext.paint()
 		elif(isinstance(color[0], tuple)):
 			bounds = widget.window.get_size()
-			gradient = cairo.LinearGradient(0, 0, bounds[0], bounds[1])
+			if self.config['pres.bg_angle'] == "Top Left to Bottom Right":
+				gr_x1 = gr_y1 = 0
+				(gr_x2, gr_y2) = bounds
+			elif self.config['pres.bg_angle'] == "Top to Bottom":
+				gr_x1 = gr_y1 = gr_x2 = 0
+				gr_y2 = bounds[1]
+			elif self.config['pres.bg_angle'] == 'Top Right to Bottom Left':
+				gr_x2 = gr_y1 = 0
+				(gr_x1, gr_y2) = bounds
+			elif self.config['pres.bg_angle'] == 'Left to Right':
+				gr_x1 = gr_y1 = gr_y2 = 0
+				gr_x2 = bounds[0]
+			gradient = cairo.LinearGradient(gr_x1, gr_y1, gr_x2, gr_y2)
 			for i in range(len(color)):
 				gradient.add_color_stop_rgb(1.0*i/(len(color)-1), color[i][0], color[i][1], color[i][2])
 			ccontext.rectangle(0,0, bounds[0], bounds[1])
@@ -114,6 +127,7 @@ class Presentation:
 			ccontext.fill()
 		else:
 			print "_set_background: Incorrect color"
+	
 	def _draw(self, widget):
 		if(not widget.window or not widget.window.is_viewable()):
 			return False
