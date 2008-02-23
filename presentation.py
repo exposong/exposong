@@ -107,10 +107,9 @@ class Presentation:
 			ccontext.paint()
 		elif(isinstance(color[0], tuple)):
 			bounds = widget.window.get_size()
-			if self.config['pres.bg_angle'] == "Top Left to Bottom Right":
-				gr_x1 = gr_y1 = 0
-				(gr_x2, gr_y2) = bounds
-			elif self.config['pres.bg_angle'] == "Top to Bottom":
+			#TODO Strings are too long for comparison. Constants or 2-4
+			# character strings would be better.
+			if self.config['pres.bg_angle'] == "Top to Bottom":
 				gr_x1 = gr_y1 = gr_x2 = 0
 				gr_y2 = bounds[1]
 			elif self.config['pres.bg_angle'] == 'Top Right to Bottom Left':
@@ -119,6 +118,9 @@ class Presentation:
 			elif self.config['pres.bg_angle'] == 'Left to Right':
 				gr_x1 = gr_y1 = gr_y2 = 0
 				gr_x2 = bounds[0]
+			else:
+				gr_x1 = gr_y1 = 0
+				(gr_x2, gr_y2) = bounds
 			gradient = cairo.LinearGradient(gr_x1, gr_y1, gr_x2, gr_y2)
 			for i in range(len(color)):
 				gradient.add_color_stop_rgb(1.0*i/(len(color)-1), color[i][0], color[i][1], color[i][2])
