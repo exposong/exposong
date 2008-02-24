@@ -265,12 +265,15 @@ class Main (gtk.Window):
 			self.pres_list.append(pres)
 	def on_pres_edit(self, *args):
 		field = self.pres_list.get_active_item()
-		if(field):
-			if(field.edit(self)):
-				self.pres_list.update_selected()
-				self.on_pres_activate()
+		if not field:
+			return False
+		if(field.edit(self)):
+			self.pres_list.update_selected()
+			self.on_pres_activate()
 	def on_pres_delete(self, *args):
 		item = self.pres_list.get_active_item()
+		if not item:
+			return False
 		dialog = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
 				gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO,
 				"Are you sure you want to delete "+item.title+"?")
