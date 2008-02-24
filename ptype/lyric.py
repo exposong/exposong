@@ -22,29 +22,27 @@ import pango
 import re
 import xml.dom
 import xml.dom.minidom
-from ptype import generic
-from ptype.generic import get_node_text
+
+import ptype
+from ptype import get_node_text
 
 '''This creates lyrics for presentation.'''
 menu_name = "Lyrics"
 title_re = re.compile("(chorus|refrain|verse|bridge)", re.I)
 icon = gtk.gdk.pixbuf_new_from_file('images/lyric.png')
 
-class Presentation(generic.Presentation):
+class Presentation(ptype.Presentation):
 	'''Sets information from an xml file.
 		
 		Requires at minimum	a title and slides (Slides object list)'''
 	def __init__(self, dom = None, filename = None):
+		ptype.Presentation.__init__(self, dom, filename)
 		self.type = 'lyric'
-		self.title = '[None]' #TODO Require title always
-		self.slides = []
-		self.filename = filename
-		if isinstance(dom, xml.dom.Node):
-			self.title = get_node_text(dom.getElementsByTagName("title")[0])
-			
-			slides = dom.getElementsByTagName("slide")
-			for sl in slides:
-				self.slides.append(Slide(sl))
+	
+	def _get_slides(self, dom):
+		slides = dom.getElementsByTagName("slide")
+		for sl in slides:
+			self.slides.append(Slide(sl))
 	
 	def get_icon(self):
 		return icon
@@ -75,7 +73,7 @@ class Presentation(generic.Presentation):
 				tbuf.insert(it1, "\n\n")
 
 
-class Slide(generic.Slide):
+class Slide(ptype.Slide):
 	'''A basic slide for the presentation.'''
 	
 	def __init__(self, value):
@@ -89,18 +87,11 @@ class Slide(generic.Slide):
 			else:
 				self.title = ''
 				self.text = value
-	
-	def get_markup(self):
-		"Get the text for the slide selection."
-		if(self.title):
-			return "<b>"+self.title+"</b>\n"+generic.Slide.get_markup(self)
-		else:
-			return generic.Slide.get_markup(self)
 
-class Edit(generic.Edit):
+class Edit(ptype.Edit):
 	'''Creates a GTK Entry to edit or add a new item'''
-	def __init__(self, parent = None, edit = None):
-		generic.Edit.__init__(self, parent, edit)
+	def __init__(self, parent = None, pres = None):
+		ptype.Edit.__init__(self, parent, pres)
 		
 		#self.dialog.set_title("Lyric")
 		self.text.get_buffer().connect("changed", self.text_changed)
