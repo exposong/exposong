@@ -105,10 +105,10 @@ class Presentation:
 		tfile = title_to_filename(self.title)
 		if not isinstance(self.filename, str) or not self.filename.startswith(tfile):
 			if(self.filename):
-				os.remove("data/"+self.filename)
+				os.remove("data/pres/"+self.filename)
 			filename = tfile + ".xml"
 			index = 0
-			while os.path.exists("data/" + filename):
+			while os.path.exists("data/pres/" + filename):
 				index -= 1
 				filename = tfile + str(index) + ".xml"
 			self.filename = filename
@@ -124,7 +124,7 @@ class Presentation:
 			s.to_node(doc, sNode)
 			root.appendChild(sNode)
 		doc.appendChild(root)
-		outfile = open("data/" + self.filename, 'w')
+		outfile = open("data/pres/" + self.filename, 'w')
 		doc.writexml(outfile)
 		doc.unlink()
 

@@ -230,7 +230,7 @@ class Main (gtk.Window):
 			self.move(0,0)
 			return (scr_geom.width/2, scr_geom.height/2, scr_geom.width/2, scr_geom.height/2)
 	
-	def build_pres_list(self, directory="data"):
+	def build_pres_list(self, directory="data/pres"):
 		dir_list = os.listdir(directory)
 		for filenm in dir_list:
 			if filenm.endswith(".xml"):
