@@ -13,6 +13,8 @@
  *	User can now delete a presentation.
  *	Presentation type is now denoted by an icon in the list.
  *	Preferences dialog.
+ *	Schedules (Only three built-in schedules so far (Library, Generic, and
+	Lyrics)
 
 == 0.1 ==
  *	Save slides to disk
