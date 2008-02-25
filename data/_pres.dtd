@@ -8,6 +8,5 @@
 <!ATTLIST presentation type CDATA "generic" >
 <!ATTLIST presentation created CDATA #REQUIRED >
 <!ATTLIST presentation modified CDATA #REQUIRED >
-<!ATTLIST presentation id ID #REQUIRED >
 <!ATTLIST author type (words|music|both) "both" >
 <!ATTLIST slide title CDATA #IMPLIED >
