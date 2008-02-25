@@ -144,7 +144,7 @@ class Main (gtk.Window):
 		
 		#### Presentation List
 		self.pres_list = PresList()
-		self.pres_list.connect("row-activated", self.on_pres_activate)
+		self.pres_list.connect("cursor-changed", self.on_pres_activate)
 		self.pres_list.connect("button-press-event", self.on_pres_rt_click)
 		pres_list_scroll = gtk.ScrolledWindow()
 		pres_list_scroll.add(self.pres_list)
@@ -239,12 +239,12 @@ class Main (gtk.Window):
 	
 	def build_schedule(self, directory="data/sched"):
 		schedule = Schedule("Library")
-		filt = self.pres_list.model.filter_new()
+		filt = self.pres_list.get_model().filter_new()
 		schedule.set_model(filt)
 		self.schedule.append(None, schedule)
 		for (ptype, mod) in type_mods.items():
 			schedule = Schedule(mod.menu_name)
-			filt = self.pres_list.model.filter_new()
+			filt = self.pres_list.get_model().filter_new()
 			filt.set_visible_func(self._filter_type, ptype)
 			schedule.set_model(filt)
 			self.schedule.append(None, schedule)
@@ -275,7 +275,7 @@ class Main (gtk.Window):
 		if not field:
 			return False
 		if(field.edit(self)):
-			self.pres_list.update_selected()
+			self.pres_list.update()
 			self.on_pres_activate()
 	def on_pres_delete(self, *args):
 		item = self.pres_list.get_active_item()
@@ -287,7 +287,7 @@ class Main (gtk.Window):
 		resp = dialog.run()
 		dialog.hide()
 		if resp == gtk.RESPONSE_YES:
-			os.remove("data/"+item.filename)
+			os.remove("data/pres/"+item.filename)
 			self.pres_list.remove(item)
 			self.on_pres_activate()
 	
@@ -297,7 +297,9 @@ class Main (gtk.Window):
 		self.config.dialog(self)
 	
 	def _filter_type(self, model, itr, tp):
-		return model.get_value(itr, 0).type == tp
+		if hasattr(model.get_value(itr, 0), "type"):
+			return model.get_value(itr, 0).type == tp
+		return False
 
 if __name__ == "__main__":
 	m = Main()
