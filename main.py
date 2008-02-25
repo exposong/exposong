@@ -29,6 +29,7 @@ from slidelist import SlideList
 from about import About
 from prefs import Prefs
 from prefs import PrefsDialog
+from schedule import Schedule, ScheduleList
 
 type_mods = {} #dynamically loaded presentation modules
 
@@ -133,38 +134,25 @@ class Main (gtk.Window):
 		win_h = gtk.HPaned()
 		### Main left area
 		win_lft = gtk.VPaned()
-		#### Playlist   TODO Toolbar
-		#playlist_tb = gtk.Toolbar()
-		#self.playlist = gtk.TreeView()
-		#self.playlist.set_size_request(150, 140)
-		#playlist_scroll = gtk.ScrolledWindow()
-		#playlist_scroll.add(self.playlist)
-		#playlist_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
-		#win_lft_vb1 = gtk.VBox()
-		#win_lft_vb1.pack_start(playlist_tb, False, True, 0)
-		#win_lft_vb1.pack_start(playlist_scroll, True, True, 0)
-		#win_lft.pack1(win_lft_vb1, True, True)
+		#### Schedule
+		self.schedule = ScheduleList()
+		self.schedule.connect("cursor-changed", self.on_schedule_activate)
+		schedule_scroll = gtk.ScrolledWindow()
+		schedule_scroll.add(self.schedule)
+		schedule_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+		win_lft.pack1(schedule_scroll, True, True)
 		
 		#### Presentation List
-		#pres_list_tb = uimanager.get_widget('/Preslist')
-		#pres_list_tb.set_tooltips(True)
-		#pres_list_tb.set_style(gtk.TOOLBAR_ICONS)
-		#pres_list_tb.set_icon_size(gtk.ICON_SIZE_MENU)
-		#win_lft_vb2.pack_start(pres_list_tb, False, True)
 		self.pres_list = PresList()
 		self.pres_list.connect("row-activated", self.on_pres_activate)
 		self.pres_list.connect("button-press-event", self.on_pres_rt_click)
-		self.build_pres_list()
 		pres_list_scroll = gtk.ScrolledWindow()
 		pres_list_scroll.add(self.pres_list)
 		pres_list_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
-		win_lft_vb2 = gtk.VBox()
-		win_lft_vb2.pack_start(pres_list_scroll, True, True)
-		#win_lft.pack2(win_lft_vb2, True, True)
+		win_lft.pack2(pres_list_scroll, True, True)
 		
 		
-		#win_h.pack1(win_lft, False, False)
-		win_h.pack1(win_lft_vb2, False, False)
+		win_h.pack1(win_lft, False, False)
 		
 		### Main right area
 		win_rt = gtk.VBox()
@@ -200,17 +188,17 @@ class Main (gtk.Window):
 		pres_buttons.add(self.pbut_hide)
 		
 		win_rt_btm.pack_end(pres_buttons, False, False, 10)
-		
 		win_rt.pack_start(win_rt_btm, False, True)
-		
 		win_h.pack2(win_rt, True, False)
-		
 		win_v.pack_start(win_h, True)
 		
 		## Status bar
 		self.status_bar = gtk.Statusbar()
-		
 		win_v.pack_end(self.status_bar, False)
+		
+		self.build_pres_list()
+		self.build_schedule()
+		
 		self.add(win_v)
 		self.show_all()
 	
@@ -249,6 +237,25 @@ class Main (gtk.Window):
 					dom.unlink()
 					del dom
 	
+	def build_schedule(self, directory="data/sched"):
+		schedule = Schedule("Library")
+		filt = self.pres_list.model.filter_new()
+		schedule.set_model(filt)
+		self.schedule.append(None, schedule)
+		for (ptype, mod) in type_mods.items():
+			schedule = Schedule(mod.menu_name)
+			filt = self.pres_list.model.filter_new()
+			filt.set_visible_func(self._filter_type, ptype)
+			schedule.set_model(filt)
+			self.schedule.append(None, schedule)
+		
+		#schedules = self.schedule.append(None, (None, "Schedules"))
+	
+	def on_schedule_activate(self, *args):
+		if(self.schedule.has_selection()):
+			model = self.schedule.get_active_item().get_model()
+			if(model):
+				self.pres_list.set_model(model)
 	def on_pres_activate(self, *args):
 		if(self.pres_list.has_selection()):
 			self.slide_list.set_slides(self.pres_list.get_active_item().slides)
@@ -288,6 +295,9 @@ class Main (gtk.Window):
 		About(self)
 	def on_prefs(self, *args):
 		self.config.dialog(self)
+	
+	def _filter_type(self, model, itr, tp):
+		return model.get_value(itr, 0).type == tp
 
 if __name__ == "__main__":
 	m = Main()
