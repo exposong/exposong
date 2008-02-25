@@ -37,11 +37,11 @@ class PresList(gtk.TreeView):
 		column.set_resizable(True)
 		self.append_column(column)
 		
-		self.pres_list = gtk.ListStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING, gobject.TYPE_STRING)
+		self.model = gtk.ListStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING, gobject.TYPE_STRING)
 		# Columns: Presentation, Title, Type (for sorting)
-		self.pres_list.set_sort_column_id(1, gtk.SORT_ASCENDING)
+		self.model.set_sort_column_id(1, gtk.SORT_ASCENDING)
 		
-		self.set_model(self.pres_list)
+		self.set_model(self.model)
 	
 	def get_active_item(self):
 		(model, s_iter) = self.get_selection().get_selected()
@@ -51,21 +51,21 @@ class PresList(gtk.TreeView):
 			return False
 	
 	def append(self, item):
-		self.pres_list.append((item, item.title, item.type))
+		self.model.append((item, item.title, item.type))
 	
 	def remove(self, item):
 		model = self.get_model()
 		iter1 = model.get_iter_first()
 		while model.get_value(iter1, 0).filename != item.filename:
 			iter1 = model.iter_next(iter1)
-		self.pres_list.remove(iter1)
+		self.model.remove(iter1)
 	
 	def update_selected(self):
 		#May need to pass in variable to be updated instead of just
 		# updating the selected item. Shouldn't take much processing
 		# to just update all items.
 		(model, s_iter) = self.get_selection().get_selected()
-		self.pres_list.set(s_iter, 1, model.get_value(s_iter, 0).title)
+		self.model.set(s_iter, 1, model.get_value(s_iter, 0).title)
 	
 	def has_selection(self):
 		return bool(self.get_selection().count_selected_rows())
