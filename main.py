@@ -95,21 +95,21 @@ class Main (gtk.Window):
 		actiongroup.add_actions([('File', None, '_File'),
 								('Quit', gtk.STOCK_QUIT, None, None, None, gtk.main_quit),
 								('Edit', None, '_Edit'),
-								('Preferences', gtk.STOCK_PREFERENCES, None, None, None, self.on_prefs),
+								('Preferences', gtk.STOCK_PREFERENCES, None, None, None, self._on_prefs),
 								('Presentation', None, '_Presentation'),
 								('Present', None, '_Present', None, None, self.presentation.show),
 								('Background', None, '_Background', None, None, self.presentation.to_background),
 								('Black Screen', None, 'Blac_k Screen', None, None, self.presentation.to_black),
 								('Hide', None, '_Hide', None, None, self.presentation.hide),
 								('pres-new', gtk.STOCK_NEW, None, None, "New presentation"),
-								('pres-edit', gtk.STOCK_EDIT, None, None, "Edit presentation", self.on_pres_edit),
-								('pres-delete', gtk.STOCK_DELETE, None, None, "Delete the presentation", self.on_pres_delete),
+								('pres-edit', gtk.STOCK_EDIT, None, None, "Edit presentation", self._on_pres_edit),
+								('pres-delete', gtk.STOCK_DELETE, None, None, "Delete the presentation", self._on_pres_delete),
 								('pres-import', None, "_Import", None, "Open a presentation from file"),
 								('pres-export', None, "_Export", None, "Export presentation"),
 								#('Playlist', None, '_Playlist'),
 								('Help', None, '_Help'),
 								('HelpContents', gtk.STOCK_HELP),
-								('About', gtk.STOCK_ABOUT, None, None, None, self.on_about)])
+								('About', gtk.STOCK_ABOUT, None, None, None, self._on_about)])
 		uimanager.insert_action_group(actiongroup, 0)
 		uimanager.add_ui_from_string(menu)
 		
@@ -123,7 +123,7 @@ class Main (gtk.Window):
 		self.pres_new_submenu = gtk.Menu()
 		for (ptype, mod) in type_mods.items():
 			mitem = gtk.MenuItem(mod.menu_name)
-			mitem.connect("activate", self.on_pres_new, ptype)
+			mitem.connect("activate", self._on_pres_new, ptype)
 			self.pres_new_submenu.append(mitem)
 		
 		self.pres_new_submenu.show_all()
@@ -136,7 +136,7 @@ class Main (gtk.Window):
 		win_lft = gtk.VPaned()
 		#### Schedule
 		self.schedule = ScheduleList()
-		self.schedule.connect("cursor-changed", self.on_schedule_activate)
+		self.schedule.connect("cursor-changed", self._on_schedule_activate)
 		schedule_scroll = gtk.ScrolledWindow()
 		schedule_scroll.add(self.schedule)
 		schedule_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
@@ -144,8 +144,8 @@ class Main (gtk.Window):
 		
 		#### Presentation List
 		self.pres_list = PresList()
-		self.pres_list.connect("cursor-changed", self.on_pres_activate)
-		self.pres_list.connect("button-press-event", self.on_pres_rt_click)
+		self.pres_list.connect("cursor-changed", self._on_pres_activate)
+		self.pres_list.connect("button-press-event", self._on_pres_rt_click)
 		pres_list_scroll = gtk.ScrolledWindow()
 		pres_list_scroll.add(self.pres_list)
 		pres_list_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
@@ -158,7 +158,7 @@ class Main (gtk.Window):
 		win_rt = gtk.VBox()
 		#### Slide List
 		slide_list = gtk.TreeView()
-		slide_list.connect("cursor-changed", self.on_slide_activate)
+		slide_list.connect("cursor-changed", self._on_slide_activate)
 		self.slide_list = SlideList(slide_list)
 		text_scroll = gtk.ScrolledWindow()
 		text_scroll.add(slide_list)
@@ -219,6 +219,7 @@ class Main (gtk.Window):
 			return (scr_geom.width/2, scr_geom.height/2, scr_geom.width/2, scr_geom.height/2)
 	
 	def build_pres_list(self, directory="data/pres"):
+		'''Add items to the presentation list.'''
 		dir_list = os.listdir(directory)
 		for filenm in dir_list:
 			if filenm.endswith(".xml"):
@@ -238,6 +239,7 @@ class Main (gtk.Window):
 					del dom
 	
 	def build_schedule(self, directory="data/sched"):
+		'''Add items to the schedule list.'''
 		schedule = Schedule("Library")
 		filt = self.pres_list.get_model().filter_new()
 		schedule.set_model(filt)
@@ -251,33 +253,46 @@ class Main (gtk.Window):
 		
 		#schedules = self.schedule.append(None, (None, "Schedules"))
 	
-	def on_schedule_activate(self, *args):
+	def _on_schedule_activate(self, *args):
+		'''Change the presentation list to the current schedule.'''
 		if(self.schedule.has_selection()):
 			model = self.schedule.get_active_item().get_model()
-			if(model):
+			if model:
 				self.pres_list.set_model(model)
-	def on_pres_activate(self, *args):
-		if(self.pres_list.has_selection()):
+	
+	def _on_pres_activate(self, *args):
+		'''Change the slides to the current presentation.'''
+		if self.pres_list.has_selection():
 			self.slide_list.set_slides(self.pres_list.get_active_item().slides)
 		else:
 			self.slide_list.set_slides([])
-	def on_pres_rt_click(self, widget, event):
-		if(event.button == 3):
+	
+	def _on_pres_rt_click(self, widget, event):
+		'''Popup the right click menu for the presentation.'''
+		if event.button == 3:
 			self.pres_list_menu.popup(None, None, None, event.button, event.get_time())
-	def on_slide_activate(self, *args):
+	
+	def _on_slide_activate(self, *args):
+		'''Present the selected slide to the screen.'''
 		self.presentation.set_text(self.slide_list.get_active_item().get_text())
-	def on_pres_new(self, menuitem, ptype):
+	
+	def _on_pres_new(self, menuitem, ptype):
+		'''Add a new presentation.'''
 		pres = type_mods[ptype].Presentation()
-		if(pres.edit(self)):
+		if pres.edit(self):
 			self.pres_list.append(pres)
-	def on_pres_edit(self, *args):
+	
+	def _on_pres_edit(self, *args):
+		'''Edit the presentation.'''
 		field = self.pres_list.get_active_item()
 		if not field:
 			return False
-		if(field.edit(self)):
+		if field.edit(self):
 			self.pres_list.update()
 			self.on_pres_activate()
-	def on_pres_delete(self, *args):
+	
+	def _on_pres_delete(self, *args):
+		'''Delete the selected presentation.'''
 		item = self.pres_list.get_active_item()
 		if not item:
 			return False
@@ -291,12 +306,18 @@ class Main (gtk.Window):
 			self.pres_list.remove(item)
 			self.on_pres_activate()
 	
-	def on_about(self, *args):
+	
+	def _on_about(self, *args):
+		'''Shows the about dialog.'''
 		About(self)
-	def on_prefs(self, *args):
+	
+	def _on_prefs(self, *args):
+		'''Shows the preferences dialog.'''
 		self.config.dialog(self)
 	
+	
 	def _filter_type(self, model, itr, tp):
+		'''Filters the presentation list based on type.'''
 		if hasattr(model.get_value(itr, 0), "type"):
 			return model.get_value(itr, 0).type == tp
 		return False

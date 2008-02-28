@@ -72,7 +72,7 @@ class ScheduleList(gtk.TreeView):
 	
 	def get_active_item(self):
 		(model, s_iter) = self.get_selection().get_selected()
-		if(s_iter):
+		if s_iter:
 			return model.get_value(s_iter, 0)
 		else:
 			return False

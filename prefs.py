@@ -91,8 +91,8 @@ class PrefsDialog(gtk.Dialog):
 		self.table.set_row_spacings(10)
 		self.table.set_border_width(10)
 		
-		self.section_title("Legal", 0)
-		g_ccli = self.text_pref("CCLI #", config['general.ccli'], 1)
+		self._append_section_title("Legal", 0)
+		g_ccli = self._append_text_setting("CCLI #", config['general.ccli'], 1)
 		
 		notebook.append_page(self.table, gtk.Label("General"))
 		
@@ -119,34 +119,34 @@ class PrefsDialog(gtk.Dialog):
 			bg_img = config['pres.bg']
 			
 		
-		self.section_title("Background", 0)
-		p_r_solid = self.radio_pref("_Solid", bg_type=='s', 1)
-		self.p_bgsol = self.color_pref(None, bg_solid, 1)
+		self._append_section_title("Background", 0)
+		p_r_solid = self._append_radio_setting("_Solid", bg_type=='s', 1)
+		self.p_bgsol = self._append_color_setting(None, bg_solid, 1)
 		self.p_bgsol.set_sensitive(bg_type=='s')
 		p_r_solid.connect('toggled', self._on_toggle, self.p_bgsol)
-		p_r_gr = self.radio_pref("_Gradiant", bg_type=='g', 2, group=p_r_solid)
-		self.p_bggr = self.color_pref(None, bg_grad, 2)
+		p_r_gr = self._append_radio_setting("_Gradiant", bg_type=='g', 2, group=p_r_solid)
+		self.p_bggr = self._append_color_setting(None, bg_grad, 2)
 		self.p_bggr[0].set_sensitive(bg_type=='g')
 		self.p_bggr[1].set_sensitive(bg_type=='g')
-		self.p_bggrang = self.combo_pref("Gradiant Angle\n(Clockwise From Up)", GRADIENT_DIRS, config['pres.bg_angle'], 3)
+		self.p_bggrang = self._append_combo_setting("Gradiant Angle\n(Clockwise From Up)", GRADIENT_DIRS, config['pres.bg_angle'], 3)
 		p_r_gr.connect('toggled', self._on_toggle, self.p_bggr+[self.p_bggrang])
 		
-		p_r_img = self.radio_pref("_Image", bg_type=='i', 4, group=p_r_solid)
+		p_r_img = self._append_radio_setting("_Image", bg_type=='i', 4, group=p_r_solid)
 		p_r_img.set_sensitive(False) #Disabled until the feature is added
-		self.p_bgimg = self.file_pref(None, bg_img, 4)
+		self.p_bgimg = self._append_file_setting(None, bg_img, 4)
 		self.p_bgimg.set_sensitive(bg_type=='i')
 		self.p_bgimg.set_size_request(180, -1)
 		p_r_img.connect('toggled', self._on_toggle, self.p_bgimg)
 		
-		self.section_title("Font", 6)
-		p_txt = self.color_pref("Text Color", config['pres.text_color'], 7)
-		p_shad = self.color_pref("Text Shadow", config['pres.text_shadow'], 8, True)
-		p_maxsize = self.spinner_pref("Max Font Size", gtk.Adjustment(config['pres.max_font_size'], 0, 96, 1), 9)
+		self._append_section_title("Font", 6)
+		p_txt = self._append_color_setting("Text Color", config['pres.text_color'], 7)
+		p_shad = self._append_color_setting("Text Shadow", config['pres.text_shadow'], 8, True)
+		p_maxsize = self._append_spinner_setting("Max Font Size", gtk.Adjustment(config['pres.max_font_size'], 0, 96, 1), 9)
 		
 		notebook.append_page(self.table, gtk.Label("Presentation"))
 		
 		self.show_all()
-		if(self.run() == gtk.RESPONSE_ACCEPT):
+		if self.run() == gtk.RESPONSE_ACCEPT:
 			if p_r_gr.get_active():
 				tlf = self.p_bggr[0].get_color()
 				brt = self.p_bggr[1].get_color()
@@ -171,23 +171,26 @@ class PrefsDialog(gtk.Dialog):
 		
 		self.hide()
 	
-	def section_title(self, title, top):
+	def _append_section_title(self, title, top):
+		'''Adds a title for the current section.'''
 		hbox = gtk.HBox()
 		label = gtk.Label()
 		label.set_markup("<b>"+title+"</b>")
 		label.set_alignment(0.0, 0.5)
 		self.table.attach(label, 0, 4, top, top+1, gtk.FILL, 0, 0)
 	
-	def text_pref(self, label, value, top):
-		self.label(label, top)
+	def _append_text_setting(self, label, value, top):
+		'''Adds a text setting and returns the text widget.'''
+		self._get_label(label, top)
 		
 		entry = gtk.Entry(10)
 		entry.set_text(value)
 		self.table.attach(entry, 2, 4, top, top+1, gtk.FILL, 0, WIDGET_SPACING)
 		return entry
 	
-	def file_pref(self, label, value, top):
-		self.label(label, top)
+	def _append_file_setting(self, label, value, top):
+		'''Adds a file setting and returns the file widget.'''
+		self._get_label(label, top)
 		
 		filech = gtk.FileChooserButton("Choose File")
 		filech.set_filename(value)
@@ -195,10 +198,11 @@ class PrefsDialog(gtk.Dialog):
 		self.table.attach(filech, 2, 4, top, top+1, gtk.FILL, 0, WIDGET_SPACING)
 		return filech
 	
-	def color_pref(self, label, value, top, alpha=False):
-		self.label(label, top)
+	def _append_color_setting(self, label, value, top, alpha=False):
+		'''Adds a color setting and returns the color widget.'''
+		self._get_label(label, top)
 		
-		if(isinstance(value[0], tuple)):
+		if isinstance(value[0], tuple):
 			buttons = []
 			cnt = 2
 			for v in value:
@@ -215,15 +219,17 @@ class PrefsDialog(gtk.Dialog):
 				button.set_use_alpha(True)
 			return button
 	
-	def spinner_pref(self, label, adjustment, top):
-		self.label(label, top)
+	def _append_spinner_setting(self, label, adjustment, top):
+		'''Adds a spinner setting and returns the spinner widget.'''
+		self._get_label(label, top)
 		
 		spinner = gtk.SpinButton(adjustment, 2.0)
 		self.table.attach(spinner, 2, 4, top, top+1, gtk.FILL, 0, WIDGET_SPACING)
 		return spinner
 	
-	def combo_pref(self, label, options, value, top):
-		self.label(label, top)
+	def _append_combo_setting(self, label, options, value, top):
+		'''Adds a combo setting and returns the combo widget.'''
+		self._get_label(label, top)
 		
 		combo = gtk.combo_box_new_text()
 		for i in range(len(options)):
@@ -233,14 +239,16 @@ class PrefsDialog(gtk.Dialog):
 		self.table.attach(combo, 2, 4, top, top+1, gtk.FILL, 0, WIDGET_SPACING)
 		return combo
 	
-	def radio_pref(self, label, active, top, group = None):
+	def _append_radio_setting(self, label, active, top, group = None):
+		'''Adds a radio setting and returns the radio widget.'''
 		radio = gtk.RadioButton(group, label)
 		radio.set_alignment(0.0, 0.5)
 		radio.set_active(active)
 		self.table.attach(radio, 1, 2, top, top+1, gtk.FILL, 0, LABEL_SPACING)
 		return radio
 	
-	def label(self, label, top):
+	def _get_label(self, label, top):
+		'''Returns a label for a widget.'''
 		if isinstance(label, str) and len(label):
 			label = gtk.Label(label)
 			label.set_alignment(0.0, 0.5)
@@ -248,6 +256,7 @@ class PrefsDialog(gtk.Dialog):
 			self.table.attach(label, 1, 2, top, top+1, gtk.FILL, 0, LABEL_SPACING)
 	
 	def _on_toggle(self, button, target):
+		'''Enables or disables target if button is set.'''
 		if isinstance(target, gtk.Widget):
 			target.set_sensitive(button.get_active())
 		elif isinstance(target, (tuple, list)):

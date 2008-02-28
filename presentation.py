@@ -41,7 +41,7 @@ class Presentation:
 		self.config = self.parent.config
 		
 		self.window = gtk.Window(gtk.WINDOW_POPUP)
-		if(isinstance(geometry, tuple) and len(geometry)):
+		if isinstance(geometry, tuple) and len(geometry):
 			self.window.move(geometry[0], geometry[1])
 			self.window.resize(geometry[2], geometry[3])
 		self.pres = gtk.DrawingArea()
@@ -49,7 +49,7 @@ class Presentation:
 		self.pres.show()
 		self.window.add(self.pres)
 		
-		if(isinstance(preview, gtk.DrawingArea)):
+		if isinstance(preview, gtk.DrawingArea):
 			self.preview = preview
 			self.preview.connect("expose-event", self.expose)
 		else:
@@ -59,7 +59,7 @@ class Presentation:
 	
 	def set_background(self, color = None):
 		self._set_background(self.preview, color)
-		if(hasattr(self, "pres") and self.pres.window):
+		if hasattr(self, "pres") and self.pres.window:
 			self._set_background(self.pres, color)
 	
 	def set_text(self, text):
@@ -96,16 +96,16 @@ class Presentation:
 	
 	
 	def _set_background(self, widget, color = None):
-		if(color == None):
+		if color == None:
 			color = c2dec(self.config['pres.bg'])
 		
-		if(not widget.window):
+		if not widget.window:
 			return False
 		ccontext = widget.window.cairo_create()
-		if(len(color) >= 3 and isinstance(color[0], (float, int))):
+		if len(color) >= 3 and isinstance(color[0], (float, int)):
 			ccontext.set_source_rgb(color[0], color[1], color[2])
 			ccontext.paint()
-		elif(isinstance(color[0], tuple)):
+		elif isinstance(color[0], tuple):
 			bounds = widget.window.get_size()
 			#TODO Strings are too long for comparison. Constants or 2-4
 			# character strings would be better.
@@ -131,9 +131,9 @@ class Presentation:
 			print "_set_background: Incorrect color"
 	
 	def _draw(self, widget):
-		if(not widget.window or not widget.window.is_viewable()):
+		if not widget.window or not widget.window.is_viewable():
 			return False
-		if(widget is self.preview and self.pres.window and self.pres.window.is_viewable()):
+		if widget is self.preview and self.pres.window and self.pres.window.is_viewable():
 			#Get a copy of the presentation window if it's visible
 			win_sz = self.pres.window.get_size()
 			width = int(135.0*win_sz[0]/win_sz[1])
@@ -146,10 +146,10 @@ class Presentation:
 			
 		
 		
-		if(self.black):
+		if self.black:
 			self._set_background(widget, COLOR_BLACK)
 			return True
-		elif(len(self.text) == 0 or self.background):
+		elif len(self.text) == 0 or self.background:
 			#When there's no text to render, just draw the background
 			self._set_background(widget)
 			return True
@@ -192,7 +192,7 @@ class Presentation:
 			layout.set_attributes(attrs)
 		
 		self._set_background(widget)
-		if(self.config['pres.text_shadow']):
+		if self.config['pres.text_shadow']:
 			shcol = c2dec(self.config['pres.text_shadow'])
 			ccontext.set_source_rgba(shcol[0], shcol[1], shcol[2], shcol[3])
 			ccontext.move_to(bounds[0] * 0.03 + size*0.1,
