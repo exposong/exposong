@@ -93,6 +93,7 @@ class Main (gtk.Window):
 		#Drag and Drop
 		self.pres_list.enable_model_drag_source(gtk.gdk.BUTTON1_MASK, DRAGDROP_SCHEDULE, gtk.gdk.ACTION_COPY)
 		self.pres_list.connect("drag-data-get", self._on_pres_drag_get)
+		self.pres_list.connect("drag-data-received", self._on_pres_drag_received)
 		self.schedule_list.enable_model_drag_dest(DRAGDROP_SCHEDULE, gtk.gdk.ACTION_DEFAULT)
 		self.schedule_list.connect("drag-drop", self._on_pres_drop)
 		self.schedule_list.connect("drag-data-received", self._on_sched_drag_received)
@@ -300,16 +301,19 @@ class Main (gtk.Window):
 	
 	def _on_schedule_activate(self, *args):
 		'''Change the presentation list to the current schedule.'''
-		if(self.schedule_list.has_selection()):
+		if self.schedule_list.has_selection():
 			sched = self.schedule_list.get_active_item()
 			if isinstance(sched, Schedule) and sched.get_model():
 				self.pres_list.set_model(sched.get_model())
-				#TODO, this disallows drag and drop from the presentation list
-				#	to the schedule. Create a custom implementation of
-				#	reordering.
-				#self.pres_list.set_reorderable(sched.is_reorderable())
+				if sched.is_reorderable():
+					self.pres_list.enable_model_drag_dest(DRAGDROP_SCHEDULE, gtk.gdk.ACTION_COPY)
+					self.pres_list.set_headers_clickable(False)
+				else:
+					self.pres_list.unset_rows_drag_dest()
+					self.pres_list.set_headers_clickable(True)
 	
 	def _on_pres_drop(self, treeview, context, x, y, timestamp):
+		'Makes sure that the schedule was dropped on a custom schedule.'
 		drop_info = treeview.get_dest_row_at_pos(x, y)
 		if drop_info:
 			path, position = drop_info
@@ -340,6 +344,28 @@ class Main (gtk.Window):
 			sched.append(pres)
 			
 			context.finish(True, False)
+		return
+	
+	def _on_pres_drag_received(self, treeview, context, x, y, selection, info, timestamp):
+		'A presentation was reordered.'
+		drop_info = treeview.get_dest_row_at_pos(x, y)
+		model = treeview.get_model()
+		schedule = self.schedule_list.get_active_item() #TODO May cause problems if user unselects the schedule
+		path_mv = int(selection.data)
+		
+		if drop_info:
+			path_to, position = drop_info
+			path_to = path_to[0]
+			if path_mv > path_to and (position is gtk.TREE_VIEW_DROP_AFTER or position is gtk.TREE_VIEW_DROP_INTO_OR_AFTER):
+				path_to += 1
+			elif path_mv < path_to and (position is gtk.TREE_VIEW_DROP_BEFORE or position is gtk.TREE_VIEW_DROP_INTO_OR_BEFORE):
+				path_to -= 1
+		else:
+			path_to = len(schedule.items)-1
+		
+		schedule.move(path_mv, path_to)
+		
+		context.finish(True, False)
 		return
 	
 	def _on_pres_activate(self, *args):

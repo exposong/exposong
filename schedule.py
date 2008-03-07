@@ -87,6 +87,17 @@ class Schedule:
 		self.items.remove(pres)
 		self.refresh_model()
 	
+	def move(self, i, i2):
+		'Move the item[i] to replace item[i2].'
+		while i != i2 and i < len(self.items) and i >= 0:
+			if i > i2:
+				self.items[i], self.items[i-1] = self.items[i-1], self.items[i]
+				i -= 1
+			else:
+				self.items[i], self.items[i+1] = self.items[i+1], self.items[i]
+				i += 1
+		self.refresh_model()
+	
 	def set_model(self, model):
 		"Filter all presentations."
 		self.pres_model = model
