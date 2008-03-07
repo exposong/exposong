@@ -19,65 +19,114 @@ import pygtk
 import gtk
 import gtk.gdk
 import gobject
+import xml.dom
+from glob import *
 
 class Schedule:
 	"Schedule of presentations."
-	def __init__(self, name):
-		self.name = name
-		self.model = None
-	
-	def load(self, filename):
-		"Loads from an xml file"
+	def __init__(self, title="", filename = None, pres_model = None, builtin = True):
+		self.title = title
 		self.filename = filename
-		#TODO load from xml.dom
+		self.pres_model = pres_model
+		self.items = []
+		self.builtin = builtin
 	
-	def save(self):
-		"Save to file"
-		pass
-		#TODO save to xml.dom
+	def load(self, dom, library):
+		"Loads from an xml file"
+		self.items = []
+		self.builtin = False
+		self.title = get_node_text(dom.getElementsByTagName("title")[0])
+		for presNode in dom.getElementsByTagName("presentation"):
+			filenm = comment = ""
+			try:
+				filenm = get_node_text(presNode.getElementsByTagName("file")[0])
+				hasFile = True
+				comment = get_node_text(presNode.getElementsByTagName("comment")[0])
+			except IndexError:
+				pass
+			if filenm:
+				pres = library.find(filename=filenm)
+				if pres:
+					self.items.append(ScheduleItem(pres, comment))
+					#self.pres_model.append(pres.get_row())
+		self.refresh_model()
+			
+	def save(self, directory='data/sched/'):
+		"Write schedule to disk."
+		self.filename = check_filename(self.title, directory, self.filename)
+		dom = xml.dom.getDOMImplementation().createDocument(None, None, None)
+		root = dom.createElement("schedule")
+		root.setAttribute("created", "0")
+		root.setAttribute("modified", "0")
+		tNode = dom.createElement("title")
+		tNode.appendChild(dom.createTextNode(self.title))
+		root.appendChild(tNode)
+		for item in self.items:
+			pNode = dom.createElement("presentation")
+			tNode = dom.createElement("file")
+			tNode.appendChild(dom.createTextNode(item.filename))
+			pNode.appendChild(tNode)
+			tNode = dom.createElement("comment")
+			tNode.appendChild(dom.createTextNode(item.comment))
+			pNode.appendChild(tNode)
+			root.appendChild(pNode)
+		dom.appendChild(root)
+		outfile = open(directory+self.filename, 'w')
+		dom.writexml(outfile)
+		dom.unlink()
+	
+	def append(self, pres, comment = ""):
+		"Add a presentation to the schedule."
+		sched = ScheduleItem(pres, comment)
+		self.items.append(sched)
+		if self.pres_model is not None:
+			self.pres_model.append(sched.get_row())
+	
+	def remove(self, pres):
+		"Remove a presentation from a schedule."
+		self.items.remove(pres)
+		self.refresh_model()
 	
 	def set_model(self, model):
-		"""Filter all presentations.
-		
-		{filt} should be a gtk.TreeViewFilter."""
-		self.model = model
+		"Filter all presentations."
+		self.pres_model = model
 	
 	def get_model(self):
 		'Return the filtered ListModel'
-		return self.model
+		if self.builtin:
+			self.pres_model.set_sort_column_id(1, gtk.SORT_ASCENDING)
+		return self.pres_model
 	
-	def get_list_row():
-		return (self, self.name)
-
-class ScheduleList(gtk.TreeView):
-	"A TreeView of presentation schedules."
-	def __init__(self):
-		gtk.TreeView.__init__(self)
-		self.set_size_request(200, 190)
-		#Columns: Schedule, Name
-		self.model = gtk.TreeStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING)
-		self.set_model(self.model)
-		self.set_enable_search(False)
+	def refresh_model(self):
+		'Clears and repopulates the model.'
+		self.pres_model.clear()
+		for sched in self.items:
+			self.pres_model.append(sched.get_row())
+	
+	def is_reorderable(self):
+		'Checks to see if the list should be reorderable.'
+		return not self.builtin
+	
+	def find(self, filename):
+		'''Searches the schedule for the matching filename.'''
 		
-		column = gtk.TreeViewColumn("Schedule", gtk.CellRendererText(), text=1)
-		column.set_resizable(False)
-		self.append_column(column)
-		
-	
-	def append(self, parent, row):
-		if isinstance(row, Schedule):
-			return self.model.append( parent, (row, row.name) )
-		elif isinstance(row, tuple):
-			return self.model.append( parent, row )
-	
-	def get_active_item(self):
-		(model, s_iter) = self.get_selection().get_selected()
-		if s_iter:
-			return model.get_value(s_iter, 0)
-		else:
-			return False
-	
-	def has_selection(self):
-		return bool(self.get_selection().count_selected_rows())
+		for item in self.items:
+			if item.filename == filename:
+				return item
 
+class ScheduleItem:
+	'An item for a schedule, including a presentation and a comment.'
+	def __init__(self, presentation, comment):
+		self.presentation = presentation
+		self.comment = comment
+	
+	def __getattr__(self, name):
+		'Get the attribute from the presentation if possible.'
+		if hasattr(self.presentation, name):
+			return getattr(self.presentation, name)
+		raise AttributeError
+	
+	def get_row(self):
+		'Get a row to put into the presentation list.'
+		return (self,) + self.presentation.get_row()[1:]
 

@@ -1,0 +1,8 @@
+<!ELEMENT schedule (title, presentation) >
+<!ELEMENT title (#PCDATA) >
+<!ELEMENT presentation (file, comments?) >
+<!ELEMENT file (#PCDATA) >
+<!ELEMENT comments (#PCDATA) >
+
+<!ATTLIST schedule created CDATA #REQUIRED >
+<!ATTLIST schedule modified CDATA #REQUIRED >

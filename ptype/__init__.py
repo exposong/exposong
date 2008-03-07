@@ -19,6 +19,7 @@ import gtk
 import gtk.gdk
 import gobject
 import os
+from glob import *
 import os.path
 import xml.dom
 import xml.dom.minidom
@@ -29,28 +30,6 @@ The type folder contains python scripts that add some ability to create
 and edit different types of slideshows. Follow the code of 'generics.py'
 to create a new type.'''
 
-def get_node_text(node):
-	'''Returns the text of a node (XML DOM Object)'''
-	if(isinstance(node, str)):
-		return node
-	rc = ""
-	for child in node.childNodes:
-		if child.nodeType == node.TEXT_NODE:
-			rc = rc + child.data
-	return rc
-	
-def title_to_filename(title):
-	ret = ''
-	for i in range(len(title)):
-		if title[i].isalnum():
-			if title[i].isupper():
-				ret += title[i].lower()
-			else:
-				ret += title[i]
-		elif title[i].isspace() and not ret[len(ret)-1].isspace():
-			ret += '_'
-	return ret
-
 
 class Presentation:
 	'''Sets information from an xml file.
@@ -58,7 +37,7 @@ class Presentation:
 		Requires at minimum	a title and slides (Slides object list)'''
 	def __init__(self, dom = None, filename = None):
 		self.type = ""
-		self.title = '' #TODO Require title always
+		self.title = ''
 		self.author = {}
 		self.copyright = ''
 		self.slides = []
@@ -77,7 +56,7 @@ class Presentation:
 			self.slides.append(Slide(sl))
 	
 	def get_row(self): # Is this being used?
-		return (self, self.title)
+		return (self, self.title, self.type)
 	
 	def set_text_buffer(self, tbuf):
 		rval = ''
@@ -105,19 +84,9 @@ class Presentation:
 			self.to_xml()
 			return True
 	
-	def to_xml(self):
+	def to_xml(self, directory = "data/pres/"):
 		#Save the data to disk
-		#TODO may need to check for access rights
-		tfile = title_to_filename(self.title)
-		if not isinstance(self.filename, str) or not self.filename.startswith(tfile):
-			if(self.filename):
-				os.remove("data/pres/"+self.filename)
-			filename = tfile + ".xml"
-			index = 0
-			while os.path.exists("data/pres/" + filename):
-				index -= 1
-				filename = tfile + str(index) + ".xml"
-			self.filename = filename
+		self.filename = check_filename(self.title, directory, self.filename)
 		
 		doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
 		root = doc.createElement("presentation")
@@ -130,7 +99,7 @@ class Presentation:
 			s.to_node(doc, sNode)
 			root.appendChild(sNode)
 		doc.appendChild(root)
-		outfile = open("data/pres/" + self.filename, 'w')
+		outfile = open(directory+self.filename, 'w')
 		doc.writexml(outfile)
 		doc.unlink()
 

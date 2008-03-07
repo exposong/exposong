@@ -26,22 +26,22 @@ class PresList(gtk.TreeView):
 		gtk.TreeView.__init__(self)
 		self.set_size_request(200, 250)
 		
-		column_rend = gtk.CellRendererPixbuf()
-		column = gtk.TreeViewColumn(None, column_rend)
-		column.set_sort_column_id(2)
-		column.set_resizable(False)
-		column.set_cell_data_func(column_rend, self._get_row_icon)
-		self.append_column(column)
-		column = gtk.TreeViewColumn("Presentation", gtk.CellRendererText(), text=1)
+		pixbufrend = gtk.CellRendererPixbuf()
+		textrend = gtk.CellRendererText()
+		#column = gtk.TreeViewColumn(None, column_rend)
+		#column.set_sort_column_id(2)
+		#column.set_resizable(False)
+		#column.set_cell_data_func(column_rend, self._get_row_icon)
+		#self.append_column(column)
+		column = gtk.TreeViewColumn("Presentation")
+		column.pack_start(pixbufrend, False)
+		column.set_cell_data_func(pixbufrend, self._get_row_icon)
+		column.pack_start(textrend, True)
+		column.set_attributes(textrend, text=1)
 		column.set_sort_column_id(1)
 		column.set_resizable(True)
+		column.set_property('spacing', 4)
 		self.append_column(column)
-		
-		model = gtk.ListStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING, gobject.TYPE_STRING)
-		# Columns: Presentation, Title, Type (for sorting)
-		model.set_sort_column_id(1, gtk.SORT_ASCENDING)
-		
-		self.set_model(model)
 	
 	def get_active_item(self):
 		(model, s_iter) = self.get_selection().get_selected()
@@ -74,10 +74,11 @@ class PresList(gtk.TreeView):
 		return bool(self.get_selection().count_selected_rows())
 	
 	def get_model(self):
-		model = gtk.TreeView.get_model(self)
-		if isinstance(model, gtk.TreeModelFilter):
-			model = model.get_model()
-		return model
+		return gtk.TreeView.get_model(self)
+	
+	@staticmethod
+	def get_empty_model():
+		return gtk.ListStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING, gobject.TYPE_STRING)
 	
 	def _get_row_icon(self, column, cell, model, titer):
 		pres = model.get_value(titer, 0)

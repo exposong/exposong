@@ -21,22 +21,23 @@ import gobject
 import pango
 
 #TODO Should be called Slides, because it no longer is a TextView (Now a treeview)
-class SlideList:
+class SlideList(gtk.TreeView):
 	'''Class to manipulate the text_area in the presentation program.'''
 	
-	def __init__(self, widget):
-		self.slide_list_view = widget
-		self.slide_list_view.set_size_request(280, 200)
+	def __init__(self):
+		gtk.TreeView.__init__(self)
+		self.set_size_request(280, 200)
+		self.set_enable_search(False)
 		
 		text_cr = gtk.CellRendererText()
 		text_cr.ellipsize = pango.ELLIPSIZE_END
 		column1 = gtk.TreeViewColumn("Slide", text_cr, markup=1)
 		column1.set_resizable(False)
-		self.slide_list_view.append_column(column1)
+		self.append_column(column1)
 		
 		self.slide_list = gtk.ListStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING)
-		self.slide_list_view.set_model(self.slide_list)
-		#self.slide_list_view.set_headers_visible(False)
+		self.set_model(self.slide_list)
+		#self.set_headers_visible(False)
 		
 	def set_slides(self, slides):
 		'''Set the text to a Song'''
@@ -45,7 +46,7 @@ class SlideList:
 			self.slide_list.append([sl, sl.get_markup()])
 	
 	def get_active_item(self):
-		(model, s_iter) = self.slide_list_view.get_selection().get_selected()
+		(model, s_iter) = self.get_selection().get_selected()
 		if s_iter:
 			return model.get_value(s_iter, 0)
 		else:
