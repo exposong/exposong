@@ -69,6 +69,7 @@ class Main (gtk.Window):
 		self.pres_prev = gtk.DrawingArea()
 		self.pres_prev.set_size_request(135*pres_geom[2]/pres_geom[3], 135)
 		self.presentation = Presentation(self, pres_geom, self.pres_prev)
+		self.schedule_list = ScheduleList()
 		
 		menu = self._create_menu()
 		win_v.pack_start(menu, False)
@@ -78,7 +79,6 @@ class Main (gtk.Window):
 		### Main left area
 		win_lft = gtk.VPaned()
 		#### Schedule
-		self.schedule_list = ScheduleList()
 		self.schedule_list.connect("cursor-changed", self._on_schedule_activate)
 		self.schedule_list.connect("button-release-event", self._on_schedule_rt_click)
 		schedule_scroll = gtk.ScrolledWindow()
@@ -97,10 +97,10 @@ class Main (gtk.Window):
 		
 		#Drag and Drop
 		self.pres_list.enable_model_drag_source(gtk.gdk.BUTTON1_MASK, DRAGDROP_SCHEDULE, gtk.gdk.ACTION_COPY)
-		self.pres_list.connect("drag-data-get", self._on_pres_drag_get)
+		self.pres_list.connect("drag-data-get", self.pres_list._on_drag_get)
 		self.pres_list.connect("drag-data-received", self._on_pres_drag_received)
 		self.schedule_list.enable_model_drag_dest(DRAGDROP_SCHEDULE, gtk.gdk.ACTION_DEFAULT)
-		self.schedule_list.connect("drag-drop", self._on_pres_drop)
+		self.schedule_list.connect("drag-drop", self.schedule_list._on_pres_drop)
 		self.schedule_list.connect("drag-data-received", self._on_sched_drag_received)
 		self.schedule_list.set_drag_dest_row((1,), gtk.TREE_VIEW_DROP_INTO_OR_BEFORE)
 		
@@ -163,9 +163,9 @@ class Main (gtk.Window):
 								('Edit', None, _('_Edit') ),
 								('Preferences', gtk.STOCK_PREFERENCES, None, None, None, self._on_prefs),
 								('Schedule', None, _("_Schedule") ),
-								('sched-new', gtk.STOCK_NEW, None, None, _("Create a new schedule"), self._on_sched_new),
-								('sched-rename', None, _("_Rename"), None, _("Rename the selected schedule"), self._on_sched_rename),
-								('sched-delete', gtk.STOCK_DELETE, None, None, _("Delete the currently selected schedule"), self._on_sched_delete),
+								('sched-new', gtk.STOCK_NEW, None, None, _("Create a new schedule"), self.schedule_list._on_new),
+								('sched-rename', None, _("_Rename"), None, _("Rename the selected schedule"), self.schedule_list._on_rename),
+								('sched-delete', gtk.STOCK_DELETE, None, None, _("Delete the currently selected schedule"), self.schedule_list._on_sched_delete ),
 								('Presentation', None, '_Presentation'),
 								('pres-new', gtk.STOCK_NEW, None, "", _("Create a new presentation")),
 								('pres-edit', gtk.STOCK_EDIT, None, None, _("Edit the currently selected presentation"), self._on_pres_edit),
@@ -287,7 +287,7 @@ class Main (gtk.Window):
 	
 	def build_schedule(self, directory="data/sched"):
 		'''Add items to the schedule list.'''
-		self.library = Schedule( _("Library"), pres_model=self.pres_list.get_empty_model())
+		self.library = Schedule( _("Library"), pres_model=PresList.get_empty_model())
 		self.build_pres_list()
 		self.schedule_list.append(None, self.library, 1)
 		
@@ -301,7 +301,7 @@ class Main (gtk.Window):
 			i += 1
 		
 		#Add custom schedules from the data directory
-		self.custom_schedules = self.schedule_list.append(None, (None, _("Custom Schedules"), i+5))
+		self.schedule_list.custom_schedules = self.schedule_list.append(None, (None, _("Custom Schedules"), i+5))
 		
 		dir_list = os.listdir(directory)
 		for filenm in dir_list:
@@ -313,9 +313,9 @@ class Main (gtk.Window):
 					print "Error reading schedule file (%s): %s" % (filenm, details)
 				if dom:
 					if dom.documentElement.tagName == "schedule":
-						schedule = Schedule(filename=filenm, pres_model=self.pres_list.get_empty_model())
+						schedule = Schedule(filename=filenm, pres_model=PresList.get_empty_model())
 						schedule.load(dom.documentElement, self.library)
-						self.schedule_list.append(self.custom_schedules, schedule)
+						self.schedule_list.append(self.schedule_list.custom_schedules, schedule)
 					else:
 						print "%s is not a schedule file." % filenm
 					dom.unlink()
@@ -334,22 +334,6 @@ class Main (gtk.Window):
 				else:
 					self.pres_list.unset_rows_drag_dest()
 					self.pres_list.set_headers_clickable(True)
-	
-	def _on_pres_drop(self, treeview, context, x, y, timestamp):
-		'Makes sure that the schedule was dropped on a custom schedule.'
-		drop_info = treeview.get_dest_row_at_pos(x, y)
-		if drop_info:
-			path, position = drop_info
-			model = treeview.get_model()
-			parent = model.iter_parent(model.get_iter(path))
-			if parent and model.get_value(parent, 0) == None: #Custom has no Schedule
-				return
-		return True
-	
-	def _on_pres_drag_get(self, treeview, context, selection, info, timestamp):
-		'''A presentation was dragged.'''
-		model, iter1 = treeview.get_selection().get_selected()
-		selection.set('text/treeview-path', info, model.get_string_from_iter(iter1))
 	
 	def _on_sched_drag_received(self, treeview, context, x, y, selection, info, timestamp):
 		'''A presentation was dropped onto a schedule.'''
@@ -370,7 +354,10 @@ class Main (gtk.Window):
 		'A presentation was reordered.'
 		drop_info = treeview.get_dest_row_at_pos(x, y)
 		model = treeview.get_model()
-		schedule = self.schedule_list.get_active_item() #TODO May cause problems if user unselects the schedule
+		schedule = self.schedule_list.get_active_item()
+		#currently requires the user not to change or unselect the schedule
+		if not schedule or schedule.get_model() is not self.pres_list.get_model():
+			return
 		path_mv = int(selection.data)
 		
 		if drop_info:
@@ -461,7 +448,7 @@ class Main (gtk.Window):
 					sched.refresh_model()
 				itr = schmod.iter_next(itr)
 			#Remove from custom schedules
-			itr = schmod.iter_children(self.custom_schedules)
+			itr = schmod.iter_children(self.schedule_list.custom_schedules)
 			while itr:
 				sched = schmod.get_value(itr, 0)
 				for item2 in sched.items:
@@ -473,7 +460,7 @@ class Main (gtk.Window):
 			self._on_pres_activate()
 	
 	def _on_pres_delete_from_schedule(self, *args):
-		'Remove the schedule from the current playlist.'
+		'Remove the schedule from the current schedule.'
 		schedule = self.schedule_list.get_active_item()
 		if not schedule or schedule.builtin:
 			return False
@@ -481,48 +468,6 @@ class Main (gtk.Window):
 		if not item:
 			return False
 		schedule.remove(item)
-	
-	def _on_sched_new(self, *args):
-		'Create a new schedule.'
-		name = _("New Schedule")
-		curnames = []
-		num = 1
-		model = self.schedule_list.get_model()
-		itr = model.iter_children(self.custom_schedules)
-		while itr:
-			if model.get_value(itr, 1).startswith(name):
-				curnames.append(model.get_value(itr, 1))
-			itr = model.iter_next(itr)
-		if len(curnames) == 0:
-			name += " 1"
-		else:
-			name += " "+str(int(curnames[len(curnames)-1][-2:]) + 1)
-		schedule = Schedule(name, pres_model=self.pres_list.get_empty_model(), builtin=False)
-		itrnew = self.schedule_list.append(self.custom_schedules, schedule)
-		pathnew = self.schedule_list.get_model().get_path(itrnew)
-		self.schedule_list.set_cursor(pathnew, self.schedule_list.get_column(0), True)
-	
-	def _on_sched_rename(self, *args):
-		'Create a new schedule.'
-		(path, focus) = self.schedule_list.get_cursor()
-		self.schedule_list.set_cursor(path, focus, True)
-	
-	def _on_sched_delete(self, *args):
-		'Delete the selected schedule.'
-		item = self.schedule_list.get_active_item()
-		if not item or item.builtin:
-			return False
-		dialog = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
-				gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
-				_('Are you sure you want to delete "%s"?') % item.title)
-		dialog.set_title( _("Delete Schedule?") )
-		resp = dialog.run()
-		dialog.hide()
-		if resp == gtk.RESPONSE_YES:
-			if item.filename:
-				os.remove("data/sched/"+item.filename)
-			self.schedule_list.remove(item, self.custom_schedules)
-			self.schedule_list.set_cursor((0,))
 	
 	def _on_about(self, *args):
 		'''Shows the about dialog.'''
@@ -536,7 +481,7 @@ class Main (gtk.Window):
 	def _quit(self, *args):
 		'Cleans up and exits the program.'
 		model = self.schedule_list.get_model()
-		sched = model.iter_children(self.custom_schedules)
+		sched = model.iter_children(self.schedule_list.custom_schedules)
 		while sched:
 			model.get_value(sched, 0).save()
 			sched = model.iter_next(sched)

@@ -80,6 +80,11 @@ class PresList(gtk.TreeView):
 	def get_empty_model():
 		return gtk.ListStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING, gobject.TYPE_STRING)
 	
+	def _on_drag_get(self, treeview, context, selection, info, timestamp):
+		'''A presentation was dragged.'''
+		model, iter1 = treeview.get_selection().get_selected()
+		selection.set('text/treeview-path', info, model.get_string_from_iter(iter1))
+	
 	def _get_row_icon(self, column, cell, model, titer):
 		pres = model.get_value(titer, 0)
 		cell.set_property('pixbuf', pres.get_icon())

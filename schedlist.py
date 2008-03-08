@@ -23,6 +23,7 @@ import xml.dom
 from glob import *
 
 from schedule import Schedule
+from preslist import PresList
 
 class ScheduleList(gtk.TreeView):
 	"A TreeView of presentation schedules."
@@ -75,6 +76,61 @@ class ScheduleList(gtk.TreeView):
 	def has_selection(self):
 		'Returns if an item is selected.'
 		return self.get_selection().count_selected_rows() > 0
+	
+	def _on_sched_delete(self, action):
+		'Delete the selected schedule.'
+		item = self.get_active_item()
+		if not item or item.builtin:
+			return False
+		win = self
+		while not isinstance(win, gtk.Window):
+			win = win.get_parent()
+		dialog = gtk.MessageDialog(win, gtk.DIALOG_MODAL,
+				gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
+				_('Are you sure you want to delete "%s"?') % item.title)
+		dialog.set_title( _("Delete Schedule?") )
+		resp = dialog.run()
+		dialog.hide()
+		if resp == gtk.RESPONSE_YES:
+			if item.filename:
+				os.remove("data/sched/"+item.filename)# directory <- for search
+			self.remove(item, self.custom_schedules)
+			self.set_cursor((0,))
+	
+	def _on_pres_drop(self, treeview, context, x, y, timestamp):
+		'Makes sure that the schedule was dropped on a custom schedule.'
+		drop_info = treeview.get_dest_row_at_pos(x, y)
+		if drop_info:
+			path, position = drop_info
+			model = treeview.get_model()
+			val = model.get_value(model.get_iter(path), 0)
+			if val and not val.builtin:
+				return
+		return True
+	
+	def _on_new(self, *args):
+		'Create a new schedule.'
+		name = _("New Schedule")
+		curnames = []
+		num = 1
+		itr = self.model.iter_children(self.custom_schedules)
+		while itr:
+			if self.model.get_value(itr, 1).startswith(name):
+				curnames.append(self.model.get_value(itr, 1))
+			itr = self.model.iter_next(itr)
+		if len(curnames) == 0:
+			name += " 1"
+		else:
+			name += " "+str(int(curnames[len(curnames)-1][-2:]) + 1)
+		schedule = Schedule(name, pres_model=PresList.get_empty_model(), builtin=False)
+		itrnew = self.append(self.custom_schedules, schedule)
+		pathnew = self.model.get_path(itrnew)
+		self.set_cursor(pathnew, self.get_column(0), True)
+	
+	def _on_rename(self, *args):
+		'Create a new schedule.'
+		(path, focus) = self.get_cursor()
+		self.set_cursor(path, focus, True)
 	
 	def _cell_data_func(self, column, cell, model, iter1):
 		'Set whether the cell is editable or not.'
