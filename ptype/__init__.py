@@ -139,6 +139,8 @@ class Slide:
 #</ui>
 #'''
 
+
+#TODO Replace this
 class Edit:
 	'''Creates a GTK Entry to edit or add a new item'''
 	def __init__(self, parent, pres = None):

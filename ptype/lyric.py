@@ -27,9 +27,11 @@ import ptype
 from ptype import get_node_text
 
 '''This creates lyrics for presentation.'''
-menu_name = "Lyrics"
-title_re = re.compile("(chorus|refrain|verse|bridge)", re.I)
+menu_name = _("Lyrics")
+type_name = 'lyrics'
 icon = gtk.gdk.pixbuf_new_from_file('images/lyric.png')
+title_re = re.compile("(chorus|refrain|verse|bridge)", re.I)
+
 
 class Presentation(ptype.Presentation):
 	'''Sets information from an xml file.

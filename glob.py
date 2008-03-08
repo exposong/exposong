@@ -35,6 +35,9 @@ def get_node_text(node):
 	return rc
 	
 def title_to_filename(title):
+	'Returns a filename with letters and underscores only.'
+	#TODO May need to translate foreign characters to english, or allow
+	#	foreign characters in the filename.
 	ret = ''
 	for i in range(len(title)):
 		if title[i].isalnum():

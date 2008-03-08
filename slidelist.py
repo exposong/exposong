@@ -31,7 +31,7 @@ class SlideList(gtk.TreeView):
 		
 		text_cr = gtk.CellRendererText()
 		text_cr.ellipsize = pango.ELLIPSIZE_END
-		column1 = gtk.TreeViewColumn("Slide", text_cr, markup=1)
+		column1 = gtk.TreeViewColumn( _("Slide"), text_cr, markup=1)
 		column1.set_resizable(False)
 		self.append_column(column1)
 		

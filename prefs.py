@@ -20,8 +20,9 @@ import gtk.gdk
 import imp
 import os.path
 
-GRADIENT_DIRS = ('Top Left to Bottom Right', 'Top to Bottom',
-				'Top Right to Bottom Left', 'Left to Right')
+
+GRADIENT_DIRS = ( _('Top Left to Bottom Right'), _('Top to Bottom'),
+				_('Top Right to Bottom Left'), _('Left to Right'))
 class Prefs:
 	def __init__(self):
 		self.cfg = {'general.ccli': '',
@@ -34,7 +35,7 @@ class Prefs:
 	def __getitem__(self, key):
 		if key in self.cfg:
 			return self.cfg[key]
-		raise KeyError, 'Could not find key: '+key
+		raise KeyError, _('Could not find key: %s') % key
 	def __setitem__(self, key, value):
 		if value == None:
 			self.__delitem__(key, value)
@@ -81,7 +82,7 @@ WIDGET_SPACING = 4
 class PrefsDialog(gtk.Dialog):
 	def __init__(self, parent, config):
 		self.widgets = {}
-		gtk.Dialog.__init__(self, "Preferences", parent, 0,
+		gtk.Dialog.__init__(self, _("Preferences"), parent, 0,
 				(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
 		notebook = gtk.Notebook()
 		self.vbox.pack_start(notebook, True, True, 5)
@@ -94,7 +95,7 @@ class PrefsDialog(gtk.Dialog):
 		self._append_section_title("Legal", 0)
 		g_ccli = self._append_text_setting("CCLI #", config['general.ccli'], 1)
 		
-		notebook.append_page(self.table, gtk.Label("General"))
+		notebook.append_page(self.table, gtk.Label( _("General") ))
 		
 		#Presentation Page
 		self.table = gtk.Table(4, 15)
@@ -119,31 +120,31 @@ class PrefsDialog(gtk.Dialog):
 			bg_img = config['pres.bg']
 			
 		
-		self._append_section_title("Background", 0)
-		p_r_solid = self._append_radio_setting("_Solid", bg_type=='s', 1)
+		self._append_section_title( _("Background"), 0)
+		p_r_solid = self._append_radio_setting( _("_Solid"), bg_type=='s', 1)
 		self.p_bgsol = self._append_color_setting(None, bg_solid, 1)
 		self.p_bgsol.set_sensitive(bg_type=='s')
 		p_r_solid.connect('toggled', self._on_toggle, self.p_bgsol)
-		p_r_gr = self._append_radio_setting("_Gradiant", bg_type=='g', 2, group=p_r_solid)
+		p_r_gr = self._append_radio_setting( _("_Gradiant"), bg_type=='g', 2, group=p_r_solid)
 		self.p_bggr = self._append_color_setting(None, bg_grad, 2)
 		self.p_bggr[0].set_sensitive(bg_type=='g')
 		self.p_bggr[1].set_sensitive(bg_type=='g')
-		self.p_bggrang = self._append_combo_setting("Gradiant Angle\n(Clockwise From Up)", GRADIENT_DIRS, config['pres.bg_angle'], 3)
+		self.p_bggrang = self._append_combo_setting( _("Gradiant Angle\n(Clockwise From Up)"), GRADIENT_DIRS, config['pres.bg_angle'], 3)
 		p_r_gr.connect('toggled', self._on_toggle, self.p_bggr+[self.p_bggrang])
 		
-		p_r_img = self._append_radio_setting("_Image", bg_type=='i', 4, group=p_r_solid)
+		p_r_img = self._append_radio_setting( _("_Image"), bg_type=='i', 4, group=p_r_solid)
 		p_r_img.set_sensitive(False) #Disabled until the feature is added
 		self.p_bgimg = self._append_file_setting(None, bg_img, 4)
 		self.p_bgimg.set_sensitive(bg_type=='i')
 		self.p_bgimg.set_size_request(180, -1)
 		p_r_img.connect('toggled', self._on_toggle, self.p_bgimg)
 		
-		self._append_section_title("Font", 6)
-		p_txt = self._append_color_setting("Text Color", config['pres.text_color'], 7)
-		p_shad = self._append_color_setting("Text Shadow", config['pres.text_shadow'], 8, True)
-		p_maxsize = self._append_spinner_setting("Max Font Size", gtk.Adjustment(config['pres.max_font_size'], 0, 96, 1), 9)
+		self._append_section_title( _("Font"), 6)
+		p_txt = self._append_color_setting( _("Text Color"), config['pres.text_color'], 7)
+		p_shad = self._append_color_setting( _("Text Shadow"), config['pres.text_shadow'], 8, True)
+		p_maxsize = self._append_spinner_setting( _("Max Font Size"), gtk.Adjustment(config['pres.max_font_size'], 0, 96, 1), 9)
 		
-		notebook.append_page(self.table, gtk.Label("Presentation"))
+		notebook.append_page(self.table, gtk.Label( _("Presentation")))
 		
 		self.show_all()
 		if self.run() == gtk.RESPONSE_ACCEPT:
@@ -192,7 +193,7 @@ class PrefsDialog(gtk.Dialog):
 		'''Adds a file setting and returns the file widget.'''
 		self._get_label(label, top)
 		
-		filech = gtk.FileChooserButton("Choose File")
+		filech = gtk.FileChooserButton( _("Choose File") )
 		filech.set_filename(value)
 		filech.set_current_folder(os.path.expanduser('~'))
 		self.table.attach(filech, 2, 4, top, top+1, gtk.FILL, 0, WIDGET_SPACING)

@@ -37,7 +37,7 @@ class ScheduleList(gtk.TreeView):
 		
 		sched_rend = gtk.CellRendererText()
 		sched_rend.connect("edited", self._rename_schedule)
-		column = gtk.TreeViewColumn("Schedule", sched_rend, text=1)
+		column = gtk.TreeViewColumn( _("Schedule"), sched_rend, text=1)
 		column.set_resizable(False)
 		column.set_cell_data_func(sched_rend, self._cell_data_func)
 		self.append_column(column)

@@ -30,10 +30,10 @@ import ptype
 All other presentation types should use these classes as
 base classes, changing only the necessary items.'''
 
-menu_name = "Generic"
-
-
+menu_name = _("Generic")
+type_name = "generic"
 icon = gtk.gdk.pixbuf_new_from_file('images/generic.png')
+
 
 class Presentation (ptype.Presentation):
 	'''Sets information from an xml file.

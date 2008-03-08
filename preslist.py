@@ -33,7 +33,7 @@ class PresList(gtk.TreeView):
 		#column.set_resizable(False)
 		#column.set_cell_data_func(column_rend, self._get_row_icon)
 		#self.append_column(column)
-		column = gtk.TreeViewColumn("Presentation")
+		column = gtk.TreeViewColumn( _("Presentation") )
 		column.pack_start(pixbufrend, False)
 		column.set_cell_data_func(pixbufrend, self._get_row_icon)
 		column.pack_start(textrend, True)

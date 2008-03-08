@@ -23,14 +23,18 @@ from xml.dom import minidom
 import imp					#to dynamically load type modules
 import os
 
+import gettext
+import __builtin__
+__builtin__._ = gettext.gettext
+
 from presentation import Presentation
 from preslist import PresList
 from slidelist import SlideList
 from about import About
-from prefs import Prefs
-from prefs import PrefsDialog
+import prefs
 from schedule import Schedule
 from schedlist import ScheduleList
+
 
 type_mods = {} #dynamically loaded presentation modules
 
@@ -47,10 +51,10 @@ class Main (gtk.Window):
 				gtk.gdk.pixbuf_new_from_file('images/es48.png'),
 				gtk.gdk.pixbuf_new_from_file('images/es32.png'),
 				gtk.gdk.pixbuf_new_from_file('images/es16.png'))
-		self.set_title("ExpoSong")
+		self.set_title( "ExpoSong" )
 		self.connect("destroy", self._quit)
 		self.set_default_size(700, 500)
-		self.config = Prefs()
+		self.config = prefs.Prefs()
 		
 		#dynamically load all presentation types
 		for fl in os.listdir("ptype"):
@@ -117,19 +121,19 @@ class Main (gtk.Window):
 		win_rt_btm.pack_start(self.pres_prev, True, False, 10)
 		
 		pres_buttons = gtk.VButtonBox()
-		self.pbut_present = gtk.Button("Present")
+		self.pbut_present = gtk.Button( _("Present") )
 		self.action_group.get_action('Present').connect_proxy(self.pbut_present)
 		#self.pbut_present.connect("clicked", self.presentation.show)
 		pres_buttons.add(self.pbut_present)
-		self.pbut_background = gtk.Button("Background")
+		self.pbut_background = gtk.Button( _("Background") )
 		self.action_group.get_action('Background').connect_proxy(self.pbut_background)
 		#self.pbut_background.connect("clicked", self.presentation.to_background)
 		pres_buttons.add(self.pbut_background)
-		self.pbut_black = gtk.Button("Black Screen")
+		self.pbut_black = gtk.Button( _("Black Screen") )
 		self.action_group.get_action('Black Screen').connect_proxy(self.pbut_black)
 		#self.pbut_black.connect("clicked", self.presentation.to_black)
 		pres_buttons.add(self.pbut_black)
-		self.pbut_hide = gtk.Button("Hide")
+		self.pbut_hide = gtk.Button( _("Hide") )
 		self.action_group.get_action('Hide').connect_proxy(self.pbut_hide)
 		#self.pbut_hide.connect("clicked", self.presentation.hide)
 		pres_buttons.add(self.pbut_hide)
@@ -154,26 +158,26 @@ class Main (gtk.Window):
 		self.add_accel_group(uimanager.get_accel_group())
 		
 		self.action_group = gtk.ActionGroup('presenter')
-		self.action_group.add_actions([('File', None, '_File'),
+		self.action_group.add_actions([('File', None, _('_File') ),
 								('Quit', gtk.STOCK_QUIT, None, None, None, self._quit),
-								('Edit', None, '_Edit'),
+								('Edit', None, _('_Edit') ),
 								('Preferences', gtk.STOCK_PREFERENCES, None, None, None, self._on_prefs),
-								('Schedule', None, "_Schedule"),
-								('sched-new', gtk.STOCK_NEW, None, None, "Create a new schedule", self._on_sched_new),
-								('sched-rename', None, "_Rename", None, "Rename the selected schedule", self._on_sched_rename),
-								('sched-delete', gtk.STOCK_DELETE, None, None, "Delete the currently selected schedule", self._on_sched_delete),
+								('Schedule', None, _("_Schedule") ),
+								('sched-new', gtk.STOCK_NEW, None, None, _("Create a new schedule"), self._on_sched_new),
+								('sched-rename', None, _("_Rename"), None, _("Rename the selected schedule"), self._on_sched_rename),
+								('sched-delete', gtk.STOCK_DELETE, None, None, _("Delete the currently selected schedule"), self._on_sched_delete),
 								('Presentation', None, '_Presentation'),
-								('pres-new', gtk.STOCK_NEW, None, "", "Create a new presentation"),
-								('pres-edit', gtk.STOCK_EDIT, None, None, "Edit the currently selected presentation", self._on_pres_edit),
-								('pres-delete', gtk.STOCK_DELETE, None, None, "Delete the presentation", self._on_pres_delete),
-								('pres-delete-from-schedule', gtk.STOCK_DELETE, "Delete from _Schedule", None, None, self._on_pres_delete_from_schedule),
-								('pres-import', None, "_Import", None, "Open a presentation from file"),
-								('pres-export', None, "_Export", None, "Export presentation"),
-								('Present', gtk.STOCK_FULLSCREEN, '_Present', "F11", None, self.presentation.show),
-								('Background', gtk.STOCK_CLEAR, '_Background', None, None, self.presentation.to_background),
-								('Black Screen', None, 'Blac_k Screen', None, None, self.presentation.to_black),
-								('Hide', gtk.STOCK_CLOSE, '_Hide', "Escape", None, self.presentation.hide),
-								('Help', None, '_Help'),
+								('pres-new', gtk.STOCK_NEW, None, "", _("Create a new presentation")),
+								('pres-edit', gtk.STOCK_EDIT, None, None, _("Edit the currently selected presentation"), self._on_pres_edit),
+								('pres-delete', gtk.STOCK_DELETE, None, None, _("Delete the presentation"), self._on_pres_delete),
+								('pres-delete-from-schedule', gtk.STOCK_DELETE, _("Delete from _Schedule"), None, None, self._on_pres_delete_from_schedule),
+								('pres-import', None, _("_Import"), None, _("Open a presentation from file")),
+								('pres-export', None, _("_Export"), None, _("Export presentation")),
+								('Present', gtk.STOCK_FULLSCREEN, _('_Present'), "F11", None, self.presentation.show),
+								('Background', gtk.STOCK_CLEAR, _('_Background'), None, None, self.presentation.to_background),
+								('Black Screen', None, _('Blac_k Screen'), None, None, self.presentation.to_black),
+								('Hide', gtk.STOCK_CLOSE, _('_Hide'), "Escape", None, self.presentation.hide),
+								('Help', None, _('_Help')),
 								('HelpContents', gtk.STOCK_HELP),
 								('About', gtk.STOCK_ABOUT, None, None, None, self._on_about)])
 		uimanager.insert_action_group(self.action_group, 0)
@@ -227,8 +231,17 @@ class Main (gtk.Window):
 		
 		pres_new_submenu = gtk.Menu()
 		for (ptype, mod) in type_mods.items():
-			mitem = gtk.MenuItem(mod.menu_name)
+			mitem = gtk.Action(mod.type_name, mod.menu_name, None, None)
 			mitem.connect("activate", self._on_pres_new, ptype)
+			self.action_group.add_action(mitem)
+			if hasattr(mod, "icon"):
+				mitem.set_menu_item_type(gtk.ImageMenuItem)
+				mimg = gtk.Image()
+				mimg.set_from_pixbuf(mod.icon)
+				mitem = mitem.create_menu_item()
+				mitem.set_image(mimg)
+			else:
+				mitem = mitem.create_menu_item()
 			pres_new_submenu.append(mitem)
 		
 		pres_new_submenu.show_all()
@@ -274,7 +287,7 @@ class Main (gtk.Window):
 	
 	def build_schedule(self, directory="data/sched"):
 		'''Add items to the schedule list.'''
-		self.library = Schedule("Library", pres_model=self.pres_list.get_empty_model())
+		self.library = Schedule( _("Library"), pres_model=self.pres_list.get_empty_model())
 		self.build_pres_list()
 		self.schedule_list.append(None, self.library, 1)
 		
@@ -288,7 +301,7 @@ class Main (gtk.Window):
 			i += 1
 		
 		#Add custom schedules from the data directory
-		self.custom_schedules = self.schedule_list.append(None, (None, "Custom Schedules", i+5))
+		self.custom_schedules = self.schedule_list.append(None, (None, _("Custom Schedules"), i+5))
 		
 		dir_list = os.listdir(directory)
 		for filenm in dir_list:
@@ -431,8 +444,8 @@ class Main (gtk.Window):
 			return False
 		dialog = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
 				gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
-				'Are you sure you want to delete "%s" from your library?' % item.title)
-		dialog.set_title("Delete Presentation?")
+				_('Are you sure you want to delete "%s" from your library?') % item.title)
+		dialog.set_title( _("Delete Presentation?") )
 		resp = dialog.run()
 		dialog.hide()
 		if resp == gtk.RESPONSE_YES:
@@ -471,7 +484,7 @@ class Main (gtk.Window):
 	
 	def _on_sched_new(self, *args):
 		'Create a new schedule.'
-		name = "New Schedule"
+		name = _("New Schedule")
 		curnames = []
 		num = 1
 		model = self.schedule_list.get_model()
@@ -501,8 +514,8 @@ class Main (gtk.Window):
 			return False
 		dialog = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
 				gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
-				'Are you sure you want to delete "%s"?' % item.title)
-		dialog.set_title("Delete Schedule?")
+				_('Are you sure you want to delete "%s"?') % item.title)
+		dialog.set_title( _("Delete Schedule?") )
 		resp = dialog.run()
 		dialog.hide()
 		if resp == gtk.RESPONSE_YES:
