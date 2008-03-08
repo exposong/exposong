@@ -32,7 +32,9 @@ def c2dec(color):
 		return color / 65535.0
 
 class Presentation:
-	"""Manage the window for presentation."""
+	'''
+	Manage the window for presentation.
+	'''
 	
 	def __init__(self, parent, geometry, preview):
 		self.text = ''
@@ -58,44 +60,52 @@ class Presentation:
 		self.set_background()
 	
 	def set_background(self, color = None):
+		'Set the background color.'
 		self._set_background(self.preview, color)
 		if hasattr(self, "pres") and self.pres.window:
 			self._set_background(self.pres, color)
 	
 	def set_text(self, text):
-		#self.set_background()
+		'Set the text of the window.'
 		self.text = str(text)
 		self.draw()
 	
 	def draw(self):
+		'Redraw the presentation and preview screens.'
 		self._draw(self.pres)
 		self._draw(self.preview)
 	
 	def to_black(self, button):
+		'Set the screen to black.'
 		self.black = True
 		self.background = False
 		self.set_background(COLOR_BLACK)
 	
 	def to_background(self, button):
+		'Hide text from the screen.'
 		self.background = True
 		self.black = False
 		self.set_background()
 	
 	def hide(self, button):
+		'Remove the presentation screen from view.'
 		self.background = self.black = False
 		self.window.hide()
 	
 	def show(self, *args):
+		'Show the presentation screen.'
 		self.background = self.black = False
 		self.window.show_all()
 		self.draw()
 	
 	def expose(self, widget, event):
+		'Redraw `widget`.'
 		self._draw(widget)
 	
 	
 	
 	def _set_background(self, widget, color = None):
+		'Set the background of `widget` to `color`.'
 		if color == None:
 			color = c2dec(self.config['pres.bg'])
 		
@@ -123,7 +133,8 @@ class Presentation:
 				(gr_x2, gr_y2) = bounds
 			gradient = cairo.LinearGradient(gr_x1, gr_y1, gr_x2, gr_y2)
 			for i in range(len(color)):
-				gradient.add_color_stop_rgb(1.0*i/(len(color)-1), color[i][0], color[i][1], color[i][2])
+				gradient.add_color_stop_rgb(1.0*i/(len(color)-1), color[i][0],
+						color[i][1], color[i][2])
 			ccontext.rectangle(0,0, bounds[0], bounds[1])
 			ccontext.set_source(gradient)
 			ccontext.fill()
@@ -131,6 +142,7 @@ class Presentation:
 			print "_set_background: Incorrect color"
 	
 	def _draw(self, widget):
+		'Render `widget`.'
 		if not widget.window or not widget.window.is_viewable():
 			return False
 		if widget is self.preview and self.pres.window and self.pres.window.is_viewable():
@@ -143,8 +155,6 @@ class Presentation:
 			ccontext.set_source_surface(self.pres.window.cairo_create().get_target(), 1, 1)
 			ccontext.paint()
 			return True
-			
-		
 		
 		if self.black:
 			self._set_background(widget, COLOR_BLACK)
@@ -165,7 +175,7 @@ class Presentation:
 		
 		attrs = pango.AttrList()
 		attrs.insert(pango.AttrFontDesc(pango.FontDescription("Sans Bold "+str(size)),
-			end_index = len(self.text)))
+				end_index = len(self.text)))
 		layout.set_attributes(attrs)
 		
 		min_sz = 0
@@ -174,7 +184,8 @@ class Presentation:
 		#until we get a number that is not a multiple of 4 (2,6,10,14, etc) to
 		#make it simpler... TODO Double check that it doesn't overflow
 		while True:
-			if layout.get_pixel_size()[0] > bounds[0]*0.97 or layout.get_pixel_size()[1] > bounds[1]*0.94:
+			if layout.get_pixel_size()[0] > bounds[0]*0.97 \
+					or layout.get_pixel_size()[1] > bounds[1]*0.94:
 				max_sz = size
 				size = (min_sz + max_sz) / 2
 			elif size % 4 != 0 or max_sz - min_sz < 3:

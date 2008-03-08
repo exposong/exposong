@@ -42,11 +42,13 @@ DRAGDROP_SCHEDULE = [("text/treeview-path", 0,0)]
 
 
 class Main (gtk.Window):
-	'''Primary user interface'''
-	
+	'''
+	Primary user interface.
+	'''
 	def __init__(self):
 		gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-		gtk.window_set_default_icon_list(gtk.gdk.pixbuf_new_from_file('images/es128.png'),
+		gtk.window_set_default_icon_list(
+				gtk.gdk.pixbuf_new_from_file('images/es128.png'),
 				gtk.gdk.pixbuf_new_from_file('images/es64.png'),
 				gtk.gdk.pixbuf_new_from_file('images/es48.png'),
 				gtk.gdk.pixbuf_new_from_file('images/es32.png'),
@@ -96,7 +98,8 @@ class Main (gtk.Window):
 		win_lft.pack2(pres_list_scroll, True, True)
 		
 		#Drag and Drop
-		self.pres_list.enable_model_drag_source(gtk.gdk.BUTTON1_MASK, DRAGDROP_SCHEDULE, gtk.gdk.ACTION_COPY)
+		self.pres_list.enable_model_drag_source(gtk.gdk.BUTTON1_MASK,
+				DRAGDROP_SCHEDULE, gtk.gdk.ACTION_COPY)
 		self.pres_list.connect("drag-data-get", self.pres_list._on_drag_get)
 		self.pres_list.connect("drag-data-received", self._on_pres_drag_received)
 		self.schedule_list.enable_model_drag_dest(DRAGDROP_SCHEDULE, gtk.gdk.ACTION_DEFAULT)
@@ -159,27 +162,42 @@ class Main (gtk.Window):
 		
 		self.action_group = gtk.ActionGroup('presenter')
 		self.action_group.add_actions([('File', None, _('_File') ),
-								('Quit', gtk.STOCK_QUIT, None, None, None, self._quit),
-								('Edit', None, _('_Edit') ),
-								('Preferences', gtk.STOCK_PREFERENCES, None, None, None, self._on_prefs),
-								('Schedule', None, _("_Schedule") ),
-								('sched-new', gtk.STOCK_NEW, None, None, _("Create a new schedule"), self.schedule_list._on_new),
-								('sched-rename', None, _("_Rename"), None, _("Rename the selected schedule"), self.schedule_list._on_rename),
-								('sched-delete', gtk.STOCK_DELETE, None, None, _("Delete the currently selected schedule"), self.schedule_list._on_sched_delete ),
-								('Presentation', None, '_Presentation'),
-								('pres-new', gtk.STOCK_NEW, None, "", _("Create a new presentation")),
-								('pres-edit', gtk.STOCK_EDIT, None, None, _("Edit the currently selected presentation"), self._on_pres_edit),
-								('pres-delete', gtk.STOCK_DELETE, None, None, _("Delete the presentation"), self._on_pres_delete),
-								('pres-delete-from-schedule', gtk.STOCK_DELETE, _("Delete from _Schedule"), None, None, self._on_pres_delete_from_schedule),
-								('pres-import', None, _("_Import"), None, _("Open a presentation from file")),
-								('pres-export', None, _("_Export"), None, _("Export presentation")),
-								('Present', gtk.STOCK_FULLSCREEN, _('_Present'), "F11", None, self.presentation.show),
-								('Background', gtk.STOCK_CLEAR, _('_Background'), None, None, self.presentation.to_background),
-								('Black Screen', None, _('Blac_k Screen'), None, None, self.presentation.to_black),
-								('Hide', gtk.STOCK_CLOSE, _('_Hide'), "Escape", None, self.presentation.hide),
-								('Help', None, _('_Help')),
-								('HelpContents', gtk.STOCK_HELP),
-								('About', gtk.STOCK_ABOUT, None, None, None, self._on_about)])
+				('Edit', None, _('_Edit') ),
+				('Schedule', None, _("_Schedule") ),
+				('Presentation', None, _('_Presentation')),
+				('Help', None, _('_Help')),
+				('Quit', gtk.STOCK_QUIT, None, None, None, self._quit),
+				('Preferences', gtk.STOCK_PREFERENCES, None, None, None, self._on_prefs),
+				('sched-new', gtk.STOCK_NEW, None, None, _("Create a new schedule"),
+						self.schedule_list._on_new),
+				('sched-rename', None, _("_Rename"), None,
+						_("Rename the selected schedule"), self.schedule_list._on_rename),
+				('sched-delete', gtk.STOCK_DELETE, None, None,
+						_("Delete the currently selected schedule"),
+						self.schedule_list._on_sched_delete ),
+				('pres-new', gtk.STOCK_NEW, None, "", _("Create a new presentation")),
+				('pres-edit', gtk.STOCK_EDIT, None, None,
+						_("Edit the currently selected presentation"),
+						self._on_pres_edit),
+				('pres-delete', gtk.STOCK_DELETE, None, None,
+						_("Delete the presentation"), self._on_pres_delete),
+				('pres-delete-from-schedule', gtk.STOCK_DELETE,
+						_("Delete from _Schedule"), None, None,
+						self._on_pres_delete_from_schedule),
+				('pres-import', None, _("_Import"), None,
+						_("Open a presentation from file")),
+				('pres-export', None, _("_Export"), None,
+						_("Export presentation")),
+				('Present', gtk.STOCK_FULLSCREEN, _('_Present'), "F11", None,
+						self.presentation.show),
+				('Background', gtk.STOCK_CLEAR, _('_Background'), None, None,
+						self.presentation.to_background),
+				('Black Screen', None, _('Blac_k Screen'), None, None,
+						self.presentation.to_black),
+				('Hide', gtk.STOCK_CLOSE, _('_Hide'), "Escape", None,
+						self.presentation.hide),
+				('HelpContents', gtk.STOCK_HELP),
+				('About', gtk.STOCK_ABOUT, None, None, None, self._on_about)])
 		uimanager.insert_action_group(self.action_group, 0)
 		uimanager.add_ui_from_string('''
 				<menubar name="MenuBar">
@@ -215,18 +233,24 @@ class Main (gtk.Window):
 		
 		menu = uimanager.get_widget('/MenuBar')
 		self.pres_list_menu = gtk.Menu()
-		self.pres_list_menu.append(self.action_group.get_action('pres-edit').create_menu_item())
-		self.pres_list_menu.append(self.action_group.get_action('pres-delete').create_menu_item())
+		self.pres_list_menu.append(self.action_group
+				.get_action('pres-edit').create_menu_item())
+		self.pres_list_menu.append(self.action_group
+				.get_action('pres-delete').create_menu_item())
 		self.pres_list_menu.show_all()
 		
 		self.pres_list_sched_menu = gtk.Menu() #Custom schedule menu
-		self.pres_list_sched_menu.append(self.action_group.get_action('pres-edit').create_menu_item())
-		self.pres_list_sched_menu.append(self.action_group.get_action('pres-delete-from-schedule').create_menu_item())
+		self.pres_list_sched_menu.append(self.action_group
+				.get_action('pres-edit').create_menu_item())
+		self.pres_list_sched_menu.append(self.action_group
+				.get_action('pres-delete-from-schedule').create_menu_item())
 		self.pres_list_sched_menu.show_all()
 		
 		self.sched_list_menu = gtk.Menu()
-		self.sched_list_menu.append(self.action_group.get_action('sched-rename').create_menu_item())
-		self.sched_list_menu.append(self.action_group.get_action('sched-delete').create_menu_item())
+		self.sched_list_menu.append(self.action_group
+				.get_action('sched-rename').create_menu_item())
+		self.sched_list_menu.append(self.action_group
+				.get_action('sched-delete').create_menu_item())
 		self.sched_list_menu.show_all()
 		
 		pres_new_submenu = gtk.Menu()
@@ -249,10 +273,12 @@ class Main (gtk.Window):
 		return menu
 	
 	def get_pres_geometry(self):
-		'''Finds the best location for the screen.
+		'''
+		Finds the best location for the screen.
 		
 		If the user is using one monitor, use the bottom right corner for
-		the presentation screen, otherwise, use the 2nd monitor.'''
+		the presentation screen, otherwise, use the 2nd monitor.
+		'''
 		screen = self.get_screen()
 		num_monitors = screen.get_n_monitors()
 		if(num_monitors > 1):
@@ -265,7 +291,7 @@ class Main (gtk.Window):
 			return (scr_geom.width/2, scr_geom.height/2, scr_geom.width/2, scr_geom.height/2)
 	
 	def build_pres_list(self, directory="data/pres"):
-		'''Add items to the presentation list.'''
+		'Add items to the presentation list.'
 		dir_list = os.listdir(directory)
 		for filenm in dir_list:
 			if filenm.endswith(".xml"):
@@ -284,24 +310,27 @@ class Main (gtk.Window):
 						print "%s is not a presentation file." % filenm
 					dom.unlink()
 					del dom
+		self.library.refresh_model()
 	
 	def build_schedule(self, directory="data/sched"):
-		'''Add items to the schedule list.'''
-		self.library = Schedule( _("Library"), pres_model=PresList.get_empty_model())
+		'Add items to the schedule list.'
+		self.library = Schedule( _("Library"))
 		self.build_pres_list()
 		self.schedule_list.append(None, self.library, 1)
 		
 		#Add the presentation type lists
 		i = 2
 		for (ptype, mod) in type_mods.items():
-			schedule = Schedule(mod.menu_name, pres_model=PresList.get_empty_model(), filter_type=ptype)
+			schedule = Schedule(mod.menu_name, filter_type=ptype)
 			for item in self.library.items:
 				schedule.append(item.presentation)
+			schedule.refresh_model()
 			self.schedule_list.append(None, schedule, i)
 			i += 1
 		
 		#Add custom schedules from the data directory
-		self.schedule_list.custom_schedules = self.schedule_list.append(None, (None, _("Custom Schedules"), i+5))
+		self.schedule_list.custom_schedules = self.schedule_list.append(None,
+				(None, _("Custom Schedules"), i+5))
 		
 		dir_list = os.listdir(directory)
 		for filenm in dir_list:
@@ -313,7 +342,7 @@ class Main (gtk.Window):
 					print "Error reading schedule file (%s): %s" % (filenm, details)
 				if dom:
 					if dom.documentElement.tagName == "schedule":
-						schedule = Schedule(filename=filenm, pres_model=PresList.get_empty_model())
+						schedule = Schedule(filename=filenm)
 						schedule.load(dom.documentElement, self.library)
 						self.schedule_list.append(self.schedule_list.custom_schedules, schedule)
 					else:
@@ -323,67 +352,73 @@ class Main (gtk.Window):
 		self.schedule_list.expand_all()
 	
 	def _on_schedule_activate(self, *args):
-		'''Change the presentation list to the current schedule.'''
+		'Change the presentation list to the current schedule.'
 		if self.schedule_list.has_selection():
 			sched = self.schedule_list.get_active_item()
-			if isinstance(sched, Schedule) and sched.get_model():
-				self.pres_list.set_model(sched.get_model())
+			sched.refresh_model()
+			if isinstance(sched, Schedule):
+				self.pres_list.set_model(sched)
 				if sched.is_reorderable():
-					self.pres_list.enable_model_drag_dest(DRAGDROP_SCHEDULE, gtk.gdk.ACTION_COPY)
+					self.pres_list.enable_model_drag_dest(DRAGDROP_SCHEDULE,
+							gtk.gdk.ACTION_COPY)
 					self.pres_list.set_headers_clickable(False)
 				else:
 					self.pres_list.unset_rows_drag_dest()
 					self.pres_list.set_headers_clickable(True)
 	
-	def _on_sched_drag_received(self, treeview, context, x, y, selection, info, timestamp):
-		'''A presentation was dropped onto a schedule.'''
+	def _on_sched_drag_received(self, treeview, context, x, y, selection, info,
+			timestamp):
+		'A presentation was dropped onto a schedule.'
 		drop_info = treeview.get_dest_row_at_pos(x, y)
 		if drop_info:
 			model = treeview.get_model()
 			path, position = drop_info
 			
 			pres = self.pres_list.get_model().get_value(
-					self.pres_list.get_model().get_iter_from_string(selection.data), 0).presentation
+					self.pres_list.get_model().get_iter_from_string(selection.data),
+							0).presentation
 			sched = model.get_value(model.get_iter(path), 0)
 			
 			sched.append(pres)
 			context.finish(True, False)
-		return
 	
-	def _on_pres_drag_received(self, treeview, context, x, y, selection, info, timestamp):
+	def _on_pres_drag_received(self, treeview, context, x, y, selection, info,
+			timestamp):
 		'A presentation was reordered.'
 		drop_info = treeview.get_dest_row_at_pos(x, y)
 		model = treeview.get_model()
-		schedule = self.schedule_list.get_active_item()
+		sched = self.schedule_list.get_active_item()
 		#currently requires the user not to change or unselect the schedule
-		if not schedule or schedule.get_model() is not self.pres_list.get_model():
+		if not sched or sched is not self.pres_list.get_model():
 			return
 		path_mv = int(selection.data)
 		
 		if drop_info:
 			path_to, position = drop_info
 			path_to = path_to[0]
-			if path_mv > path_to and (position is gtk.TREE_VIEW_DROP_AFTER or position is gtk.TREE_VIEW_DROP_INTO_OR_AFTER):
+			if path_mv > path_to and (position is gtk.TREE_VIEW_DROP_AFTER or
+					position is gtk.TREE_VIEW_DROP_INTO_OR_AFTER):
 				path_to += 1
-			elif path_mv < path_to and (position is gtk.TREE_VIEW_DROP_BEFORE or position is gtk.TREE_VIEW_DROP_INTO_OR_BEFORE):
+			elif path_mv < path_to and (position is gtk.TREE_VIEW_DROP_BEFORE or
+					position is gtk.TREE_VIEW_DROP_INTO_OR_BEFORE):
 				path_to -= 1
 		else:
-			path_to = len(schedule.items)-1
+			path_to = len(sched.items)-1
 		
-		schedule.move(path_mv, path_to)
+		sched.move(path_mv, path_to)
 		
 		context.finish(True, False)
 		return
 	
 	def _on_pres_activate(self, *args):
-		'''Change the slides to the current presentation.'''
+		'Change the slides to the current presentation.'
 		if self.pres_list.has_selection():
 			self.slide_list.set_slides(self.pres_list.get_active_item().slides)
 		else:
 			self.slide_list.set_slides([])
 	
 	def _on_pres_rt_click(self, widget, event):
-		'''Popup the right click menu for the presentation.'''
+		'The user right clicked in the presentation list area.'
 		if event.button == 3:
 			if self.schedule_list.get_active_item().builtin:
 				menu = self.pres_list_menu
@@ -392,21 +427,23 @@ class Main (gtk.Window):
 			menu.popup(None, None, None, event.button, event.get_time())
 	
 	def _on_schedule_rt_click(self, widget, event):
+		'The user right clicked in the schedule area.'
 		if event.button == 3:
 			if widget.get_active_item() and not widget.get_active_item().builtin:
 				self.sched_list_menu.popup(None, None, None, event.button, event.get_time())
 	
 	def _on_slide_activate(self, *args):
-		'''Present the selected slide to the screen.'''
+		'Present the selected slide to the screen.'
 		self.presentation.set_text(self.slide_list.get_active_item().get_text())
 	
 	def _on_pres_new(self, menuitem, ptype):
-		'''Add a new presentation.'''
+		'Add a new presentation.'
 		pres = type_mods[ptype].Presentation()
 		if pres.edit(self):
 			sched = self.schedule_list.get_active_item()
 			if sched and not sched.builtin:
 				sched.append(pres)
+			#Add presentation to appropriate builtin schedules
 			model = self.schedule_list.get_model()
 			itr = model.get_iter_first()
 			while itr:
@@ -416,7 +453,7 @@ class Main (gtk.Window):
 				itr = model.iter_next(itr)
 	
 	def _on_pres_edit(self, *args):
-		'''Edit the presentation.'''
+		'Edit the presentation.'
 		field = self.pres_list.get_active_item()
 		if not field:
 			return False
@@ -425,7 +462,7 @@ class Main (gtk.Window):
 			self._on_pres_activate()
 	
 	def _on_pres_delete(self, *args):
-		'''Delete the selected presentation.'''
+		'Delete the selected presentation.'
 		item = self.pres_list.get_active_item()
 		if not item:
 			return False
@@ -461,22 +498,21 @@ class Main (gtk.Window):
 	
 	def _on_pres_delete_from_schedule(self, *args):
 		'Remove the schedule from the current schedule.'
-		schedule = self.schedule_list.get_active_item()
-		if not schedule or schedule.builtin:
+		sched = self.schedule_list.get_active_item()
+		if not sched or sched.builtin:
 			return False
 		item = self.pres_list.get_active_item()
 		if not item:
 			return False
-		schedule.remove(item)
+		sched.remove(item)
 	
 	def _on_about(self, *args):
-		'''Shows the about dialog.'''
+		'Shows the about dialog.'
 		About(self)
 	
 	def _on_prefs(self, *args):
-		'''Shows the preferences dialog.'''
+		'Shows the preferences dialog.'
 		self.config.dialog(self)
-	
 	
 	def _quit(self, *args):
 		'Cleans up and exits the program.'
@@ -485,7 +521,9 @@ class Main (gtk.Window):
 		while sched:
 			model.get_value(sched, 0).save()
 			sched = model.iter_next(sched)
+		
 		gtk.main_quit()
+
 
 if __name__ == "__main__":
 	m = Main()

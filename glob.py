@@ -25,7 +25,7 @@ the program. May contain certain variables as well.
 """
 
 def get_node_text(node):
-	'''Returns the text of a node (XML DOM Object)'''
+	'Returns the text of a node (XML DOM Object)'
 	if(isinstance(node, str)):
 		return node
 	rc = ""

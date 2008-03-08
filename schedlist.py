@@ -25,8 +25,11 @@ from glob import *
 from schedule import Schedule
 from preslist import PresList
 
+
 class ScheduleList(gtk.TreeView):
-	"A TreeView of presentation schedules."
+	'''
+	A TreeView of presentation schedules.
+	'''
 	def __init__(self):
 		gtk.TreeView.__init__(self)
 		self.set_size_request(200, 190)
@@ -55,12 +58,10 @@ class ScheduleList(gtk.TreeView):
 		elif isinstance(row, tuple):
 			return self.model.append( parent, row )
 	
-	def remove(self, item, custom_sched): #TODO custom_sched from class (?)
-		'''Remove the item from the model.
-		
-		@param custom_sched Should be main.custom_schedule.'''
+	def remove(self, item):
+		'Remove the item from the model.'
 		model = self.get_model()
-		itr = model.iter_children(custom_sched)
+		itr = model.iter_children(self.custom_schedules)
 		while model.get_value(itr, 0).filename != item.filename:
 			itr = model.iter_next(itr)
 		self.get_model().remove(itr)
@@ -94,7 +95,7 @@ class ScheduleList(gtk.TreeView):
 		if resp == gtk.RESPONSE_YES:
 			if item.filename:
 				os.remove("data/sched/"+item.filename)# directory <- for search
-			self.remove(item, self.custom_schedules)
+			self.remove(item)
 			self.set_cursor((0,))
 	
 	def _on_pres_drop(self, treeview, context, x, y, timestamp):

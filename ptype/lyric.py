@@ -34,23 +34,27 @@ title_re = re.compile("(chorus|refrain|verse|bridge)", re.I)
 
 
 class Presentation(ptype.Presentation):
-	'''Sets information from an xml file.
-		
-		Requires at minimum	a title and slides (Slides object list)'''
+	'''
+	Sets information from an xml file.
+	
+	Requires at minimum	a title and slides.
+	'''
 	def __init__(self, dom = None, filename = None):
 		ptype.Presentation.__init__(self, dom, filename)
 		self.type = 'lyric'
 	
-	def _get_slides(self, dom):
+	def _set_slides(self, dom):
+		'Set the slides from xml.'
 		slides = dom.getElementsByTagName("slide")
 		for sl in slides:
 			self.slides.append(Slide(sl))
 	
 	def get_icon(self):
+		'Return a pixbuf that represents the ptype'
 		return icon
 	
 	def edit(self, parent = None):
-		'''Run the edit dialog for the presentation.'''
+		'Run the edit dialog for the presentation.'
 		edit = Edit(parent, self)
 		rval = edit.run()
 		
@@ -63,6 +67,7 @@ class Presentation(ptype.Presentation):
 			return True
 	
 	def set_text_buffer(self, tbuf):
+		'Sets the value of a text buffer.'
 		it1 = tbuf.get_start_iter()
 		titleTag = tbuf.create_tag("titleTag", weight=pango.WEIGHT_BOLD, background="orange")
 		
@@ -76,8 +81,9 @@ class Presentation(ptype.Presentation):
 
 
 class Slide(ptype.Slide):
-	'''A basic slide for the presentation.'''
-	
+	'''
+	A lyric slide for the presentation.
+	'''
 	def __init__(self, value):
 		if(isinstance(value, xml.dom.Node)):
 			self.text = get_node_text(value)
@@ -89,6 +95,7 @@ class Slide(ptype.Slide):
 			else:
 				self.title = ''
 				self.text = value
+
 
 class Edit(ptype.Edit):
 	'''Creates a GTK Entry to edit or add a new item'''

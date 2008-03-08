@@ -32,3 +32,4 @@ class About:
 		self.dialog.set_modal(False)
 		self.dialog.run()
 		self.dialog.hide()
+

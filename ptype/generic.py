@@ -25,10 +25,12 @@ import xml.dom.minidom
 
 import ptype
 
-'''Supports a generic presentation.
+'''
+Supports a generic presentation.
 
 All other presentation types should use these classes as
-base classes, changing only the necessary items.'''
+base classes, changing only the necessary items.
+'''
 
 menu_name = _("Generic")
 type_name = "generic"
@@ -36,13 +38,16 @@ icon = gtk.gdk.pixbuf_new_from_file('images/generic.png')
 
 
 class Presentation (ptype.Presentation):
-	'''Sets information from an xml file.
-		
-		Requires at minimum	a title and slides (Slides object list)'''
+	'''
+	Sets information from an xml file.
+	
+	Requires at minimum	a title and slides (Slides object list)
+	'''
 	def __init__(self, dom = None, filename = None):
 		ptype.Presentation.__init__(self, dom, filename)
 		self.type = "generic"
 	
 	def get_icon(self):
+		'Return a pixbuf that represents the ptype'
 		return icon
 

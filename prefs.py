@@ -20,10 +20,16 @@ import gtk.gdk
 import imp
 import os.path
 
+'''
+Configures program usage for ExpoSong.
+'''
 
 GRADIENT_DIRS = ( _('Top Left to Bottom Right'), _('Top to Bottom'),
 				_('Top Right to Bottom Left'), _('Left to Right'))
 class Prefs:
+	'''
+	Manages user preferences.
+	'''
 	def __init__(self):
 		self.cfg = {'general.ccli': '',
 				'pres.max_font_size': 56,
@@ -32,19 +38,26 @@ class Prefs:
 				'pres.text_color': (65535, 65535, 65535),
 				'pres.text_shadow': (0, 0, 0, 26214)}
 		self.load()
+	
 	def __getitem__(self, key):
+		'Return a preference.'
 		if key in self.cfg:
 			return self.cfg[key]
 		raise KeyError, _('Could not find key: %s') % key
+	
 	def __setitem__(self, key, value):
+		'Set a preference.'
 		if value == None:
 			self.__delitem__(key, value)
 		else:
 			self.cfg[key] = value
+	
 	def __delitem__(self, key):
+		'Deletes a preference.'
 		del self.cfg[key]
 	
 	def load(self):
+		'Load preferences from file.'
 		try:
 			config = imp.load_source('config', 'config.py')
 		except IOError:
@@ -55,6 +68,7 @@ class Prefs:
 				self.cfg[k] = getattr(getattr(config, ksp[0]), ksp[1])
 			
 	def save(self):
+		'Save preferences to file.'
 		cfile = open('config.py', 'r+')
 		cnt = 0
 		for line in cfile:
@@ -74,12 +88,16 @@ class Prefs:
 		cfile.close()
 	
 	def dialog(self, parent):
+		'Show the preferences dialog.'
 		PrefsDialog(parent, self)
 
 LABEL_SPACING = 12
 WIDGET_SPACING = 4
 
 class PrefsDialog(gtk.Dialog):
+	'''
+	Dialog to configure user preferences.
+	'''
 	def __init__(self, parent, config):
 		self.widgets = {}
 		gtk.Dialog.__init__(self, _("Preferences"), parent, 0,
@@ -173,7 +191,7 @@ class PrefsDialog(gtk.Dialog):
 		self.hide()
 	
 	def _append_section_title(self, title, top):
-		'''Adds a title for the current section.'''
+		'Adds a title for the current section.'
 		hbox = gtk.HBox()
 		label = gtk.Label()
 		label.set_markup("<b>"+title+"</b>")
@@ -181,7 +199,7 @@ class PrefsDialog(gtk.Dialog):
 		self.table.attach(label, 0, 4, top, top+1, gtk.FILL, 0, 0)
 	
 	def _append_text_setting(self, label, value, top):
-		'''Adds a text setting and returns the text widget.'''
+		'Adds a text setting and returns the text widget.'
 		self._get_label(label, top)
 		
 		entry = gtk.Entry(10)
@@ -190,7 +208,7 @@ class PrefsDialog(gtk.Dialog):
 		return entry
 	
 	def _append_file_setting(self, label, value, top):
-		'''Adds a file setting and returns the file widget.'''
+		'Adds a file setting and returns the file widget.'
 		self._get_label(label, top)
 		
 		filech = gtk.FileChooserButton( _("Choose File") )
@@ -200,7 +218,7 @@ class PrefsDialog(gtk.Dialog):
 		return filech
 	
 	def _append_color_setting(self, label, value, top, alpha=False):
-		'''Adds a color setting and returns the color widget.'''
+		'Adds a color setting and returns the color widget.'
 		self._get_label(label, top)
 		
 		if isinstance(value[0], tuple):
@@ -221,7 +239,7 @@ class PrefsDialog(gtk.Dialog):
 			return button
 	
 	def _append_spinner_setting(self, label, adjustment, top):
-		'''Adds a spinner setting and returns the spinner widget.'''
+		'Adds a spinner setting and returns the spinner widget.'
 		self._get_label(label, top)
 		
 		spinner = gtk.SpinButton(adjustment, 2.0)
@@ -229,7 +247,7 @@ class PrefsDialog(gtk.Dialog):
 		return spinner
 	
 	def _append_combo_setting(self, label, options, value, top):
-		'''Adds a combo setting and returns the combo widget.'''
+		'Adds a combo setting and returns the combo widget.'
 		self._get_label(label, top)
 		
 		combo = gtk.combo_box_new_text()
@@ -241,7 +259,7 @@ class PrefsDialog(gtk.Dialog):
 		return combo
 	
 	def _append_radio_setting(self, label, active, top, group = None):
-		'''Adds a radio setting and returns the radio widget.'''
+		'Adds a radio setting and returns the radio widget.'
 		radio = gtk.RadioButton(group, label)
 		radio.set_alignment(0.0, 0.5)
 		radio.set_active(active)
@@ -249,7 +267,7 @@ class PrefsDialog(gtk.Dialog):
 		return radio
 	
 	def _get_label(self, label, top):
-		'''Returns a label for a widget.'''
+		'Returns a label for a widget.'
 		if isinstance(label, str) and len(label):
 			label = gtk.Label(label)
 			label.set_alignment(0.0, 0.5)
@@ -257,7 +275,7 @@ class PrefsDialog(gtk.Dialog):
 			self.table.attach(label, 1, 2, top, top+1, gtk.FILL, 0, LABEL_SPACING)
 	
 	def _on_toggle(self, button, target):
-		'''Enables or disables target if button is set.'''
+		'Enables or disables target if button is set.'
 		if isinstance(target, gtk.Widget):
 			target.set_sensitive(button.get_active())
 		elif isinstance(target, (tuple, list)):

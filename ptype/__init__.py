@@ -24,17 +24,21 @@ import os.path
 import xml.dom
 import xml.dom.minidom
 
-'''Provides the different types of presentations.
+'''
+Provides the different types of presentations.
 
 The type folder contains python scripts that add some ability to create
 and edit different types of slideshows. Follow the code of 'generics.py'
-to create a new type.'''
+to create a new type.
+'''
 
 
 class Presentation:
-	'''Sets information from an xml file.
-		
-		Requires at minimum	a title and slides (Slides object list)'''
+	'''
+	Sets information from an xml file.
+	
+	Requires at minimum	a title and slides.
+	'''
 	def __init__(self, dom = None, filename = None):
 		self.type = ""
 		self.title = ''
@@ -48,17 +52,20 @@ class Presentation:
 				atype = dom.getAttribute("type")
 				self.author[atype] = get_node_text(el)
 			
-			self._get_slides(dom)
+			self._set_slides(dom)
 	
-	def _get_slides(self, dom):
+	def _set_slides(self, dom):
+		'Set the slides from xml.'
 		slides = dom.getElementsByTagName("slide")
 		for sl in slides:
 			self.slides.append(Slide(sl))
 	
-	def get_row(self): # Is this being used?
+	def get_row(self):
+		'Gets the data to add to the presentation list.'
 		return (self, self.title, self.type)
 	
 	def set_text_buffer(self, tbuf):
+		'Sets the value of a text buffer.'
 		rval = ''
 		for sl in self.slides:
 			rval += sl.get_text() + "\n\n"
@@ -69,10 +76,12 @@ class Presentation:
 		pass
 	
 	def edit(self, parent):
-		'''Run the edit dialog for the presentation.
+		'''
+		Run the edit dialog for the presentation.
 		
 		Always define this function in subclasses if a custom "Edit"
-		class is used.'''
+		class is used.
+		'''
 		edit = Edit(parent, self)
 		rval = edit.run()
 		
@@ -85,7 +94,7 @@ class Presentation:
 			return True
 	
 	def to_xml(self, directory = "data/pres/"):
-		#Save the data to disk
+		'Save the data to disk.'
 		self.filename = check_filename(self.title, directory, self.filename)
 		
 		doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
@@ -103,9 +112,11 @@ class Presentation:
 		doc.writexml(outfile)
 		doc.unlink()
 
+
 class Slide:
-	'''A basic slide for the presentation.'''
-	
+	'''
+	A basic slide for the presentation.
+	'''
 	def __init__(self, value):
 		if isinstance(value, xml.dom.Node):
 			self.text = get_node_text(value)
@@ -115,11 +126,11 @@ class Slide:
 			self.title = None
 	
 	def get_text(self):
-		"Get the text for the presentation."
+		'Get the text for the presentation.'
 		return self.text
 	
 	def get_markup(self):
-		"Get the text for the slide selection."
+		'Get the text for the slide selection.'
 		if(self.title):
 			return "<b>"+self.title+"</b>\n"+self.text
 		else:
@@ -129,15 +140,6 @@ class Slide:
 		if(self.title):
 			node.setAttribute("title", self.title)
 		node.appendChild( document.createTextNode(self.text) )
-
-#menu = '''<ui>
-#<toolbar action='edit'>
-#	<toolitem action='copy' />
-#	<toolitem action='cut' />
-#	<toolitem action='paste' />
-#</toolbar>
-#</ui>
-#'''
 
 
 #TODO Replace this
@@ -152,19 +154,6 @@ class Edit:
 		else:
 			self.dialog.set_title("New " + pres.type.title() + " Presentation")
 		self.dialog.vbox.set_spacing(4)
-		
-		#uimanager = gtk.UIManager()
-		#self.dialog.add_accel_group(uimanager.get_accel_group())
-		#actiongroup = gtk.ActionGroup('edit')
-		#actiongroup.add_actions([('edit', None),
-		#						('copy', gtk.STOCK_COPY, None, None, None, self.copy),
-		#						('cut', gtk.STOCK_CUT, None, None, None, self.cut),
-		#						('paste', gtk.STOCK_PASTE, None, None, None, self.paste)])
-		#uimanager.insert_action_group(actiongroup, 0)
-		#uimanager.add_ui_from_string(menu)
-		
-		#self.toolbar = uimanager.get_widget('/edit')
-		#self.dialog.vbox.pack_start(self.toolbar, False, True)
 		
 		label = gtk.Label("Title:")
 		label.set_alignment(0.0, 0.0)

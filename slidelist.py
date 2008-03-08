@@ -22,8 +22,9 @@ import pango
 
 #TODO Should be called Slides, because it no longer is a TextView (Now a treeview)
 class SlideList(gtk.TreeView):
-	'''Class to manipulate the text_area in the presentation program.'''
-	
+	'''
+	Class to manipulate the text_area in the presentation program.
+	'''
 	def __init__(self):
 		gtk.TreeView.__init__(self)
 		self.set_size_request(280, 200)
@@ -40,12 +41,13 @@ class SlideList(gtk.TreeView):
 		#self.set_headers_visible(False)
 		
 	def set_slides(self, slides):
-		'''Set the text to a Song'''
+		'Set the text to a Song.'
 		self.slide_list.clear()
 		for sl in slides:
 			self.slide_list.append([sl, sl.get_markup()])
 	
 	def get_active_item(self):
+		'Return the selected `Slide` object.'
 		(model, s_iter) = self.get_selection().get_selected()
 		if s_iter:
 			return model.get_value(s_iter, 0)
