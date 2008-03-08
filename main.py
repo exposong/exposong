@@ -254,9 +254,8 @@ class Main (gtk.Window):
 					if root_elem.tagName == "presentation" and root_elem.hasAttribute("type"):
 						filetype = root_elem.getAttribute("type")
 						if filetype in type_mods:
-							obj = type_mods[filetype].Presentation(dom.documentElement, filenm)
-							self.library.append(obj)
-							obj = None
+							pres = type_mods[filetype].Presentation(dom.documentElement, filenm)
+							self.library.append(pres)
 					else:
 						print "%s is not a presentation file." % filenm
 					dom.unlink()
@@ -271,9 +270,9 @@ class Main (gtk.Window):
 		#Add the presentation type lists
 		i = 2
 		for (ptype, mod) in type_mods.items():
-			schedule = Schedule(mod.menu_name, pres_model=self._get_type_model(ptype))
-			#model = self._get_type_model(ptype)
-			#schedule.set_model(model)
+			schedule = Schedule(mod.menu_name, pres_model=PresList.get_empty_model(), filter_type=ptype)
+			for item in self.library.items:
+				schedule.append(item.presentation)
 			self.schedule_list.append(None, schedule, i)
 			i += 1
 		
@@ -336,13 +335,10 @@ class Main (gtk.Window):
 			path, position = drop_info
 			
 			pres = self.pres_list.get_model().get_value(
-					self.pres_list.get_model().get_iter_from_string(selection.data), 0)
+					self.pres_list.get_model().get_iter_from_string(selection.data), 0).presentation
 			sched = model.get_value(model.get_iter(path), 0)
-			if not isinstance(sched, Schedule):
-				context.finish(False, False)
 			
 			sched.append(pres)
-			
 			context.finish(True, False)
 		return
 	
@@ -388,7 +384,16 @@ class Main (gtk.Window):
 		'''Add a new presentation.'''
 		pres = type_mods[ptype].Presentation()
 		if pres.edit(self):
-			self.pres_list.append(pres)
+			sched = self.schedule_list.get_active_item()
+			if sched and not sched.builtin:
+				sched.append(pres)
+			model = self.schedule_list.get_model()
+			itr = model.get_iter_first()
+			while itr:
+				sched = model.get_value(itr, 0)
+				if sched:
+					sched.append(pres)
+				itr = model.iter_next(itr)
 	
 	def _on_pres_edit(self, *args):
 		'''Edit the presentation.'''
@@ -411,10 +416,28 @@ class Main (gtk.Window):
 		resp = dialog.run()
 		dialog.hide()
 		if resp == gtk.RESPONSE_YES:
+			schmod = self.schedule_list.get_model()
+			#Remove from builtin modules
+			itr = schmod.get_iter_first()
+			while itr:
+				sched = schmod.get_value(itr, 0)
+				if sched:
+					for item2 in sched.items:
+						if item2.presentation is item.presentation:
+							sched.items.remove(item2)
+					sched.refresh_model()
+				itr = schmod.iter_next(itr)
+			#Remove from custom schedules
+			itr = schmod.iter_children(self.custom_schedules)
+			while itr:
+				sched = schmod.get_value(itr, 0)
+				for item2 in sched.items:
+					if item2.presentation is item.presentation:
+						sched.items.remove(item2)
+				sched.refresh_model()
+				itr = schmod.iter_next(itr)
 			os.remove("data/pres/"+item.filename)
-			self.pres_list.remove(item)
 			self._on_pres_activate()
-			#TODO Delete the presentation from each schedule
 	
 	def _on_pres_delete_from_schedule(self, *args):
 		'Remove the schedule from the current playlist.'
@@ -477,15 +500,8 @@ class Main (gtk.Window):
 		self.config.dialog(self)
 	
 	
-	def _get_type_model(self, tp):
-		'''Filters the presentation list based on type.'''
-		model = PresList.get_empty_model()
-		for item in self.library.items:
-			if item.type == tp:
-				model.append(item.get_row())
-		return model
-	
 	def _quit(self, *args):
+		'Cleans up and exits the program.'
 		model = self.schedule_list.get_model()
 		sched = model.iter_children(self.custom_schedules)
 		while sched:

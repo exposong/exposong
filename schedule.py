@@ -24,12 +24,13 @@ from glob import *
 
 class Schedule:
 	"Schedule of presentations."
-	def __init__(self, title="", filename = None, pres_model = None, builtin = True):
+	def __init__(self, title="", filename = None, pres_model = None, builtin = True, filter_type = None):
 		self.title = title
 		self.filename = filename
 		self.pres_model = pres_model
 		self.items = []
 		self.builtin = builtin
+		self.filter_type = filter_type
 	
 	def load(self, dom, library):
 		"Loads from an xml file"
@@ -77,10 +78,13 @@ class Schedule:
 	
 	def append(self, pres, comment = ""):
 		"Add a presentation to the schedule."
+		if self.filter_type and self.filter_type != pres.type:
+			return False
 		sched = ScheduleItem(pres, comment)
 		self.items.append(sched)
 		if self.pres_model is not None:
 			self.pres_model.append(sched.get_row())
+		self.refresh_model()
 	
 	def remove(self, pres):
 		"Remove a presentation from a schedule."
@@ -104,6 +108,7 @@ class Schedule:
 	
 	def get_model(self):
 		'Return the filtered ListModel'
+		self.refresh_model()
 		if self.builtin:
 			self.pres_model.set_sort_column_id(1, gtk.SORT_ASCENDING)
 		return self.pres_model
@@ -120,10 +125,9 @@ class Schedule:
 	
 	def find(self, filename):
 		'''Searches the schedule for the matching filename.'''
-		
 		for item in self.items:
 			if item.filename == filename:
-				return item
+				return item.presentation
 
 class ScheduleItem:
 	'An item for a schedule, including a presentation and a comment.'
