@@ -6,6 +6,11 @@
 
 = Changelog =
 
+== 0.3 ==
+
+ *	Custom schedules are now possible. Drag and drop adding, reordering, and
+	deleting of presentations removes it from all lists.
+
 == 0.2 ==
 
  *	Removed the toolbar for presentations, and created a right click menu

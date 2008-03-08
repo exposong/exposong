@@ -76,6 +76,7 @@ class Main (gtk.Window):
 		#### Schedule
 		self.schedule_list = ScheduleList()
 		self.schedule_list.connect("cursor-changed", self._on_schedule_activate)
+		self.schedule_list.connect("button-release-event", self._on_schedule_rt_click)
 		schedule_scroll = gtk.ScrolledWindow()
 		schedule_scroll.add(self.schedule_list)
 		schedule_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
@@ -84,7 +85,7 @@ class Main (gtk.Window):
 		#### Presentation List
 		self.pres_list = PresList()
 		self.pres_list.connect("cursor-changed", self._on_pres_activate)
-		self.pres_list.connect("button-press-event", self._on_pres_rt_click)
+		self.pres_list.connect("button-release-event", self._on_pres_rt_click)
 		pres_list_scroll = gtk.ScrolledWindow()
 		pres_list_scroll.add(self.pres_list)
 		pres_list_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
@@ -213,6 +214,16 @@ class Main (gtk.Window):
 		self.pres_list_menu.append(self.action_group.get_action('pres-edit').create_menu_item())
 		self.pres_list_menu.append(self.action_group.get_action('pres-delete').create_menu_item())
 		self.pres_list_menu.show_all()
+		
+		self.pres_list_sched_menu = gtk.Menu() #Custom schedule menu
+		self.pres_list_sched_menu.append(self.action_group.get_action('pres-edit').create_menu_item())
+		self.pres_list_sched_menu.append(self.action_group.get_action('pres-delete-from-schedule').create_menu_item())
+		self.pres_list_sched_menu.show_all()
+		
+		self.sched_list_menu = gtk.Menu()
+		self.sched_list_menu.append(self.action_group.get_action('sched-rename').create_menu_item())
+		self.sched_list_menu.append(self.action_group.get_action('sched-delete').create_menu_item())
+		self.sched_list_menu.show_all()
 		
 		pres_new_submenu = gtk.Menu()
 		for (ptype, mod) in type_mods.items():
@@ -374,7 +385,16 @@ class Main (gtk.Window):
 	def _on_pres_rt_click(self, widget, event):
 		'''Popup the right click menu for the presentation.'''
 		if event.button == 3:
-			self.pres_list_menu.popup(None, None, None, event.button, event.get_time())
+			if self.schedule_list.get_active_item().builtin:
+				menu = self.pres_list_menu
+			else:
+				menu = self.pres_list_sched_menu
+			menu.popup(None, None, None, event.button, event.get_time())
+	
+	def _on_schedule_rt_click(self, widget, event):
+		if event.button == 3:
+			if widget.get_active_item() and not widget.get_active_item().builtin:
+				self.sched_list_menu.popup(None, None, None, event.button, event.get_time())
 	
 	def _on_slide_activate(self, *args):
 		'''Present the selected slide to the screen.'''
