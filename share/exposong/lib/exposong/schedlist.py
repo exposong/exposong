@@ -22,8 +22,8 @@ import gobject
 import xml.dom
 from glob import *
 
-from schedule import Schedule
-from preslist import PresList
+from exposong.schedule import Schedule
+from exposong.preslist import PresList
 
 
 class ScheduleList(gtk.TreeView):
@@ -123,7 +123,7 @@ class ScheduleList(gtk.TreeView):
 			name += " 1"
 		else:
 			name += " "+str(int(curnames[len(curnames)-1][-2:]) + 1)
-		schedule = Schedule(name, pres_model=PresList.get_empty_model(), builtin=False)
+		schedule = Schedule(name, builtin=False)
 		itrnew = self.append(self.custom_schedules, schedule)
 		pathnew = self.model.get_path(itrnew)
 		self.set_cursor(pathnew, self.get_column(0), True)

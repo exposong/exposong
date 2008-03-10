@@ -15,25 +15,22 @@
 #	You should have received a copy of the GNU General Public License
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import pygtk
-pygtk.require("2.0")
 import gtk
 import gtk.gdk
 from xml.dom import minidom
 import imp					#to dynamically load type modules
 import os
+from os.path import join
 
-import gettext
-import __builtin__
-__builtin__._ = gettext.gettext
+from exposong import RESOURCE_PATH, DATA_PATH, SHARED_FILES
 
-from presentation import Presentation
-from preslist import PresList
-from slidelist import SlideList
-from about import About
-import prefs
-from schedule import Schedule
-from schedlist import ScheduleList
+from exposong.presentation import Presentation
+from exposong.preslist import PresList
+from exposong.slidelist import SlideList
+from exposong.about import About
+from exposong import prefs
+from exposong.schedule import Schedule
+from exposong.schedlist import ScheduleList
 
 
 type_mods = {} #dynamically loaded presentation modules
@@ -48,20 +45,21 @@ class Main (gtk.Window):
 	def __init__(self):
 		gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 		gtk.window_set_default_icon_list(
-				gtk.gdk.pixbuf_new_from_file('images/es128.png'),
-				gtk.gdk.pixbuf_new_from_file('images/es64.png'),
-				gtk.gdk.pixbuf_new_from_file('images/es48.png'),
-				gtk.gdk.pixbuf_new_from_file('images/es32.png'),
-				gtk.gdk.pixbuf_new_from_file('images/es16.png'))
+				gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH, 'es128.png')),
+				gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH, 'es64.png')),
+				gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH, 'es48.png')),
+				gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH, 'es32.png')),
+				gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH, 'es16.png')))
 		self.set_title( "ExpoSong" )
 		self.connect("destroy", self._quit)
 		self.set_default_size(700, 500)
 		self.config = prefs.Prefs()
 		
 		#dynamically load all presentation types
-		for fl in os.listdir("ptype"):
+		ptype_dir = join(SHARED_FILES, 'lib', 'exposong', 'ptype')
+		for fl in os.listdir(ptype_dir):
 			if fl.endswith(".py") and fl != "__init__.py":
-				type_mods[fl[:-3]] = imp.load_source(fl[:-3], 'ptype/'+fl)
+				type_mods[fl[:-3]] = imp.load_source(fl[:-3], join(ptype_dir, fl))
 		
 		##	GUI
 		win_v = gtk.VBox()
@@ -290,13 +288,14 @@ class Main (gtk.Window):
 			self.move(0,0)
 			return (scr_geom.width/2, scr_geom.height/2, scr_geom.width/2, scr_geom.height/2)
 	
-	def build_pres_list(self, directory="data/pres"):
+	def build_pres_list(self):
+		directory = join(DATA_PATH, "pres")
 		'Add items to the presentation list.'
 		dir_list = os.listdir(directory)
 		for filenm in dir_list:
 			if filenm.endswith(".xml"):
 				try:
-					dom = minidom.parse(directory+"/"+filenm)
+					dom = minidom.parse(join(directory,filenm))
 				except Exception, details:
 					print "Error reading presentation file (%s): %s" % (filenm, details)
 				if dom:
@@ -311,7 +310,8 @@ class Main (gtk.Window):
 					dom.unlink()
 					del dom
 	
-	def build_schedule(self, directory="data/sched"):
+	def build_schedule(self):
+		directory = join(DATA_PATH, "sched")
 		'Add items to the schedule list.'
 		self.library = Schedule( _("Library"))
 		self.build_pres_list()
@@ -488,7 +488,7 @@ class Main (gtk.Window):
 				sched = schmod.get_value(itr, 0)
 				sched.remove_if(presentation=item.presentation)
 				itr = schmod.iter_next(itr)
-			os.remove("data/pres/"+item.filename)
+			os.remove(join(DATA_PATH,"pres",item.filename))
 			self._on_pres_activate()
 	
 	def _on_pres_delete_from_schedule(self, *args):
@@ -517,7 +517,7 @@ class Main (gtk.Window):
 		gtk.main_quit()
 
 
-if __name__ == "__main__":
+def main():
 	m = Main()
 	gtk.main()
 

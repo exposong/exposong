@@ -18,11 +18,12 @@ import pygtk
 import gtk
 import gtk.gdk
 import gobject
-import os
-from glob import *
-import os.path
 import xml.dom
 import xml.dom.minidom
+from os.path import join
+
+from exposong.glob import *
+from exposong import RESOURCE_PATH, DATA_PATH
 
 '''
 Provides the different types of presentations.
@@ -93,8 +94,9 @@ class Presentation:
 			self.to_xml()
 			return True
 	
-	def to_xml(self, directory = "data/pres/"):
+	def to_xml(self):
 		'Save the data to disk.'
+		directory = join(DATA_PATH, 'pres')
 		self.filename = check_filename(self.title, directory, self.filename)
 		
 		doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
@@ -108,7 +110,7 @@ class Presentation:
 			s.to_node(doc, sNode)
 			root.appendChild(sNode)
 		doc.appendChild(root)
-		outfile = open(directory+self.filename, 'w')
+		outfile = open(join(directory, self.filename), 'w')
 		doc.writexml(outfile)
 		doc.unlink()
 

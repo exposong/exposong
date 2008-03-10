@@ -22,8 +22,9 @@ import os
 import os.path
 import xml.dom
 import xml.dom.minidom
+from os.path import join
 
-import ptype
+from exposong import ptype, RESOURCE_PATH, DATA_PATH
 
 '''
 Supports a generic presentation.
@@ -34,7 +35,7 @@ base classes, changing only the necessary items.
 
 menu_name = _("Generic")
 type_name = "generic"
-icon = gtk.gdk.pixbuf_new_from_file('images/generic.png')
+icon = gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH,'generic.png'))
 
 
 class Presentation (ptype.Presentation):

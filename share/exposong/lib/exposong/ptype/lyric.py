@@ -22,14 +22,15 @@ import pango
 import re
 import xml.dom
 import xml.dom.minidom
+from os.path import join
 
-import ptype
-from ptype import get_node_text
+from exposong.glob import *
+from exposong import ptype, RESOURCE_PATH, DATA_PATH
 
 '''This creates lyrics for presentation.'''
 menu_name = _("Lyrics")
 type_name = 'lyrics'
-icon = gtk.gdk.pixbuf_new_from_file('images/lyric.png')
+icon = gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH,'lyric.png'))
 title_re = re.compile("(chorus|refrain|verse|bridge)", re.I)
 
 

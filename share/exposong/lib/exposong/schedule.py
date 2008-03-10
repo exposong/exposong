@@ -21,9 +21,9 @@ import gtk.gdk
 import gobject
 import xml.dom
 from glob import *
+from os.path import join
 
-import preslist
-import ptype
+from exposong import DATA_PATH, preslist, ptype
 
 
 class Schedule(gtk.ListStore):
@@ -55,10 +55,11 @@ class Schedule(gtk.ListStore):
 				if pres:
 					gtk.ListStore.append(self, ScheduleItem(pres, comment).get_row())
 				else:
-					print 'Presentation file "%s" not found.' % pres.filename
+					print 'Presentation file "%s" not found.' % filenm
 			
-	def save(self, directory='data/sched/'):
+	def save(self):
 		'Write schedule to disk.'
+		directory = join(DATA_PATH, 'sched')
 		self.filename = check_filename(self.title, directory, self.filename)
 		dom = xml.dom.getDOMImplementation().createDocument(None, None, None)
 		root = dom.createElement("schedule")
@@ -82,7 +83,7 @@ class Schedule(gtk.ListStore):
 			root.appendChild(pNode)
 			itr = self.iter_next(itr)
 		dom.appendChild(root)
-		outfile = open(directory+self.filename, 'w')
+		outfile = open(join(directory, self.filename), 'w')
 		dom.writexml(outfile)
 		dom.unlink()
 	
@@ -104,7 +105,9 @@ class Schedule(gtk.ListStore):
 		while itr:
 			item = self.get_value(itr, 0)
 			if item.presentation == presentation:
+				itr2 = self.iter_next(itr)
 				self.remove(itr)
+				itr = itr2
 				ret = True
 			else:
 				itr = self.iter_next(itr)
