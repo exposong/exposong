@@ -1,6 +1,6 @@
 +------------------------------------+
 | ExpoSong                           |
-| Version 0.2-alpha                  |
+| Version 0.3-alpha                  |
 | Copyright (C) 2008 Fishhookweb.com |
 +------------------------------------+
 
@@ -10,6 +10,7 @@
 
  *	Custom schedules are now possible. Drag and drop adding, reordering, and
 	deleting of presentations removes it from all lists.
+ *	Progress has been made to enable translations.
 
 == 0.2 ==
 
