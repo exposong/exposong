@@ -25,7 +25,7 @@ class About:
 		self.dialog.set_transient_for(parent)
 		self.dialog.set_name("ExpoSong")
 		self.dialog.set_version( "0.3 Beta" )
-		self.dialog.set_copyright(_(u"Copyright ")+u"\xA9 2008 Fishhookweb.com")
+		self.dialog.set_copyright(_("Copyright %s") % "2008 Fishhookweb.com")
 		self.dialog.set_authors(("Brad Landis","Robert Nix","Siegwart Bogatscher"))
 		self.dialog.set_logo(gtk.gdk.pixbuf_new_from_file("images/exposong.png"))
 		self.dialog.set_website("http://exposong.org")
