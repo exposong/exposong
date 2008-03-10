@@ -34,13 +34,12 @@ class Schedule(gtk.ListStore):
 		gtk.ListStore.__init__(self, *preslist.PresList.get_model_args())
 		self.title = title
 		self.filename = filename
-		self.items = []
 		self.builtin = builtin
 		self.filter_type = filter_type
 	
 	def load(self, dom, library):
 		'Loads from an xml file.'
-		self.items = []
+		self.clear()
 		self.builtin = False
 		self.title = get_node_text(dom.getElementsByTagName("title")[0])
 		for presNode in dom.getElementsByTagName("presentation"):
@@ -54,8 +53,9 @@ class Schedule(gtk.ListStore):
 			if filenm:
 				pres = library.find(filename=filenm)
 				if pres:
-					self.items.append(ScheduleItem(pres, comment))
-		self.refresh_model()
+					gtk.ListStore.append(self, ScheduleItem(pres, comment).get_row())
+				else:
+					print 'Presentation file "%s" not found.' % pres.filename
 			
 	def save(self, directory='data/sched/'):
 		'Write schedule to disk.'
@@ -67,7 +67,11 @@ class Schedule(gtk.ListStore):
 		tNode = dom.createElement("title")
 		tNode.appendChild(dom.createTextNode(self.title))
 		root.appendChild(tNode)
-		for item in self.items:
+		
+		itr = self.get_iter_first()
+		while itr:
+			item = self.get_value(itr, 0)
+			
 			pNode = dom.createElement("presentation")
 			tNode = dom.createElement("file")
 			tNode.appendChild(dom.createTextNode(item.filename))
@@ -76,6 +80,7 @@ class Schedule(gtk.ListStore):
 			tNode.appendChild(dom.createTextNode(item.comment))
 			pNode.appendChild(tNode)
 			root.appendChild(pNode)
+			itr = self.iter_next(itr)
 		dom.appendChild(root)
 		outfile = open(directory+self.filename, 'w')
 		dom.writexml(outfile)
@@ -86,23 +91,24 @@ class Schedule(gtk.ListStore):
 		if self.filter_type and self.filter_type != pres.type:
 			return False
 		sched = ScheduleItem(pres, comment)
-		self.items.append(sched)
+		gtk.ListStore.append(self, sched.get_row())
 	
-	def remove(self, pres):
+	def remove(self, itr):
 		'Remove a presentation from a schedule.'
-		self.items.remove(pres)
-		self.refresh_model()
+		gtk.ListStore.remove(self, itr)
 	
-	def move(self, i, i2):
-		'Move the item[i] to replace item[i2].'
-		while i != i2 and i < len(self.items) and i >= 0:
-			if i > i2:
-				self.items[i], self.items[i-1] = self.items[i-1], self.items[i]
-				i -= 1
+	def remove_if(self, presentation):
+		'Searches and removes a schedule if it is presentation.'
+		itr = self.get_iter_first()
+		ret = False
+		while itr:
+			item = self.get_value(itr, 0)
+			if item.presentation == presentation:
+				self.remove(itr)
+				ret = True
 			else:
-				self.items[i], self.items[i+1] = self.items[i+1], self.items[i]
-				i += 1
-		self.refresh_model()
+				itr = self.iter_next(itr)
+		return ret
 	
 	def set_model(self, model):
 		'Filter all presentations.'
@@ -110,14 +116,14 @@ class Schedule(gtk.ListStore):
 	
 	def get_model(self):
 		'Return the filtered ListModel'
-		self.refresh_model()
 		return self
 	
 	def refresh_model(self):
 		'Clears and repopulates the model.'
-		self.clear()
-		for sched in self.items:
-			gtk.ListStore.append(self, sched.get_row())
+		itr = self.get_iter_first()
+		while itr:
+			self.set_value(itr, 1, self.get_value(itr, 0).title)
+			itr = self.iter_next(itr)
 		if self.builtin:
 			self.set_sort_column_id(1, gtk.SORT_ASCENDING)
 	
@@ -127,9 +133,12 @@ class Schedule(gtk.ListStore):
 	
 	def find(self, filename):
 		'Searches the schedule for the matching filename.'
-		for item in self.items:
+		itr = self.get_iter_first()
+		while itr:
+			item = self.get_value(itr, 0)
 			if item.filename == filename:
 				return item.presentation
+			itr = self.iter_next(itr)
 
 
 class ScheduleItem:
@@ -149,5 +158,5 @@ class ScheduleItem:
 	
 	def get_row(self):
 		'Get a row to put into the presentation list.'
-		return (self,) + self.presentation.get_row()[1:]
+		return (self, self.title)
 

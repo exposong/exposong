@@ -63,7 +63,6 @@ class PresList(gtk.TreeView):
 	#def update(self):
 	#	'Update each item in the model.'
 	#	self.get_model().refresh_model()
-	#	print 1
 	
 	def has_selection(self):
 		'Return true if an item is selected.'
@@ -86,5 +85,5 @@ class PresList(gtk.TreeView):
 	@staticmethod
 	def get_model_args():
 		'Get the arguments to pass to `gtk.ListStore`.'
-		return (gobject.TYPE_PYOBJECT, gobject.TYPE_STRING, gobject.TYPE_STRING)
+		return (gobject.TYPE_PYOBJECT, gobject.TYPE_STRING)
 

@@ -62,7 +62,7 @@ class Presentation:
 	
 	def get_row(self):
 		'Gets the data to add to the presentation list.'
-		return (self, self.title, self.type)
+		return (self, self.title)
 	
 	def set_text_buffer(self, tbuf):
 		'Sets the value of a text buffer.'

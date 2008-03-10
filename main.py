@@ -310,7 +310,6 @@ class Main (gtk.Window):
 						print "%s is not a presentation file." % filenm
 					dom.unlink()
 					del dom
-		self.library.refresh_model()
 	
 	def build_schedule(self, directory="data/sched"):
 		'Add items to the schedule list.'
@@ -322,9 +321,11 @@ class Main (gtk.Window):
 		i = 2
 		for (ptype, mod) in type_mods.items():
 			schedule = Schedule(mod.menu_name, filter_type=ptype)
-			for item in self.library.items:
+			itr = self.library.get_iter_first()
+			while itr:
+				item = self.library.get_value(itr, 0)
 				schedule.append(item.presentation)
-			schedule.refresh_model()
+				itr = self.library.iter_next(itr)
 			self.schedule_list.append(None, schedule, i)
 			i += 1
 		
@@ -355,9 +356,9 @@ class Main (gtk.Window):
 		'Change the presentation list to the current schedule.'
 		if self.schedule_list.has_selection():
 			sched = self.schedule_list.get_active_item()
-			sched.refresh_model()
 			if isinstance(sched, Schedule):
 				self.pres_list.set_model(sched)
+				sched.refresh_model()
 				if sched.is_reorderable():
 					self.pres_list.enable_model_drag_dest(DRAGDROP_SCHEDULE,
 							gtk.gdk.ACTION_COPY)
@@ -387,25 +388,23 @@ class Main (gtk.Window):
 		'A presentation was reordered.'
 		drop_info = treeview.get_dest_row_at_pos(x, y)
 		model = treeview.get_model()
-		sched = self.schedule_list.get_active_item()
-		#currently requires the user not to change or unselect the schedule
-		if not sched or sched is not self.pres_list.get_model():
-			return
+		sched = self.pres_list.get_model() #Gets the current schedule
 		path_mv = int(selection.data)
 		
 		if drop_info:
 			path_to, position = drop_info
-			path_to = path_to[0]
-			if path_mv > path_to and (position is gtk.TREE_VIEW_DROP_AFTER or
-					position is gtk.TREE_VIEW_DROP_INTO_OR_AFTER):
-				path_to += 1
-			elif path_mv < path_to and (position is gtk.TREE_VIEW_DROP_BEFORE or
-					position is gtk.TREE_VIEW_DROP_INTO_OR_BEFORE):
-				path_to -= 1
-		else:
-			path_to = len(sched.items)-1
+			itr_to = sched.get_iter(path_to)
+		else: #Assumes that if there's no drop info, it's at the end of the list
+			position = gtk.TREE_VIEW_DROP_BEFORE
+			itr_to = None
+		itr_mv = sched.get_iter(path_mv)
 		
-		sched.move(path_mv, path_to)
+		if path_mv > path_to and (position is gtk.TREE_VIEW_DROP_AFTER or
+				position is gtk.TREE_VIEW_DROP_INTO_OR_AFTER):
+			sched.move_after(itr_mv, itr_to)
+		elif path_mv < path_to and (position is gtk.TREE_VIEW_DROP_BEFORE or
+				position is gtk.TREE_VIEW_DROP_INTO_OR_BEFORE):
+			sched.move_before(itr_mv, itr_to)
 		
 		context.finish(True, False)
 		return
@@ -458,7 +457,7 @@ class Main (gtk.Window):
 		if not field:
 			return False
 		if field.edit(self):
-			self.pres_list.update()
+			self.pres_list.get_model().refresh_model()
 			self._on_pres_activate()
 	
 	def _on_pres_delete(self, *args):
@@ -474,37 +473,30 @@ class Main (gtk.Window):
 		dialog.hide()
 		if resp == gtk.RESPONSE_YES:
 			schmod = self.schedule_list.get_model()
+			
 			#Remove from builtin modules
 			itr = schmod.get_iter_first()
 			while itr:
 				sched = schmod.get_value(itr, 0)
 				if sched:
-					for item2 in sched.items:
-						if item2.presentation is item.presentation:
-							sched.items.remove(item2)
-					sched.refresh_model()
+					sched.remove_if(presentation=item.presentation)
 				itr = schmod.iter_next(itr)
+			
 			#Remove from custom schedules
 			itr = schmod.iter_children(self.schedule_list.custom_schedules)
 			while itr:
 				sched = schmod.get_value(itr, 0)
-				for item2 in sched.items:
-					if item2.presentation is item.presentation:
-						sched.items.remove(item2)
-				sched.refresh_model()
+				sched.remove_if(presentation=item.presentation)
 				itr = schmod.iter_next(itr)
 			os.remove("data/pres/"+item.filename)
 			self._on_pres_activate()
 	
 	def _on_pres_delete_from_schedule(self, *args):
 		'Remove the schedule from the current schedule.'
-		sched = self.schedule_list.get_active_item()
-		if not sched or sched.builtin:
+		sched, itr = self.pres_list.get_selection().get_selected()
+		if not itr or sched.builtin:
 			return False
-		item = self.pres_list.get_active_item()
-		if not item:
-			return False
-		sched.remove(item)
+		sched.remove(itr)
 	
 	def _on_about(self, *args):
 		'Shows the about dialog.'
