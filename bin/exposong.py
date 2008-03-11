@@ -18,5 +18,5 @@
 import sys
 from os.path import dirname, join, pardir
 sys.path.insert(0, join(dirname(__file__), pardir, 'share', 'exposong', 'lib'))
-from exposong.application import main
+from exposong import main
 main()

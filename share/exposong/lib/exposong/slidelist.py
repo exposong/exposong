@@ -14,13 +14,10 @@
 #
 #	You should have received a copy of the GNU General Public License
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import pygtk
-pygtk.require("2.0")
 import gtk
 import gobject
 import pango
 
-#TODO Should be called Slides, because it no longer is a TextView (Now a treeview)
 class SlideList(gtk.TreeView):
 	'''
 	Class to manipulate the text_area in the presentation program.

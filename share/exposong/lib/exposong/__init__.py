@@ -22,13 +22,21 @@ LOCALE_PATH = join(SHARED_FILES, 'i18n')
 RESOURCE_PATH = join(SHARED_FILES, 'res')
 DATA_PATH = abspath(join(SHARED_FILES, pardir, pardir, 'data'))
 
-GETTEXT_DOMAIN = 'exposong'
 
 import pygtk
-pygtk.require("2.0")
+pygtk.require("2.0") #TODO Make sure this requirement is good enough
 
+#Set up translations for the program
 import gettext
+import locale
+
+locale.setlocale(locale.LC_ALL, '')
+gettext.bindtextdomain('exposong', LOCALE_PATH)
+gettext.textdomain('exposong')
+
 import __builtin__
 __builtin__._ = gettext.gettext
 
+#import the main application
+from exposong.application import main
 
