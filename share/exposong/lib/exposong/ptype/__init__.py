@@ -144,33 +144,31 @@ class Slide:
 		node.appendChild( document.createTextNode(self.text) )
 
 
-#TODO Replace this
 class Edit:
 	'''Creates a GTK Entry to edit or add a new item'''
 	def __init__(self, parent, pres = None):
-		'Parent: parent dialog. Pres: Presentation to edit.'
 		self.dialog = gtk.Dialog("New Presentation", parent, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
 				(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
 		if(pres.title):
 			self.dialog.set_title("Editing " + pres.title)
 		else:
 			self.dialog.set_title("New " + pres.type.title() + " Presentation")
-		self.dialog.vbox.set_spacing(4)
+		notebook = gtk.Notebook()
+		self.dialog.vbox.pack_start(notebook, True, True, 6)
+		
+		vbox = gtk.VBox()
+		vbox.set_border_width(4)
+		vbox.set_spacing(7)
+		hbox = gtk.HBox()
 		
 		label = gtk.Label("Title:")
-		label.set_alignment(0.0, 0.0)
-		self.dialog.vbox.pack_start(label, False, True)
-		label.show()
-		
+		label.set_alignment(0.5, 0.5)
+		hbox.pack_start(label, False, True, 5)
 		self.title = gtk.Entry(45)
 		self.title.set_text(pres.title)
-		self.dialog.vbox.pack_start(self.title, False, True)
-		self.title.show()
+		hbox.pack_start(self.title, True, True)
 		
-		label = gtk.Label("Text:")
-		label.set_alignment(0.0, 0.0)
-		self.dialog.vbox.pack_start(label, False, True)
-		label.show()
+		vbox.pack_start(hbox, False, True)
 		
 		self.text = gtk.TextView()
 		self.text.set_wrap_mode(gtk.WRAP_WORD)
@@ -179,10 +177,11 @@ class Edit:
 		text_scroll.add(self.text)
 		text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
 		text_scroll.set_size_request(300, 200)
-		text_scroll.set_shadow_type(gtk.SHADOW_IN)
 		text_scroll.show_all()
+		vbox.pack_start(text_scroll, True, True)
 		
-		self.dialog.vbox.pack_start(text_scroll, True, True)
+		notebook.append_page(vbox, gtk.Label(_("Edit")))
+		notebook.show_all()
 	
 	def run(self):
 		rval = False
