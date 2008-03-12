@@ -16,6 +16,9 @@
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import gtk
 import gtk.gdk
+from os.path import join
+
+from exposong import RESOURCE_PATH
 
 class About:
 	'''Creates an About dialog to show details about the program. Use about.run()
@@ -27,7 +30,8 @@ class About:
 		self.dialog.set_version( "0.3 Beta" )
 		self.dialog.set_copyright(_("Copyright %s") % "2008 Fishhookweb.com")
 		self.dialog.set_authors(("Brad Landis","Robert Nix","Siegwart Bogatscher"))
-		self.dialog.set_logo(gtk.gdk.pixbuf_new_from_file("images/exposong.png"))
+		self.dialog.set_logo(gtk.gdk.pixbuf_new_from_file(
+				join(RESOURCE_PATH, "exposong.png")))
 		self.dialog.set_website("http://exposong.org")
 		self.dialog.set_modal(False)
 		self.dialog.run()
