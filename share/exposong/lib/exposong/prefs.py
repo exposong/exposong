@@ -109,7 +109,7 @@ class PrefsDialog(gtk.Dialog):
 		self.table.set_row_spacings(10)
 		self.table.set_border_width(10)
 		
-		self._append_section_title("Legal", 0)
+		self._append_section_title(_("Legal"), 0)
 		g_ccli = self._append_text_setting("CCLI #", config['general.ccli'], 1)
 		
 		notebook.append_page(self.table, gtk.Label( _("General") ))
