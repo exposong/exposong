@@ -1,0 +1,242 @@
+# German translations for Exposong package.
+# Copyright (C) 2008 Fishhookweb.com
+# This file is distributed under the same license as the ExpoSong package.
+# Siegwart <siegwart.b@googlemail.com>, 2008.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-03-12 00:00+0100\n"
+"PO-Revision-Date: 2008-03-12 00:02+0100\n"
+"Last-Translator: Siegwart <siegwart.b@googlemail.com>\n"
+"Language-Team: German\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: share/exposong/lib/exposong/about.py:28
+#, python-format
+msgid "Copyright %s"
+msgstr ""
+
+#: share/exposong/lib/exposong/application.py:125
+msgid "Present"
+msgstr "Präsentieren"
+
+#: share/exposong/lib/exposong/application.py:129
+#: share/exposong/lib/exposong/prefs.py:140
+msgid "Background"
+msgstr "Hintergrund"
+
+#: share/exposong/lib/exposong/application.py:133
+msgid "Black Screen"
+msgstr "Schwarzer Bildschirm"
+
+#: share/exposong/lib/exposong/application.py:137
+msgid "Hide"
+msgstr "Verstecken"
+
+#: share/exposong/lib/exposong/application.py:162
+msgid "_File"
+msgstr "_Datei"
+
+#: share/exposong/lib/exposong/application.py:163
+msgid "_Edit"
+msgstr "_Bearbeiten"
+
+#: share/exposong/lib/exposong/application.py:164
+msgid "_Schedule"
+msgstr "_Ablaufplan"
+
+#: share/exposong/lib/exposong/application.py:165
+msgid "_Presentation"
+msgstr "_Präsentation"
+
+#: share/exposong/lib/exposong/application.py:166
+msgid "_Help"
+msgstr "_Hilfe"
+
+#: share/exposong/lib/exposong/application.py:169
+msgid "Create a new schedule"
+msgstr "Erstelle neuen Ablaufplan"
+
+#: share/exposong/lib/exposong/application.py:171
+msgid "_Rename"
+msgstr "_Umbenennen"
+
+#: share/exposong/lib/exposong/application.py:172
+msgid "Rename the selected schedule"
+msgstr "Ausgewählten Ablaufplan umbenennen"
+
+#: share/exposong/lib/exposong/application.py:174
+msgid "Delete the currently selected schedule"
+msgstr "Ausgewählten Ablaufplan löschen"
+
+#: share/exposong/lib/exposong/application.py:176
+msgid "Create a new presentation"
+msgstr "Neue Präsentation erstellen"
+
+#: share/exposong/lib/exposong/application.py:178
+msgid "Edit the currently selected presentation"
+msgstr "Ausgewählte Präsentation bearbeiten"
+
+#: share/exposong/lib/exposong/application.py:181
+msgid "Delete the presentation"
+msgstr "Präsentation löschen"
+
+#: share/exposong/lib/exposong/application.py:183
+msgid "Delete from _Schedule"
+msgstr "Aus _Ablaufplan löschen"
+
+#: share/exposong/lib/exposong/application.py:185
+msgid "_Import"
+msgstr "_Importieren"
+
+#: share/exposong/lib/exposong/application.py:186
+msgid "Open a presentation from file"
+msgstr "Öffne Präsentation aus Datei"
+
+#: share/exposong/lib/exposong/application.py:187
+msgid "_Export"
+msgstr "_Exportieren"
+
+#: share/exposong/lib/exposong/application.py:188
+msgid "Export presentation"
+msgstr "Präsentation exportieren"
+
+#: share/exposong/lib/exposong/application.py:189
+msgid "_Present"
+msgstr "_Präsentieren"
+
+#: share/exposong/lib/exposong/application.py:191
+msgid "_Background"
+msgstr "_Hintergrund"
+
+#: share/exposong/lib/exposong/application.py:193
+msgid "Blac_k Screen"
+msgstr "_Schwarzer Bildschirm"
+
+#: share/exposong/lib/exposong/application.py:195
+msgid "_Hide"
+msgstr "_Verstecken"
+
+#: share/exposong/lib/exposong/application.py:316
+msgid "Library"
+msgstr "Bibliothek"
+
+#: share/exposong/lib/exposong/application.py:334
+msgid "Custom Schedules"
+msgstr "Eigene Ablaufpläne"
+
+#: share/exposong/lib/exposong/application.py:470
+#, python-format
+msgid "Are you sure you want to delete \"%s\" from your library?"
+msgstr "Sind Sie sicher, dass sie \"%s\" aus ihrer Bibliothek löschen möchten?"
+
+#: share/exposong/lib/exposong/application.py:471
+msgid "Delete Presentation?"
+msgstr "Präsentation löschen"
+
+#: share/exposong/lib/exposong/prefs.py:26
+msgid "Top Left to Bottom Right"
+msgstr "Von links oben nach rechts unten"
+
+#: share/exposong/lib/exposong/prefs.py:26
+msgid "Top to Bottom"
+msgstr "Von oben nach unten"
+
+#: share/exposong/lib/exposong/prefs.py:27
+msgid "Top Right to Bottom Left"
+msgstr "Von rechts oben nach links unten"
+
+#: share/exposong/lib/exposong/prefs.py:27
+msgid "Left to Right"
+msgstr "Von links nach rechts"
+
+#: share/exposong/lib/exposong/prefs.py:45
+#, python-format
+msgid "Could not find key: %s"
+msgstr ""
+
+#: share/exposong/lib/exposong/prefs.py:102
+msgid "Preferences"
+msgstr "Kann den Schlüssel %s nicht finden"
+
+#: share/exposong/lib/exposong/prefs.py:115
+msgid "General"
+msgstr "Allgemein"
+
+#: share/exposong/lib/exposong/prefs.py:141
+msgid "_Solid"
+msgstr "_Einfarbig"
+
+#: share/exposong/lib/exposong/prefs.py:145
+msgid "_Gradiant"
+msgstr "_Gradient"
+
+#: share/exposong/lib/exposong/prefs.py:149
+msgid ""
+"Gradiant Angle\n"
+"(Clockwise From Up)"
+msgstr "Gradient Winkel\n"
+"(Im Uhrzeigersinn von oben beginnend)"
+
+#: share/exposong/lib/exposong/prefs.py:152
+msgid "_Image"
+msgstr "_Bild"
+
+#: share/exposong/lib/exposong/prefs.py:159
+msgid "Font"
+msgstr "Schriftart"
+
+#: share/exposong/lib/exposong/prefs.py:160
+msgid "Text Color"
+msgstr "Textfarbe"
+
+#: share/exposong/lib/exposong/prefs.py:161
+msgid "Text Shadow"
+msgstr "Textschatten"
+
+#: share/exposong/lib/exposong/prefs.py:162
+msgid "Max Font Size"
+msgstr "Maximale Schriftgröße"
+
+#: share/exposong/lib/exposong/prefs.py:164
+#: share/exposong/lib/exposong/preslist.py:32
+msgid "Presentation"
+msgstr "Präsentation"
+
+#: share/exposong/lib/exposong/prefs.py:213
+msgid "Choose File"
+msgstr "Datei auswählen"
+
+#: share/exposong/lib/exposong/schedlist.py:42
+msgid "Schedule"
+msgstr "Ablaufplan"
+
+#: share/exposong/lib/exposong/schedlist.py:89
+#, python-format
+msgid "Are you sure you want to delete \"%s\"?"
+msgstr "Sind Sie sicher, dass sie \"%s\" löschen möchten?"
+
+#: share/exposong/lib/exposong/schedlist.py:90
+msgid "Delete Schedule?"
+msgstr "Ablaufplan löschen?"
+
+#: share/exposong/lib/exposong/schedlist.py:112
+msgid "New Schedule"
+msgstr "Neuer Ablaufplan"
+
+#: share/exposong/lib/exposong/slidelist.py:32
+msgid "Slide"
+msgstr "Folie"
+
+#: share/exposong/lib/exposong/ptype/generic.py:36
+msgid "Generic"
+msgstr "Allgemein"
+
+#: share/exposong/lib/exposong/ptype/lyric.py:31
+msgid "Lyrics"
+msgstr "Liedtext"
