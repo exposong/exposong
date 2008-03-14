@@ -56,10 +56,10 @@ def check_filename(title, directory, filename = None):
 	match = "^"+re.escape(tfile)+"(-[0-9]+)?.xml$"
 	if not isinstance(filename, str) or not re.match(match, filename):
 		if(filename):
-			os.remove(directory+filename)
+			os.remove(os.path.join(directory, filename))
 		filename = tfile + ".xml"
 		index = 0
-		while os.path.exists(directory + filename):
+		while os.path.exists(os.path.join(directory, filename)):
 			index -= 1
 			filename = tfile + str(index) + ".xml"
 	return filename
