@@ -395,6 +395,7 @@ class Main (gtk.Window):
 			path_to, position = drop_info
 			itr_to = sched.get_iter(path_to)
 		else: #Assumes that if there's no drop info, it's at the end of the list
+			path_to = path_mv + 1
 			position = gtk.TREE_VIEW_DROP_BEFORE
 			itr_to = None
 		itr_mv = sched.get_iter(path_mv)
