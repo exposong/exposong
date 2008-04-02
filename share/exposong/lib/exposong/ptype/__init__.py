@@ -77,14 +77,46 @@ class Presentation:
 		pass
 	
 	def edit(self, parent):
-		'''
-		Run the edit dialog for the presentation.
+		'Run the edit dialog for the presentation.'
+		dialog = gtk.Dialog(_("New Presentation"), parent, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+				(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+		if(self.title):
+			dialog.set_title(_("Editing %s") % self.title)
+		else:
+			dialog.set_title(_("New %s Presentation") % self.type.title())
+		notebook = gtk.Notebook()
+		dialog.vbox.pack_start(notebook, True, True, 6)
 		
-		Always define this function in subclasses if a custom "Edit"
-		class is used.
-		'''
-		edit = Edit(parent, self)
-		rval = edit.run()
+		vbox = gtk.VBox()
+		vbox.set_border_width(4)
+		vbox.set_spacing(7)
+		hbox = gtk.HBox()
+		
+		label = gtk.Label(_("Title:"))
+		label.set_alignment(0.5, 0.5)
+		hbox.pack_start(label, False, True, 5)
+		title = gtk.Entry(45)
+		title.set_text(self.title)
+		hbox.pack_start(title, True, True)
+		
+		vbox.pack_start(hbox, False, True)
+		
+		text = gtk.TextView()
+		text.set_wrap_mode(gtk.WRAP_WORD)
+		self.set_text_buffer(text.get_buffer())
+		text_scroll = gtk.ScrolledWindow()
+		text_scroll.add(text)
+		text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+		text_scroll.set_size_request(300, 200)
+		vbox.pack_start(text_scroll, True, True)
+		notebook.append_page(vbox, gtk.Label(_("Edit")))
+		
+		notebook.show_all()
+		rval = False
+		if(dialog.run() == gtk.RESPONSE_ACCEPT):
+			bounds = text.get_buffer().get_bounds()
+			rval = (title.get_text(), text.get_buffer().get_text(bounds[0], bounds[1]))
+		dialog.hide()
 		
 		if(rval):
 			self.title = rval[0]
@@ -142,60 +174,4 @@ class Slide:
 		if(self.title):
 			node.setAttribute("title", self.title)
 		node.appendChild( document.createTextNode(self.text) )
-
-
-class Edit:
-	'''Creates a GTK Entry to edit or add a new item'''
-	def __init__(self, parent, pres = None):
-		self.dialog = gtk.Dialog("New Presentation", parent, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-				(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
-		if(pres.title):
-			self.dialog.set_title("Editing " + pres.title)
-		else:
-			self.dialog.set_title("New " + pres.type.title() + " Presentation")
-		notebook = gtk.Notebook()
-		self.dialog.vbox.pack_start(notebook, True, True, 6)
-		
-		vbox = gtk.VBox()
-		vbox.set_border_width(4)
-		vbox.set_spacing(7)
-		hbox = gtk.HBox()
-		
-		label = gtk.Label("Title:")
-		label.set_alignment(0.5, 0.5)
-		hbox.pack_start(label, False, True, 5)
-		self.title = gtk.Entry(45)
-		self.title.set_text(pres.title)
-		hbox.pack_start(self.title, True, True)
-		
-		vbox.pack_start(hbox, False, True)
-		
-		self.text = gtk.TextView()
-		self.text.set_wrap_mode(gtk.WRAP_WORD)
-		pres.set_text_buffer(self.text.get_buffer())
-		text_scroll = gtk.ScrolledWindow()
-		text_scroll.add(self.text)
-		text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
-		text_scroll.set_size_request(300, 200)
-		text_scroll.show_all()
-		vbox.pack_start(text_scroll, True, True)
-		
-		notebook.append_page(vbox, gtk.Label(_("Edit")))
-		notebook.show_all()
-	
-	def run(self):
-		rval = False
-		if(self.dialog.run() == gtk.RESPONSE_ACCEPT):
-			bounds = self.text.get_buffer().get_bounds()
-			rval = (self.title.get_text(), self.text.get_buffer().get_text(bounds[0], bounds[1]))
-		self.dialog.hide()
-		return rval
-	
-	def copy(self, *args):
-		pass
-	def cut(self, *args):
-		pass
-	def paste(self, *args):
-		pass
-
 

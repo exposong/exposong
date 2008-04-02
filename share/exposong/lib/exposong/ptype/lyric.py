@@ -56,16 +56,7 @@ class Presentation(ptype.Presentation):
 	
 	def edit(self, parent = None):
 		'Run the edit dialog for the presentation.'
-		edit = Edit(parent, self)
-		rval = edit.run()
-		
-		if(rval):
-			self.title = rval[0]
-			self.slides = []
-			for sl in rval[1].split("\n\n"):
-				self.slides.append(Slide(sl))
-			self.to_xml()
-			return True
+		return ptype.Presentation.edit(self, parent)
 	
 	def set_text_buffer(self, tbuf):
 		'Sets the value of a text buffer.'
@@ -96,30 +87,4 @@ class Slide(ptype.Slide):
 			else:
 				self.title = ''
 				self.text = value
-
-
-class Edit(ptype.Edit):
-	'''Creates a GTK Entry to edit or add a new item'''
-	def __init__(self, parent = None, pres = None):
-		ptype.Edit.__init__(self, parent, pres)
-		
-		#self.dialog.set_title("Lyric")
-		self.text.get_buffer().connect("changed", self.text_changed)
-	
-	def text_changed(self, tbuf):
-		it = tbuf.get_start_iter()
-		tbuf.remove_tag_by_name("titleTag", it, tbuf.get_end_iter())
-		cont = True
-		while cont:
-			end_ln = it.copy().forward_search('\n', gtk.TEXT_SEARCH_VISIBLE_ONLY)
-			if(not end_ln):
-				end_ln = tbuf.get_end_iter()
-			else:
-				end_ln = end_ln[1]
-			line = it.get_text(end_ln)
-			if(title_re.match(line, endpos=30)):
-				tbuf.apply_tag_by_name("titleTag", it, end_ln)
-				
-			cont = it.forward_line()
-
 
