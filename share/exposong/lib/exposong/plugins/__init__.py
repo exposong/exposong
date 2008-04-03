@@ -43,8 +43,6 @@ class Plugin(object):
 
 def init_plugin_system(cfg):
 	'Load plugins dynamically.'
-	if not cfg['plugin_path'] in sys.path:
-		sys.path.insert(0, cfg['plugin_path'])
 	load_plugins(cfg['plugins'])
 	
 
