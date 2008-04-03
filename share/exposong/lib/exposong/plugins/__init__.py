@@ -49,7 +49,7 @@ def init_plugin_system(cfg):
 def load_plugins(plugins):
 	'Import plugins.'
 	for plugin in plugins:
-		__import__(plugin, None, None, [''])
+		__import__("exposong.plugins." plugin, None, None, [''])
 
 
 def find_plugins():
