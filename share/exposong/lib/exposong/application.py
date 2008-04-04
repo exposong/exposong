@@ -206,7 +206,7 @@ class Main (gtk.Window):
 						<menuitem action="Preferences" />
 					</menu>
 					<menu action="Schedule">
-						<menuitem action='sched-new' />
+						<menu action='sched-new'></menu>
 						<menuitem action='sched-rename' />
 						<menuitem action='sched-delete' />
 					</menu>

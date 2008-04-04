@@ -18,8 +18,6 @@
 
 """
 This provides a base class for the plugin system.
-
-
 """
 
 class Plugin(object):

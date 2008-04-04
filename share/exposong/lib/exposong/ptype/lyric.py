@@ -25,7 +25,7 @@ import xml.dom.minidom
 from os.path import join
 
 from exposong.glob import *
-from exposong import ptype, RESOURCE_PATH, DATA_PATH
+from exposong import ptype, RESOURCE_PATH
 
 '''This creates lyrics for presentation.'''
 menu_name = _("Lyrics")
