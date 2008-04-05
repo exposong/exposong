@@ -3,7 +3,7 @@ import gtk
 from os.path import join
 
 from exposong import RESOURCE_PATH
-from exposong.plugins import ptype
+from exposong.plugins import Plugin, _abstract
 
 """
 Plain text presentations.
@@ -14,7 +14,7 @@ information = {
 		'required': False,
 }
 
-class Presentation (ptype.Presentation):
+class Presentation (Plugin, _abstract.Presentation):
 	'''
 	Text presentation type.
 	'''
@@ -25,6 +25,7 @@ class Presentation (ptype.Presentation):
 		self.type = "text"
 	
 	def merge_menu(self, uimanager):
+		'Merge new values with the uimanager.'
 		factory = gtk.IconFactory()
 		factory.add('exposong-text',gtk.IconSet(gtk.gdk.pixbuf_new_from_file(
 				join(RESOURCE_PATH,'generic.png'))))
@@ -34,7 +35,7 @@ class Presentation (ptype.Presentation):
 		actiongroup.add_actions(("pres-new-text", 'exposong-text'))
 		uimanager.insert_action_group(actiongroup, -1)
 		
-		uimanager.add_ui_from_string("""
+		self.menu_merge_id = uimanager.add_ui_from_string("""
 			<menubar name='MenuBar'>
 				<menu action="Presentation">
 						<menu action="pres-new">
@@ -43,4 +44,8 @@ class Presentation (ptype.Presentation):
 				</menu>
 			</menubar>
 			""")
+	
+	def unmerge_menu(self, uimanager):
+		'Remove merged items from the menu.'
+		uimanager.remove_ui(self.menu_merge_id)
 

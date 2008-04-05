@@ -55,11 +55,11 @@ def find_plugins():
 	return Plugin.__subclasses__()
 
 
-def get_plugins_by_capability(capability):
-	'Return all plugins that have a capability.'
+def get_plugins_by_capability(classname):
+	'Return all plugins that have a super-class in "_abstract.py".'
 	result = []
 	for plugin in Plugin.__subclasses__():
-		if capability in plugin.capabilities:
+		if issubclass(plugin, classname):
 			result.append(plugin)
 	return result
 

@@ -3,7 +3,7 @@ import gtk
 from os.path import join
 
 from exposong import RESOURCE_PATH
-from exposong.plugins import ptype
+from exposong.plugins import Plugin, _abstract
 
 """
 Lyric presentations.
@@ -15,7 +15,7 @@ information = {
 }
 
 
-class Presentation (ptype.Presentation):
+class Presentation (Plugin, _abstract.Presentation):
 	'''
 	Lyric presentation type.
 	'''
@@ -32,6 +32,7 @@ class Presentation (ptype.Presentation):
 			self.slides.append(Slide(sl))
 	
 	def merge_menu(self, uimanager):
+		'Merge new values with the uimanager.'
 		factory = gtk.IconFactory()
 		factory.add('exposong-lyric',gtk.IconSet(gtk.gdk.pixbuf_new_from_file(
 				join(RESOURCE_PATH,'lyric.png')))
@@ -41,7 +42,7 @@ class Presentation (ptype.Presentation):
 		actiongroup.add_actions(("pres-new-lyric", 'exposong-lyric'))
 		uimanager.insert_action_group(actiongroup, -1)
 		
-		uimanager.add_ui_from_string("""
+		self.menu_merge_id = uimanager.add_ui_from_string("""
 			<menubar name='MenuBar'>
 				<menu action="Presentation">
 						<menu action="pres-new">
@@ -50,8 +51,13 @@ class Presentation (ptype.Presentation):
 				</menu>
 			</menubar>
 			""")
+	
+	def unmerge_menu(self, uimanager):
+		'Remove merged items from the menu.'
+		uimanager.remove_ui(self.menu_merge_id)
 
-class Slide (ptype.Slide):
+
+class Slide (Plugin, _abstract.Slide):
 	'''
 	A lyric slide for the presentation.
 	'''
