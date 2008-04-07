@@ -400,11 +400,11 @@ class Main (gtk.Window):
 			itr_to = None
 		itr_mv = sched.get_iter(path_mv)
 		
-		if path_mv > path_to and (position is gtk.TREE_VIEW_DROP_AFTER or
-				position is gtk.TREE_VIEW_DROP_INTO_OR_AFTER):
+		if position is gtk.TREE_VIEW_DROP_AFTER or\
+				position is gtk.TREE_VIEW_DROP_INTO_OR_AFTER:
 			sched.move_after(itr_mv, itr_to)
-		elif path_mv < path_to and (position is gtk.TREE_VIEW_DROP_BEFORE or
-				position is gtk.TREE_VIEW_DROP_INTO_OR_BEFORE):
+		elif position is gtk.TREE_VIEW_DROP_BEFORE or\
+				position is gtk.TREE_VIEW_DROP_INTO_OR_BEFORE:
 			sched.move_before(itr_mv, itr_to)
 		
 		context.finish(True, False)
