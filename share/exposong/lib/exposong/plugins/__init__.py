@@ -39,9 +39,9 @@ class Plugin(object):
 		return ""
 
 
-def init_plugin_system(cfg):
+def init_plugin_system(plugins):
 	'Load plugins dynamically.'
-	load_plugins(cfg['plugins'])
+	load_plugins(plugins)
 	
 
 def load_plugins(plugins):
