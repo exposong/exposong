@@ -12,8 +12,7 @@
    deleting of presentations removes it from all lists.
  * Progress has been made to enable translations. A german translation is
    available.
- * A plugin system has been added, but not all of the capabilities are there
-   yet.
+ * A plugin system has been added.
 
 == 0.2 ==
 
