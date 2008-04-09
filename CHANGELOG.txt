@@ -8,30 +8,33 @@
 
 == 0.3 ==
 
- *	Custom schedules are now possible. Drag and drop adding, reordering, and
-	deleting of presentations removes it from all lists.
- *	Progress has been made to enable translations.
+ * Custom schedules are now possible. Drag and drop adding, reordering, and
+   deleting of presentations removes it from all lists.
+ * Progress has been made to enable translations. A german translation is
+   available.
+ * A plugin system has been added, but not all of the capabilities are there
+   yet.
 
 == 0.2 ==
 
- *	Removed the toolbar for presentations, and created a right click menu
-	instead.
- *	User can now delete a presentation.
- *	Presentation type is now denoted by an icon in the list.
- *	Preferences dialog.
- *	Schedules (Only three built-in schedules so far (Library, Generic, and
-	Lyrics)
+ * Removed the toolbar for presentations, and created a right click menu
+   instead.
+ * User can now delete a presentation.
+ * Presentation type is now denoted by an icon in the list.
+ * Preferences dialog.
+ * Schedules (Only three built-in schedules so far (Library, Generic, and
+   Lyrics)
 
 == 0.1 ==
- *	Save slides to disk
- *	Create new slides
- *	Editing of slides
- *	The menu's have been moved to UIManager, which is easier to maintain.
- *	Preview is a duplicate of the presentation window when possible.
+ * Save slides to disk
+ * Create new slides
+ * Editing of slides
+ * The menu's have been moved to UIManager, which is easier to maintain.
+ * Preview is a duplicate of the presentation window when possible.
 
 == Version 0.03 ==
- *	Glade requirement removed
- *	Presentation data stored in xml.
- *	Presentation type for lyrics.
- *	Preferences stored in config.py
+ * Glade requirement removed
+ * Presentation data stored in xml.
+ * Presentation type for lyrics.
+ * Preferences stored in config.py
 

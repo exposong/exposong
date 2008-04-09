@@ -43,6 +43,7 @@ class Main (gtk.Window):
 	Primary user interface.
 	'''
 	def __init__(self):
+		#define this instance in the global scope
 		global main
 		main = self
 		
