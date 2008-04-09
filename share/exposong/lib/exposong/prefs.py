@@ -281,3 +281,5 @@ class PrefsDialog(gtk.Dialog):
 			for t in target:
 				self._on_toggle(button, t)
 
+config = Prefs()
+

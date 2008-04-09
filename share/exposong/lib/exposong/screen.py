@@ -19,8 +19,7 @@ import pango
 import cairo
 import time
 
-#TODO make the preview use a copy of the larger screen if it is visible.
-# Otherwise, we can just render it inexact
+from exposong import prefs
 
 COLOR_BLACK = (0, 0, 0)
 def c2dec(color):
@@ -29,21 +28,19 @@ def c2dec(color):
 	else:
 		return color / 65535.0
 
-class Presentation:
+screen = None # will be the instance variable for Screen once Main runs
+
+class Screen:
 	'''
 	Manage the window for presentation.
 	'''
 	
-	def __init__(self, parent, geometry, preview):
+	def __init__(self, preview):
 		self.text = ''
 		self.black = self.background = False
-		self.parent = parent
-		self.config = self.parent.config
 		
 		self.window = gtk.Window(gtk.WINDOW_POPUP)
-		if isinstance(geometry, tuple) and len(geometry):
-			self.window.move(geometry[0], geometry[1])
-			self.window.resize(geometry[2], geometry[3])
+		
 		self.pres = gtk.DrawingArea()
 		self.pres.connect("expose-event", self.expose)
 		self.pres.show()
@@ -56,6 +53,27 @@ class Presentation:
 			raise Exception("'preview' must be gtk.DrawingArea")
 		
 		self.set_background()
+	
+	def auto_locate(self, main):
+		'''
+		Finds the best location for the screen.
+		
+		If the user is using one monitor, use the bottom right corner for
+		the presentation screen, otherwise, use the 2nd monitor.
+		'''
+		screen = main.get_screen()
+		num_monitors = screen.get_n_monitors()
+		if(num_monitors > 1):
+			scr_geom = screen.get_monitor_geometry(1)
+			geometry = (scr_geom.x, scr_geom.y, scr_geom.width, scr_geom.height)
+		else:
+			# No 2nd monitor, so preview it small in the corner of the screen
+			scr_geom = screen.get_monitor_geometry(0)
+			main.move(0,0)
+			geometry = (scr_geom.width/2, scr_geom.height/2, scr_geom.width/2, scr_geom.height/2)
+		self.window.move(geometry[0], geometry[1])
+		self.window.resize(geometry[2], geometry[3])
+		self.preview.set_size_request(135*geometry[2]/geometry[3], 135)
 	
 	def set_background(self, color = None):
 		'Set the background color.'
@@ -105,7 +123,7 @@ class Presentation:
 	def _set_background(self, widget, color = None):
 		'Set the background of `widget` to `color`.'
 		if color == None:
-			color = c2dec(self.config['pres.bg'])
+			color = c2dec(prefs.config['pres.bg'])
 		
 		if not widget.window:
 			return False
@@ -117,13 +135,13 @@ class Presentation:
 			bounds = widget.window.get_size()
 			#TODO Strings are too long for comparison. Constants or 2-4
 			# character strings would be better.
-			if self.config['pres.bg_angle'] == "Top to Bottom":
+			if prefs.config['pres.bg_angle'] == "Top to Bottom":
 				gr_x1 = gr_y1 = gr_x2 = 0
 				gr_y2 = bounds[1]
-			elif self.config['pres.bg_angle'] == 'Top Right to Bottom Left':
+			elif prefs.config['pres.bg_angle'] == 'Top Right to Bottom Left':
 				gr_x2 = gr_y1 = 0
 				(gr_x1, gr_y2) = bounds
-			elif self.config['pres.bg_angle'] == 'Left to Right':
+			elif prefs.config['pres.bg_angle'] == 'Left to Right':
 				gr_x1 = gr_y1 = gr_y2 = 0
 				gr_x2 = bounds[0]
 			else:
@@ -177,7 +195,7 @@ class Presentation:
 		layout.set_attributes(attrs)
 		
 		min_sz = 0
-		max_sz = int(self.config['pres.max_font_size'])
+		max_sz = int(prefs.config['pres.max_font_size'])
 		#Loop through until the text is between 80% of the height and 94%, or
 		#until we get a number that is not a multiple of 4 (2,6,10,14, etc) to
 		#make it simpler... TODO Double check that it doesn't overflow
@@ -201,13 +219,13 @@ class Presentation:
 			layout.set_attributes(attrs)
 		
 		self._set_background(widget)
-		if self.config['pres.text_shadow']:
-			shcol = c2dec(self.config['pres.text_shadow'])
+		if prefs.config['pres.text_shadow']:
+			shcol = c2dec(prefs.config['pres.text_shadow'])
 			ccontext.set_source_rgba(shcol[0], shcol[1], shcol[2], shcol[3])
 			ccontext.move_to(bounds[0] * 0.03 + size*0.1,
 					(bounds[1] - layout.get_pixel_size()[1])/2.0 + size*0.1)
 			ccontext.show_layout(layout)
-		txcol = c2dec(self.config['pres.text_color'])
+		txcol = c2dec(prefs.config['pres.text_color'])
 		ccontext.set_source_rgba(txcol[0], txcol[1], txcol[2], 1.0)
 		ccontext.move_to(bounds[0] * 0.03,(bounds[1] - layout.get_pixel_size()[1])/2.0)
 		ccontext.show_layout(layout)

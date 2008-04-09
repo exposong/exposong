@@ -23,16 +23,16 @@ import os
 from os.path import join
 
 from exposong import RESOURCE_PATH, DATA_PATH, SHARED_FILES
-
-from exposong.presentation import Presentation
+from exposong import prefs, screen
+#from exposong.presentation import Presentation
 from exposong.preslist import PresList
 from exposong.slidelist import SlideList
 from exposong.about import About
-from exposong import prefs
 from exposong.schedule import Schedule
 from exposong.schedlist import ScheduleList
+from exposong import plugins
 
-
+main = None
 type_mods = {} #dynamically loaded presentation modules
 
 DRAGDROP_SCHEDULE = [("text/treeview-path", 0,0)]
@@ -43,6 +43,9 @@ class Main (gtk.Window):
 	Primary user interface.
 	'''
 	def __init__(self):
+		global main
+		main = self
+		
 		gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 		gtk.window_set_default_icon_list(
 				gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH, 'es128.png')),
@@ -53,7 +56,6 @@ class Main (gtk.Window):
 		self.set_title( "ExpoSong" )
 		self.connect("destroy", self._quit)
 		self.set_default_size(700, 500)
-		self.config = prefs.Prefs()
 		
 		#dynamically load all presentation types
 		ptype_dir = join(SHARED_FILES, 'lib', 'exposong', 'ptype')
@@ -65,10 +67,10 @@ class Main (gtk.Window):
 		win_v = gtk.VBox()
 		
 		#These have to be initialized for the menus to render properly
-		pres_geom = self.get_pres_geometry()
 		self.pres_prev = gtk.DrawingArea()
-		self.pres_prev.set_size_request(135*pres_geom[2]/pres_geom[3], 135)
-		self.presentation = Presentation(self, pres_geom, self.pres_prev)
+		screen.screen = screen.Screen(self.pres_prev)
+		screen.screen.auto_locate(self)
+		
 		self.schedule_list = ScheduleList()
 		
 		menu = self._create_menu()
@@ -124,19 +126,15 @@ class Main (gtk.Window):
 		pres_buttons = gtk.VButtonBox()
 		self.pbut_present = gtk.Button( _("Present") )
 		self.action_group.get_action('Present').connect_proxy(self.pbut_present)
-		#self.pbut_present.connect("clicked", self.presentation.show)
 		pres_buttons.add(self.pbut_present)
 		self.pbut_background = gtk.Button( _("Background") )
 		self.action_group.get_action('Background').connect_proxy(self.pbut_background)
-		#self.pbut_background.connect("clicked", self.presentation.to_background)
 		pres_buttons.add(self.pbut_background)
 		self.pbut_black = gtk.Button( _("Black Screen") )
 		self.action_group.get_action('Black Screen').connect_proxy(self.pbut_black)
-		#self.pbut_black.connect("clicked", self.presentation.to_black)
 		pres_buttons.add(self.pbut_black)
 		self.pbut_hide = gtk.Button( _("Hide") )
 		self.action_group.get_action('Hide').connect_proxy(self.pbut_hide)
-		#self.pbut_hide.connect("clicked", self.presentation.hide)
 		pres_buttons.add(self.pbut_hide)
 		
 		win_rt_btm.pack_end(pres_buttons, False, False, 10)
@@ -187,13 +185,13 @@ class Main (gtk.Window):
 				('pres-export', None, _("_Export"), None,
 						_("Export presentation")),
 				('Present', gtk.STOCK_FULLSCREEN, _('_Present'), "<Alt>p", None,
-						self.presentation.show),
+						screen.screen.show),
 				('Background', gtk.STOCK_CLEAR, _('_Background'), "<Alt>b", None,
-						self.presentation.to_background),
+						screen.screen.to_background),
 				('Black Screen', None, _('Blac_k Screen'), "<Alt>k", None,
-						self.presentation.to_black),
+						screen.screen.to_black),
 				('Hide', gtk.STOCK_CLOSE, _('Hi_de'), "<Alt>d", None,
-						self.presentation.hide),
+						screen.screen.hide),
 				('HelpContents', gtk.STOCK_HELP),
 				('About', gtk.STOCK_ABOUT, None, None, None, self._on_about)])
 		uimanager.insert_action_group(self.action_group, 0)
@@ -270,25 +268,8 @@ class Main (gtk.Window):
 		uimanager.get_widget('/MenuBar/Presentation/pres-new').set_submenu(pres_new_submenu)
 		return menu
 	
-	def get_pres_geometry(self):
-		'''
-		Finds the best location for the screen.
-		
-		If the user is using one monitor, use the bottom right corner for
-		the presentation screen, otherwise, use the 2nd monitor.
-		'''
-		screen = self.get_screen()
-		num_monitors = screen.get_n_monitors()
-		if(num_monitors > 1):
-			scr_geom = screen.get_monitor_geometry(1)
-			return (scr_geom.x, scr_geom.y, scr_geom.width, scr_geom.height)
-		else:
-			# No 2nd monitor, so preview it small in the corner of the screen
-			scr_geom = screen.get_monitor_geometry(0)
-			self.move(0,0)
-			return (scr_geom.width/2, scr_geom.height/2, scr_geom.width/2, scr_geom.height/2)
-	
 	def build_pres_list(self):
+		'Load presentations and add them to self.library.'
 		directory = join(DATA_PATH, "pres")
 		'Add items to the presentation list.'
 		dir_list = os.listdir(directory)
@@ -434,7 +415,7 @@ class Main (gtk.Window):
 	
 	def _on_slide_activate(self, *args):
 		'Present the selected slide to the screen.'
-		self.presentation.set_text(self.slide_list.get_active_item().get_text())
+		screen.screen.set_text(self.slide_list.get_active_item().get_text())
 	
 	def _on_pres_new(self, menuitem, ptype):
 		'Add a new presentation.'
@@ -505,7 +486,7 @@ class Main (gtk.Window):
 	
 	def _on_prefs(self, *args):
 		'Shows the preferences dialog.'
-		self.config.dialog(self)
+		prefs.config.dialog(self)
 	
 	def _quit(self, *args):
 		'Cleans up and exits the program.'
@@ -518,7 +499,7 @@ class Main (gtk.Window):
 		gtk.main_quit()
 
 
-def main():
-	m = Main()
+def run():
+	Main()
 	gtk.main()
 

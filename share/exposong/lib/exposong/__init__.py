@@ -38,5 +38,5 @@ import __builtin__
 __builtin__._ = gettext.gettext
 
 #import the main application
-from exposong.application import main
+from exposong.application import run
 
