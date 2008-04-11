@@ -14,14 +14,13 @@ information = {
 		'required': False,
 }
 
-class Presentation (Plugin, _abstract.Presentation):
+class Presentation (Plugin, _abstract.Presentation, _abstract.Slide):
 	'''
 	Text presentation type.
 	'''
-	capabilities = ptype.Presentation.capabilities + ['menu']
 	
 	def __init__(self, dom = None, filename = None):
-		ptype.Presentation.__init__(self, dom, filename)
+		_abstract.Presentation.__init__(self, dom, filename)
 		self.type = "text"
 	
 	def merge_menu(self, uimanager):

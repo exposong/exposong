@@ -15,14 +15,13 @@ information = {
 }
 
 
-class Presentation (Plugin, _abstract.Presentation):
+class Presentation (Plugin, _abstract.Presentation, _abstract.Menu):
 	'''
 	Lyric presentation type.
 	'''
-	capabilities = ptype.Presentation.capabilities + ['menu']
 	
 	def __init__(self, dom = None, filename = None):
-		ptype.Presentation.__init__(self, dom, filename)
+		_abstract.Presentation.__init__(self, dom, filename)
 		self.type = 'lyric'
 	
 	def _set_slides(self, dom):
@@ -35,7 +34,7 @@ class Presentation (Plugin, _abstract.Presentation):
 		'Merge new values with the uimanager.'
 		factory = gtk.IconFactory()
 		factory.add('exposong-lyric',gtk.IconSet(gtk.gdk.pixbuf_new_from_file(
-				join(RESOURCE_PATH,'lyric.png')))
+				join(RESOURCE_PATH,'lyric.png'))))
 		gtk.stock_add(("exposong-lyric",_("Lyric"), None, None, None))
 		
 		actiongroup = gtk.ActionGroup()

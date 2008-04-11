@@ -167,7 +167,7 @@ class Slide:
 	def get_markup(self):
 		'Get the text for the slide selection.'
 		if(self.title):
-			return "<b>" self.title "</b>\n" self.text
+			return "<b>" + self.title + "</b>\n" + self.text
 		else:
 			return self.text
 	
