@@ -18,6 +18,10 @@ import gtk
 import gtk.gdk
 import gobject
 
+from exposong import slidelist
+import application # for some reason it won't let me use exposong.application
+
+preslist = None #will hold the PresList instance
 
 class PresList(gtk.TreeView):
 	'''
@@ -59,22 +63,57 @@ class PresList(gtk.TreeView):
 			iter1 = model.iter_next(iter1)
 		self.get_model().remove(iter1)
 	
-	#def update(self):
-	#	'Update each item in the model.'
-	#	self.get_model().refresh_model()
-	
 	def has_selection(self):
 		'Return true if an item is selected.'
 		return bool(self.get_selection().count_selected_rows())
 	
-	#def get_model(self):
-	#	'Returns the current model.'
-	#	return gtk.TreeView.get_model(self)
+	def _on_pres_activate(self, *args):
+		'Change the slides to the current presentation.'
+		if self.has_selection():
+			slidelist.slidelist.set_slides(self.get_active_item().slides)
+		else:
+			slidelist.slidelist.set_slides([])
+	
+	def _on_pres_edit(self, *args):
+		'Edit the presentation.'
+		field = self.get_active_item()
+		if not field:
+			return False
+		if field.edit(application.main):
+			self.get_model().refresh_model()
+			self._on_pres_activate()
 	
 	def _on_drag_get(self, treeview, context, selection, info, timestamp):
 		'A presentation was dragged.'
 		model, iter1 = treeview.get_selection().get_selected()
 		selection.set('text/treeview-path', info, model.get_string_from_iter(iter1))
+	
+	def _on_pres_drag_received(self, treeview, context, x, y, selection, info,
+			timestamp):
+		'A presentation was reordered.'
+		drop_info = treeview.get_dest_row_at_pos(x, y)
+		model = treeview.get_model()
+		sched = self.get_model() #Gets the current schedule
+		path_mv = int(selection.data)
+		
+		if drop_info:
+			path_to, position = drop_info
+			itr_to = sched.get_iter(path_to)
+		else: #Assumes that if there's no drop info, it's at the end of the list
+			path_to = path_mv + 1
+			position = gtk.TREE_VIEW_DROP_BEFORE
+			itr_to = None
+		itr_mv = sched.get_iter(path_mv)
+		
+		if position is gtk.TREE_VIEW_DROP_AFTER or\
+				position is gtk.TREE_VIEW_DROP_INTO_OR_AFTER:
+			sched.move_after(itr_mv, itr_to)
+		elif position is gtk.TREE_VIEW_DROP_BEFORE or\
+				position is gtk.TREE_VIEW_DROP_INTO_OR_BEFORE:
+			sched.move_before(itr_mv, itr_to)
+		
+		context.finish(True, False)
+		return
 	
 	def _get_row_icon(self, column, cell, model, titer):
 		'Returns the icon of the current presentation.'

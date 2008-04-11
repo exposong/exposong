@@ -18,6 +18,10 @@ import gtk
 import gobject
 import pango
 
+from exposong import screen
+
+slidelist = None #will hold instance of SlideList
+
 class SlideList(gtk.TreeView):
 	'''
 	Class to manipulate the text_area in the presentation program.
@@ -50,5 +54,9 @@ class SlideList(gtk.TreeView):
 			return model.get_value(s_iter, 0)
 		else:
 			return False
+	
+	def _on_slide_activate(self, *args):
+		'Present the selected slide to the screen.'
+		screen.screen.set_text(self.get_active_item().get_text())
 
 

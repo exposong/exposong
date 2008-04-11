@@ -20,8 +20,8 @@ import gobject
 import xml.dom
 from glob import *
 
-from exposong.schedule import Schedule
-from exposong.preslist import PresList
+from exposong import schedule, preslist
+import application
 
 
 class ScheduleList(gtk.TreeView):
@@ -47,7 +47,7 @@ class ScheduleList(gtk.TreeView):
 	
 	def append(self, parent, row, sort = None):
 		'Add an item to the list.'
-		if isinstance(row, Schedule):
+		if isinstance(row, schedule.Schedule):
 			if sort is None:
 				sort = row.title
 			else:
@@ -75,6 +75,21 @@ class ScheduleList(gtk.TreeView):
 	def has_selection(self):
 		'Returns if an item is selected.'
 		return self.get_selection().count_selected_rows() > 0
+	
+	def _on_schedule_activate(self, *args):
+		'Change the presentation list to the current schedule.'
+		if self.has_selection():
+			sched = self.get_active_item()
+			if isinstance(sched, schedule.Schedule):
+				preslist.preslist.set_model(sched)
+				sched.refresh_model()
+				if sched.is_reorderable():
+					preslist.preslist.enable_model_drag_dest(
+							application.DRAGDROP_SCHEDULE, gtk.gdk.ACTION_COPY)
+					preslist.preslist.set_headers_clickable(False)
+				else:
+					preslist.preslist.unset_rows_drag_dest()
+					preslist.preslist.set_headers_clickable(True)
 	
 	def _on_sched_delete(self, action):
 		'Delete the selected schedule.'
@@ -107,6 +122,22 @@ class ScheduleList(gtk.TreeView):
 				return
 		return True
 	
+	@staticmethod
+	def _on_sched_drag_received(treeview, context, x, y, selection, info, timestamp):
+		'A presentation was dropped onto a schedule.'
+		drop_info = treeview.get_dest_row_at_pos(x, y)
+		if drop_info:
+			model = treeview.get_model()
+			path, position = drop_info
+			
+			pres = preslist.preslist.get_model().get_value(
+					preslist.preslist.get_model().get_iter_from_string(selection.data),
+							0).presentation
+			sched = model.get_value(model.get_iter(path), 0)
+			
+			sched.append(pres)
+			context.finish(True, False)
+	
 	def _on_new(self, *args):
 		'Create a new schedule.'
 		name = _("New Schedule")
@@ -121,8 +152,8 @@ class ScheduleList(gtk.TreeView):
 			name += " 1"
 		else:
 			name += " "+str(int(curnames[len(curnames)-1][-2:]) + 1)
-		schedule = Schedule(name, builtin=False)
-		itrnew = self.append(self.custom_schedules, schedule)
+		sched = schedule.Schedule(name, builtin=False)
+		itrnew = self.append(self.custom_schedules, sched)
 		pathnew = self.model.get_path(itrnew)
 		self.set_cursor(pathnew, self.get_column(0), True)
 	
@@ -134,7 +165,7 @@ class ScheduleList(gtk.TreeView):
 	def _cell_data_func(self, column, cell, model, iter1):
 		'Set whether the cell is editable or not.'
 		sched = model.get_value(iter1, 0)
-		cell.set_property('editable', isinstance(sched, Schedule) and sched.builtin is False)
+		cell.set_property('editable', isinstance(sched, schedule.Schedule) and sched.builtin is False)
 	
 	def _rename_schedule(self, text_rend, path, new_text):
 		"Rename a schedule in the list and it's filename"
