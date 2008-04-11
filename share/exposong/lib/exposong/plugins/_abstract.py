@@ -217,3 +217,20 @@ class Schedule:
 		'Called on each presentation, and return True if it can be added.'
 		raise NotImplementedError
 
+
+class Screen:
+	'''
+	Hooks into the presentation screen.
+	'''
+	def draw(self, surface):
+		'Draw anywhere on the screen.'
+		return NotImplemented
+	
+	def header_text(self, text, priority=1):
+		'Draw on the header.'
+		return NotImplemented
+	
+	def footer_text(self, text, priority=1):
+		'Draw text on the footer.'
+		return NotImplemented
+
