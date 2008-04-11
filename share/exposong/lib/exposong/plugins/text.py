@@ -31,7 +31,8 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Slide):
 		gtk.stock_add(("exposong-text",_("Text"), None, None, None))
 		
 		actiongroup = gtk.ActionGroup()
-		actiongroup.add_actions(("pres-new-text", 'exposong-text'))
+		actiongroup.add_actions(("pres-new-text", 'exposong-text', None, None,
+				None, self._on_pres_new))
 		uimanager.insert_action_group(actiongroup, -1)
 		
 		self.menu_merge_id = uimanager.add_ui_from_string("""
@@ -47,4 +48,14 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Slide):
 	def unmerge_menu(self, uimanager):
 		'Remove merged items from the menu.'
 		uimanager.remove_ui(self.menu_merge_id)
+	
+	@staticmethod
+	def get_version():
+		'Return the version number of the plugin.'
+		return (1,0)
+	
+	@staticmethod
+	def get_description():
+		'Return the description of the plugin.'
+		return "A text presentation type."
 

@@ -22,7 +22,7 @@ import xml.dom.minidom
 from os.path import join
 
 from exposong.glob import *
-from exposong import DATA_PATH
+from exposong import DATA_PATH, schedule
 from exposong.plugins import Plugin
 
 '''
@@ -144,6 +144,21 @@ class Presentation:
 		outfile = open(join(directory, self.filename), 'w')
 		doc.writexml(outfile)
 		doc.unlink()
+	
+	def _on_pres_new(self, *args):
+		pres = self.__class__()
+		if pres.edit(self):
+			sched = schedlist.schedlist.get_active_item()
+			if sched and not sched.builtin:
+				sched.append(pres)
+			#Add presentation to appropriate builtin schedules
+			model = schedlist.schedlist.get_model()
+			itr = model.get_iter_first()
+			while itr:
+				sched = model.get_value(itr, 0)
+				if sched:
+					sched.append(pres)
+				itr = model.iter_next(itr)
 
 
 class Slide:
@@ -187,5 +202,18 @@ class Menu:
 		raise NotImplementedError
 	def unmerge_menu(self, uimanager):
 		'Remove merged items from the menu.'
+		raise NotImplementedError
+
+
+class Schedule:
+	'''
+	Hooks to add built-in schedules.
+	'''
+	def schedule_name(self):
+		'Return the string schedule name.'
+		raise NotImplementedError
+	
+	def filter_pres(self, pres):
+		'Called on each presentation, and return True if it can be added.'
 		raise NotImplementedError
 

@@ -18,25 +18,25 @@
 
 """
 This provides a base class for the plugin system.
+
+Thanks to Armin Ronacher for writing most of this code
+(http://lucumr.pocoo.org/blogarchive/python-plugin-system).
 """
 
 class Plugin(object):
 	'''
 	Custom plugins should inherit from this class.
 	'''
-	capabilities = []
 	
-	def __repr__(self):
-		return '<%s %r>' % (
-			self.__class__.__name__,
-			self.capabilities
-		)
-	
+	@staticmethod
 	def get_version():
-		pass
+		'Return the version number of the plugin.\n\nShould be in tuple format (e.g. (1,0) for 1.0)'
+		raise NotImplementedError
 	
+	@staticmethod
 	def get_description():
-		return ""
+		'Return the description of the plugin.'
+		raise NotImplementedError
 
 
 def init_plugin_system(plugins):
@@ -56,7 +56,7 @@ def find_plugins():
 
 
 def get_plugins_by_capability(klass):
-	'Return all plugins that have a super-class in "_abstract.py".'
+	'Return all plugins that inherit from `klass`.'
 	result = []
 	for plugin in Plugin.__subclasses__():
 		if issubclass(plugin, klass):

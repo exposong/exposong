@@ -113,7 +113,13 @@ class PresList(gtk.TreeView):
 			sched.move_before(itr_mv, itr_to)
 		
 		context.finish(True, False)
-		return
+	
+	def _on_pres_delete_from_schedule(self, *args):
+		'Remove the schedule from the current schedule.'
+		sched, itr = self.get_selection().get_selected()
+		if not itr or sched.builtin:
+			return False
+		sched.remove(itr)
 	
 	def _get_row_icon(self, column, cell, model, titer):
 		'Returns the icon of the current presentation.'

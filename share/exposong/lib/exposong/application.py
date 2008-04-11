@@ -24,12 +24,8 @@ from os.path import join
 
 from exposong import RESOURCE_PATH, DATA_PATH, SHARED_FILES
 from exposong import prefs, screen, preslist, schedlist, slidelist
-#from exposong.presentation import Presentation
-#from exposong.preslist import PresList
-#from exposong.slidelist import SlideList
 from exposong.about import About
 from exposong.schedule import Schedule # ? where to put library
-#from exposong.schedlist import ScheduleList
 from exposong import plugins
 
 main = None
@@ -180,7 +176,7 @@ class Main (gtk.Window):
 						_("Delete the presentation"), self._on_pres_delete),
 				('pres-delete-from-schedule', gtk.STOCK_DELETE,
 						_("Delete from _Schedule"), None, None,
-						self._on_pres_delete_from_schedule),
+						preslist.preslist._on_pres_delete_from_schedule),
 				('pres-import', None, _("_Import"), None,
 						_("Open a presentation from file")),
 				('pres-export', None, _("_Export"), None,
@@ -250,6 +246,7 @@ class Main (gtk.Window):
 				.get_action('sched-delete').create_menu_item())
 		self.sched_list_menu.show_all()
 		
+		#Add presentation menu items
 		pres_new_submenu = gtk.Menu()
 		for (ptype, mod) in type_mods.items():
 			mitem = gtk.Action(mod.type_name, mod.menu_name, None, None)
@@ -300,7 +297,7 @@ class Main (gtk.Window):
 		self.build_pres_list()
 		schedlist.schedlist.append(None, self.library, 1)
 		
-		#Add the presentation type lists
+		#Add the presentation type schedules
 		i = 2
 		for (ptype, mod) in type_mods.items():
 			schedule = Schedule(mod.menu_name, filter_type=ptype)
@@ -398,13 +395,6 @@ class Main (gtk.Window):
 				itr = schmod.iter_next(itr)
 			os.remove(join(DATA_PATH,"pres",item.filename))
 			preslist.preslist._on_pres_activate()
-	
-	def _on_pres_delete_from_schedule(self, *args):
-		'Remove the schedule from the current schedule.'
-		sched, itr = preslist.preslist.get_selection().get_selected()
-		if not itr or sched.builtin:
-			return False
-		sched.remove(itr)
 	
 	def _on_about(self, *args):
 		'Shows the about dialog.'

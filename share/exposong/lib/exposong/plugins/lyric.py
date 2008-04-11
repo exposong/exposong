@@ -38,7 +38,8 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu):
 		gtk.stock_add(("exposong-lyric",_("Lyric"), None, None, None))
 		
 		actiongroup = gtk.ActionGroup()
-		actiongroup.add_actions(("pres-new-lyric", 'exposong-lyric'))
+		actiongroup.add_actions(("pres-new-lyric", 'exposong-lyric', None, None,
+				None, self._on_pres_new))
 		uimanager.insert_action_group(actiongroup, -1)
 		
 		self.menu_merge_id = uimanager.add_ui_from_string("""
@@ -71,4 +72,14 @@ class Slide (Plugin, _abstract.Slide):
 			else:
 				self.title = ''
 				self.text = value
+	
+	@staticmethod
+	def get_version():
+		'Return the version number of the plugin.'
+		return (1,0)
+	
+	@staticmethod
+	def get_description():
+		'Return the description of the plugin.'
+		return "A lyric presentation type."
 
