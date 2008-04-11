@@ -6,8 +6,11 @@
 
 = About =
 
-ExpoSong is a program to display lyrics, or general textual slides on an
-overhead screen.
+ExpoSong is a worship presentation software. It's early in development, so feel
+free to take it for a test run, but it is suggested that you do not try to use
+it in production environments.
+
+Find out more at http://exposong.org
 
 
 = Installation =
