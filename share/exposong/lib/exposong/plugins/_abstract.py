@@ -222,7 +222,7 @@ class Screen:
 	'''
 	Hooks into the presentation screen.
 	'''
-	def draw(self, surface):
+	def draw(self, surface, priority=1):
 		'Draw anywhere on the screen.'
 		return NotImplemented
 	
@@ -232,5 +232,9 @@ class Screen:
 	
 	def footer_text(self, text, priority=1):
 		'Draw text on the footer.'
+		return NotImplemented
+	
+	def body_text(self, text, priority=1):
+		'Draw text in the center of the screen.'
 		return NotImplemented
 

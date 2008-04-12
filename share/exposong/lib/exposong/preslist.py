@@ -18,8 +18,8 @@ import gtk
 import gtk.gdk
 import gobject
 
-from exposong import slidelist
-import application # for some reason it won't let me use exposong.application
+import exposong.slidelist
+import exposong.application # for some reason it won't let me use exposong.application
 
 preslist = None #will hold the PresList instance
 
@@ -70,16 +70,16 @@ class PresList(gtk.TreeView):
 	def _on_pres_activate(self, *args):
 		'Change the slides to the current presentation.'
 		if self.has_selection():
-			slidelist.slidelist.set_slides(self.get_active_item().slides)
+			exposong.slidelist.slidelist.set_slides(self.get_active_item().slides)
 		else:
-			slidelist.slidelist.set_slides([])
+			exposong.slidelist.slidelist.set_slides([])
 	
 	def _on_pres_edit(self, *args):
 		'Edit the presentation.'
 		field = self.get_active_item()
 		if not field:
 			return False
-		if field.edit(application.main):
+		if field.edit(exposong.application.main):
 			self.get_model().refresh_model()
 			self._on_pres_activate()
 	
