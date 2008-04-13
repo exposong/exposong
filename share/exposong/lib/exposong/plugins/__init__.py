@@ -23,6 +23,10 @@ Thanks to Armin Ronacher for writing most of this code
 (http://lucumr.pocoo.org/blogarchive/python-plugin-system).
 """
 
+import os
+
+__all__ = [fnm for fnm in os.listdir('.') if fnm.endswith("py") and not fnm.startswith("_")]
+
 class Plugin(object):
 	'''
 	Custom plugins should inherit from this class.
@@ -44,9 +48,9 @@ def init_plugin_system(plugins):
 	load_plugins(plugins)
 	
 
-def load_plugins(plugins):
+def load_plugins():
 	'Import plugins.'
-	for plugin in plugins:
+	for plugin in __all__:
 		__import__("exposong.plugins."+plugin, None, None, [''])
 
 

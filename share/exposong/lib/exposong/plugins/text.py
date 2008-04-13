@@ -14,7 +14,8 @@ information = {
 		'required': False,
 }
 
-class Presentation (Plugin, _abstract.Presentation, _abstract.Slide):
+
+class Presentation (Plugin, _abstract.Presentation, _abstract.Menu):
 	'''
 	Text presentation type.
 	'''
