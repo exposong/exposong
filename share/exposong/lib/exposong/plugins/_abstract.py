@@ -43,6 +43,38 @@ class Presentation:
 	
 	Requires at minimum	a title and slides.
 	'''
+	class Slide:
+		'''
+		A plain text slide.
+	
+		Reimplementing this class is optional.
+		'''
+		def __init__(self, value):
+			if isinstance(value, xml.dom.Node):
+				self.text = get_node_text(value)
+				self.title = value.getAttribute("title")
+			elif isinstance(value, str):
+				self.text = value
+				self.title = None
+	
+		def get_text(self):
+			'Get the text for the presentation.'
+			return self.text
+	
+		def get_markup(self):
+			'Get the text for the slide selection.'
+			if(self.title):
+				return "<b>" + self.title + "</b>\n" + self.text
+			else:
+				return self.text
+	
+		def to_node(self, document, node):
+			'Populate the node element'
+			if(self.title):
+				node.setAttribute("title", self.title)
+			node.appendChild( document.createTextNode(self.text) )
+	
+	
 	def __init__(self, dom = None, filename = None):
 		if self.__class__ is Presentation:
 			raise NotImplementedError("This class cannot be instantiated.")
@@ -74,7 +106,7 @@ class Presentation:
 		'Set the slides from xml.'
 		slides = dom.getElementsByTagName("slide")
 		for sl in slides:
-			self.slides.append(Slide(sl))
+			self.slides.append(self.Slide(sl))
 	
 	def get_row(self):
 		'Gets the data to add to the presentation list.'
@@ -133,7 +165,7 @@ class Presentation:
 			self.title = rval[0]
 			self.slides = []
 			for sl in rval[1].split("\n\n"):
-				self.slides.append(Slide(sl))
+				self.slides.append(self.Slide(sl))
 			self.to_xml()
 			return True
 	
@@ -173,36 +205,7 @@ class Presentation:
 				itr = model.iter_next(itr)
 
 
-class Slide:
-	'''
-	A plain text slide.
 	
-	Reimplementing this class is optional.
-	'''
-	def __init__(self, value):
-		if isinstance(value, xml.dom.Node):
-			self.text = get_node_text(value)
-			self.title = value.getAttribute("title")
-		elif isinstance(value, str):
-			self.text = value
-			self.title = None
-	
-	def get_text(self):
-		'Get the text for the presentation.'
-		return self.text
-	
-	def get_markup(self):
-		'Get the text for the slide selection.'
-		if(self.title):
-			return "<b>" + self.title + "</b>\n" + self.text
-		else:
-			return self.text
-	
-	def to_node(self, document, node):
-		'Populate the node element'
-		if(self.title):
-			node.setAttribute("title", self.title)
-		node.appendChild( document.createTextNode(self.text) )
 
 
 class Menu:
