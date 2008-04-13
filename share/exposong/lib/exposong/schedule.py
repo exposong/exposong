@@ -21,7 +21,8 @@ import xml.dom
 from glob import *
 from os.path import join
 
-from exposong import DATA_PATH, preslist, ptype
+from exposong import DATA_PATH, preslist
+import exposong.plugins._abstract
 
 
 class Schedule(gtk.ListStore):
@@ -147,7 +148,7 @@ class ScheduleItem:
 	An item for a schedule, including a presentation and a comment.
 	'''
 	def __init__(self, presentation, comment):
-		assert(isinstance(presentation, ptype.Presentation))
+		assert(isinstance(presentation, exposong.plugins._abstract.Presentation))
 		self.presentation = presentation
 		self.comment = comment
 	

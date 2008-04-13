@@ -26,10 +26,9 @@ from exposong import RESOURCE_PATH, DATA_PATH, SHARED_FILES
 from exposong import prefs, screen, preslist, schedlist, slidelist
 from exposong.about import About
 from exposong.schedule import Schedule # ? where to put library
-from exposong import plugins
+import exposong.plugins, exposong.plugins._abstract
 
 main = None
-type_mods = {} #dynamically loaded presentation modules
 
 DRAGDROP_SCHEDULE = [("text/treeview-path", 0,0)]
 
@@ -54,11 +53,9 @@ class Main (gtk.Window):
 		self.connect("destroy", self._quit)
 		self.set_default_size(700, 500)
 		
-		#dynamically load all presentation types
-		ptype_dir = join(SHARED_FILES, 'lib', 'exposong', 'ptype')
-		for fl in os.listdir(ptype_dir):
-			if fl.endswith(".py") and fl != "__init__.py":
-				type_mods[fl[:-3]] = imp.load_source(fl[:-3], join(ptype_dir, fl))
+		#dynamically load plugins
+		exposong.plugins.load_plugins()
+		
 		
 		##	GUI
 		win_v = gtk.VBox()
@@ -153,7 +150,7 @@ class Main (gtk.Window):
 		uimanager = gtk.UIManager()
 		self.add_accel_group(uimanager.get_accel_group())
 		
-		self.action_group = gtk.ActionGroup('presenter')
+		self.action_group = gtk.ActionGroup('exposong')
 		self.action_group.add_actions([('File', None, _('_File') ),
 				('Edit', None, _('_Edit') ),
 				('Schedule', None, _("_Schedule") ),
@@ -206,7 +203,7 @@ class Main (gtk.Window):
 						<menuitem action='sched-delete' />
 					</menu>
 					<menu action="Presentation">
-						<menuitem action="pres-new" />
+						<menu action="pres-new"></menu>
 						<menuitem action="pres-edit" />
 						<menuitem action="pres-delete" />
 						<menuitem action="pres-delete-from-schedule" />
@@ -223,6 +220,9 @@ class Main (gtk.Window):
 						<menuitem action="About" />
 					</menu>
 				</menubar>''')
+		
+		for mod in exposong.plugins.get_plugins_by_capability(exposong.plugins._abstract.Menu):
+			mod().merge_menu(uimanager)
 		
 		menu = uimanager.get_widget('/MenuBar')
 		self.pres_list_menu = gtk.Menu()
@@ -246,24 +246,6 @@ class Main (gtk.Window):
 				.get_action('sched-delete').create_menu_item())
 		self.sched_list_menu.show_all()
 		
-		#Add presentation menu items
-		pres_new_submenu = gtk.Menu()
-		for (ptype, mod) in type_mods.items():
-			mitem = gtk.Action(mod.type_name, mod.menu_name, None, None)
-			mitem.connect("activate", self._on_pres_new, ptype)
-			self.action_group.add_action(mitem)
-			if hasattr(mod, "icon"):
-				mitem.set_menu_item_type(gtk.ImageMenuItem)
-				mimg = gtk.Image()
-				mimg.set_from_pixbuf(mod.icon)
-				mitem = mitem.create_menu_item()
-				mitem.set_image(mimg)
-			else:
-				mitem = mitem.create_menu_item()
-			pres_new_submenu.append(mitem)
-		
-		pres_new_submenu.show_all()
-		uimanager.get_widget('/MenuBar/Presentation/pres-new').set_submenu(pres_new_submenu)
 		return menu
 	
 	def build_pres_list(self):
@@ -281,9 +263,12 @@ class Main (gtk.Window):
 					root_elem = dom.documentElement
 					if root_elem.tagName == "presentation" and root_elem.hasAttribute("type"):
 						filetype = root_elem.getAttribute("type")
-						if filetype in type_mods:
-							pres = type_mods[filetype].Presentation(dom.documentElement, filenm)
-							self.library.append(pres)
+						plugins = exposong.plugins.get_plugins_by_capability(exposong.plugins._abstract.Presentation)
+						for plugin in plugins:
+							if str(filetype) == plugin.get_type():
+								pres = plugin(dom.documentElement, filenm)
+								self.library.append(pres)
+								break
 					else:
 						print "%s is not a presentation file." % filenm
 					dom.unlink()
@@ -298,20 +283,10 @@ class Main (gtk.Window):
 		schedlist.schedlist.append(None, self.library, 1)
 		
 		#Add the presentation type schedules
-		i = 2
-		for (ptype, mod) in type_mods.items():
-			schedule = Schedule(mod.menu_name, filter_type=ptype)
-			itr = self.library.get_iter_first()
-			while itr:
-				item = self.library.get_value(itr, 0)
-				schedule.append(item.presentation)
-				itr = self.library.iter_next(itr)
-			schedlist.schedlist.append(None, schedule, i)
-			i += 1
 		
 		#Add custom schedules from the data directory
 		schedlist.schedlist.custom_schedules = schedlist.schedlist.append(None,
-				(None, _("Custom Schedules"), i+5))
+				(None, _("Custom Schedules"), 40))
 		
 		dir_list = os.listdir(directory)
 		for filenm in dir_list:
@@ -348,22 +323,6 @@ class Main (gtk.Window):
 		if event.button == 3:
 			if widget.get_active_item() and not widget.get_active_item().builtin:
 				self.sched_list_menu.popup(None, None, None, event.button, event.get_time())
-	
-	def _on_pres_new(self, menuitem, ptype):
-		'Add a new presentation.'
-		pres = type_mods[ptype].Presentation()
-		if pres.edit(self):
-			sched = schedlist.schedlist.get_active_item()
-			if sched and not sched.builtin:
-				sched.append(pres)
-			#Add presentation to appropriate builtin schedules
-			model = schedlist.schedlist.get_model()
-			itr = model.get_iter_first()
-			while itr:
-				sched = model.get_value(itr, 0)
-				if sched:
-					sched.append(pres)
-				itr = model.iter_next(itr)
 	
 	def _on_pres_delete(self, *args):
 		'Delete the selected presentation.'

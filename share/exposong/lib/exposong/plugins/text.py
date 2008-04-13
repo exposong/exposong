@@ -1,7 +1,11 @@
 #! /usr/bin/env python
 import gtk
+import gtk.gdk
 from os.path import join
+import xml.dom
+import xml.dom.minidom
 
+from exposong.glob import *
 from exposong import RESOURCE_PATH
 from exposong.plugins import Plugin, _abstract
 
@@ -24,16 +28,28 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu):
 		_abstract.Presentation.__init__(self, dom, filename)
 		self.type = "text"
 	
+	@staticmethod
+	def get_type():
+		'Return the presentation type.'
+		return 'text'
+	
+	@staticmethod
+	def get_icon():
+		'Return the pixbuf icon.'
+		gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH,'text.png'))
+	
 	def merge_menu(self, uimanager):
 		'Merge new values with the uimanager.'
 		factory = gtk.IconFactory()
 		factory.add('exposong-text',gtk.IconSet(gtk.gdk.pixbuf_new_from_file(
-				join(RESOURCE_PATH,'generic.png'))))
-		gtk.stock_add(("exposong-text",_("Text"), None, None, None))
+				join(RESOURCE_PATH,'text.png'))))
+		factory.add_default()
+		gtk.stock_add([("exposong-text",_("_Text"), gtk.gdk.MOD1_MASK, 
+				0, "pymserv")])
 		
-		actiongroup = gtk.ActionGroup()
-		actiongroup.add_actions(("pres-new-text", 'exposong-text', None, None,
-				None, self._on_pres_new))
+		actiongroup = gtk.ActionGroup('exposong-text')
+		actiongroup.add_actions([("pres-new-text", 'exposong-text', None, None,
+				None, self._on_pres_new)])
 		uimanager.insert_action_group(actiongroup, -1)
 		
 		self.menu_merge_id = uimanager.add_ui_from_string("""

@@ -25,7 +25,7 @@ Thanks to Armin Ronacher for writing most of this code
 
 import os
 
-__all__ = [fnm for fnm in os.listdir('.') if fnm.endswith("py") and not fnm.startswith("_")]
+__all__ = [fnm[:-3] for fnm in os.listdir(__path__[0]) if fnm.endswith(".py") and not fnm.startswith("_")]
 
 class Plugin(object):
 	'''

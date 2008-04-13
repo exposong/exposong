@@ -22,8 +22,10 @@ import xml.dom.minidom
 from os.path import join
 
 from exposong.glob import *
-from exposong import DATA_PATH, schedule
+from exposong import DATA_PATH
 from exposong.plugins import Plugin
+import exposong.application
+import exposong.schedlist
 
 '''
 Abstract classes that create plugin functionality.
@@ -57,6 +59,16 @@ class Presentation:
 				self.author[atype] = get_node_text(el)
 			
 			self._set_slides(dom)
+	
+	@staticmethod
+	def get_type():
+		'Return the presentation type.'
+		raise NotImplementedError
+	
+	@staticmethod
+	def get_icon():
+		'Return the pixbuf icon.'
+		raise NotImplementedError
 	
 	def _set_slides(self, dom):
 		'Set the slides from xml.'
@@ -145,14 +157,14 @@ class Presentation:
 		doc.writexml(outfile)
 		doc.unlink()
 	
-	def _on_pres_new(self, *args):
+	def _on_pres_new(self, action):
 		pres = self.__class__()
-		if pres.edit(self):
-			sched = schedlist.schedlist.get_active_item()
+		if pres.edit(exposong.application.main):
+			sched = exposong.schedlist.schedlist.get_active_item()
 			if sched and not sched.builtin:
 				sched.append(pres)
 			#Add presentation to appropriate builtin schedules
-			model = schedlist.schedlist.get_model()
+			model = exposong.schedlist.schedlist.get_model()
 			itr = model.get_iter_first()
 			while itr:
 				sched = model.get_value(itr, 0)

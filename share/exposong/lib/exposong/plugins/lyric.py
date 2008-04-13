@@ -1,7 +1,11 @@
 #! /usr/bin/env python
 import gtk
+import gtk.gdk
 from os.path import join
+import xml.dom
+import xml.dom.minidom
 
+from exposong.glob import *
 from exposong import RESOURCE_PATH
 from exposong.plugins import Plugin, _abstract
 
@@ -24,6 +28,16 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu):
 		_abstract.Presentation.__init__(self, dom, filename)
 		self.type = 'lyric'
 	
+	@staticmethod
+	def get_type():
+		'Return the presentation type.'
+		return 'lyric'
+	
+	@staticmethod
+	def get_icon():
+		'Return the pixbuf icon.'
+		return gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH,'lyric.png'))
+	
 	def _set_slides(self, dom):
 		'Set the slides from xml.'
 		slides = dom.getElementsByTagName("slide")
@@ -35,11 +49,13 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu):
 		factory = gtk.IconFactory()
 		factory.add('exposong-lyric',gtk.IconSet(gtk.gdk.pixbuf_new_from_file(
 				join(RESOURCE_PATH,'lyric.png'))))
-		gtk.stock_add(("exposong-lyric",_("Lyric"), None, None, None))
+		factory.add_default()
+		gtk.stock_add([("exposong-lyric",_("_Lyric"), gtk.gdk.MOD1_MASK, 
+				0, "pymserv")])
 		
-		actiongroup = gtk.ActionGroup()
-		actiongroup.add_actions(("pres-new-lyric", 'exposong-lyric', None, None,
-				None, self._on_pres_new))
+		actiongroup = gtk.ActionGroup('exposong-lyric')
+		actiongroup.add_actions([("pres-new-lyric", 'exposong-lyric', None, None,
+				None, self._on_pres_new)])
 		uimanager.insert_action_group(actiongroup, -1)
 		
 		self.menu_merge_id = uimanager.add_ui_from_string("""
