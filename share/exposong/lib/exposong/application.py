@@ -275,14 +275,14 @@ class Main (gtk.Window):
 					del dom
 	
 	def build_schedule(self):
-		'Add builtin lists to the schedule, and load all custom lists.'
-		directory = join(DATA_PATH, "sched")
 		'Add items to the schedule list.'
+		#Initialize the Library
+		directory = join(DATA_PATH, "sched")
 		self.library = Schedule( _("Library"))
 		self.build_pres_list()
 		schedlist.schedlist.append(None, self.library, 1)
 		
-		#Add the presentation type schedules
+		#Add schedules from plugins
 		plugins = exposong.plugins.get_plugins_by_capability(exposong.plugins._abstract.Schedule)
 		for plugin in plugins:
 			schedule = Schedule(plugin.schedule_name(), filter_func=plugin.schedule_filter)

@@ -205,9 +205,6 @@ class Presentation:
 				itr = model.iter_next(itr)
 
 
-	
-
-
 class Menu:
 	'''
 	Subclasses can modify the menu using uimanager.
