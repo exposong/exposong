@@ -15,7 +15,7 @@ from exposong.plugins import Plugin, _abstract
 Lyric presentations.
 """
 information = {
-		'name': "Lyric Presentation",
+		'name': _("Lyric Presentation"),
 		'description': __doc__,
 		'required': False,
 }
@@ -23,7 +23,8 @@ information = {
 title_re = re.compile("(chorus|refrain|verse|bridge)", re.I)
 
 
-class Presentation (Plugin, _abstract.Presentation, _abstract.Menu):
+class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
+		_abstract.Schedule):
 	'''
 	Lyric presentation type.
 	'''
@@ -108,5 +109,24 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu):
 	def unmerge_menu(self, uimanager):
 		'Remove merged items from the menu.'
 		uimanager.remove_ui(self.menu_merge_id)
-
+	
+	@classmethod
+	def schedule_name(cls):
+		'Return the string schedule name.'
+		return _('Lyric Presentations')
+	
+	@classmethod
+	def schedule_filter(cls, pres):
+		'Called on each presentation, and return True if it can be added.'
+		return isinstance(pres, cls)
+	
+	@staticmethod
+	def get_version():
+		'Return the version number of the plugin.'
+		return (1,0)
+	
+	@staticmethod
+	def get_description():
+		'Return the description of the plugin.'
+		return "A lyric presentation type."
 

@@ -224,11 +224,13 @@ class Schedule:
 	'''
 	Hooks to add built-in schedules.
 	'''
-	def schedule_name(self):
+	@classmethod
+	def schedule_name(cls):
 		'Return the string schedule name.'
 		raise NotImplementedError
 	
-	def filter_pres(self, pres):
+	@classmethod
+	def schedule_filter(cls, pres):
 		'Called on each presentation, and return True if it can be added.'
 		raise NotImplementedError
 

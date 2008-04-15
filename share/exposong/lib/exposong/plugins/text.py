@@ -13,13 +13,14 @@ from exposong.plugins import Plugin, _abstract
 Plain text presentations.
 """
 information = {
-		'name': "Text Presentation",
+		'name': _("Text Presentation"),
 		'description': __doc__,
 		'required': False,
 }
 
 
-class Presentation (Plugin, _abstract.Presentation, _abstract.Menu):
+class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
+		_abstract.Schedule):
 	'''
 	Text presentation type.
 	'''
@@ -36,7 +37,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu):
 	@staticmethod
 	def get_icon():
 		'Return the pixbuf icon.'
-		gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH,'text.png'))
+		return gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH,'text.png'))
 	
 	def merge_menu(self, uimanager):
 		'Merge new values with the uimanager.'
@@ -65,6 +66,16 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu):
 	def unmerge_menu(self, uimanager):
 		'Remove merged items from the menu.'
 		uimanager.remove_ui(self.menu_merge_id)
+	
+	@classmethod
+	def schedule_name(cls):
+		'Return the string schedule name.'
+		return _('Text Presentations')
+	
+	@classmethod
+	def schedule_filter(cls, pres):
+		'Called on each presentation, and return True if it can be added.'
+		return isinstance(pres, cls)
 	
 	@staticmethod
 	def get_version():

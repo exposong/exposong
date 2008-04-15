@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<presentation type="generic"><title>ExpoSong</title><slide>Exposong
+<presentation type="text"><title>ExpoSong</title><slide>Exposong
 0.3-alpha</slide><slide>Exposong is a program to display
 lyrics, or general textual slides on
 an overhead screen. Right now the

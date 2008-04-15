@@ -283,6 +283,15 @@ class Main (gtk.Window):
 		schedlist.schedlist.append(None, self.library, 1)
 		
 		#Add the presentation type schedules
+		plugins = exposong.plugins.get_plugins_by_capability(exposong.plugins._abstract.Schedule)
+		for plugin in plugins:
+			schedule = Schedule(plugin.schedule_name(), filter_func=plugin.schedule_filter)
+			itr = self.library.get_iter_first()
+			while itr:
+				item = self.library.get_value(itr, 0).presentation
+				schedule.append(item)
+				itr = self.library.iter_next(itr)
+			schedlist.schedlist.append(None, schedule, 2)
 		
 		#Add custom schedules from the data directory
 		schedlist.schedlist.custom_schedules = schedlist.schedlist.append(None,

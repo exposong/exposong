@@ -29,12 +29,12 @@ class Schedule(gtk.ListStore):
 	'''
 	Schedule of presentations.'
 	'''
-	def __init__(self, title="", filename = None, builtin = True, filter_type = None):
+	def __init__(self, title="", filename = None, builtin = True, filter_func = None):
 		gtk.ListStore.__init__(self, *preslist.PresList.get_model_args())
 		self.title = title
 		self.filename = filename
 		self.builtin = builtin
-		self.filter_type = filter_type
+		self.filter_func = filter_func
 	
 	def load(self, dom, library):
 		'Loads from an xml file.'
@@ -88,7 +88,7 @@ class Schedule(gtk.ListStore):
 	
 	def append(self, pres, comment = ""):
 		'Add a presentation to the schedule.'
-		if self.filter_type and self.filter_type != pres.type:
+		if callable(self.filter_func) and not self.filter_func(pres):
 			return False
 		sched = ScheduleItem(pres, comment)
 		gtk.ListStore.append(self, sched.get_row())
