@@ -1,6 +1,6 @@
 +------------------------------------+
 | ExpoSong                           |
-| Version 0.3-alpha                  |
+| Version 0.3 Beta                   |
 | Copyright (C) 2008 Fishhookweb.com |
 +------------------------------------+
 
@@ -8,11 +8,13 @@
 
 == 0.3 ==
 
- * Custom schedules are now possible. Drag and drop adding, reordering, and
+ * Custom schedules. Drag and drop adding, reordering, and
    deleting of presentations removes it from all lists.
- * Progress has been made to enable translations. A german translation is
-   available.
+ * Translations. A german translation is available.
  * A plugin system has been added.
+ * Presentations can now use images as backgrounds.
+ * Rendering speed of presentation is faster.
+ * Lots of code, including making the application.py file shorter.
 
 == 0.2 ==
 
