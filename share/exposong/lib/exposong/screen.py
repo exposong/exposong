@@ -18,10 +18,11 @@ import gtk
 import pango
 import cairo
 import time
+import gobject
 
-from exposong import prefs
+import exposong.prefs
 
-COLOR_BLACK = (0, 0, 0)
+
 def c2dec(color):
 	if isinstance(color, tuple):
 		return tuple(c2dec(x) for x in color)
@@ -52,7 +53,7 @@ class Screen:
 		else:
 			raise Exception("'preview' must be gtk.DrawingArea")
 		
-		self.set_background()
+		self.draw()
 	
 	def auto_locate(self, main):
 		'''
@@ -75,11 +76,11 @@ class Screen:
 		self.window.resize(geometry[2], geometry[3])
 		self.preview.set_size_request(135*geometry[2]/geometry[3], 135)
 	
-	def set_background(self, color = None):
-		'Set the background color.'
-		self._set_background(self.preview, color)
-		if hasattr(self, "pres") and self.pres.window:
-			self._set_background(self.pres, color)
+	#def set_background(self, **keys):
+	#	'Set the background color.'
+	#	self._set_background(self.preview, **keys)
+	#	if hasattr(self, "pres") and self.pres.window:
+	#		self._set_background(self.pres, **keys)
 	
 	def set_text(self, text):
 		'Set the text of the window.'
@@ -97,13 +98,13 @@ class Screen:
 		'Set the screen to black.'
 		self.black = True
 		self.background = False
-		self.set_background(COLOR_BLACK)
+		self.draw()
 	
 	def to_background(self, button):
 		'Hide text from the screen.'
 		self.background = True
 		self.black = False
-		self.set_background()
+		self.draw()
 	
 	def hide(self, button):
 		'Remove the presentation screen from view.'
@@ -121,42 +122,76 @@ class Screen:
 		self._draw(widget)
 	
 	
-	def _set_background(self, widget, color = None):
+	def _set_background(self, widget):
 		'Set the background of `widget` to `color`.'
-		if color == None:
-			color = c2dec(prefs.config['pres.bg'])
-		
 		if not widget.window:
 			return False
+		
 		ccontext = widget.window.cairo_create()
-		if len(color) >= 3 and isinstance(color[0], (float, int)):
-			ccontext.set_source_rgb(color[0], color[1], color[2])
-			ccontext.paint()
-		elif isinstance(color[0], tuple):
-			bounds = widget.window.get_size()
-			#TODO Strings are too long for comparison. Constants or 2-4
-			# character strings would be better.
-			if prefs.config['pres.bg_angle'] == "Top to Bottom":
-				gr_x1 = gr_y1 = gr_x2 = 0
-				gr_y2 = bounds[1]
-			elif prefs.config['pres.bg_angle'] == 'Top Right to Bottom Left':
-				gr_x2 = gr_y1 = 0
-				(gr_x1, gr_y2) = bounds
-			elif prefs.config['pres.bg_angle'] == 'Left to Right':
-				gr_x1 = gr_y1 = gr_y2 = 0
-				gr_x2 = bounds[0]
-			else:
-				gr_x1 = gr_y1 = 0
-				(gr_x2, gr_y2) = bounds
-			gradient = cairo.LinearGradient(gr_x1, gr_y1, gr_x2, gr_y2)
-			for i in range(len(color)):
-				gradient.add_color_stop_rgb(1.0*i/(len(color)-1), color[i][0],
-						color[i][1], color[i][2])
-			ccontext.rectangle(0,0, bounds[0], bounds[1])
-			ccontext.set_source(gradient)
-			ccontext.fill()
+		bounds = widget.window.get_size()
+		
+		if self.black:
+			color = (0, 0, 0)
 		else:
-			print "_set_background: Incorrect color"
+			bg = exposong.prefs.config['pres.bg']
+		
+		if isinstance(bg, str):
+			#Image file
+			try:
+				if self.bg_dirty or not hasattr(self, 'bg_img') or self.bg_img.get_width() != bounds[0]:
+					pixbuf = gtk.gdk.pixbuf_new_from_file(bg)
+					self.bg_img = pixbuf.scale_simple(bounds[0], bounds[1], gtk.gdk.INTERP_BILINEAR)
+		
+			except gobject.GError:
+				print "Error: Could not open background file."
+				if hasattr(self, 'bg_img'):
+					del self.bg_img
+				bg = (0,0,0)
+			else:
+				ccontext.set_source_pixbuf(self.bg_img, 0, 0)
+				ccontext.paint()
+				return
+			finally:
+				self.bg_dirty = False
+		
+		if isinstance(bg, tuple):
+			color = c2dec(bg)
+		
+			if len(color) >= 3 and isinstance(color[0], (float, int)):
+				# Draw a solid color
+				ccontext.set_source_rgb(color[0], color[1], color[2])
+				ccontext.paint()
+			elif isinstance(color[0], tuple):
+				# Draw a gradiant
+				
+				#TODO Strings are too long for comparison. Constants or 2-4
+				# character strings would be better.
+				if exposong.prefs.config['pres.bg_angle'] == "Top to Bottom":
+					gr_x1 = gr_y1 = gr_x2 = 0
+					gr_y2 = bounds[1]
+				elif exposong.prefs.config['pres.bg_angle'] == 'Top Right to Bottom Left':
+					gr_x2 = gr_y1 = 0
+					(gr_x1, gr_y2) = bounds
+				elif exposong.prefs.config['pres.bg_angle'] == 'Left to Right':
+					gr_x1 = gr_y1 = gr_y2 = 0
+					gr_x2 = bounds[0]
+				else:
+					gr_x1 = gr_y1 = 0
+					(gr_x2, gr_y2) = bounds
+				gradient = cairo.LinearGradient(gr_x1, gr_y1, gr_x2, gr_y2)
+				for i in range(len(color)):
+					gradient.add_color_stop_rgb(1.0*i/(len(color)-1), color[i][0],
+							color[i][1], color[i][2])
+				ccontext.rectangle(0,0, bounds[0], bounds[1])
+				ccontext.set_source(gradient)
+				ccontext.fill()
+			else:
+				print "_set_background: Incorrect color"
+	
+	def refresh_bg(self):
+		self.bg_dirty = True
+		self.draw()
+	
 	
 	def _draw(self, widget):
 		'Render `widget`.'
@@ -174,12 +209,10 @@ class Screen:
 		elif widget is self.pres:
 			self.preview.queue_draw()
 		
-		if self.black:
-			self._set_background(widget, COLOR_BLACK)
-			return True
-		elif len(self.text) == 0 or self.background:
+		self._set_background(widget)
+		
+		if self.background or self.black or len(self.text) == 0:
 			#When there's no text to render, just draw the background
-			self._set_background(widget)
 			return True
 		
 		ccontext = widget.window.cairo_create()
@@ -197,7 +230,7 @@ class Screen:
 		layout.set_attributes(attrs)
 		
 		min_sz = 0
-		max_sz = int(prefs.config['pres.max_font_size'])
+		max_sz = int(exposong.prefs.config['pres.max_font_size'])
 		#Loop through until the text is between 80% of the height and 94%, or
 		#until we get a number that is not a multiple of 4 (2,6,10,14, etc) to
 		#make it simpler... TODO Double check that it doesn't overflow
@@ -221,13 +254,13 @@ class Screen:
 			layout.set_attributes(attrs)
 		
 		self._set_background(widget)
-		if prefs.config['pres.text_shadow']:
-			shcol = c2dec(prefs.config['pres.text_shadow'])
+		if exposong.prefs.config['pres.text_shadow']:
+			shcol = c2dec(exposong.prefs.config['pres.text_shadow'])
 			ccontext.set_source_rgba(shcol[0], shcol[1], shcol[2], shcol[3])
 			ccontext.move_to(bounds[0] * 0.03 + size*0.1,
 					(bounds[1] - layout.get_pixel_size()[1])/2.0 + size*0.1)
 			ccontext.show_layout(layout)
-		txcol = c2dec(prefs.config['pres.text_color'])
+		txcol = c2dec(exposong.prefs.config['pres.text_color'])
 		ccontext.set_source_rgba(txcol[0], txcol[1], txcol[2], 1.0)
 		ccontext.move_to(bounds[0] * 0.03,(bounds[1] - layout.get_pixel_size()[1])/2.0)
 		ccontext.show_layout(layout)

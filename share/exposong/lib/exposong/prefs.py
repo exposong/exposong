@@ -19,6 +19,8 @@ import gtk.gdk
 import imp
 import os.path
 
+import exposong.screen
+
 '''
 Configures program usage for ExpoSong.
 '''
@@ -58,7 +60,7 @@ class Prefs:
 	def load(self):
 		'Load preferences from file.'
 		try:
-			config = imp.load_source('config', 'config.py')
+			config = imp.load_source('config', os.path.expanduser('~/.exposong_cfg.py'))
 		except IOError:
 			return False
 		for k,v in self.cfg.iteritems():
@@ -68,22 +70,26 @@ class Prefs:
 			
 	def save(self):
 		'Save preferences to file.'
-		cfile = open('config.py', 'r+')
+		cfile = file(os.path.expanduser('~/.exposong_cfg.py'), 'w')
+		
 		cnt = 0
-		for line in cfile:
-			cnt += len(line)
-			if line.startswith('# @START_WRITE'):
-				break
-		cfile.seek(cnt)
+		#for line in cfile:
+		#	cnt += len(line)
+		#	if line.startswith('# @START_WRITE'):
+		#		break
+		#cfile.seek(cnt)
+		
+		#cfile.write("\n\n")
+		cfile.write('class Cfg:\n\tpass\n\n')
+		
+		for key in set(k.split('.')[0] for k in self.cfg.keys()):
+			cfile.write(key+" = Cfg()\n")
 		cfile.write("\n\n")
-		cnt += 1
 		
 		for key, value in self.cfg.iteritems():
 			ln = key+' = '+repr(value)+'\n'
 			cfile.write(ln)
-			cnt += len(ln)
 		
-		cfile.truncate(cnt)
 		cfile.close()
 	
 	def dialog(self, parent):
@@ -131,7 +137,7 @@ class PrefsDialog(gtk.Dialog):
 				bg_solid = config['pres.bg']
 				bg_img = ''
 		else:
-			bg_type = 'i'
+			bg_type = 'i' #Image
 			bg_grad = ((0,0,0), (0,0,0))
 			bg_solid = (0,0,0)
 			bg_img = config['pres.bg']
@@ -150,7 +156,7 @@ class PrefsDialog(gtk.Dialog):
 		p_r_gr.connect('toggled', self._on_toggle, self.p_bggr+[self.p_bggrang])
 		
 		p_r_img = self._append_radio_setting( _("_Image"), bg_type=='i', 4, group=p_r_solid)
-		p_r_img.set_sensitive(False) #Disabled until the feature is added
+		#p_r_img.set_sensitive(False) #Disabled until the feature is added
 		self.p_bgimg = self._append_file_setting(None, bg_img, 4)
 		self.p_bgimg.set_sensitive(bg_type=='i')
 		self.p_bgimg.set_size_request(180, -1)
@@ -175,8 +181,8 @@ class PrefsDialog(gtk.Dialog):
 				bgcol = self.p_bgsol.get_color()
 				config['pres.bg'] = (bgcol.red, bgcol.green, bgcol.blue)
 			elif p_r_img.get_active():
-				img = self.p_bgimg.get_uri()
-				#TODO Process the file
+				img = self.p_bgimg.get_filename()
+				config['pres.bg'] = img
 			txtc = p_txt.get_color()
 			config['pres.text_color'] = (txtc.red, txtc.green, txtc.blue)
 			txts = p_shad.get_color()
@@ -185,7 +191,7 @@ class PrefsDialog(gtk.Dialog):
 			config['general.ccli'] = g_ccli.get_text()
 			
 			config.save()
-			parent.presentation.draw()
+			exposong.screen.screen.refresh_bg()
 		
 		self.hide()
 	
@@ -211,8 +217,10 @@ class PrefsDialog(gtk.Dialog):
 		self._get_label(label, top)
 		
 		filech = gtk.FileChooserButton( _("Choose File") )
-		filech.set_filename(value)
-		filech.set_current_folder(os.path.expanduser('~'))
+		if value:
+			filech.set_filename(value)
+		else:
+			filech.set_current_folder(os.path.expanduser('~'))
 		self.table.attach(filech, 2, 4, top, top+1, gtk.FILL, 0, WIDGET_SPACING)
 		return filech
 	
