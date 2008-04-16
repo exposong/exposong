@@ -88,8 +88,10 @@ class Screen:
 	
 	def draw(self):
 		'Redraw the presentation and preview screens.'
-		self._draw(self.pres)
-		self._draw(self.preview)
+		if self.pres.window and self.pres.window.is_viewable():
+			self.pres.queue_draw()
+		else:
+			self.preview.queue_draw()
 	
 	def to_black(self, button):
 		'Set the screen to black.'
@@ -117,7 +119,6 @@ class Screen:
 	def expose(self, widget, event):
 		'Redraw `widget`.'
 		self._draw(widget)
-	
 	
 	
 	def _set_background(self, widget, color = None):
@@ -165,12 +166,13 @@ class Screen:
 			#Get a copy of the presentation window if it's visible
 			win_sz = self.pres.window.get_size()
 			width = int(135.0*win_sz[0]/win_sz[1])
-			#widget.set_size_request(width, 135)
 			ccontext = widget.window.cairo_create()
 			ccontext.scale(float(width)/win_sz[0], 135.0/win_sz[1])
 			ccontext.set_source_surface(self.pres.window.cairo_create().get_target(), 1, 1)
 			ccontext.paint()
 			return True
+		elif widget is self.pres:
+			self.preview.queue_draw()
 		
 		if self.black:
 			self._set_background(widget, COLOR_BLACK)
