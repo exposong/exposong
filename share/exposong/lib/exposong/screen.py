@@ -39,6 +39,7 @@ class Screen:
 	def __init__(self, preview):
 		self.text = ''
 		self.black = self.background = False
+		self.bg_dirty = False
 		
 		self.window = gtk.Window(gtk.WINDOW_POPUP)
 		
