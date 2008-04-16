@@ -24,7 +24,7 @@ msgstr "Copyright %s"
 #: share/exposong/lib/exposong/about.py:33
 #: share/exposong/lib/exposong/about.py:34
 msgid "Translators Name"
-msgstr "Siegwart Bogatscher"
+msgstr "Übersetzer"
 
 #: share/exposong/lib/exposong/application.py:121
 msgid "Present"
