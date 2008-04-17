@@ -132,7 +132,7 @@ class Screen:
 		bounds = widget.window.get_size()
 		
 		if self.black:
-			color = (0, 0, 0)
+			bg = (0, 0, 0)
 		else:
 			bg = exposong.prefs.config['pres.bg']
 		
