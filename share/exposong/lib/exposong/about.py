@@ -16,6 +16,7 @@
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import gtk
 import gtk.gdk
+import webbrowser
 from os.path import join
 
 from exposong import RESOURCE_PATH
@@ -38,4 +39,6 @@ class About:
 		self.dialog.set_modal(False)
 		self.dialog.run()
 		self.dialog.hide()
+
+gtk.about_dialog_set_url_hook(lambda dlg, url: webbrowser.open(url))
 
