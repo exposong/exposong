@@ -165,18 +165,16 @@ class Screen:
 			elif isinstance(color[0], tuple):
 				# Draw a gradiant
 				
-				#TODO Strings are too long for comparison. Constants or 2-4
-				# character strings would be better.
-				if exposong.prefs.config['pres.bg_angle'] == "Top to Bottom":
+				if exposong.prefs.config['pres.bg_angle'] == "N":
 					gr_x1 = gr_y1 = gr_x2 = 0
 					gr_y2 = bounds[1]
-				elif exposong.prefs.config['pres.bg_angle'] == 'Top Right to Bottom Left':
+				elif exposong.prefs.config['pres.bg_angle'] == 'NE':
 					gr_x2 = gr_y1 = 0
 					(gr_x1, gr_y2) = bounds
-				elif exposong.prefs.config['pres.bg_angle'] == 'Left to Right':
+				elif exposong.prefs.config['pres.bg_angle'] == 'W':
 					gr_x1 = gr_y1 = gr_y2 = 0
 					gr_x2 = bounds[0]
-				else:
+				else: # Assume NW
 					gr_x1 = gr_y1 = 0
 					(gr_x2, gr_y2) = bounds
 				gradient = cairo.LinearGradient(gr_x1, gr_y1, gr_x2, gr_y2)

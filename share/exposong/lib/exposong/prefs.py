@@ -24,9 +24,9 @@ import exposong.screen
 '''
 Configures program usage for ExpoSong.
 '''
-
-GRADIENT_DIRS = ( _('Top Left to Bottom Right'), _('Top to Bottom'),
-				_('Top Right to Bottom Left'), _('Left to Right'))
+GRADIENT_KEYS = [ "NW", "N", "NE", "W" ]
+GRADIENT_VALS = [ _('Top Left to Bottom Right'), _('Top to Bottom'),
+				_('Top Right to Bottom Left'), _('Left to Right') ]
 class Prefs:
 	'''
 	Manages user preferences.
@@ -35,7 +35,7 @@ class Prefs:
 		self.cfg = {'general.ccli': '',
 				'pres.max_font_size': 56,
 				'pres.bg': ((0, 13107, 19660), (0, 26214, 39321)),
-				'pres.bg_angle': GRADIENT_DIRS[0],
+				'pres.bg_angle': GRADIENT_KEYS[0],
 				'pres.text_color': (65535, 65535, 65535),
 				'pres.text_shadow': (0, 0, 0, 26214)}
 		self.load()
@@ -152,11 +152,12 @@ class PrefsDialog(gtk.Dialog):
 		self.p_bggr = self._append_color_setting(None, bg_grad, 2)
 		self.p_bggr[0].set_sensitive(bg_type=='g')
 		self.p_bggr[1].set_sensitive(bg_type=='g')
-		self.p_bggrang = self._append_combo_setting( _("Gradiant Angle\n(Clockwise From Up)"), GRADIENT_DIRS, config['pres.bg_angle'], 3)
+		self.p_bggrang = self._append_combo_setting( _("Gradiant Angle\n(Clockwise From Up)"),
+				GRADIENT_VALS, GRADIENT_VALS[GRADIENT_KEYS.index(config['pres.bg_angle'])], 3)
+		self.p_bggrang.set_sensitive(bg_type=='g')
 		p_r_gr.connect('toggled', self._on_toggle, self.p_bggr+[self.p_bggrang])
 		
 		p_r_img = self._append_radio_setting( _("_Image"), bg_type=='i', 4, group=p_r_solid)
-		#p_r_img.set_sensitive(False) #Disabled until the feature is added
 		self.p_bgimg = self._append_file_setting(None, bg_img, 4)
 		self.p_bgimg.set_sensitive(bg_type=='i')
 		self.p_bgimg.set_size_request(180, -1)
@@ -176,7 +177,8 @@ class PrefsDialog(gtk.Dialog):
 				brt = self.p_bggr[1].get_color()
 				config['pres.bg'] = ((tlf.red, tlf.green, tlf.blue),
 						(brt.red, brt.green, brt.blue))
-				config['pres.bg_angle'] = self.p_bggrang.get_active_text()
+				config['pres.bg_angle'] = GRADIENT_KEYS[GRADIENT_VALS.index(
+						self.p_bggrang.get_active_text())]
 			elif p_r_solid.get_active():
 				bgcol = self.p_bgsol.get_color()
 				config['pres.bg'] = (bgcol.red, bgcol.green, bgcol.blue)
