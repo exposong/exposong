@@ -178,13 +178,17 @@ class Main (gtk.Window):
             _("Open a presentation from file")),
         ('pres-export', None, _("_Export"), None,
             _("Export presentation")),
-        ('Present', gtk.STOCK_FULLSCREEN, _('_Present'), "<Alt>p", None,
+        ('pres-prev', None, _("Previous Slide"), "<Release>comma", None,
+            slidelist.slidelist.prev_slide),
+        ('pres-next', None, _("Next Slide"), "<Release>period", None,
+            slidelist.slidelist.next_slide),
+        ('Present', gtk.STOCK_FULLSCREEN, _('_Present'), "<Release>p", None,
             screen.screen.show),
-        ('Background', gtk.STOCK_CLEAR, _('_Background'), "<Alt>b", None,
+        ('Background', gtk.STOCK_CLEAR, _('_Background'), "<Release>b", None,
             screen.screen.to_background),
-        ('Black Screen', None, _('Blac_k Screen'), "<Alt>k", None,
+        ('Black Screen', None, _('Blac_k Screen'), "<Release>k", None,
             screen.screen.to_black),
-        ('Hide', gtk.STOCK_CLOSE, _('Hi_de'), "<Alt>d", None,
+        ('Hide', gtk.STOCK_CLOSE, _('Hi_de'), "<Release>h", None,
             screen.screen.hide),
         ('HelpContents', gtk.STOCK_HELP),
         ('About', gtk.STOCK_ABOUT, None, None, None, self._on_about)])
@@ -214,6 +218,9 @@ class Main (gtk.Window):
             <menuitem action="Background" />
             <menuitem action="Black Screen" />
             <menuitem action="Hide" />
+            <separator />
+            <menuitem action="pres-prev" />
+            <menuitem action="pres-next" />
           </menu>
           <menu action="Help">
             <menuitem action="HelpContents" />
