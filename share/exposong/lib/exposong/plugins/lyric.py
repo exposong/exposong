@@ -8,8 +8,9 @@ import pango
 import re
 
 from exposong.glob import *
-from exposong import RESOURCE_PATH
+from exposong import RESOURCE_PATH, DATA_PATH
 from exposong.plugins import Plugin, _abstract
+import exposong.application
 
 """
 Lyric presentations.
@@ -58,6 +59,127 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
   def __init__(self, dom = None, filename = None):
     _abstract.Presentation.__init__(self, dom, filename)
     self.type = 'lyric'
+  
+  def edit(self):
+    'Run the edit dialog for the presentation.'
+    dialog = gtk.Dialog(_("New Presentation"), exposong.application.main, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+        (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+    if(self.title):
+      dialog.set_title(_("Editing %s") % self.title)
+    else:
+      dialog.set_title(_("New %s Presentation") % self.type.title())
+    notebook = gtk.Notebook()
+    dialog.vbox.pack_start(notebook, True, True, 6)
+    
+    vbox = gtk.VBox()
+    vbox.set_border_width(4)
+    vbox.set_spacing(7)
+    hbox = gtk.HBox()
+    
+    label = gtk.Label(_("Title:"))
+    label.set_alignment(0.5, 0.5)
+    hbox.pack_start(label, False, True, 5)
+    title = gtk.Entry(45)
+    title.set_text(self.title)
+    hbox.pack_start(title, True, True)
+    
+    vbox.pack_start(hbox, False, True)
+    
+    text = gtk.TextView()
+    text.set_wrap_mode(gtk.WRAP_WORD)
+    self.set_text_buffer(text.get_buffer())
+    text_scroll = gtk.ScrolledWindow()
+    text_scroll.add(text)
+    text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+    text_scroll.set_size_request(340, 240)
+    vbox.pack_start(text_scroll, True, True)
+    notebook.append_page(vbox, gtk.Label(_("Edit")))
+    
+    vbox = gtk.VBox()
+    vbox.set_border_width(4)
+    vbox.set_spacing(7)
+    
+    hbox = gtk.HBox()
+    label = gtk.Label(_("Words:"))
+    hbox.pack_start(label, False, True, 5)
+    words = gtk.Entry(50)
+    words.set_text(self.author.get('words',''))
+    hbox.pack_start(words, True, True, 5)
+    vbox.pack_start(hbox, False, True)
+    
+    hbox = gtk.HBox()
+    label = gtk.Label(_("Music:"))
+    hbox.pack_start(label, False, True, 5)
+    music = gtk.Entry(50)
+    music.set_text(self.author.get('music',''))
+    hbox.pack_start(music, True, True, 5)
+    vbox.pack_start(hbox, False, True)
+    
+    hbox = gtk.HBox()
+    label = gtk.Label(_("Copyright:"))
+    hbox.pack_start(label, False, True, 5)
+    copyright = gtk.Entry(50)
+    copyright.set_text(self.copyright)
+    hbox.pack_start(copyright, True, True, 5)
+    vbox.pack_start(hbox, False, True)
+    
+    notebook.append_page(vbox, gtk.Label(_("Information")))
+    
+    notebook.show_all()
+    
+    if(dialog.run() == gtk.RESPONSE_ACCEPT):
+      bounds = text.get_buffer().get_bounds()
+      self.title = title.get_text()
+      self.author['words'] = words.get_text()
+      self.author['music'] = music.get_text()
+      self.copyright = copyright.get_text()
+      sval = text.get_buffer().get_text(bounds[0], bounds[1])
+      self.slides = []
+      for sl in sval.split("\n\n"):
+        self.slides.append(self.Slide(sl))
+      self.to_xml()
+      
+      dialog.hide()
+      return True
+    else:
+      dialog.hide()
+      return False
+  
+  def to_xml(self):
+    'Save the data to disk.'
+    directory = join(DATA_PATH, 'pres')
+    self.filename = check_filename(self.title, directory, self.filename)
+    
+    doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
+    root = doc.createElement("presentation")
+    root.setAttribute("type", self.type)
+    
+    node = doc.createElement("title")
+    node.appendChild(doc.createTextNode(self.title))
+    root.appendChild(node)
+    
+    node = doc.createElement("author")
+    node.setAttribute('type', 'words')
+    node.appendChild(doc.createTextNode(self.author.get('words', '')))
+    root.appendChild(node)
+    
+    node = doc.createElement("author")
+    node.setAttribute('type', 'music')
+    node.appendChild(doc.createTextNode(self.author.get('music', '')))
+    root.appendChild(node)
+    
+    node = doc.createElement("copyright")
+    node.appendChild(doc.createTextNode(self.copyright))
+    root.appendChild(node)
+    
+    for s in self.slides:
+      sNode = doc.createElement("slide")
+      s.to_node(doc, sNode)
+      root.appendChild(sNode)
+    doc.appendChild(root)
+    outfile = open(join(directory, self.filename), 'w')
+    doc.writexml(outfile)
+    doc.unlink()
   
   @staticmethod
   def get_type():

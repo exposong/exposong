@@ -79,7 +79,7 @@ class PresList(gtk.TreeView):
     field = self.get_active_item()
     if not field:
       return False
-    if field.edit(exposong.application.main):
+    if field.edit():
       self.get_model().refresh_model()
       self._on_pres_activate()
   

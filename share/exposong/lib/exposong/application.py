@@ -18,7 +18,6 @@
 import gtk
 import gtk.gdk
 from xml.dom import minidom
-import imp          #to dynamically load type modules
 import os
 from os.path import join
 
