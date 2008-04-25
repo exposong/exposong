@@ -231,7 +231,7 @@ class Screen:
     
     attrs = pango.AttrList()
     attrs.insert(pango.AttrFontDesc(pango.FontDescription("Sans Bold "+str(int(screenH/54.0))),
-        end_index = len(slide.body_text())))
+        end_index = len(slide.body_text())+40))
     layout.set_attributes(attrs)
     
     footer_height = layout.get_pixel_size()[1]

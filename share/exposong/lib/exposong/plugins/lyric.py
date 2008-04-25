@@ -27,6 +27,7 @@ from exposong.glob import *
 from exposong import RESOURCE_PATH, DATA_PATH
 from exposong.plugins import Plugin, _abstract
 import exposong.application
+from exposong.prefs import config
 
 """
 Lyric presentations.
@@ -74,12 +75,14 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
   
     def footer_text(self):
       'Draw text on the footer.'
-      jn = [self.pres.title]
-      author = ';  '.join( k.title()+": "+v for k,v in self.pres.author.iteritems() if v )
+      jn = ['"%s"' % self.pres.title]
+      author = ';  '.join( _(k.title())+": "+v for k,v in self.pres.author.iteritems() if v )
       if author:
         jn.append(author)
       if hasattr(self.pres, "copyright"):
         jn.append(u"Copyright \xA9 %s" % self.pres.copyright)
+      if config['general.ccli']:
+        jn.append("CCLI# %s" % config['general.ccli'])
       return '\n'.join(jn)
   
   
