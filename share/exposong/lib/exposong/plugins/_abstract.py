@@ -49,7 +49,8 @@ class Presentation:
   
     Reimplementing this class is optional.
     '''
-    def __init__(self, value):
+    def __init__(self, pres, value):
+      self.pres = pres
       if isinstance(value, xml.dom.Node):
         self.text = get_node_text(value)
         self.title = value.getAttribute("title")
@@ -73,6 +74,18 @@ class Presentation:
       if(self.title):
         node.setAttribute("title", self.title)
       node.appendChild( document.createTextNode(self.text) )
+    
+    def header_text(self):
+      'Draw on the header.'
+      return NotImplemented
+    
+    def footer_text(self):
+      'Draw text on the footer.'
+      return NotImplemented
+    
+    def body_text(self):
+      'Draw text in the center of the screen.'
+      return self.get_text()
   
   
   def __init__(self, dom = None, filename = None):
@@ -109,7 +122,7 @@ class Presentation:
     'Set the slides from xml.'
     slides = dom.getElementsByTagName("slide")
     for sl in slides:
-      self.slides.append(self.Slide(sl))
+      self.slides.append(self.Slide(self, sl))
   
   def get_row(self):
     'Gets the data to add to the presentation list.'
@@ -195,17 +208,5 @@ class Screen:
   '''
   def draw(self, surface, priority=1):
     'Draw anywhere on the screen.'
-    return NotImplemented
-  
-  def header_text(self, text, priority=1):
-    'Draw on the header.'
-    return NotImplemented
-  
-  def footer_text(self, text, priority=1):
-    'Draw text on the footer.'
-    return NotImplemented
-  
-  def body_text(self, text, priority=1):
-    'Draw text in the center of the screen.'
     return NotImplemented
 

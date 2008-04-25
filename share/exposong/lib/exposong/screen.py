@@ -21,6 +21,7 @@ import time
 import gobject
 
 import exposong.prefs
+import exposong.slidelist
 
 
 def c2dec(color):
@@ -37,7 +38,6 @@ class Screen:
   '''
   
   def __init__(self, preview):
-    self.text = ''
     self.black = self.background = False
     self.bg_dirty = False
     
@@ -83,10 +83,10 @@ class Screen:
   # if hasattr(self, "pres") and self.pres.window:
   #   self._set_background(self.pres, **keys)
   
-  def set_text(self, text):
-    'Set the text of the window.'
-    self.text = str(text)
-    self.draw()
+  #def set_text(self, text):
+  #  'Set the text of the window.'
+  #  self.text = str(text)
+  #  self.draw()
   
   def draw(self):
     'Redraw the presentation and preview screens.'
@@ -210,37 +210,66 @@ class Screen:
     
     self._set_background(widget)
     
-    if self.background or self.black or len(self.text) == 0:
+    slide = exposong.slidelist.slidelist.get_active_item()
+    
+    if self.background or self.black or not slide:
       #When there's no text to render, just draw the background
       return True
     
     ccontext = widget.window.cairo_create()
+    screenW, screenH = widget.window.get_size()
+    txcol = c2dec(exposong.prefs.config['pres.text_color'])
+    screenCenterY = screenH/2
+    # Header text
+    # TODO
+    
+    # Footer text
     layout = ccontext.create_layout()
-    bounds = widget.window.get_size()
+    layout.set_text(slide.footer_text())
+    layout.set_alignment(pango.ALIGN_CENTER)
+    layout.set_width(int(screenW*pango.SCALE * 0.97))
+    
+    attrs = pango.AttrList()
+    attrs.insert(pango.AttrFontDesc(pango.FontDescription("Sans Bold "+str(int(screenH/54.0))),
+        end_index = len(slide.body_text())))
+    layout.set_attributes(attrs)
+    
+    footer_height = layout.get_pixel_size()[1]
+    
+    ccontext.set_source_rgba(txcol[0], txcol[1], txcol[2], 1.0)
+    ccontext.move_to(screenW * 0.015, screenH - footer_height)
+    ccontext.show_layout(layout)
+    
+    screenH -= footer_height
+    screenCenterY -= footer_height
+    
+    # Body Text
+    layout = ccontext.create_layout()
     
     size = 16
-    layout.set_text(self.text)
+    layout.set_text(slide.body_text())
     layout.set_alignment(pango.ALIGN_CENTER)
-    layout.set_width(int(bounds[0]*pango.SCALE * 0.97))
+    layout.set_width(int(screenW*pango.SCALE * 0.97))
     
     attrs = pango.AttrList()
     attrs.insert(pango.AttrFontDesc(pango.FontDescription("Sans Bold "+str(size)),
-        end_index = len(self.text)))
+        end_index = len(slide.body_text())))
     layout.set_attributes(attrs)
     
     min_sz = 0
     max_sz = int(exposong.prefs.config['pres.max_font_size'])
-    #Loop through until the text is between 80% of the height and 94%, or
+    
+    #Loop through until the text is between 78% of the height and 94%, or
     #until we get a number that is not a multiple of 4 (2,6,10,14, etc) to
     #make it simpler... TODO Double check that it doesn't overflow
     while True:
-      if layout.get_pixel_size()[0] > bounds[0]*0.97 \
-          or layout.get_pixel_size()[1] > bounds[1]*0.94:
+      if layout.get_pixel_size()[0] > screenW*0.97 \
+          or layout.get_pixel_size()[1] > screenH*0.94:
         max_sz = size
         size = (min_sz + max_sz) / 2
       elif size % 4 != 0 or max_sz - min_sz < 3:
         break
-      elif layout.get_pixel_size()[1] < bounds[1]*0.78:
+      elif layout.get_pixel_size()[1] < screenH*0.78:
         min_sz = size
         if(max_sz):
           size = (min_sz + max_sz) / 2
@@ -249,19 +278,18 @@ class Screen:
       else:
         break
       attrs.insert(pango.AttrFontDesc(pango.FontDescription("Sans Bold "+str(size)),
-        end_index = len(self.text)))
+        end_index = len(slide.body_text())))
       layout.set_attributes(attrs)
     
-    self._set_background(widget)
+    #self._set_background(widget)
     if exposong.prefs.config['pres.text_shadow']:
       shcol = c2dec(exposong.prefs.config['pres.text_shadow'])
       ccontext.set_source_rgba(shcol[0], shcol[1], shcol[2], shcol[3])
-      ccontext.move_to(bounds[0] * 0.03 + size*0.1,
-          (bounds[1] - layout.get_pixel_size()[1])/2.0 + size*0.1)
+      ccontext.move_to(screenW * 0.015 + size*0.1,
+          screenCenterY - layout.get_pixel_size()[1]/2.0 + size*0.1)
       ccontext.show_layout(layout)
-    txcol = c2dec(exposong.prefs.config['pres.text_color'])
     ccontext.set_source_rgba(txcol[0], txcol[1], txcol[2], 1.0)
-    ccontext.move_to(bounds[0] * 0.03,(bounds[1] - layout.get_pixel_size()[1])/2.0)
+    ccontext.move_to(screenW * 0.015,screenCenterY - layout.get_pixel_size()[1]/2.0)
     ccontext.show_layout(layout)
     return True
 

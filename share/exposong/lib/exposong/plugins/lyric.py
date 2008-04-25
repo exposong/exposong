@@ -1,4 +1,20 @@
 #! /usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# Copyright (C) 2008 Fishhookweb.com
+#
+# ExpoSong is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import gtk
 import gtk.gdk
 from os.path import join
@@ -25,7 +41,7 @@ title_re = re.compile("(chorus|refrain|verse|bridge)", re.I)
 
 
 class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
-    _abstract.Schedule):
+    _abstract.Schedule, _abstract.Screen):
   '''
   Lyric presentation type.
   '''
@@ -33,7 +49,8 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     '''
     A lyric slide for the presentation.
     '''
-    def __init__(self, value):
+    def __init__(self, pres, value):
+      self.pres = pres
       if(isinstance(value, xml.dom.Node)):
         self.text = get_node_text(value)
         self.title = value.getAttribute("title")
@@ -54,6 +71,16 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     def get_description():
       'Return the description of the plugin.'
       return "A lyric presentation type."
+  
+    def footer_text(self):
+      'Draw text on the footer.'
+      jn = [self.pres.title]
+      author = ';  '.join( k.title()+": "+v for k,v in self.pres.author.iteritems() if v )
+      if author:
+        jn.append(author)
+      if hasattr(self.pres, "copyright"):
+        jn.append(u"Copyright \xA9 %s" % self.pres.copyright)
+      return '\n'.join(jn)
   
   
   def __init__(self, dom = None, filename = None):
@@ -136,7 +163,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       sval = text.get_buffer().get_text(bounds[0], bounds[1])
       self.slides = []
       for sl in sval.split("\n\n"):
-        self.slides.append(self.Slide(sl))
+        self.slides.append(self.Slide(self, sl))
       self.to_xml()
       
       dialog.hide()

@@ -18,7 +18,7 @@ import gtk
 import gobject
 import pango
 
-from exposong import screen
+import exposong.screen
 
 slidelist = None #will hold instance of SlideList
 
@@ -65,6 +65,6 @@ class SlideList(gtk.TreeView):
   
   def _on_slide_activate(self, *args):
     'Present the selected slide to the screen.'
-    screen.screen.set_text(self.get_active_item().get_text())
+    exposong.screen.screen.draw()
 
 
