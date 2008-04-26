@@ -241,19 +241,19 @@ class Screen:
     ccontext.show_layout(layout)
     
     screenH -= footer_height
-    screenCenterY -= footer_height
+    screenCenterY -= footer_height/2
     
     # Body Text
     layout = ccontext.create_layout()
     
     size = 16
-    layout.set_text(slide.body_text())
+    layout.set_text(str(slide.body_text()))
     layout.set_alignment(pango.ALIGN_CENTER)
     layout.set_width(int(screenW*pango.SCALE * 0.97))
     
     attrs = pango.AttrList()
     attrs.insert(pango.AttrFontDesc(pango.FontDescription("Sans Bold "+str(size)),
-        end_index = len(slide.body_text())))
+        end_index = len(str(slide.body_text()))))
     layout.set_attributes(attrs)
     
     min_sz = 0
