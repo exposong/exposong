@@ -50,13 +50,14 @@ class BGSelect (gtk.VBox):
     directory = os.path.join(DATA_PATH, "bg")
     dir_list = os.listdir(directory)
     for filenm in dir_list:
-      if os.path.isfile(os.path.join(directory, filenm)) and\
-          mimetypes.guess_type(filenm)[0].startswith("image"):
-        path = os.path.join(directory, filenm)
-        pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(path, 80, 50)
-        itr = self.imgmodel.append([path, pixbuf])
-        if isinstance(curbg, str) and path == curbg:
-          self.imgcombo.set_active_iter(itr)
+      if os.path.isfile(os.path.join(directory, filenm)):
+        mime = mimetypes.guess_type(filenm)
+        if mime[0] and mime[0].startswith("image"):
+          path = os.path.join(directory, filenm)
+          pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(path, 80, 50)
+          itr = self.imgmodel.append([path, pixbuf])
+          if isinstance(curbg, str) and path == curbg:
+            self.imgcombo.set_active_iter(itr)
     self.pack_start(hbox, False, True, 2)
     
     hbox = gtk.HBox()
