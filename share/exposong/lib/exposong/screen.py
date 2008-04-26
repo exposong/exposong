@@ -165,16 +165,16 @@ class Screen:
       elif isinstance(color[0], tuple):
         # Draw a gradiant
         
-        if exposong.prefs.config['pres.bg_angle'] == "N":
+        if exposong.prefs.config['pres.bg_angle'] == u"\u2193": #Down
           gr_x1 = gr_y1 = gr_x2 = 0
           gr_y2 = bounds[1]
-        elif exposong.prefs.config['pres.bg_angle'] == 'NE':
+        elif exposong.prefs.config['pres.bg_angle'] == u'\u2199': #Down-Left
           gr_x2 = gr_y1 = 0
           (gr_x1, gr_y2) = bounds
-        elif exposong.prefs.config['pres.bg_angle'] == 'W':
+        elif exposong.prefs.config['pres.bg_angle'] == u'\u2192': #Right
           gr_x1 = gr_y1 = gr_y2 = 0
           gr_x2 = bounds[0]
-        else: # Assume NW
+        else: # Down-Right
           gr_x1 = gr_y1 = 0
           (gr_x2, gr_y2) = bounds
         gradient = cairo.LinearGradient(gr_x1, gr_y1, gr_x2, gr_y2)
@@ -187,9 +187,8 @@ class Screen:
       else:
         print "_set_background: Incorrect color"
   
-  def refresh_bg(self):
-    self.bg_dirty = True
-    self.draw()
+  def set_dirty(self, dirty = True):
+    self.bg_dirty = dirty
   
   
   def _draw(self, widget):

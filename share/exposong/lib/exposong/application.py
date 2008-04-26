@@ -26,6 +26,7 @@ from exposong import prefs, screen, preslist, schedlist, slidelist
 from exposong.about import About
 from exposong.schedule import Schedule # ? where to put library
 import exposong.plugins, exposong.plugins._abstract
+import exposong.bgselect
 
 main = None
 
@@ -114,6 +115,9 @@ class Main (gtk.Window):
     
     #### Preview and Presentation Buttons
     win_rt_btm = gtk.HBox()
+    
+    bgsel = exposong.bgselect.BGSelect()
+    win_rt_btm.pack_start(bgsel, False, True, 10)
     win_rt_btm.pack_start(pres_prev, True, False, 10)
     
     pres_buttons = gtk.VButtonBox()
@@ -257,7 +261,6 @@ class Main (gtk.Window):
   def build_pres_list(self):
     'Load presentations and add them to self.library.'
     directory = join(DATA_PATH, "pres")
-    'Add items to the presentation list.'
     dir_list = os.listdir(directory)
     for filenm in dir_list:
       if filenm.endswith(".xml"):
@@ -286,7 +289,9 @@ class Main (gtk.Window):
     directory = join(DATA_PATH, "sched")
     self.library = Schedule( _("Library"))
     self.build_pres_list()
-    schedlist.schedlist.append(None, self.library, 1)
+    libitr = schedlist.schedlist.append(None, self.library, 1)
+    schedlist.schedlist.get_selection().select_iter(libitr)
+    del libitr
     
     #Add schedules from plugins
     plugins = exposong.plugins.get_plugins_by_capability(exposong.plugins._abstract.Schedule)
@@ -386,6 +391,7 @@ class Main (gtk.Window):
       model.get_value(sched, 0).save()
       sched = model.iter_next(sched)
     
+    prefs.config.save()
     gtk.main_quit()
 
 

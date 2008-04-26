@@ -107,6 +107,7 @@ class PrefsDialog(gtk.Dialog):
     self.widgets = {}
     gtk.Dialog.__init__(self, _("Preferences"), parent, 0,
         (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+    self.set_default_size(350, 410)
     notebook = gtk.Notebook()
     self.vbox.pack_start(notebook, True, True, 5)
     
@@ -125,66 +126,65 @@ class PrefsDialog(gtk.Dialog):
     self.table.set_row_spacings(10)
     self.table.set_border_width(10)
     
-    if isinstance(config['pres.bg'], tuple):
-      if isinstance(config['pres.bg'][0], tuple):
-        bg_type = 'g' #Gradiant
-        bg_grad = config['pres.bg']
-        bg_solid = config['pres.bg'][0]
-        bg_img = ''
-      else:
-        bg_type = 's' #Solid
-        bg_grad = (config['pres.bg'], config['pres.bg'])
-        bg_solid = config['pres.bg']
-        bg_img = ''
-    else:
-      bg_type = 'i' #Image
-      bg_grad = ((0,0,0), (0,0,0))
-      bg_solid = (0,0,0)
-      bg_img = config['pres.bg']
-      
+    #if isinstance(config['pres.bg'], tuple):
+    #  if isinstance(config['pres.bg'][0], tuple):
+    #    bg_type = 'g' #Gradiant
+    #    bg_grad = config['pres.bg']
+    #    bg_solid = config['pres.bg'][0]
+    #    bg_img = ''
+    #  else:
+    #    bg_type = 's' #Solid
+    #    bg_grad = (config['pres.bg'], config['pres.bg'])
+    #    bg_solid = config['pres.bg']
+    #    bg_img = ''
+    #else:
+    #  bg_type = 'i' #Image
+    #  bg_grad = ((0,0,0), (0,0,0))
+    #  bg_solid = (0,0,0)
+    #  bg_img = config['pres.bg']
     
-    self._append_section_title( _("Background"), 0)
-    p_r_solid = self._append_radio_setting( _("_Solid"), bg_type=='s', 1)
-    self.p_bgsol = self._append_color_setting(None, bg_solid, 1)
-    self.p_bgsol.set_sensitive(bg_type=='s')
-    p_r_solid.connect('toggled', self._on_toggle, self.p_bgsol)
-    p_r_gr = self._append_radio_setting( _("_Gradiant"), bg_type=='g', 2, group=p_r_solid)
-    self.p_bggr = self._append_color_setting(None, bg_grad, 2)
-    self.p_bggr[0].set_sensitive(bg_type=='g')
-    self.p_bggr[1].set_sensitive(bg_type=='g')
-    self.p_bggrang = self._append_combo_setting( _("Gradiant Angle\n(Clockwise From Up)"),
-        GRADIENT_VALS, GRADIENT_VALS[GRADIENT_KEYS.index(config['pres.bg_angle'])], 3)
-    self.p_bggrang.set_sensitive(bg_type=='g')
-    p_r_gr.connect('toggled', self._on_toggle, self.p_bggr+[self.p_bggrang])
+    #self._append_section_title( _("Background"), 0)
+    #p_r_solid = self._append_radio_setting( _("_Solid"), bg_type=='s', 1)
+    #self.p_bgsol = self._append_color_setting(None, bg_solid, 1)
+    #self.p_bgsol.set_sensitive(bg_type=='s')
+    #p_r_solid.connect('toggled', self._on_toggle, self.p_bgsol)
+    #p_r_gr = self._append_radio_setting( _("_Gradiant"), bg_type=='g', 2, group=p_r_solid)
+    #self.p_bggr = self._append_color_setting(None, bg_grad, 2)
+    #self.p_bggr[0].set_sensitive(bg_type=='g')
+    #self.p_bggr[1].set_sensitive(bg_type=='g')
+    #self.p_bggrang = self._append_combo_setting( _("Gradiant Angle\n(Clockwise From Up)"),
+    #    GRADIENT_VALS, GRADIENT_VALS[GRADIENT_KEYS.index(config['pres.bg_angle'])], 3)
+    #self.p_bggrang.set_sensitive(bg_type=='g')
+    #p_r_gr.connect('toggled', self._on_toggle, self.p_bggr+[self.p_bggrang])
     
-    p_r_img = self._append_radio_setting( _("_Image"), bg_type=='i', 4, group=p_r_solid)
-    self.p_bgimg = self._append_file_setting(None, bg_img, 4)
-    self.p_bgimg.set_sensitive(bg_type=='i')
-    self.p_bgimg.set_size_request(180, -1)
-    p_r_img.connect('toggled', self._on_toggle, self.p_bgimg)
+    #p_r_img = self._append_radio_setting( _("_Image"), bg_type=='i', 4, group=p_r_solid)
+    #self.p_bgimg = self._append_file_setting(None, bg_img, 4)
+    #self.p_bgimg.set_sensitive(bg_type=='i')
+    #self.p_bgimg.set_size_request(180, -1)
+    #p_r_img.connect('toggled', self._on_toggle, self.p_bgimg)
     
-    self._append_section_title( _("Font"), 6)
-    p_txt = self._append_color_setting( _("Text Color"), config['pres.text_color'], 7)
-    p_shad = self._append_color_setting( _("Text Shadow"), config['pres.text_shadow'], 8, True)
-    p_maxsize = self._append_spinner_setting( _("Max Font Size"), gtk.Adjustment(config['pres.max_font_size'], 0, 96, 1), 9)
+    self._append_section_title( _("Font"), 0)
+    p_txt = self._append_color_setting( _("Text Color"), config['pres.text_color'], 1)
+    p_shad = self._append_color_setting( _("Text Shadow"), config['pres.text_shadow'], 2, True)
+    p_maxsize = self._append_spinner_setting( _("Max Font Size"), gtk.Adjustment(config['pres.max_font_size'], 0, 96, 1), 3)
     
     notebook.append_page(self.table, gtk.Label( _("Presentation")))
     
     self.show_all()
     if self.run() == gtk.RESPONSE_ACCEPT:
-      if p_r_gr.get_active():
-        tlf = self.p_bggr[0].get_color()
-        brt = self.p_bggr[1].get_color()
-        config['pres.bg'] = ((tlf.red, tlf.green, tlf.blue),
-            (brt.red, brt.green, brt.blue))
-        config['pres.bg_angle'] = GRADIENT_KEYS[GRADIENT_VALS.index(
-            self.p_bggrang.get_active_text())]
-      elif p_r_solid.get_active():
-        bgcol = self.p_bgsol.get_color()
-        config['pres.bg'] = (bgcol.red, bgcol.green, bgcol.blue)
-      elif p_r_img.get_active():
-        img = self.p_bgimg.get_filename()
-        config['pres.bg'] = img
+      #if p_r_gr.get_active():
+      #  tlf = self.p_bggr[0].get_color()
+      #  brt = self.p_bggr[1].get_color()
+      #  config['pres.bg'] = ((tlf.red, tlf.green, tlf.blue),
+      #      (brt.red, brt.green, brt.blue))
+      #  config['pres.bg_angle'] = GRADIENT_KEYS[GRADIENT_VALS.index(
+      #      self.p_bggrang.get_active_text())]
+      #elif p_r_solid.get_active():
+      #  bgcol = self.p_bgsol.get_color()
+      #  config['pres.bg'] = (bgcol.red, bgcol.green, bgcol.blue)
+      #elif p_r_img.get_active():
+      #  img = self.p_bgimg.get_filename()
+      #  config['pres.bg'] = img
       txtc = p_txt.get_color()
       config['pres.text_color'] = (txtc.red, txtc.green, txtc.blue)
       txts = p_shad.get_color()
@@ -192,8 +192,8 @@ class PrefsDialog(gtk.Dialog):
       config['pres.max_font_size'] = p_maxsize.get_value()
       config['general.ccli'] = g_ccli.get_text()
       
-      config.save()
-      exposong.screen.screen.refresh_bg()
+      exposong.screen.screen.set_dirty()
+      exposong.screen.screen.draw()
     
     self.hide()
   
