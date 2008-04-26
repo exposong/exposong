@@ -113,10 +113,12 @@ class BGSelect (gtk.VBox):
   
   def _on_image_radio(self, radio):
       self.imgcombo.set_sensitive(radio.get_active())
+      self._on_image_change(self.imgcombo)
   
   def _on_grad_radio(self, radio):
       self.graddir.set_sensitive(radio.get_active())
       self.grad1.set_sensitive(radio.get_active())
       self.grad2.set_sensitive(radio.get_active())
+      self._on_grad_change()
     
 
