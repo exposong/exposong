@@ -99,9 +99,10 @@ class BGSelect (gtk.VBox):
   def _on_image_change(self, imgcombo):
     'Change to the selected image.'
     itr = imgcombo.get_active_iter()
-    mod = imgcombo.get_model()
-    exposong.prefs.config['pres.bg'] = mod.get_value(itr, 0)
-    exposong.screen.screen.set_dirty()
+    if itr:
+      mod = imgcombo.get_model()
+      exposong.prefs.config['pres.bg'] = mod.get_value(itr, 0)
+      exposong.screen.screen.set_dirty()
   
   def _on_grad_change(self, *args):
     'The gradient has been modified.'
