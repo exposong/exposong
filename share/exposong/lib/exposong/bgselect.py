@@ -18,10 +18,14 @@
 import gtk
 import os
 import mimetypes
+import shutil
 
 from exposong import DATA_PATH
 import exposong.prefs
 import exposong.screen
+import exposong.application
+
+thsz = (80, 50)
 
 class BGSelect (gtk.VBox):
   '''
@@ -32,12 +36,14 @@ class BGSelect (gtk.VBox):
     
     curbg = exposong.prefs.config['pres.bg']
     
+    # Image Background
     hbox = gtk.HBox()
+    vbox = gtk.VBox()
     self.imgradio = gtk.RadioButton()
     hbox.pack_start(self.imgradio, False, True, 2)
     self.imgmodel = gtk.ListStore(str, gtk.gdk.Pixbuf)
     self.imgcombo = gtk.ComboBox(self.imgmodel)
-    hbox.pack_start(self.imgcombo, True, True, 2)
+    vbox.pack_start(self.imgcombo, True, True, 2)
     self.imgcombo.set_wrap_width(2)
     cell = gtk.CellRendererPixbuf()
     self.imgcombo.pack_start(cell, True)
@@ -54,12 +60,18 @@ class BGSelect (gtk.VBox):
         mime = mimetypes.guess_type(filenm)
         if mime[0] and mime[0].startswith("image"):
           path = os.path.join(directory, filenm)
-          pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(path, 80, 50)
+          pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(path, thsz[0], thsz[1])
           itr = self.imgmodel.append([path, pixbuf])
           if isinstance(curbg, str) and path == curbg:
             self.imgcombo.set_active_iter(itr)
-    self.pack_start(hbox, False, True, 2)
     
+    self.new_image = gtk.Button("Add", gtk.STOCK_ADD, False)
+    self.new_image.connect("clicked", self._on_new_image)
+    vbox.pack_start(self.new_image, False, True, 2)
+    hbox.pack_start(vbox, True, True, 2)
+    self.pack_start(hbox, True, True, 2)
+    
+    # Gradient Background
     hbox = gtk.HBox()
     self.gradradio = gtk.RadioButton(self.imgradio)
     hbox.pack_start(self.gradradio, False, True, 2)
@@ -71,15 +83,11 @@ class BGSelect (gtk.VBox):
       self.graddir.set_active(graddirlist.index(exposong.prefs.config['pres.bg_angle']))
     else:
       self.graddir.set_active(0)
-    vbox = gtk.VBox()
-    vbox.pack_start(self.graddir, True, True, 2)
+    hbox.pack_start(self.graddir, True, True, 2)
     self.grad1 = gtk.ColorButton()
     self.grad2 = gtk.ColorButton()
-    hbox2 = gtk.HBox()
-    hbox2.pack_start(self.grad1, True, True)
-    hbox2.pack_start(self.grad2, True, True)
-    vbox.pack_start(hbox2, True, True, 2)
-    hbox.pack_start(vbox, True, True, 2)
+    hbox.pack_start(self.grad1, True, True)
+    hbox.pack_start(self.grad2, True, True)
     
     if isinstance(curbg, tuple):
       self.gradradio.set_active(True)
@@ -88,7 +96,7 @@ class BGSelect (gtk.VBox):
     
     self._on_image_radio(self.imgradio)
     self._on_grad_radio(self.gradradio)
-    self.pack_start(hbox, False, True, 2)
+    self.pack_start(hbox, True, True, 2)
     
     self.imgradio.connect("toggled", self._on_image_radio)
     self.imgcombo.connect('changed', self._on_image_change)
@@ -98,7 +106,7 @@ class BGSelect (gtk.VBox):
     self.grad2.connect("color-set", self._on_grad_change)
   
   def _on_image_change(self, imgcombo):
-    'Change to the selected image.'
+    'A new image was selected.'
     itr = imgcombo.get_active_iter()
     if itr:
       mod = imgcombo.get_model()
@@ -114,15 +122,39 @@ class BGSelect (gtk.VBox):
         (grad2.red,grad2.green,grad2.blue))
   
   def _on_image_radio(self, radio):
-      self.imgcombo.set_sensitive(radio.get_active())
-      if radio.get_active():
-        self._on_image_change(self.imgcombo)
+    'The image radioButton was changed.'
+    self.imgcombo.set_sensitive(radio.get_active())
+    self.new_image.set_sensitive(radio.get_active())
+    if radio.get_active():
+      self._on_image_change(self.imgcombo)
   
   def _on_grad_radio(self, radio):
-      self.graddir.set_sensitive(radio.get_active())
-      self.grad1.set_sensitive(radio.get_active())
-      self.grad2.set_sensitive(radio.get_active())
-      if radio.get_active():
-        self._on_grad_change()
-    
+    'The gradient radioButton was changed.'
+    self.graddir.set_sensitive(radio.get_active())
+    self.grad1.set_sensitive(radio.get_active())
+    self.grad2.set_sensitive(radio.get_active())
+    if radio.get_active():
+      self._on_grad_change()
+  
+  def _on_new_image(self, button):
+    'The user added a new image as a background.'
+    fltr = gtk.FileFilter()
+    fltr.add_mime_type("image/jpeg")
+    fltr.add_mime_type("image/png")
+    fltr.add_mime_type("image/gif")
+    dlg = gtk.FileChooserDialog( _("Add Image"), exposong.application.main,
+        buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK,
+        gtk.RESPONSE_ACCEPT))
+    dlg.add_filter(fltr)
+    if dlg.run() == gtk.RESPONSE_ACCEPT:
+      img = dlg.get_filename()
+      dlg.hide()
+      shutil.copyfile(img, os.path.join(DATA_PATH, 'bg', img.rpartition('/')[2]))
+      itr = self.imgmodel.append([img,
+          gtk.gdk.pixbuf_new_from_file_at_size(img, thsz[0], thsz[1])])
+      self.imgcombo.set_active_iter(itr)
+    else:
+      dlg.hide()
+      
+      
 

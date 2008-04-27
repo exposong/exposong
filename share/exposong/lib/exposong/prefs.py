@@ -24,9 +24,6 @@ import exposong.screen
 '''
 Configures program usage for ExpoSong.
 '''
-GRADIENT_KEYS = [ "NW", "N", "NE", "W" ]
-GRADIENT_VALS = [ _('Top Left to Bottom Right'), _('Top to Bottom'),
-        _('Top Right to Bottom Left'), _('Left to Right') ]
 class Prefs:
   '''
   Manages user preferences.
@@ -35,7 +32,7 @@ class Prefs:
     self.cfg = {'general.ccli': '',
         'pres.max_font_size': 56,
         'pres.bg': ((0, 13107, 19660), (0, 26214, 39321)),
-        'pres.bg_angle': GRADIENT_KEYS[0],
+        'pres.bg_angle': u'\u2198',
         'pres.text_color': (65535, 65535, 65535),
         'pres.text_shadow': (0, 0, 0, 26214)}
     self.load()
@@ -73,13 +70,6 @@ class Prefs:
     cfile = file(os.path.expanduser('~/.exposong_cfg.py'), 'w')
     
     cnt = 0
-    #for line in cfile:
-    # cnt += len(line)
-    # if line.startswith('# @START_WRITE'):
-    #   break
-    #cfile.seek(cnt)
-    
-    #cfile.write("\n\n")
     cfile.write('class Cfg:\n\tpass\n\n')
     
     for key in set(k.split('.')[0] for k in self.cfg.keys()):
@@ -126,43 +116,6 @@ class PrefsDialog(gtk.Dialog):
     self.table.set_row_spacings(10)
     self.table.set_border_width(10)
     
-    #if isinstance(config['pres.bg'], tuple):
-    #  if isinstance(config['pres.bg'][0], tuple):
-    #    bg_type = 'g' #Gradiant
-    #    bg_grad = config['pres.bg']
-    #    bg_solid = config['pres.bg'][0]
-    #    bg_img = ''
-    #  else:
-    #    bg_type = 's' #Solid
-    #    bg_grad = (config['pres.bg'], config['pres.bg'])
-    #    bg_solid = config['pres.bg']
-    #    bg_img = ''
-    #else:
-    #  bg_type = 'i' #Image
-    #  bg_grad = ((0,0,0), (0,0,0))
-    #  bg_solid = (0,0,0)
-    #  bg_img = config['pres.bg']
-    
-    #self._append_section_title( _("Background"), 0)
-    #p_r_solid = self._append_radio_setting( _("_Solid"), bg_type=='s', 1)
-    #self.p_bgsol = self._append_color_setting(None, bg_solid, 1)
-    #self.p_bgsol.set_sensitive(bg_type=='s')
-    #p_r_solid.connect('toggled', self._on_toggle, self.p_bgsol)
-    #p_r_gr = self._append_radio_setting( _("_Gradiant"), bg_type=='g', 2, group=p_r_solid)
-    #self.p_bggr = self._append_color_setting(None, bg_grad, 2)
-    #self.p_bggr[0].set_sensitive(bg_type=='g')
-    #self.p_bggr[1].set_sensitive(bg_type=='g')
-    #self.p_bggrang = self._append_combo_setting( _("Gradiant Angle\n(Clockwise From Up)"),
-    #    GRADIENT_VALS, GRADIENT_VALS[GRADIENT_KEYS.index(config['pres.bg_angle'])], 3)
-    #self.p_bggrang.set_sensitive(bg_type=='g')
-    #p_r_gr.connect('toggled', self._on_toggle, self.p_bggr+[self.p_bggrang])
-    
-    #p_r_img = self._append_radio_setting( _("_Image"), bg_type=='i', 4, group=p_r_solid)
-    #self.p_bgimg = self._append_file_setting(None, bg_img, 4)
-    #self.p_bgimg.set_sensitive(bg_type=='i')
-    #self.p_bgimg.set_size_request(180, -1)
-    #p_r_img.connect('toggled', self._on_toggle, self.p_bgimg)
-    
     self._append_section_title( _("Font"), 0)
     p_txt = self._append_color_setting( _("Text Color"), config['pres.text_color'], 1)
     p_shad = self._append_color_setting( _("Text Shadow"), config['pres.text_shadow'], 2, True)
@@ -172,19 +125,6 @@ class PrefsDialog(gtk.Dialog):
     
     self.show_all()
     if self.run() == gtk.RESPONSE_ACCEPT:
-      #if p_r_gr.get_active():
-      #  tlf = self.p_bggr[0].get_color()
-      #  brt = self.p_bggr[1].get_color()
-      #  config['pres.bg'] = ((tlf.red, tlf.green, tlf.blue),
-      #      (brt.red, brt.green, brt.blue))
-      #  config['pres.bg_angle'] = GRADIENT_KEYS[GRADIENT_VALS.index(
-      #      self.p_bggrang.get_active_text())]
-      #elif p_r_solid.get_active():
-      #  bgcol = self.p_bgsol.get_color()
-      #  config['pres.bg'] = (bgcol.red, bgcol.green, bgcol.blue)
-      #elif p_r_img.get_active():
-      #  img = self.p_bgimg.get_filename()
-      #  config['pres.bg'] = img
       txtc = p_txt.get_color()
       config['pres.text_color'] = (txtc.red, txtc.green, txtc.blue)
       txts = p_shad.get_color()
