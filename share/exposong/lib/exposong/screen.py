@@ -223,24 +223,26 @@ class Screen:
     # TODO
     
     # Footer text
-    layout = ccontext.create_layout()
-    layout.set_text(slide.footer_text())
-    layout.set_alignment(pango.ALIGN_CENTER)
-    layout.set_width(int(screenW*pango.SCALE * 0.97))
-    
-    attrs = pango.AttrList()
-    attrs.insert(pango.AttrFontDesc(pango.FontDescription("Sans Bold "+str(int(screenH/54.0))),
-        end_index = len(slide.body_text())+40))
-    layout.set_attributes(attrs)
-    
-    footer_height = layout.get_pixel_size()[1]
-    
-    ccontext.set_source_rgba(txcol[0], txcol[1], txcol[2], 1.0)
-    ccontext.move_to(screenW * 0.015, screenH - footer_height)
-    ccontext.show_layout(layout)
-    
-    screenH -= footer_height
-    screenCenterY -= footer_height/2
+    ftext = slide.footer_text()
+    if isinstance(ftext, str) and len(ftext):
+      layout = ccontext.create_layout()
+      layout.set_text(ftext)
+      layout.set_alignment(pango.ALIGN_CENTER)
+      layout.set_width(int(screenW*pango.SCALE * 0.97))
+      
+      attrs = pango.AttrList()
+      attrs.insert(pango.AttrFontDesc(pango.FontDescription("Sans Bold "+str(int(screenH/54.0))),
+          end_index = len(slide.body_text())+40))
+      layout.set_attributes(attrs)
+      
+      footer_height = layout.get_pixel_size()[1]
+      
+      ccontext.set_source_rgba(txcol[0], txcol[1], txcol[2], 1.0)
+      ccontext.move_to(screenW * 0.015, screenH - footer_height)
+      ccontext.show_layout(layout)
+      
+      screenH -= footer_height
+      screenCenterY -= footer_height/2
     
     # Body Text
     layout = ccontext.create_layout()
