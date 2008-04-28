@@ -37,6 +37,9 @@ gettext.textdomain('exposong')
 import __builtin__
 __builtin__._ = gettext.gettext
 
+HELP_URL = abspath(join(SHARED_FILES, pardir, pardir, 'help', _('en') ,
+    'index.html'))
+    
 #import the main application
 from exposong.application import run
 

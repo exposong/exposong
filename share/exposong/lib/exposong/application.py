@@ -19,9 +19,10 @@ import gtk
 import gtk.gdk
 from xml.dom import minidom
 import os
+import webbrowser
 from os.path import join
 
-from exposong import RESOURCE_PATH, DATA_PATH, SHARED_FILES
+from exposong import RESOURCE_PATH, DATA_PATH, SHARED_FILES, HELP_URL
 from exposong import prefs, screen, preslist, schedlist, slidelist
 from exposong.about import About
 from exposong.schedule import Schedule # ? where to put library
@@ -193,7 +194,7 @@ class Main (gtk.Window):
             screen.screen.to_black),
         ('Hide', gtk.STOCK_CLOSE, _('Hi_de'), "<Release>h", None,
             screen.screen.hide),
-        ('HelpContents', gtk.STOCK_HELP),
+        ('HelpContents', gtk.STOCK_HELP, None, None, None, self._show_help),
         ('About', gtk.STOCK_ABOUT, None, None, None, self._on_about)])
     uimanager.insert_action_group(self.action_group, 0)
     uimanager.add_ui_from_string('''
@@ -382,6 +383,10 @@ class Main (gtk.Window):
   def _on_prefs(self, *args):
     'Shows the preferences dialog.'
     prefs.config.dialog(self)
+  
+  def _show_help(self, *args):
+    'Show the help pages.'
+    webbrowser.open(HELP_URL)
   
   def _quit(self, *args):
     'Cleans up and exits the program.'
