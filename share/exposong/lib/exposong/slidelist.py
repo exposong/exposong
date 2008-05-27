@@ -19,6 +19,7 @@ import gobject
 import pango
 
 import exposong.screen
+import cellrendererimage
 
 slidelist = None #will hold instance of SlideList
 
@@ -31,11 +32,10 @@ class SlideList(gtk.TreeView):
     self.set_size_request(280, 200)
     self.set_enable_search(False)
     
-    text_cr = gtk.CellRendererText()
-    text_cr.ellipsize = pango.ELLIPSIZE_END
-    column1 = gtk.TreeViewColumn( _("Slide"), text_cr, markup=1)
-    column1.set_resizable(False)
-    self.append_column(column1)
+    self.column1 = gtk.TreeViewColumn( _("Slide"))
+    self.column1.set_resizable(False)
+    self.append_column(self.column1)
+    #self.set_column()
     
     self.slide_list = gtk.ListStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING)
     self.set_model(self.slide_list)
@@ -46,6 +46,32 @@ class SlideList(gtk.TreeView):
     self.slide_list.clear()
     for sl in slides:
       self.slide_list.append([sl, sl.get_markup()])
+  
+  def set_presentation(self, pres):
+    'Set the active presentation.'
+    if pres is None:
+      self.slide_list.clear()
+    else:
+      self.slide_list.clear()
+      if not hasattr(self, 'pres_type') or self.pres_type is not pres.type:
+        self.pres_type = pres.type
+        pres.slide_column(self.column1)
+      for slide in pres.get_slide_list():
+        self.slide_list.append(slide)
+    
+  
+  #def set_column(self, img=False):
+  #  'Set the display column to image type.'
+  #  self.column1.clear()
+  #  if img:
+  #    img_cr = cellrendererimage.CellRendererImage()
+  #    self.column1.pack_start(img_cr, False)
+  #    self.column1.add_attribute(img_cr, 'image', 1)
+  #  else:
+  #    text_cr = gtk.CellRendererText()
+  #    text_cr.ellipsize = pango.ELLIPSIZE_END
+  #    self.column1.pack_start(text_cr, False)
+  #    self.column1.add_attribute(text_cr, 'markup', 1)
   
   def get_active_item(self):
     'Return the selected `Slide` object.'

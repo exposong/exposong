@@ -70,9 +70,9 @@ class PresList(gtk.TreeView):
   def _on_pres_activate(self, *args):
     'Change the slides to the current presentation.'
     if self.has_selection():
-      exposong.slidelist.slidelist.set_slides(self.get_active_item().slides)
+      exposong.slidelist.slidelist.set_presentation(self.get_active_item().presentation)
     else:
-      exposong.slidelist.slidelist.set_slides([])
+      exposong.slidelist.slidelist.set_presentation(None)
   
   def _on_pres_edit(self, *args):
     'Edit the presentation.'

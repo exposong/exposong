@@ -159,9 +159,21 @@ class Presentation:
     doc.writexml(outfile)
     doc.unlink()
   
+  def slide_column(self, col):
+    'Set the column to use text.'
+    col.clear()
+    text_cr = gtk.CellRendererText()
+    #text_cr.ellipsize = pango.ELLIPSIZE_END
+    col.pack_start(text_cr, False)
+    col.add_attribute(text_cr, 'markup', 1)
+  
+  def get_slide_list(self):
+    'Get the slide list.'
+    return tuple( (sl, sl.get_markup()) for sl in self.slides)
+  
   def _on_pres_new(self, action):
     pres = self.__class__()
-    if pres.edit(exposong.application.main):
+    if pres.edit():
       sched = exposong.schedlist.schedlist.get_active_item()
       if sched and not sched.builtin:
         sched.append(pres)
