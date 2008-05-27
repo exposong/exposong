@@ -269,7 +269,7 @@ class Main (gtk.Window):
           dom = minidom.parse(join(directory,filenm))
         except Exception, details:
           print "Error reading presentation file (%s): %s" % (filenm, details)
-        if dom:
+        else:
           root_elem = dom.documentElement
           if root_elem.tagName == "presentation" and root_elem.hasAttribute("type"):
             filetype = root_elem.getAttribute("type")

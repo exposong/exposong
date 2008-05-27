@@ -207,13 +207,17 @@ class Screen:
     elif widget is self.pres:
       self.preview.queue_draw()
     
-    self._set_background(widget)
-    
     slide = exposong.slidelist.slidelist.get_active_item()
     
     if self.background or self.black or not slide:
       #When there's no text to render, just draw the background
+      self._set_background(widget)
       return True
+    
+    if slide.draw(widget) is not NotImplemented:
+      return True
+    
+    self._set_background(widget)
     
     ccontext = widget.window.cairo_create()
     screenW, screenH = widget.window.get_size()

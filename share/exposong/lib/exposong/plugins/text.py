@@ -33,7 +33,7 @@ information = {
     'description': __doc__,
     'required': False,
 }
-
+type_icon = gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH,'text.png'))
 
 class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     _abstract.Schedule):
@@ -107,7 +107,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
   @staticmethod
   def get_icon():
     'Return the pixbuf icon.'
-    return gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH,'text.png'))
+    return type_icon
   
   def merge_menu(self, uimanager):
     'Merge new values with the uimanager.'

@@ -86,6 +86,10 @@ class Presentation:
     def body_text(self):
       'Draw text in the center of the screen.'
       return self.get_text()
+    
+    def draw(self, widget):
+      'Overrides all text rendering to render custom slides.'
+      return NotImplemented
   
   
   def __init__(self, dom = None, filename = None):
@@ -166,6 +170,8 @@ class Presentation:
     #text_cr.ellipsize = pango.ELLIPSIZE_END
     col.pack_start(text_cr, False)
     col.add_attribute(text_cr, 'markup', 1)
+    exposong.slidelist.slidelist.set_model(\
+        gtk.ListStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING))
   
   def get_slide_list(self):
     'Get the slide list.'

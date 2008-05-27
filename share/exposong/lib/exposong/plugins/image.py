@@ -21,13 +21,13 @@ from os.path import join
 import xml.dom
 import xml.dom.minidom
 import pango
+import gobject
 
 from exposong.glob import *
 from exposong import RESOURCE_PATH, DATA_PATH
 from exposong.plugins import Plugin, _abstract
 import exposong.application
 from exposong.prefs import config
-import cellrendererimage
 
 """
 Image presentations.
@@ -37,6 +37,17 @@ information = {
     'description': __doc__,
     'required': False,
 }
+type_icon = gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH,'image.png'))
+
+def get_rotate_const(rotate):
+  if rotate == "cw":
+    return gtk.gdk.PIXBUF_ROTATE_CLOCKWISE
+  elif rotate == "ud":
+    return gtk.gdk.PIXBUF_ROTATE_UPSIDEDOWN
+  elif rotate == "ccw":
+    return gtk.gdk.PIXBUF_ROTATE_COUNTERCLOCKWISE
+  else:
+    return gtk.gdk.PIXBUF_ROTATE_NONE
 
 class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     _abstract.Schedule, _abstract.Screen):
@@ -49,12 +60,24 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     '''
     def __init__(self, pres, value):
       self.pres = pres
+      
       if(isinstance(value, xml.dom.Node)):
-        self.image = get_node_text(value)
         self.title = value.getAttribute("title")
+        imgdom = value.getElementsByTagName("img").item(0)
+        if imgdom:
+          self.image = imgdom.getAttribute("src")
+          self.rotate = get_rotate_const(imgdom.getAttribute("rotate"))
+        
       elif(isinstance(value, gtk.Image)):
         self.title = ''
         self.image = value
+      
+      if not os.path.isabs(self.image):
+        self.image = DATA_PATH + '/image/' + self.image
+      
+      if hasattr(self, "image"):
+        self.thumb = gtk.gdk.pixbuf_new_from_file_at_size(self.image, 150, 150)\
+            .rotate_simple(self.rotate)
     
     @staticmethod
     def get_version():
@@ -65,7 +88,10 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     def get_description():
       'Return the description of the plugin.'
       return "An image presentation type."
-  
+    
+    def draw(self, widget):
+      'Override screen to draw an image instead of text.'
+      return True
   
   def __init__(self, dom = None, filename = None):
     _abstract.Presentation.__init__(self, dom, filename)
@@ -158,7 +184,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
   @staticmethod
   def get_icon():
     'Return the pixbuf icon.'
-    return gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH,'image.png'))
+    return type_icon
   
   def set_text_buffer(self, tbuf):
     'Sets the value of the buffer.'
@@ -167,13 +193,16 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
   def slide_column(self, col):
     'Set the column to use images.'
     col.clear()
-    img_cr = cellrendererimage.CellRendererImage()
-    self.column1.pack_start(img_cr, False)
-    self.column1.add_attribute(img_cr, 'image', 1)
+    img_cr = gtk.CellRendererPixbuf()
+    col.pack_start(img_cr, False)
+    col.add_attribute(img_cr, 'pixbuf', 1)
+    
+    exposong.slidelist.slidelist.set_model(\
+        gtk.ListStore(gobject.TYPE_PYOBJECT, gobject.TYPE_OBJECT))
   
   def get_slide_list(self):
     'Get the slide list.'
-    return tuple( (sl, sl.get_markup()) for sl in self.slides)
+    return tuple( (sl, sl.thumb) for sl in self.slides)
   
   def merge_menu(self, uimanager):
     'Merge new values with the uimanager.'

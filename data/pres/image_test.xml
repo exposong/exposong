@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<presentation type="image">
+<title>Image Test</title>
+<slide><img src='0001.jpg' /></slide>
+<slide><img src='0002.jpg' /></slide>
+<slide><img src='0003.jpg' /></slide>
+</presentation>
