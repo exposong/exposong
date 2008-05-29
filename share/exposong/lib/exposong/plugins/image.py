@@ -76,8 +76,11 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
         self.image = DATA_PATH + '/image/' + self.image
       
       if hasattr(self, "image"):
-        self.thumb = gtk.gdk.pixbuf_new_from_file_at_size(self.image, 150, 150)\
-            .rotate_simple(self.rotate)
+        try:
+          self.thumb = gtk.gdk.pixbuf_new_from_file_at_size(self.image, 150, 150)\
+              .rotate_simple(self.rotate)
+        except gobject.GError:
+          print "Error: Could not open file."
     
     @staticmethod
     def get_version():
@@ -91,7 +94,25 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     
     def draw(self, widget):
       'Override screen to draw an image instead of text.'
-      return True
+      ccontext = widget.window.cairo_create()
+      bounds = widget.window.get_size()
+      
+      #draw a black background
+      ccontext.set_source_rgb(0, 0, 0)
+      ccontext.paint()
+      
+      if not hasattr(self,'pixbuf') or bounds[0] <> self.pixbuf.get_width()\
+          or bounds[1] <> self.pixbuf.get_height():
+        try:
+          self.pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(self.image,\
+              bounds[0], bounds[1]).rotate_simple(self.rotate)
+        except gobject.GError:
+          print "Error: Could not open background file."
+          return
+      ccontext.set_source_pixbuf(self.pixbuf, (bounds[0]-self.pixbuf.get_width())/2,\
+      (bounds[1]-self.pixbuf.get_height())/2)
+      ccontext.paint()
+      return
   
   def __init__(self, dom = None, filename = None):
     _abstract.Presentation.__init__(self, dom, filename)
