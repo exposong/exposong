@@ -71,11 +71,22 @@ class SlideList(gtk.TreeView):
   
   def prev_slide(self, widget):
     'Move to the previous slide.'
-    print 'prev'
+    (model, s_iter) = self.get_selection().get_selected()
+    if s_iter:
+      path = model.get_path(s_iter)
+      if path[0] > 0:
+        path = (path[0]-1,)
+        self.set_cursor(path)
   
   def next_slide(self, widget):
     'Move to the next slide.'
-    print 'next'
+    (model, s_iter) = self.get_selection().get_selected()
+    if s_iter:
+      path = model.get_path(s_iter)
+      path = (path[0]+1,)
+      self.set_cursor(path)
+    else:
+      self.set_cursor((0,))
   
   def _on_slide_activate(self, *args):
     'Present the selected slide to the screen.'
