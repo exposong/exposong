@@ -228,7 +228,7 @@ class Screen:
     
     # Footer text
     ftext = slide.footer_text()
-    if isinstance(ftext, str) and len(ftext):
+    if isinstance(ftext, (unicode, str)) and len(ftext):
       layout = ccontext.create_layout()
       layout.set_text(ftext)
       layout.set_alignment(pango.ALIGN_CENTER)
