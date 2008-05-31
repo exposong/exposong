@@ -151,17 +151,16 @@ class Presentation:
     notebook = gtk.Notebook()
     dialog.vbox.pack_start(notebook, True, True, 6)
     
+    self._fields = dict()
+    
     self._edit_tabs(notebook)
     
     notebook.show_all()
     
     if(dialog.run() == gtk.RESPONSE_ACCEPT):
-      bounds = text.get_buffer().get_bounds()
-      self.title = title.get_text()
-      sval = text.get_buffer().get_text(bounds[0], bounds[1])
-      self.slides = []
-      for sl in sval.split("\n\n"):
-        self.slides.append(self.Slide(sl))
+      self._edit_save()
+      del(self._fields)
+      
       self.to_xml()
       
       dialog.hide()
@@ -173,6 +172,10 @@ class Presentation:
   def _edit_tabs(self, notebook):
     'Tabs for the dialog.'
     pass # Later we'll have presentation specific backgrounds.
+  
+  def _edit_save(self):
+    'Save the fields if the user clicks ok.'
+    pass
   
   def to_xml(self):
     'Save the data to disk.'

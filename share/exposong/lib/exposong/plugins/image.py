@@ -119,9 +119,13 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     self.type = 'image'
   
   def _edit_tabs(self, notebook):
-    'Run the edit dialog for the presentation.'
+    'Tabs for the dialog.'
     
     _abstract.Presentation._edit_tabs(self, notebook)
+  
+  def _edit_save(self):
+    'Save the fields if the user clicks ok.'
+    pass
   
   def to_xml(self):
     'Save the data to disk.'

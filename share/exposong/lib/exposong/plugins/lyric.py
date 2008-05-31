@@ -101,18 +101,18 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     label = gtk.Label(_("Title:"))
     label.set_alignment(0.5, 0.5)
     hbox.pack_start(label, False, True, 5)
-    title = gtk.Entry(45)
-    title.set_text(self.title)
-    hbox.pack_start(title, True, True)
+    self._fields['title'] = gtk.Entry(45)
+    self._fields['title'].set_text(self.title)
+    hbox.pack_start(self._fields['title'], True, True)
     
     vbox.pack_start(hbox, False, True)
     
-    text = gtk.TextView()
-    text.set_wrap_mode(gtk.WRAP_WORD)
-    text.get_buffer().connect("changed", self._text_changed)
-    self.set_text_buffer(text.get_buffer())
+    self._fields['text'] = gtk.TextView()
+    self._fields['text'].set_wrap_mode(gtk.WRAP_WORD)
+    self._fields['text'].get_buffer().connect("changed", self._text_changed)
+    self.set_text_buffer(self._fields['text'].get_buffer())
     text_scroll = gtk.ScrolledWindow()
-    text_scroll.add(text)
+    text_scroll.add(self._fields['text'])
     text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
     text_scroll.set_size_request(340, 240)
     vbox.pack_start(text_scroll, True, True)
@@ -125,29 +125,41 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     hbox = gtk.HBox()
     label = gtk.Label(_("Words:"))
     hbox.pack_start(label, False, True, 5)
-    words = gtk.Entry(50)
-    words.set_text(self.author.get('words',''))
-    hbox.pack_start(words, True, True, 5)
+    self._fields['words'] = gtk.Entry(50)
+    self._fields['words'].set_text(self.author.get('words',''))
+    hbox.pack_start(self._fields['words'], True, True, 5)
     vbox.pack_start(hbox, False, True)
     
     hbox = gtk.HBox()
     label = gtk.Label(_("Music:"))
     hbox.pack_start(label, False, True, 5)
-    music = gtk.Entry(50)
-    music.set_text(self.author.get('music',''))
-    hbox.pack_start(music, True, True, 5)
+    self._fields['music'] = gtk.Entry(50)
+    self._fields['music'].set_text(self.author.get('music',''))
+    hbox.pack_start(self._fields['music'], True, True, 5)
     vbox.pack_start(hbox, False, True)
     
     hbox = gtk.HBox()
     label = gtk.Label(_("Copyright:"))
     hbox.pack_start(label, False, True, 5)
-    copyright = gtk.Entry(50)
-    copyright.set_text(self.copyright)
-    hbox.pack_start(copyright, True, True, 5)
+    self._fields['copyright'] = gtk.Entry(50)
+    self._fields['copyright'].set_text(self.copyright)
+    hbox.pack_start(self._fields['copyright'], True, True, 5)
     vbox.pack_start(hbox, False, True)
     notebook.append_page(vbox, gtk.Label(_("Information")))
     
     _abstract.Presentation._edit_tabs(self, notebook)
+  
+  def _edit_save(self):
+    'Save the fields if the user clicks ok.'
+    self.title = self._fields['title'].get_text()
+    self.author['words'] = self._fields['words'].get_text()
+    self.author['music'] = self._fields['music'].get_text()
+    self.copyright = self._fields['copyright'].get_text()
+    bounds = self._fields['text'].get_buffer().get_bounds()
+    sval = self._fields['text'].get_buffer().get_text(bounds[0], bounds[1])
+    self.slides = []
+    for sl in sval.split("\n\n"):
+      self.slides.append(self.Slide(self, sl))
   
   def to_xml(self):
     'Save the data to disk.'

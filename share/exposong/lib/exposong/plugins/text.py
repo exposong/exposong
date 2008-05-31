@@ -46,6 +46,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     self.type = "text"
   
   def _edit_tabs(self, notebook):
+    'Tabs for the dialog.'
     tabs = list()
     vbox = gtk.VBox()
     vbox.set_border_width(4)
@@ -55,23 +56,33 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     label = gtk.Label(_("Title:"))
     label.set_alignment(0.5, 0.5)
     hbox.pack_start(label, False, True, 5)
-    title = gtk.Entry(45)
-    title.set_text(self.title)
-    hbox.pack_start(title, True, True)
+    
+    self._fields['title'] = gtk.Entry(45)
+    self._fields['title'].set_text(self.title)
+    hbox.pack_start(self._fields['title'], True, True)
     
     vbox.pack_start(hbox, False, True)
     
-    text = gtk.TextView()
-    text.set_wrap_mode(gtk.WRAP_WORD)
-    self.set_text_buffer(text.get_buffer())
+    self._fields['text'] = gtk.TextView()
+    self._fields['text'].set_wrap_mode(gtk.WRAP_WORD)
+    self.set_text_buffer(self._fields['text'].get_buffer())
     text_scroll = gtk.ScrolledWindow()
-    text_scroll.add(text)
+    text_scroll.add(self._fields['text'])
     text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
     text_scroll.set_size_request(300, 200)
     vbox.pack_start(text_scroll, True, True)
     notebook.append_page(vbox, gtk.Label(_("Edit")))
     
     _abstract.Presentation._edit_tabs(self, notebook)
+  
+  def _edit_save(self):
+    'Save the fields if the user clicks ok.'
+    self.title = self._fields['title'].get_text()
+    bounds = self._fields['text'].get_buffer().get_bounds()
+    sval = self._fields['text'].get_buffer().get_text(bounds[0], bounds[1])
+    self.slides = []
+    for sl in sval.split("\n\n"):
+      self.slides.append(self.Slide(self, sl))
   
   @staticmethod
   def get_type():
