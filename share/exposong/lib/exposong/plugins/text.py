@@ -45,19 +45,8 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     _abstract.Presentation.__init__(self, dom, filename)
     self.type = "text"
   
-  
-  
-  def edit(self):
-    'Run the edit dialog for the presentation.'
-    dialog = gtk.Dialog(_("New Presentation"), exposong.application.main, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-        (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
-    if(self.title):
-      dialog.set_title(_("Editing %s") % self.title)
-    else:
-      dialog.set_title(_("New %s Presentation") % self.type.title())
-    notebook = gtk.Notebook()
-    dialog.vbox.pack_start(notebook, True, True, 6)
-    
+  def _edit_tabs(self, notebook):
+    tabs = list()
     vbox = gtk.VBox()
     vbox.set_border_width(4)
     vbox.set_spacing(7)
@@ -82,22 +71,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     vbox.pack_start(text_scroll, True, True)
     notebook.append_page(vbox, gtk.Label(_("Edit")))
     
-    notebook.show_all()
-    
-    if(dialog.run() == gtk.RESPONSE_ACCEPT):
-      bounds = text.get_buffer().get_bounds()
-      self.title = title.get_text()
-      sval = text.get_buffer().get_text(bounds[0], bounds[1])
-      self.slides = []
-      for sl in sval.split("\n\n"):
-        self.slides.append(self.Slide(sl))
-      self.to_xml()
-      
-      dialog.hide()
-      return True
-    else:
-      dialog.hide()
-      return False
+    _abstract.Presentation._edit_tabs(self, notebook)
   
   @staticmethod
   def get_type():

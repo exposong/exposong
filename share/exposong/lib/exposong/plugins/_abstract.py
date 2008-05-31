@@ -141,7 +141,38 @@ class Presentation:
   
   def edit(self):
     'Run the edit dialog for the presentation.'
-    raise NotImplementedError
+    dialog = gtk.Dialog(_("New Presentation"), exposong.application.main, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+        (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+    dialog.set_default_size(340, 400)
+    if(self.title):
+      dialog.set_title(_("Editing %s") % self.title)
+    else:
+      dialog.set_title(_("New %s Presentation") % self.type.title())
+    notebook = gtk.Notebook()
+    dialog.vbox.pack_start(notebook, True, True, 6)
+    
+    self._edit_tabs(notebook)
+    
+    notebook.show_all()
+    
+    if(dialog.run() == gtk.RESPONSE_ACCEPT):
+      bounds = text.get_buffer().get_bounds()
+      self.title = title.get_text()
+      sval = text.get_buffer().get_text(bounds[0], bounds[1])
+      self.slides = []
+      for sl in sval.split("\n\n"):
+        self.slides.append(self.Slide(sl))
+      self.to_xml()
+      
+      dialog.hide()
+      return True
+    else:
+      dialog.hide()
+      return False
+  
+  def _edit_tabs(self, notebook):
+    'Tabs for the dialog.'
+    pass # Later we'll have presentation specific backgrounds.
   
   def to_xml(self):
     'Save the data to disk.'

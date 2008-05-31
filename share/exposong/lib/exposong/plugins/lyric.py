@@ -91,17 +91,8 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     _abstract.Presentation.__init__(self, dom, filename)
     self.type = 'lyric'
   
-  def edit(self):
+  def _edit_tabs(self, notebook):
     'Run the edit dialog for the presentation.'
-    dialog = gtk.Dialog(_("New Presentation"), exposong.application.main, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-        (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
-    if(self.title):
-      dialog.set_title(_("Editing %s") % self.title)
-    else:
-      dialog.set_title(_("New %s Presentation") % self.type.title())
-    notebook = gtk.Notebook()
-    dialog.vbox.pack_start(notebook, True, True, 6)
-    
     vbox = gtk.VBox()
     vbox.set_border_width(4)
     vbox.set_spacing(7)
@@ -118,6 +109,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     
     text = gtk.TextView()
     text.set_wrap_mode(gtk.WRAP_WORD)
+    text.get_buffer().connect("changed", self._text_changed)
     self.set_text_buffer(text.get_buffer())
     text_scroll = gtk.ScrolledWindow()
     text_scroll.add(text)
@@ -153,28 +145,9 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     copyright.set_text(self.copyright)
     hbox.pack_start(copyright, True, True, 5)
     vbox.pack_start(hbox, False, True)
-    
     notebook.append_page(vbox, gtk.Label(_("Information")))
     
-    notebook.show_all()
-    
-    if(dialog.run() == gtk.RESPONSE_ACCEPT):
-      bounds = text.get_buffer().get_bounds()
-      self.title = title.get_text()
-      self.author['words'] = words.get_text()
-      self.author['music'] = music.get_text()
-      self.copyright = copyright.get_text()
-      sval = text.get_buffer().get_text(bounds[0], bounds[1])
-      self.slides = []
-      for sl in sval.split("\n\n"):
-        self.slides.append(self.Slide(self, sl))
-      self.to_xml()
-      
-      dialog.hide()
-      return True
-    else:
-      dialog.hide()
-      return False
+    _abstract.Presentation._edit_tabs(self, notebook)
   
   def to_xml(self):
     'Save the data to disk.'
@@ -226,15 +199,31 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     'Sets the value of a text buffer.'
     it1 = tbuf.get_start_iter()
     titleTag = tbuf.create_tag("titleTag", weight=pango.WEIGHT_BOLD, background="orange")
-
+    
     for sl in self.slides:
-        if(hasattr(sl, 'title') and len(sl.title) > 0):
-            tbuf.insert_with_tags(it1, sl.title, titleTag)
-            tbuf.insert(it1, "\n")
+      if(hasattr(sl, 'title') and len(sl.title) > 0):
+        tbuf.insert_with_tags(it1, sl.title, titleTag)
+        tbuf.insert(it1, "\n")
         tbuf.insert(it1, sl.get_text())
         if(sl is not self.slides[len(self.slides)-1]):
-            tbuf.insert(it1, "\n\n")
-
+          tbuf.insert(it1, "\n\n")
+  
+  def _text_changed(self, tbuf):
+    it = tbuf.get_start_iter()
+    tbuf.remove_tag_by_name("titleTag", it, tbuf.get_end_iter())
+    cont = True
+    while cont:
+      end_ln = it.copy().forward_search('\n', gtk.TEXT_SEARCH_VISIBLE_ONLY)
+      if(not end_ln):
+        end_ln = tbuf.get_end_iter()
+      else:
+        end_ln = end_ln[1]
+      line = it.get_text(end_ln)
+      if(title_re.match(line, endpos=30)):
+        tbuf.apply_tag_by_name("titleTag", it, end_ln)
+              
+      cont = it.forward_line()
+  
   def merge_menu(self, uimanager):
     'Merge new values with the uimanager.'
     factory = gtk.IconFactory()
