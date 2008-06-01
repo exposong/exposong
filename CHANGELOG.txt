@@ -10,6 +10,8 @@
 
  * Author and copyright information on lyrics slide.
  * Some help pages.
+ * Image Presentations. Drag and drop reorders the slides, and multiple images
+   can be added at a time.
 
 == 0.3 ==
 
