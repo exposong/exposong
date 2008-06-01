@@ -87,13 +87,20 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       
       if not os.path.isabs(self.image):
         self.image = DATA_PATH + '/image/' + self.image
-      
+    
+    def get_thumb(self):
       if hasattr(self, "image"):
-        try:
-          self.thumb = gtk.gdk.pixbuf_new_from_file_at_size(self.image, thsz[0], thsz[1])\
-              .rotate_simple(self.rotate)
-        except gobject.GError:
-          print "Error: Could not open file."
+        if not hasattr(self, "thumb"):
+          try:
+            self.thumb = gtk.gdk.pixbuf_new_from_file_at_size(self.image, thsz[0], thsz[1])
+            self.thumb.rotate_simple(self.rotate)
+            return self.thumb
+          except gobject.GError:
+            print "Error: Could not open file."
+      if hasattr(self, "thumb"):
+        return self.thumb
+      else:
+        return gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, True, 8, 150, 150)
     
     def to_node(self, document, node):
       'Populate the node element'
@@ -181,7 +188,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     imgscroll.set_size_request(300, 290)
     
     for sl in self.slides:
-      self._fields['images'].append( (sl.image, sl.thumb) )
+      self._fields['images'].append( (sl.image, sl.get_thumb()) )
     vbox.pack_start(imgscroll, True, True)
     
     notebook.append_page(vbox, gtk.Label(_("Edit")))
@@ -206,14 +213,24 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
         gtk.FILE_CHOOSER_ACTION_OPEN, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,\
         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT) )
     fchooser.set_select_multiple(True)
+    progress = gtk.ProgressBar()
+    fchooser.set_extra_widget(progress)
+    
     filt = gtk.FileFilter()
     filt.set_name( _("Image Types") )
     filt.add_pixbuf_formats()
     fchooser.add_filter(filt)
     if fchooser.run() == gtk.RESPONSE_ACCEPT:
-      for fl in fchooser.get_filenames():
+      files = fchooser.get_filenames()
+      for fl in files:
         treeview.get_model().append( (fl, \
             gtk.gdk.pixbuf_new_from_file_at_size(fl, thsz[0], thsz[1])) )
+        progress.set_fraction(progress.get_fraction() + 1.0/len(files))
+        #It may be better to use generator statements here.
+        #http://faq.pygtk.org/index.py?req=show&file=faq23.020.htp
+        #This makes the progressbar change.
+        while gtk.events_pending():
+          gtk.main_iteration()
       
     fchooser.hide()
   
@@ -249,7 +266,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
   
   def get_slide_list(self):
     'Get the slide list.'
-    return tuple( (sl, sl.thumb) for sl in self.slides)
+    return tuple( (sl, sl.get_thumb()) for sl in self.slides)
   
   def merge_menu(self, uimanager):
     'Merge new values with the uimanager.'
