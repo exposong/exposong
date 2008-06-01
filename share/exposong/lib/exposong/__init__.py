@@ -24,7 +24,7 @@ DATA_PATH = abspath(join(SHARED_FILES, pardir, pardir, 'data'))
 
 
 import pygtk
-pygtk.require("2.0") #TODO Make sure this requirement is good enough
+pygtk.require("2.0")
 
 #Set up translations for the program
 import gettext

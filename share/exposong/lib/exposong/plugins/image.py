@@ -38,6 +38,7 @@ information = {
     'required': False,
 }
 type_icon = gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH,'image.png'))
+thsz = (150, 150)
 
 def get_rotate_const(rotate):
   if rotate == "cw":
@@ -49,11 +50,22 @@ def get_rotate_const(rotate):
   else:
     return gtk.gdk.PIXBUF_ROTATE_NONE
 
+def get_rotate_str(rotate):
+  if rotate == gtk.gdk.PIXBUF_ROTATE_CLOCKWISE:
+    return "cw"
+  elif rotate == gtk.gdk.PIXBUF_ROTATE_UPSIDEDOWN:
+    return "ud"
+  elif rotate == gtk.gdk.PIXBUF_ROTATE_COUNTERCLOCKWISE:
+    return "ccw"
+  else:
+    return "n"
+
 class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     _abstract.Schedule, _abstract.Screen):
   '''
   Image presentation type.
   '''
+  
   class Slide (Plugin, _abstract.Presentation.Slide):
     '''
     An image slide.
@@ -68,19 +80,31 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
           self.image = imgdom.getAttribute("src")
           self.rotate = get_rotate_const(imgdom.getAttribute("rotate"))
         
-      elif(isinstance(value, gtk.Image)):
+      elif(isinstance(value, str)):
         self.title = ''
         self.image = value
+        self.rotate = get_rotate_const("n") #TODO Make this possible
       
       if not os.path.isabs(self.image):
         self.image = DATA_PATH + '/image/' + self.image
       
       if hasattr(self, "image"):
         try:
-          self.thumb = gtk.gdk.pixbuf_new_from_file_at_size(self.image, 150, 150)\
+          self.thumb = gtk.gdk.pixbuf_new_from_file_at_size(self.image, thsz[0], thsz[1])\
               .rotate_simple(self.rotate)
         except gobject.GError:
           print "Error: Could not open file."
+    
+    def to_node(self, document, node):
+      'Populate the node element'
+      if(self.title):
+        node.setAttribute("title", self.title)
+      
+      # <img src='..' rotate='n|cw|ccw|ud' />
+      img = document.createElement("img")
+      img.setAttribute("src", self.image)
+      img.setAttribute("rotate", get_rotate_str(self.rotate))
+      node.appendChild(img)
     
     @staticmethod
     def get_version():
@@ -120,34 +144,84 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
   
   def _edit_tabs(self, notebook):
     'Tabs for the dialog.'
+    vbox = gtk.VBox()
+    vbox.set_border_width(4)
+    vbox.set_spacing(7)
+    hbox = gtk.HBox()
+    
+    label = gtk.Label(_("Title:"))
+    label.set_alignment(0.5, 0.5)
+    hbox.pack_start(label, False, True, 5)
+    
+    self._fields['title'] = gtk.Entry(45)
+    self._fields['title'].set_text(self.title)
+    hbox.pack_start(self._fields['title'], True, True)
+    vbox.pack_start(hbox, False, True)
+    
+    toolbar = gtk.Toolbar()
+    toolbar.set_style(gtk.TOOLBAR_ICONS)
+    img_add = gtk.ToolButton(gtk.STOCK_ADD)
+    toolbar.insert(img_add, 0)
+    img_del = gtk.ToolButton(gtk.STOCK_DELETE)
+    toolbar.insert(img_del, 1)
+    vbox.pack_start(toolbar, False, True)
+    
+    self._fields['images'] = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_OBJECT)
+    imgtree = gtk.TreeView(self._fields['images'])
+    imgtree.set_reorderable(True)
+    col = gtk.TreeViewColumn()
+    img_cr = gtk.CellRendererPixbuf()
+    col.pack_start(img_cr, False)
+    col.add_attribute(img_cr, 'pixbuf', 1)
+    imgtree.append_column(col)
+    imgtree.set_headers_visible(False)
+    imgscroll = gtk.ScrolledWindow()
+    imgscroll.add(imgtree)
+    imgscroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+    imgscroll.set_size_request(300, 290)
+    
+    for sl in self.slides:
+      self._fields['images'].append( (sl.image, sl.thumb) )
+    vbox.pack_start(imgscroll, True, True)
+    
+    notebook.append_page(vbox, gtk.Label(_("Edit")))
+    
+    img_add.connect("clicked", self._on_img_add, imgtree)
+    img_del.connect("clicked", self._on_img_del, imgtree)
     
     _abstract.Presentation._edit_tabs(self, notebook)
   
   def _edit_save(self):
     'Save the fields if the user clicks ok.'
-    pass
+    self.title = self._fields['title'].get_text()
+    self.slides = []
+    itr = self._fields['images'].get_iter_first()
+    while itr:
+      self.slides.append(self.Slide(self, self._fields['images'].get_value(itr, 0)))
+      itr = self._fields['images'].iter_next(itr)
   
-  def to_xml(self):
-    'Save the data to disk.'
-    directory = join(DATA_PATH, 'pres')
-    self.filename = check_filename(self.title, directory, self.filename)
-    
-    doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
-    root = doc.createElement("presentation")
-    root.setAttribute("type", self.type)
-    
-    node = doc.createElement("title")
-    node.appendChild(doc.createTextNode(self.title))
-    root.appendChild(node)
-    
-    for s in self.slides:
-      sNode = doc.createElement("slide")
-      s.to_node(doc, sNode)
-      root.appendChild(sNode)
-    doc.appendChild(root)
-    outfile = open(join(directory, self.filename), 'w')
-    doc.writexml(outfile)
-    doc.unlink()
+  def _on_img_add(self, button, treeview):
+    'Add an image to the presentation.'
+    fchooser = gtk.FileChooserDialog( _("Add Images"), button.get_toplevel(),\
+        gtk.FILE_CHOOSER_ACTION_OPEN, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,\
+        gtk.STOCK_OK, gtk.RESPONSE_ACCEPT) )
+    fchooser.set_select_multiple(True)
+    filt = gtk.FileFilter()
+    filt.set_name( _("Image Types") )
+    filt.add_pixbuf_formats()
+    fchooser.add_filter(filt)
+    if fchooser.run() == gtk.RESPONSE_ACCEPT:
+      for fl in fchooser.get_filenames():
+        treeview.get_model().append( (fl, \
+            gtk.gdk.pixbuf_new_from_file_at_size(fl, thsz[0], thsz[1])) )
+      
+    fchooser.hide()
+  
+  def _on_img_del(self, button, treeview):
+    'Remove an image from the presentation.'
+    (model, s_iter) = treeview.get_selection().get_selected()
+    if s_iter:
+      model.remove(s_iter)
   
   @staticmethod
   def get_type():

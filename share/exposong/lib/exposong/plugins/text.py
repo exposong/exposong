@@ -47,7 +47,6 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
   
   def _edit_tabs(self, notebook):
     'Tabs for the dialog.'
-    tabs = list()
     vbox = gtk.VBox()
     vbox.set_border_width(4)
     vbox.set_spacing(7)

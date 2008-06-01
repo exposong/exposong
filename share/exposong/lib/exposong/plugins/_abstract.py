@@ -157,7 +157,7 @@ class Presentation:
     
     notebook.show_all()
     
-    if(dialog.run() == gtk.RESPONSE_ACCEPT):
+    if dialog.run() == gtk.RESPONSE_ACCEPT:
       self._edit_save()
       del(self._fields)
       
