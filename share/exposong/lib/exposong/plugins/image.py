@@ -60,6 +60,12 @@ def get_rotate_str(rotate):
   else:
     return "n"
 
+
+class ImageNotFoundError( Exception ):
+  def __init__(self, image):
+    self.image = image
+
+
 class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     _abstract.Schedule, _abstract.Screen):
   '''
@@ -87,6 +93,8 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       
       if not os.path.isabs(self.image):
         self.image = DATA_PATH + '/image/' + self.image
+      if not os.path.isfile(self.image):
+        raise ImageNotFoundError(self.image)
     
     def get_thumb(self):
       if hasattr(self, "image"):
@@ -148,6 +156,15 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
   def __init__(self, dom = None, filename = None):
     _abstract.Presentation.__init__(self, dom, filename)
     self.type = 'image'
+  
+  def _set_slides(self, dom):
+    'Set the slides from xml.'
+    slides = dom.getElementsByTagName("slide")
+    for sl in slides:
+      try:
+        self.slides.append(self.Slide(self, sl))
+      except ImageNotFoundError, err:
+        print "Image not found (%s), slide was not added to the \"%s.\"" % (err.image, self.title)
   
   def _edit_tabs(self, notebook):
     'Tabs for the dialog.'
