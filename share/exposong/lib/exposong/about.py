@@ -22,15 +22,14 @@ from os.path import join
 from exposong import RESOURCE_PATH
 
 class About:
-  '''Creates an About dialog to show details about the program. Use about.run()
-  to start the dialog.'''
+  '''Creates an About dialog to show details about the program.'''
   def __init__(self, parent = None):
     self.dialog = gtk.AboutDialog()
     self.dialog.set_transient_for(parent)
     self.dialog.set_name("ExpoSong")
-    self.dialog.set_version( "0.3 Beta" )
+    self.dialog.set_version( "0.4 Beta" )
     self.dialog.set_copyright(_("Copyright %s") % "2008 Fishhookweb.com")
-    self.dialog.set_authors(("Brad Landis","Siegwart Bogatscher","Robert Nix"))
+    self.dialog.set_authors(("Brad Landis","Siegwart Bogatscher"))
     if _("Translators Name") is not "Translators Name":
       self.dialog.set_translator_credits(_("Translators Name"))
     self.dialog.set_logo(gtk.gdk.pixbuf_new_from_file(

@@ -1,6 +1,6 @@
 +------------------------------------+
 | ExpoSong                           |
-| Version 0.3 Beta                   |
+| Version 0.4 Beta                   |
 | Copyright (C) 2008 Fishhookweb.com |
 +------------------------------------+
 
