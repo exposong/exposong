@@ -29,7 +29,7 @@ class About:
     self.dialog.set_name("ExpoSong")
     self.dialog.set_version( "0.4 Beta" )
     self.dialog.set_copyright(_("Copyright %s") % "2008 Fishhookweb.com")
-    self.dialog.set_authors(("Brad Landis","Siegwart Bogatscher"))
+    self.dialog.set_authors(("Brad Landis","Siegwart Bogatscher", "Alessandro Felici"))
     if _("Translators Name") is not "Translators Name":
       self.dialog.set_translator_credits(_("Translators Name"))
     self.dialog.set_logo(gtk.gdk.pixbuf_new_from_file(
