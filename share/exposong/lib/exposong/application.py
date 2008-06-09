@@ -17,6 +17,7 @@
 
 import gtk
 import gtk.gdk
+import gobject
 from xml.dom import minidom
 import os
 import webbrowser
@@ -144,7 +145,8 @@ class Main (gtk.Window):
     self.status_bar = gtk.Statusbar()
     win_v.pack_end(self.status_bar, False)
     
-    self.build_schedule()
+    task = self.build_schedule()
+    gobject.idle_add(task.next)
     
     self.add(win_v)
     self.show_all()
@@ -283,15 +285,20 @@ class Main (gtk.Window):
             print "%s is not a presentation file." % filenm
           dom.unlink()
           del dom
+        yield True
+    yield False
   
   def build_schedule(self):
     'Add items to the schedule list.'
     #Initialize the Library
     directory = join(DATA_PATH, "sched")
     self.library = Schedule( _("Library"))
-    self.build_pres_list()
+    task = self.build_pres_list()
+    gobject.idle_add(task.next, priority=gobject.PRIORITY_DEFAULT_IDLE-1)
+    yield True
     libitr = schedlist.schedlist.append(None, self.library, 1)
     schedlist.schedlist.get_selection().select_iter(libitr)
+    schedlist.schedlist._on_schedule_activate()
     del libitr
     
     #Add schedules from plugins
@@ -304,6 +311,7 @@ class Main (gtk.Window):
         schedule.append(item)
         itr = self.library.iter_next(itr)
       schedlist.schedlist.append(None, schedule, 2)
+      yield True
     
     #Add custom schedules from the data directory
     schedlist.schedlist.custom_schedules = schedlist.schedlist.append(None,
@@ -326,7 +334,9 @@ class Main (gtk.Window):
             print "%s is not a schedule file." % filenm
           dom.unlink()
           del dom
+      yield True
     schedlist.schedlist.expand_all()
+    yield False
   
   def _on_pres_rt_click(self, widget, event):
     'The user right clicked in the presentation list area.'
