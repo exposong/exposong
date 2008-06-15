@@ -38,7 +38,6 @@ class ScheduleList(gtk.TreeView):
     self.set_enable_search(False)
     
     sched_rend = gtk.CellRendererText()
-    sched_rend.connect("edited", self._rename_schedule)
     column = gtk.TreeViewColumn( _("Schedule"), sched_rend, text=1)
     column.set_resizable(False)
     column.set_cell_data_func(sched_rend, self._cell_data_func)
@@ -140,22 +139,21 @@ class ScheduleList(gtk.TreeView):
   
   def _on_new(self, *args):
     'Create a new schedule.'
-    name = _("New Schedule")
-    curnames = []
-    num = 1
-    itr = self.model.iter_children(self.custom_schedules)
-    while itr:
-      if self.model.get_value(itr, 1).startswith(name):
-        curnames.append(self.model.get_value(itr, 1))
-      itr = self.model.iter_next(itr)
-    if len(curnames) == 0:
-      name += " 1"
-    else:
-      name += " "+str(int(curnames[len(curnames)-1][-2:]) + 1)
-    sched = schedule.Schedule(name, builtin=False)
-    itrnew = self.append(self.custom_schedules, sched)
-    pathnew = self.model.get_path(itrnew)
-    self.set_cursor(pathnew, self.get_column(0), True)
+    dlg = gtk.Dialog(_("Schedule Name"), application.main, gtk.DIALOG_MODAL,
+        (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+        gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+    dlg.vbox.pack_start(gtk.Label(_("Schedule Name")), True, True, 5)
+    entry = gtk.Entry(32)
+    dlg.vbox.pack_start(entry, True, True, 5)
+    dlg.show_all()
+    
+    if dlg.run() == gtk.RESPONSE_ACCEPT:
+      if entry.get_text() <> "":
+        sched = schedule.Schedule(entry.get_text(), builtin=False)
+        itrnew = self.append(self.custom_schedules, sched)
+        pathnew = self.model.get_path(itrnew)
+        self.set_cursor(pathnew, self.get_column(0), True)
+    dlg.hide()
   
   def _on_rename(self, *args):
     'Create a new schedule.'
@@ -167,12 +165,4 @@ class ScheduleList(gtk.TreeView):
     sched = model.get_value(iter1, 0)
     cell.set_property('editable', isinstance(sched, schedule.Schedule) and sched.builtin is False)
   
-  def _rename_schedule(self, text_rend, path, new_text):
-    "Rename a schedule in the list and it's filename"
-    if len(new_text.strip()) == 0:
-      return
-    iter1 = self.model.get_iter(path)
-    self.model.get_value(iter1, 0).title = new_text
-    self.model.set_value(iter1, 1, new_text)
-    self.model.set_value(iter1, 2, new_text)
 
