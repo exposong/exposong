@@ -139,21 +139,23 @@ class ScheduleList(gtk.TreeView):
   
   def _on_new(self, *args):
     'Create a new schedule.'
-    dlg = gtk.Dialog(_("Schedule Name"), application.main, gtk.DIALOG_MODAL,
-        (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-        gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
-    dlg.vbox.pack_start(gtk.Label(_("Schedule Name")), True, True, 5)
-    entry = gtk.Entry(32)
-    dlg.vbox.pack_start(entry, True, True, 5)
-    dlg.show_all()
-    
-    if dlg.run() == gtk.RESPONSE_ACCEPT:
-      if entry.get_text() <> "":
-        sched = schedule.Schedule(entry.get_text(), builtin=False)
-        itrnew = self.append(self.custom_schedules, sched)
-        pathnew = self.model.get_path(itrnew)
-        self.set_cursor(pathnew, self.get_column(0), True)
-    dlg.hide()
+    name = _("New Schedule")
+    curnames = []
+    num = 1
+    itr = self.model.iter_children(self.custom_schedules)
+    while itr:
+      if self.model.get_value(itr, 1).startswith(name):
+        curnames.append(self.model.get_value(itr, 1))
+      itr = self.model.iter_next(itr)
+    if len(curnames) == 0:
+      name += " 1"
+    else:
+      name += " "+str(int(curnames[len(curnames)-1][-2:]) + 1)
+    sched = schedule.Schedule(name, builtin=False)
+    itrnew = self.append(self.custom_schedules, sched)
+    pathnew = self.model.get_path(itrnew)
+    self.expand_all()
+    self.set_cursor(pathnew, self.get_column(0), True)
   
   def _on_rename(self, *args):
     'Create a new schedule.'
