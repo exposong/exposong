@@ -39,6 +39,7 @@ class ScheduleList(gtk.TreeView):
     
     sched_rend = gtk.CellRendererText()
     column = gtk.TreeViewColumn( _("Schedule"), sched_rend, text=1)
+    sched_rend.connect("edited", self._rename_schedule)
     column.set_resizable(False)
     column.set_cell_data_func(sched_rend, self._cell_data_func)
     self.append_column(column)
@@ -167,4 +168,12 @@ class ScheduleList(gtk.TreeView):
     sched = model.get_value(iter1, 0)
     cell.set_property('editable', isinstance(sched, schedule.Schedule) and sched.builtin is False)
   
+  def _rename_schedule(self, text_rend, path, new_text):
+    "Rename a schedule in the list and it's filename."
+    if len(new_text.strip()) == 0:
+      return
+    iter1 = self.model.get_iter(path)
+    self.model.get_value(iter1, 0).title = new_text
+    self.model.set_value(iter1, 1, new_text)
+    self.model.set_value(iter1, 2, new_text)
 
