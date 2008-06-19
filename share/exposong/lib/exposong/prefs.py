@@ -19,6 +19,7 @@ import gtk.gdk
 import imp
 import os.path
 
+from exposong import SHARED_FILES
 import exposong.screen
 
 '''
@@ -34,7 +35,8 @@ class Prefs:
         'pres.bg': ((0, 13107, 19660), (0, 26214, 39321)),
         'pres.bg_angle': u'\u2198',
         'pres.text_color': (65535, 65535, 65535),
-        'pres.text_shadow': (0, 0, 0, 26214)}
+        'pres.text_shadow': (0, 0, 0, 26214),
+        'pres.logo': SHARED_FILES+"/res/exposong-logo.png"}
     self.load()
   
   def __getitem__(self, key):

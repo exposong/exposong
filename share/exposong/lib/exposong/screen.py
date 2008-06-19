@@ -38,13 +38,15 @@ class Screen:
   '''
   
   def __init__(self, preview):
-    self.black = self.background = False
+    self._black = self._background = self._logo = False
     self.bg_dirty = False
+    self._notification = None
     
     self.window = gtk.Window(gtk.WINDOW_POPUP)
     
     self.pres = gtk.DrawingArea()
     self.pres.connect("expose-event", self.expose)
+    self.pres.set_double_buffered(True)
     self.pres.show()
     self.window.add(self.pres)
     
@@ -97,31 +99,47 @@ class Screen:
   
   def to_black(self, button):
     'Set the screen to black.'
-    self.black = True
-    self.background = False
+    self._black = True
+    self._background = self._logo = False
+    self.draw()
+  
+  def to_logo(self, button):
+    'Set the screen to black.'
+    self._logo = True
+    self._black = self._background = False
     self.draw()
   
   def to_background(self, button):
     'Hide text from the screen.'
-    self.background = True
-    self.black = False
+    self._background = True
+    self._black = self._logo = False
     self.draw()
   
   def hide(self, button):
     'Remove the presentation screen from view.'
-    self.background = self.black = False
+    self._background = self._black = self._logo = False
     self.window.hide()
   
   def show(self, *args):
     'Show the presentation screen.'
-    self.background = self.black = False
+    self._background = self._black = self._logo = False
     self.window.show_all()
     self.draw()
   
   def expose(self, widget, event):
     'Redraw `widget`.'
+    #widget.window.begin_paint_region(gtk.gdk.region_rectangle(event.area))
     self._draw(widget)
+    #widget.window.end_paint()
   
+  def set_dirty(self, dirty = True):
+    'Reload the background image if necessary.'
+    self.bg_dirty = dirty
+  
+  def set_notification(self, text = None):
+    'Put up notification text on the screen.'
+    self._notification = text
+    self.draw()
   
   def _set_background(self, widget):
     'Set the background of `widget` to `color`.'
@@ -131,8 +149,23 @@ class Screen:
     ccontext = widget.window.cairo_create()
     bounds = widget.window.get_size()
     
-    if self.black:
+    if self._black and widget is self.pres:
       bg = (0, 0, 0)
+    elif self._logo and widget is self.pres:
+      if not hasattr(self,"_logo_pbuf"):
+        try:
+          self._logo_pbuf = gtk.gdk.pixbuf_new_from_file_at_size(
+              exposong.prefs.config['pres.logo'], int(bounds[0]/1.5), int(bounds[1]/1.5))
+        except gobject.GError:
+          print "Error: Could not open logo file."
+          self._logo_pbuf = None
+      ccontext.set_source_rgb(0, 0, 0)
+      ccontext.paint()
+      if self._logo_pbuf <> None:
+        ccontext.set_source_pixbuf(self._logo_pbuf, (bounds[0]-self._logo_pbuf.get_width())/2,\
+        (bounds[1]-self._logo_pbuf.get_height())/2)
+        ccontext.paint()
+      return
     else:
       bg = exposong.prefs.config['pres.bg']
     
@@ -187,10 +220,6 @@ class Screen:
       else:
         print "_set_background: Incorrect color"
   
-  def set_dirty(self, dirty = True):
-    self.bg_dirty = dirty
-  
-  
   def _draw(self, widget):
     'Render `widget`.'
     if not widget.window or not widget.window.is_viewable():
@@ -209,7 +238,7 @@ class Screen:
     
     slide = exposong.slidelist.slidelist.get_active_item()
     
-    if self.background or self.black or not slide:
+    if widget is self.pres and (self._background or self._black or self._logo) or not slide:
       #When there's no text to render, just draw the background
       self._set_background(widget)
       return True

@@ -139,6 +139,7 @@ class BGSelect (gtk.VBox):
   def _on_new_image(self, button):
     'The user added a new image as a background.'
     fltr = gtk.FileFilter()
+    fltr.set_name("Image Types")
     fltr.add_mime_type("image/jpeg")
     fltr.add_mime_type("image/png")
     fltr.add_mime_type("image/gif")

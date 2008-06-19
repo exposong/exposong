@@ -192,6 +192,8 @@ class Main (gtk.Window):
             screen.screen.show),
         ('Background', gtk.STOCK_CLEAR, _('_Background'), "<Ctrl>b", None,
             screen.screen.to_background),
+        ('Logo', None, _('Lo_go'), "<Ctrl>g", None,
+            screen.screen.to_logo),
         ('Black Screen', None, _('Blac_k Screen'), "<Ctrl>k", None,
             screen.screen.to_black),
         ('Hide', gtk.STOCK_CLOSE, _('Hi_de'), "<Ctrl>h", None,
@@ -222,6 +224,7 @@ class Main (gtk.Window):
             <separator />
             <menuitem action="Present" />
             <menuitem action="Background" />
+            <menuitem action="Logo" />
             <menuitem action="Black Screen" />
             <menuitem action="Hide" />
             <separator />
