@@ -36,7 +36,8 @@ class Prefs:
         'pres.bg_angle': u'\u2198',
         'pres.text_color': (65535, 65535, 65535),
         'pres.text_shadow': (0, 0, 0, 26214),
-        'pres.logo': SHARED_FILES+"/res/exposong-logo.png"}
+        'pres.logo': SHARED_FILES+"/res/exposong-white.png",
+        'pres.logo_bg': (65535, 43690, 4369)}
     self.load()
   
   def __getitem__(self, key):
@@ -104,7 +105,7 @@ class PrefsDialog(gtk.Dialog):
     self.vbox.pack_start(notebook, True, True, 5)
     
     #General Page
-    self.table = gtk.Table(2, 8)
+    self.table = gtk.Table(8, 2)
     self.table.set_row_spacings(10)
     self.table.set_border_width(10)
     
@@ -114,7 +115,7 @@ class PrefsDialog(gtk.Dialog):
     notebook.append_page(self.table, gtk.Label( _("General") ))
     
     #Presentation Page
-    self.table = gtk.Table(4, 15)
+    self.table = gtk.Table(15, 4)
     self.table.set_row_spacings(10)
     self.table.set_border_width(10)
     
@@ -123,18 +124,28 @@ class PrefsDialog(gtk.Dialog):
     p_shad = self._append_color_setting( _("Text Shadow"), config['pres.text_shadow'], 2, True)
     p_maxsize = self._append_spinner_setting( _("Max Font Size"), gtk.Adjustment(config['pres.max_font_size'], 0, 96, 1), 3)
     
+    self._append_section_title( _("Logo"), 5)
+    p_logo = self._append_file_setting( _("Image"), config['pres.logo'], 6)
+    p_logo_bg = self._append_color_setting( _("Background"), config['pres.logo_bg'], 7)
+    
     notebook.append_page(self.table, gtk.Label( _("Presentation")))
     
     self.show_all()
     if self.run() == gtk.RESPONSE_ACCEPT:
+      config['general.ccli'] = g_ccli.get_text()
+      
       txtc = p_txt.get_color()
       config['pres.text_color'] = (txtc.red, txtc.green, txtc.blue)
       txts = p_shad.get_color()
       config['pres.text_shadow'] = (txts.red, txts.green, txts.blue, p_shad.get_alpha())
       config['pres.max_font_size'] = p_maxsize.get_value()
-      config['general.ccli'] = g_ccli.get_text()
+      
+      config['pres.logo'] = p_logo.get_filename()
+      logoc = p_logo_bg.get_color()
+      config['pres.logo_bg'] = (logoc.red, logoc.green, logoc.blue)
       
       exposong.screen.screen.set_dirty()
+      del exposong.screen.screen._logo_pbuf
       exposong.screen.screen.draw()
     
     self.hide()

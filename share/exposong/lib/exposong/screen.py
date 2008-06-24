@@ -46,7 +46,7 @@ class Screen:
     
     self.pres = gtk.DrawingArea()
     self.pres.connect("expose-event", self.expose)
-    self.pres.set_double_buffered(True)
+    #self.pres.set_redraw_on_allocate(False) #This may fix the compiz redraw problem.
     self.pres.show()
     self.window.add(self.pres)
     
@@ -159,7 +159,8 @@ class Screen:
         except gobject.GError:
           print "Error: Could not open logo file."
           self._logo_pbuf = None
-      ccontext.set_source_rgb(0, 0, 0)
+      bg = c2dec(exposong.prefs.config['pres.logo_bg'])
+      ccontext.set_source_rgb(bg[0], bg[1], bg[2])
       ccontext.paint()
       if self._logo_pbuf <> None:
         ccontext.set_source_pixbuf(self._logo_pbuf, (bounds[0]-self._logo_pbuf.get_width())/2,\
