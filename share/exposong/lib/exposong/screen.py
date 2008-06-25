@@ -41,6 +41,7 @@ class Screen:
     self._black = self._background = self._logo = False
     self.bg_dirty = False
     self._notification = None
+    self.bg_img = {}
     
     self.window = gtk.Window(gtk.WINDOW_POPUP)
     
@@ -141,13 +142,15 @@ class Screen:
     self._notification = text
     self.draw()
   
-  def _set_background(self, widget):
+  def _set_background(self, widget, ccontext = None, bounds = None):
     'Set the background of `widget` to `color`.'
     if not widget.window:
       return False
     
-    ccontext = widget.window.cairo_create()
-    bounds = widget.window.get_size()
+    if ccontext is None:
+      ccontext = widget.window.cairo_create()
+    if bounds is None:
+      bounds = widget.window.get_size()
     
     if self._black and widget is self.pres:
       bg = (0, 0, 0)
@@ -172,18 +175,18 @@ class Screen:
     
     if isinstance(bg, str):
       #Image file
+      bgkey = str(bounds[0])+'x'+str(bounds[1])
       try:
-        if self.bg_dirty or not hasattr(self, 'bg_img') or self.bg_img.get_width() != bounds[0]:
+        if self.bg_dirty or bgkey not in self.bg_img:
           pixbuf = gtk.gdk.pixbuf_new_from_file(bg)
-          self.bg_img = pixbuf.scale_simple(bounds[0], bounds[1], gtk.gdk.INTERP_BILINEAR)
-    
+          self.bg_img[bgkey] = pixbuf.scale_simple(bounds[0], bounds[1], gtk.gdk.INTERP_BILINEAR)
       except gobject.GError:
         print "Error: Could not open background file."
         if hasattr(self, 'bg_img'):
-          del self.bg_img
+          del self.bg_img[bgkey]
         bg = (0,0,0)
       else:
-        ccontext.set_source_pixbuf(self.bg_img, 0, 0)
+        ccontext.set_source_pixbuf(self.bg_img[bgkey], 0, 0)
         ccontext.paint()
         return
       finally:
@@ -225,15 +228,16 @@ class Screen:
     'Render `widget`.'
     if not widget.window or not widget.window.is_viewable():
       return False
+    
+    ccontext = widget.window.cairo_create()
+    screenW, screenH = widget.window.get_size()
     if widget is self.preview and self.pres.window and self.pres.window.is_viewable():
-      #Get a copy of the presentation window if it's visible
+      #Scale if the presentation window size is available
       win_sz = self.pres.window.get_size()
       width = int(135.0*win_sz[0]/win_sz[1])
-      ccontext = widget.window.cairo_create()
+      screenW = screenW*win_sz[0]/width
+      screenH = screenH*win_sz[1]/135
       ccontext.scale(float(width)/win_sz[0], 135.0/win_sz[1])
-      ccontext.set_source_surface(self.pres.window.cairo_create().get_target(), 1, 1)
-      ccontext.paint()
-      return True
     elif widget is self.pres:
       self.preview.queue_draw()
     
@@ -241,16 +245,14 @@ class Screen:
     
     if widget is self.pres and (self._background or self._black or self._logo) or not slide:
       #When there's no text to render, just draw the background
-      self._set_background(widget)
+      self._set_background(widget, ccontext, (screenW, screenH))
       return True
     
     if slide.draw(widget) is not NotImplemented:
       return True
     
-    self._set_background(widget)
+    self._set_background(widget, ccontext, (screenW, screenH))
     
-    ccontext = widget.window.cairo_create()
-    screenW, screenH = widget.window.get_size()
     txcol = c2dec(exposong.prefs.config['pres.text_color'])
     screenCenterY = screenH/2
     # Header text
@@ -316,7 +318,6 @@ class Screen:
         end_index = len(slide.body_text())))
       layout.set_attributes(attrs)
     
-    #self._set_background(widget)
     if exposong.prefs.config['pres.text_shadow']:
       shcol = c2dec(exposong.prefs.config['pres.text_shadow'])
       ccontext.set_source_rgba(shcol[0], shcol[1], shcol[2], shcol[3])

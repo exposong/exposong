@@ -120,7 +120,10 @@ class Main (gtk.Window):
     
     bgsel = exposong.bgselect.BGSelect()
     win_rt_btm.pack_start(bgsel, False, True, 10)
-    win_rt_btm.pack_start(pres_prev, True, False, 10)
+    #wrap it so that the aspect ratio is kept
+    prev_box = gtk.VBox()
+    prev_box.pack_start(pres_prev, True, False, 0)
+    win_rt_btm.pack_start(prev_box, True, False, 10)
     
     pres_buttons = gtk.VButtonBox()
     self.pbut_present = gtk.Button( _("Present") )
