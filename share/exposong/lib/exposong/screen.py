@@ -31,6 +31,7 @@ def c2dec(color):
     return color / 65535.0
 
 screen = None # will be the instance variable for Screen once Main runs
+preview_height = 145
 
 class Screen:
   '''
@@ -78,7 +79,8 @@ class Screen:
       geometry = (scr_geom.width/2, scr_geom.height/2, scr_geom.width/2, scr_geom.height/2)
     self.window.move(geometry[0], geometry[1])
     self.window.resize(geometry[2], geometry[3])
-    self.preview.set_size_request(135*geometry[2]/geometry[3], 135)
+    self.aspect = float(geometry[2])/geometry[3]
+    self.preview.set_size_request(int(preview_height*self.aspect), preview_height)
   
   #def set_background(self, **keys):
   # 'Set the background color.'
@@ -232,10 +234,10 @@ class Screen:
     if widget is self.preview and self.pres.window and self.pres.window.is_viewable():
       #Scale if the presentation window size is available
       win_sz = self.pres.window.get_size()
-      width = int(135.0*win_sz[0]/win_sz[1])
+      width = int(float(preview_height)*win_sz[0]/win_sz[1])
       screenW = screenW*win_sz[0]/width
-      screenH = screenH*win_sz[1]/135
-      ccontext.scale(float(width)/win_sz[0], 135.0/win_sz[1])
+      screenH = screenH*win_sz[1]/preview_height
+      ccontext.scale(float(width)/win_sz[0], float(preview_height)/win_sz[1])
     elif widget is self.pres:
       self.preview.queue_draw()
     

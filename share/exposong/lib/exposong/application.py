@@ -122,7 +122,11 @@ class Main (gtk.Window):
     win_rt_btm.pack_start(bgsel, False, True, 10)
     #wrap it so that the aspect ratio is kept
     prev_box = gtk.VBox()
-    prev_box.pack_start(pres_prev, True, False, 0)
+    prev_aspect = gtk.AspectFrame(None, 0.5, 0.5, exposong.screen.screen.aspect,
+        False)
+    prev_aspect.set_shadow_type(gtk.SHADOW_NONE)
+    prev_aspect.add(pres_prev)
+    prev_box.pack_start(prev_aspect, True, False, 0)
     
     prev_box.pack_start(exposong.notify.notify, True, False, 0)
     win_rt_btm.pack_start(prev_box, True, False, 10)

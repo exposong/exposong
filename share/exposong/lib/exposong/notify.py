@@ -7,6 +7,7 @@ class Notify(gtk.HBox):
     gtk.HBox.__init__(self)
     
     self.notify = gtk.Entry(45)
+    self.notify.set_width_chars(15)
     self.notify.set_tooltip_text("Notification Text")
     self.notify.connect("activate", self._on_activate)
     self.pack_start(self.notify, True, True, 0)
@@ -15,13 +16,13 @@ class Notify(gtk.HBox):
     img.set_from_stock(gtk.STOCK_CLEAR, gtk.ICON_SIZE_BUTTON)
     notify_clear.set_image(img)
     notify_clear.connect("clicked", self._on_clear)
-    self.pack_start(notify_clear, True, False, 0)
+    self.pack_start(notify_clear, False, True, 0)
     notify_save = gtk.Button()
     img = gtk.Image()
     img.set_from_stock(gtk.STOCK_OK, gtk.ICON_SIZE_BUTTON)
     notify_save.set_image(img)
     notify_save.connect("clicked", self._on_save)
-    self.pack_start(notify_save, True, False, 0)
+    self.pack_start(notify_save, False, True, 0)
   
   def _on_save(self, *args):
     'The user clicked save.'
