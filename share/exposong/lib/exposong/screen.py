@@ -129,15 +129,13 @@ class Screen:
   
   def expose(self, widget, event):
     'Redraw `widget`.'
-    #widget.window.begin_paint_region(gtk.gdk.region_rectangle(event.area))
     self._draw(widget)
-    #widget.window.end_paint()
   
   def set_dirty(self, dirty = True):
     'Reload the background image if necessary.'
     self.bg_dirty = dirty
   
-  def set_notification(self, text = None):
+  def notify(self, text = None):
     'Put up notification text on the screen.'
     self._notification = text
     self.draw()
@@ -246,86 +244,114 @@ class Screen:
     if widget is self.pres and (self._background or self._black or self._logo) or not slide:
       #When there's no text to render, just draw the background
       self._set_background(widget, ccontext, (screenW, screenH))
-      return True
-    
-    if slide.draw(widget) is not NotImplemented:
-      return True
-    
-    self._set_background(widget, ccontext, (screenW, screenH))
-    
-    txcol = c2dec(exposong.prefs.config['pres.text_color'])
-    screenCenterY = screenH/2
-    # Header text
-    # TODO
-    
-    # Footer text
-    ftext = slide.footer_text()
-    if isinstance(ftext, (unicode, str)) and len(ftext):
+    else:
+      
+      if slide.draw(widget) is not NotImplemented:
+        return True
+      
+      self._set_background(widget, ccontext, (screenW, screenH))
+      
+      txcol = c2dec(exposong.prefs.config['pres.text_color'])
+      screenCenterY = screenH/2
+      # Header text
+      # TODO
+      
+      # Footer text
+      ftext = slide.footer_text()
+      if isinstance(ftext, (unicode, str)) and len(ftext):
+        layout = ccontext.create_layout()
+        layout.set_text(ftext)
+        layout.set_alignment(pango.ALIGN_CENTER)
+        layout.set_width(int(screenW*pango.SCALE * 0.97))
+        
+        attrs = pango.AttrList()
+        attrs.insert(pango.AttrFontDesc(pango.FontDescription("Sans Bold "+str(int(screenH/54.0))),
+            end_index = len(slide.body_text())+40))
+        layout.set_attributes(attrs)
+        
+        footer_height = layout.get_pixel_size()[1]
+        
+        ccontext.set_source_rgba(txcol[0], txcol[1], txcol[2], 1.0)
+        ccontext.move_to(screenW * 0.015, screenH - footer_height)
+        ccontext.show_layout(layout)
+        
+        screenH -= footer_height
+        screenCenterY -= footer_height/2
+      
+      # Body Text
       layout = ccontext.create_layout()
-      layout.set_text(ftext)
+      
+      size = 16
+      layout.set_text(str(slide.body_text()))
       layout.set_alignment(pango.ALIGN_CENTER)
       layout.set_width(int(screenW*pango.SCALE * 0.97))
       
       attrs = pango.AttrList()
-      attrs.insert(pango.AttrFontDesc(pango.FontDescription("Sans Bold "+str(int(screenH/54.0))),
-          end_index = len(slide.body_text())+40))
-      layout.set_attributes(attrs)
-      
-      footer_height = layout.get_pixel_size()[1]
-      
-      ccontext.set_source_rgba(txcol[0], txcol[1], txcol[2], 1.0)
-      ccontext.move_to(screenW * 0.015, screenH - footer_height)
-      ccontext.show_layout(layout)
-      
-      screenH -= footer_height
-      screenCenterY -= footer_height/2
-    
-    # Body Text
-    layout = ccontext.create_layout()
-    
-    size = 16
-    layout.set_text(str(slide.body_text()))
-    layout.set_alignment(pango.ALIGN_CENTER)
-    layout.set_width(int(screenW*pango.SCALE * 0.97))
-    
-    attrs = pango.AttrList()
-    attrs.insert(pango.AttrFontDesc(pango.FontDescription("Sans Bold "+str(size)),
-        end_index = len(str(slide.body_text()))))
-    layout.set_attributes(attrs)
-    
-    min_sz = 0
-    max_sz = int(exposong.prefs.config['pres.max_font_size'])
-    
-    #Loop through until the text is between 78% of the height and 94%, or
-    #until we get a number that is not a multiple of 4 (2,6,10,14, etc) to
-    #make it simpler... TODO Double check that it doesn't overflow
-    while True:
-      if layout.get_pixel_size()[0] > screenW*0.97 \
-          or layout.get_pixel_size()[1] > screenH*0.94:
-        max_sz = size
-        size = (min_sz + max_sz) / 2
-      elif size % 4 != 0 or max_sz - min_sz < 3:
-        break
-      elif layout.get_pixel_size()[1] < screenH*0.78:
-        min_sz = size
-        if(max_sz):
-          size = (min_sz + max_sz) / 2
-        else:
-          size = size * 2
-      else:
-        break
       attrs.insert(pango.AttrFontDesc(pango.FontDescription("Sans Bold "+str(size)),
-        end_index = len(slide.body_text())))
+          end_index = len(str(slide.body_text()))))
       layout.set_attributes(attrs)
-    
-    if exposong.prefs.config['pres.text_shadow']:
-      shcol = c2dec(exposong.prefs.config['pres.text_shadow'])
-      ccontext.set_source_rgba(shcol[0], shcol[1], shcol[2], shcol[3])
-      ccontext.move_to(screenW * 0.015 + size*0.1,
-          screenCenterY - layout.get_pixel_size()[1]/2.0 + size*0.1)
+      
+      min_sz = 0
+      max_sz = int(exposong.prefs.config['pres.max_font_size'])
+      
+      #Loop through until the text is between 78% of the height and 94%, or
+      #until we get a number that is not a multiple of 4 (2,6,10,14, etc) to
+      #make it simpler... TODO Double check that it doesn't overflow
+      while True:
+        if layout.get_pixel_size()[0] > screenW*0.97 \
+            or layout.get_pixel_size()[1] > screenH*0.94:
+          max_sz = size
+          size = (min_sz + max_sz) / 2
+        elif size % 4 != 0 or max_sz - min_sz < 3:
+          break
+        elif layout.get_pixel_size()[1] < screenH*0.78:
+          min_sz = size
+          if(max_sz):
+            size = (min_sz + max_sz) / 2
+          else:
+            size = size * 2
+        else:
+          break
+        attrs.insert(pango.AttrFontDesc(pango.FontDescription("Sans Bold "+str(size)),
+          end_index = len(slide.body_text())))
+        layout.set_attributes(attrs)
+      
+      if exposong.prefs.config['pres.text_shadow']:
+        shcol = c2dec(exposong.prefs.config['pres.text_shadow'])
+        ccontext.set_source_rgba(shcol[0], shcol[1], shcol[2], shcol[3])
+        ccontext.move_to(screenW * 0.015 + size*0.1,
+            screenCenterY - layout.get_pixel_size()[1]/2.0 + size*0.1)
+        ccontext.show_layout(layout)
+      ccontext.set_source_rgba(txcol[0], txcol[1], txcol[2], 1.0)
+      ccontext.move_to(screenW * 0.015,screenCenterY - layout.get_pixel_size()[1]/2.0)
       ccontext.show_layout(layout)
-    ccontext.set_source_rgba(txcol[0], txcol[1], txcol[2], 1.0)
-    ccontext.move_to(screenW * 0.015,screenCenterY - layout.get_pixel_size()[1]/2.0)
-    ccontext.show_layout(layout)
+    
+    #Draw notification
+    if widget is self.pres and self._notification:
+      layout = ccontext.create_layout()
+      layout.set_text(self._notification)
+      
+      attrs = pango.AttrList()
+      notify_sz = int(screenH/12.0)
+      attrs.insert(pango.AttrFontDesc(pango.FontDescription("Sans Bold "+str(notify_sz)),
+          end_index = len(self._notification)+40))
+      layout.set_attributes(attrs)
+      while layout.get_pixel_size()[0] > screenW*0.6:
+        notify_sz = int(notify_sz*0.89)
+        attrs.insert(pango.AttrFontDesc(pango.FontDescription("Sans Bold "+str(notify_sz)),
+            end_index = len(slide.body_text())+40))
+        layout.set_attributes(attrs)
+      sbounds = widget.window.get_size()
+      nbounds = layout.get_pixel_size()
+      pad = notify_sz/14.0
+      ccontext.rectangle(sbounds[0]-nbounds[0]-pad*2, sbounds[1]-nbounds[1]-pad*2,
+          sbounds[0], sbounds[1])
+      ccontext.set_source_rgb(exposong.prefs.config['pres.notify_bg'][0],
+          exposong.prefs.config['pres.notify_bg'][1],
+          exposong.prefs.config['pres.notify_bg'][2])
+      ccontext.fill()
+      ccontext.set_source_rgb(1.0, 1.0, 1.0)
+      ccontext.move_to(sbounds[0]-nbounds[0]-pad, sbounds[1]-nbounds[1]-pad)
+      ccontext.show_layout(layout)
     return True
 

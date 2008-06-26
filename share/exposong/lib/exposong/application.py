@@ -28,7 +28,7 @@ from exposong import prefs, screen, preslist, schedlist, slidelist
 from exposong.about import About
 from exposong.schedule import Schedule # ? where to put library
 import exposong.plugins, exposong.plugins._abstract
-import exposong.bgselect
+import exposong.bgselect, exposong.notify
 
 main = None
 
@@ -123,6 +123,8 @@ class Main (gtk.Window):
     #wrap it so that the aspect ratio is kept
     prev_box = gtk.VBox()
     prev_box.pack_start(pres_prev, True, False, 0)
+    
+    prev_box.pack_start(exposong.notify.notify, True, False, 0)
     win_rt_btm.pack_start(prev_box, True, False, 10)
     
     pres_buttons = gtk.VButtonBox()
@@ -190,9 +192,9 @@ class Main (gtk.Window):
             _("Open a presentation from file")),
         ('pres-export', None, _("_Export"), None,
             _("Export presentation")),
-        ('pres-prev', None, _("Previous Slide"), "<Release>comma", None,
+        ('pres-prev', None, _("Previous Slide"), "<Ctrl>comma", None,
             slidelist.slidelist.prev_slide),
-        ('pres-next', None, _("Next Slide"), "<Release>period", None,
+        ('pres-next', None, _("Next Slide"), "<Ctrl>period", None,
             slidelist.slidelist.next_slide),
         ('Present', gtk.STOCK_FULLSCREEN, _('_Present'), "<Ctrl>p", None,
             screen.screen.show),

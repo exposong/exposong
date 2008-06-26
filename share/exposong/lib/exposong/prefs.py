@@ -37,7 +37,9 @@ class Prefs:
         'pres.text_color': (65535, 65535, 65535),
         'pres.text_shadow': (0, 0, 0, 26214),
         'pres.logo': SHARED_FILES+"/res/exposong-white.png",
-        'pres.logo_bg': (65535, 43690, 4369)}
+        'pres.logo_bg': (65535, 43690, 4369),
+        'pres.notify_bg': (65535, 0, 0),
+        }
     self.load()
   
   def __getitem__(self, key):
@@ -128,6 +130,9 @@ class PrefsDialog(gtk.Dialog):
     p_logo = self._append_file_setting( _("Image"), config['pres.logo'], 6)
     p_logo_bg = self._append_color_setting( _("Background"), config['pres.logo_bg'], 7)
     
+    self._append_section_title( _("Notify"), 9)
+    p_notify_bg = self._append_color_setting( _("Background"), config['pres.notify_bg'], 10)
+    
     notebook.append_page(self.table, gtk.Label( _("Presentation")))
     
     self.show_all()
@@ -143,6 +148,8 @@ class PrefsDialog(gtk.Dialog):
       config['pres.logo'] = p_logo.get_filename()
       logoc = p_logo_bg.get_color()
       config['pres.logo_bg'] = (logoc.red, logoc.green, logoc.blue)
+      ntfc = p_notify_bg.get_color()
+      config['pres.notify_bg'] = (ntfc.red, ntfc.green, ntfc.blue)
       
       exposong.screen.screen.set_dirty()
       del exposong.screen.screen._logo_pbuf
@@ -172,6 +179,7 @@ class PrefsDialog(gtk.Dialog):
     self._get_label(label, top)
     
     filech = gtk.FileChooserButton( _("Choose File") )
+    filech.set_width_chars(15)
     if value:
       filech.set_filename(value)
     else:
