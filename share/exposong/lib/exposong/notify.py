@@ -7,16 +7,18 @@ class Notify(gtk.HBox):
     gtk.HBox.__init__(self)
     
     self.notify = gtk.Entry(45)
-    self.notify.set_width_chars(15)
+    self.notify.set_width_chars(15) #Prevent it from expanding wider than the preview
     self.notify.set_tooltip_text("Notification Text")
     self.notify.connect("activate", self._on_activate)
     self.pack_start(self.notify, True, True, 0)
+    
     notify_clear = gtk.Button()
     img = gtk.Image()
     img.set_from_stock(gtk.STOCK_CLEAR, gtk.ICON_SIZE_BUTTON)
     notify_clear.set_image(img)
     notify_clear.connect("clicked", self._on_clear)
     self.pack_start(notify_clear, False, True, 0)
+    
     notify_save = gtk.Button()
     img = gtk.Image()
     img.set_from_stock(gtk.STOCK_OK, gtk.ICON_SIZE_BUTTON)
