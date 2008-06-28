@@ -1,16 +1,16 @@
 +------------------------------------+
 | ExpoSong                           |
-| Version 0.4 Beta                   |
+| Version 0.5                        |
 | Copyright (C) 2008 Fishhookweb.com |
 +------------------------------------+
 
 = About =
 
-ExpoSong is a worship presentation software. It's early in development, so feel
-free to take it for a test run, but it's not quite ready for production
-environments.
+ExpoSong is a worship presentation software. Features include, image, lyric, and
+text presentations, image, gradient backgrounds, schedules, on-screen
+notifications, show logo, and more. 
 
-Find out more at http://exposong.org, and http://exposong.googlecode.com
+Find out more at http://exposong.org, and http://exposong.googlecode.com .
 
 
 = Installation =

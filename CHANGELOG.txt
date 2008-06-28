@@ -1,10 +1,20 @@
 +------------------------------------+
 | ExpoSong                           |
-| Version 0.4 Beta                   |
+| Version 0.5                        |
 | Copyright (C) 2008 Fishhookweb.com |
 +------------------------------------+
 
 = Changelog =
+
+== 0.5 ==
+
+ * On-screen notifications, for nursury alerts, or any other reason.
+ * Preset your church logo, and show it instead of a black screen or blank
+   background.
+ * Some bug fixes:
+   * Program now shows up faster.
+   * Preview screen no longer shows up blank, as it would in some cases.
+   * Preview screen always shows the correct aspect ratio.
 
 == 0.4 ==
 
