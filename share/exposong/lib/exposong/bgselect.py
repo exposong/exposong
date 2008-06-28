@@ -65,7 +65,7 @@ class BGSelect (gtk.VBox):
           if isinstance(curbg, str) and path == curbg:
             self.imgcombo.set_active_iter(itr)
     
-    self.new_image = gtk.Button("Add", gtk.STOCK_ADD, False)
+    self.new_image = gtk.Button( _("Add"), gtk.STOCK_ADD, False)
     self.new_image.connect("clicked", self._on_new_image)
     vbox.pack_start(self.new_image, False, True, 2)
     hbox.pack_start(vbox, True, True, 2)
@@ -139,7 +139,7 @@ class BGSelect (gtk.VBox):
   def _on_new_image(self, button):
     'The user added a new image as a background.'
     fltr = gtk.FileFilter()
-    fltr.set_name("Image Types")
+    fltr.set_name( _("Image Types"))
     fltr.add_mime_type("image/jpeg")
     fltr.add_mime_type("image/png")
     fltr.add_mime_type("image/gif")
