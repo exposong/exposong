@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-06-26 19:34+0100\n"
+"POT-Creation-Date: 2008-06-28 18:34+0100\n"
 "PO-Revision-Date: 2008-03-12 00:02+0100\n"
 "Last-Translator: Siegwart <siegwart.b@googlemail.com>\n"
 "Language-Team: German\n"
@@ -62,7 +62,6 @@ msgid "_Schedule"
 msgstr "_Ablaufplan"
 
 #: share/exposong/lib/exposong/application.py:175
-#, fuzzy
 msgid "P_resentation"
 msgstr "P_räsentation"
 
@@ -123,7 +122,6 @@ msgid "Previous Slide"
 msgstr "Vorherige Folie"
 
 #: share/exposong/lib/exposong/application.py:201
-#, fuzzy
 msgid "Next Slide"
 msgstr "Nächste Folie"
 
@@ -144,7 +142,6 @@ msgid "Blac_k Screen"
 msgstr "_Schwarzer Bildschirm"
 
 #: share/exposong/lib/exposong/application.py:211
-#, fuzzy
 msgid "Hi_de"
 msgstr "_Verstecken"
 
@@ -165,8 +162,16 @@ msgstr "Sind Sie sicher, dass sie \"%s\" aus ihrer Bibliothek löschen möchten?
 msgid "Delete Presentation?"
 msgstr "Präsentation löschen?"
 
+#: share/exposong/lib/exposong/bgselect.py:68
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: share/exposong/lib/exposong/bgselect.py:142
+#: share/exposong/lib/exposong/plugins/image.py:237
+msgid "Image Types"
+msgstr "Bild-Typen"
+
 #: share/exposong/lib/exposong/bgselect.py:146
-#, fuzzy
 msgid "Add Image"
 msgstr "Bild hinzufügen"
 
@@ -208,13 +213,12 @@ msgid "Max Font Size"
 msgstr "Maximale Schriftgröße"
 
 #: share/exposong/lib/exposong/prefs.py:130
-#, fuzzy
 msgid "Image"
-msgstr "_Grafik"
+msgstr "Grafik"
 
 #: share/exposong/lib/exposong/prefs.py:133
 msgid "Notify"
-msgstr "Mitteilen"
+msgstr "Mitteilung"
 
 #: share/exposong/lib/exposong/prefs.py:136
 #: share/exposong/lib/exposong/preslist.py:36
@@ -247,7 +251,6 @@ msgid "Slide"
 msgstr "Folie"
 
 #: share/exposong/lib/exposong/plugins/_abstract.py:144
-#, fuzzy
 msgid "New Presentation"
 msgstr "Neue Präsentation"
 
@@ -257,12 +260,11 @@ msgid "Editing %s"
 msgstr "%s bearbeiten"
 
 #: share/exposong/lib/exposong/plugins/_abstract.py:150
-#, fuzzy, python-format
+#, python-format
 msgid "New %s Presentation"
 msgstr "Neue %s Präsentation"
 
 #: share/exposong/lib/exposong/plugins/image.py:36
-#, fuzzy
 msgid "Image Presentation"
 msgstr "Bilder Präsentation"
 
@@ -275,30 +277,22 @@ msgstr "Titel:"
 #: share/exposong/lib/exposong/plugins/image.py:211
 #: share/exposong/lib/exposong/plugins/lyric.py:119
 #: share/exposong/lib/exposong/plugins/text.py:73
-#, fuzzy
 msgid "Edit"
 msgstr "Bearbeiten"
 
 #: share/exposong/lib/exposong/plugins/image.py:229
-#, fuzzy
 msgid "Add Images"
 msgstr "Bilder hinzufügen"
-
-#: share/exposong/lib/exposong/plugins/image.py:237
-msgid "Image Types"
-msgstr "Bild-Typen"
 
 #: share/exposong/lib/exposong/plugins/image.py:294
 msgid "_Image"
 msgstr "_Grafik"
 
 #: share/exposong/lib/exposong/plugins/image.py:319
-#, fuzzy
 msgid "Image Presentations"
 msgstr "Text-Präsentationen"
 
 #: share/exposong/lib/exposong/plugins/lyric.py:36
-#, fuzzy
 msgid "Lyric Presentation"
 msgstr "Lieder-Präsentation"
 
@@ -311,7 +305,6 @@ msgid "Music:"
 msgstr "Musik:"
 
 #: share/exposong/lib/exposong/plugins/lyric.py:142
-#, fuzzy
 msgid "Copyright:"
 msgstr "Copyright:"
 
@@ -320,17 +313,14 @@ msgid "Information"
 msgstr "Information"
 
 #: share/exposong/lib/exposong/plugins/lyric.py:245
-#, fuzzy
 msgid "_Lyric"
 msgstr "_Liedtext"
 
 #: share/exposong/lib/exposong/plugins/lyric.py:270
-#, fuzzy
 msgid "Lyric Presentations"
 msgstr "Lieder-Präsentationen"
 
 #: share/exposong/lib/exposong/plugins/text.py:32
-#, fuzzy
 msgid "Text Presentation"
 msgstr "Text-Präsentation"
 
@@ -339,7 +329,6 @@ msgid "_Text"
 msgstr "_Text"
 
 #: share/exposong/lib/exposong/plugins/text.py:127
-#, fuzzy
 msgid "Text Presentations"
 msgstr "Text-Präsentationen"
 
