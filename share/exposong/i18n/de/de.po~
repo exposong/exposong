@@ -172,7 +172,6 @@ msgid "Image Types"
 msgstr "Bild-Typen"
 
 #: share/exposong/lib/exposong/bgselect.py:146
-#, fuzzy
 msgid "Add Image"
 msgstr "Bild hinzufügen"
 
@@ -215,7 +214,7 @@ msgstr "Maximale Schriftgröße"
 
 #: share/exposong/lib/exposong/prefs.py:130
 msgid "Image"
-msgstr "_Grafik"
+msgstr "Grafik"
 
 #: share/exposong/lib/exposong/prefs.py:133
 msgid "Notify"
@@ -291,7 +290,7 @@ msgstr "_Grafik"
 
 #: share/exposong/lib/exposong/plugins/image.py:319
 msgid "Image Presentations"
-msgstr "Text-Präsentationen"
+msgstr "Bilder-Präsentationen"
 
 #: share/exposong/lib/exposong/plugins/lyric.py:36
 msgid "Lyric Presentation"
@@ -318,7 +317,6 @@ msgid "_Lyric"
 msgstr "_Liedtext"
 
 #: share/exposong/lib/exposong/plugins/lyric.py:270
-#, fuzzy
 msgid "Lyric Presentations"
 msgstr "Lieder-Präsentationen"
 

@@ -290,7 +290,7 @@ msgstr "_Grafik"
 
 #: share/exposong/lib/exposong/plugins/image.py:319
 msgid "Image Presentations"
-msgstr "Text-Präsentationen"
+msgstr "Bilder-Präsentationen"
 
 #: share/exposong/lib/exposong/plugins/lyric.py:36
 msgid "Lyric Presentation"
@@ -310,7 +310,7 @@ msgstr "Copyright:"
 
 #: share/exposong/lib/exposong/plugins/lyric.py:148
 msgid "Information"
-msgstr "Information"
+msgstr "Informationen"
 
 #: share/exposong/lib/exposong/plugins/lyric.py:245
 msgid "_Lyric"
