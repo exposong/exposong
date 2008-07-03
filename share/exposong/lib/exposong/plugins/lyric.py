@@ -217,9 +217,9 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       if(hasattr(sl, 'title') and len(sl.title) > 0):
         tbuf.insert_with_tags(it1, sl.title, titleTag)
         tbuf.insert(it1, "\n")
-        tbuf.insert(it1, sl.get_text())
-        if(sl is not self.slides[len(self.slides)-1]):
-          tbuf.insert(it1, "\n\n")
+      tbuf.insert(it1, sl.get_text())
+      if(sl is not self.slides[len(self.slides)-1]):
+        tbuf.insert(it1, "\n\n")
   
   def _text_changed(self, tbuf):
     it = tbuf.get_start_iter()
