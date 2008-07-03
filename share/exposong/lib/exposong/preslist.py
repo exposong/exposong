@@ -19,7 +19,7 @@ import gtk.gdk
 import gobject
 
 import exposong.slidelist
-import exposong.application # for some reason it won't let me use exposong.application
+import exposong.application
 
 preslist = None #will hold the PresList instance
 
@@ -66,6 +66,12 @@ class PresList(gtk.TreeView):
   def has_selection(self):
     'Return true if an item is selected.'
     return bool(self.get_selection().count_selected_rows())
+  
+  def get_model(self):
+    model = gtk.TreeView.get_model(self)
+    if isinstance(model, (gtk.TreeModelFilter, gtk.TreeModelSort)):
+      return model.get_model()
+    return model
   
   def _on_pres_activate(self, *args):
     'Change the slides to the current presentation.'

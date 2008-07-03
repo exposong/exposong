@@ -82,6 +82,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     self.slides = []
     for sl in sval.split("\n\n"):
       self.slides.append(self.Slide(self, sl))
+    _abstract.Presentation._edit_save(self)
   
   @staticmethod
   def get_type():

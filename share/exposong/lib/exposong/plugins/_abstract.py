@@ -100,6 +100,7 @@ class Presentation:
     self.copyright = ''
     self.author = {}
     self.slides = []
+    self.timer = None
     self.filename = filename
     if isinstance(dom, xml.dom.Node):
       self.title = get_node_text(dom.getElementsByTagName("title")[0])
@@ -171,11 +172,40 @@ class Presentation:
   
   def _edit_tabs(self, notebook):
     'Tabs for the dialog.'
-    pass # Later we'll have presentation specific backgrounds.
+    #Slide Timer
+    settings = gtk.VBox()
+    settings.set_border_width(8)
+    settings.set_spacing(7)
+    
+    label = gtk.Label()
+    label.set_markup("<b>Timer</b>")
+    label.set_alignment(0.0, 0.5)
+    settings.pack_start(label, False)
+    
+    self._fields['timer_on'] = gtk.CheckButton("Use Timer")
+    self._fields['timer_on'].set_active(self.timer is not None)
+    self._fields['timer_on'].connect("toggled", lambda chk: self._fields['timer'].set_sensitive(chk.get_active()))
+    settings.pack_start(self._fields['timer_on'], False)
+    
+    hbox = gtk.HBox()
+    hbox.set_spacing(18)
+    hbox.pack_start(gtk.Label("Seconds Per Slide"), False, False)
+    
+    self._fields['timer'] = gtk.SpinButton(gtk.Adjustment(1, 1, 25, 1, 3, 10), 1, 0)
+    self._fields['timer'].set_sensitive(self.timer is not None)
+    if isinstance(self.timer, (int, float)):
+      self._fields['timer'].set_value(self.timer)
+    hbox.pack_start(self._fields['timer'], False, False)
+    
+    settings.pack_start(hbox, False)
+    notebook.append_page(settings, gtk.Label("Settings"))
+    
+    # TODO: Presentation specific backgrounds.
   
   def _edit_save(self):
     'Save the fields if the user clicks ok.'
-    pass
+    if self._fields['timer_on'].get_active():
+      self.timer = self._fields['timer'].get_value_as_int()
   
   def to_xml(self):
     'Save the data to disk.'

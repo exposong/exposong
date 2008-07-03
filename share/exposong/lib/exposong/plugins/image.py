@@ -223,6 +223,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     while itr:
       self.slides.append(self.Slide(self, self._fields['images'].get_value(itr, 0)))
       itr = self._fields['images'].iter_next(itr)
+    _abstract.Presentation._edit_save(self)
   
   def _on_img_add(self, button, treeview):
     'Add an image to the presentation.'
