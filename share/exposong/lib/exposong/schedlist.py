@@ -82,6 +82,7 @@ class ScheduleList(gtk.TreeView):
       sched = self.get_active_item()
       if isinstance(sched, schedule.Schedule):
         preslist.preslist.set_model(sched)
+        preslist.preslist.columns_autosize()
         sched.refresh_model()
         if sched.is_reorderable():
           preslist.preslist.enable_model_drag_dest(
@@ -89,7 +90,6 @@ class ScheduleList(gtk.TreeView):
           preslist.preslist.set_headers_clickable(False)
         else:
           preslist.preslist.unset_rows_drag_dest()
-          preslist.preslist.set_headers_clickable(True)
   
   def _on_sched_delete(self, action):
     'Delete the selected schedule.'

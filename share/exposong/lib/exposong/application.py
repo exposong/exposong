@@ -83,7 +83,7 @@ class Main (gtk.Window):
     schedlist.schedlist.connect("button-release-event", self._on_schedule_rt_click)
     schedule_scroll = gtk.ScrolledWindow()
     schedule_scroll.add(schedlist.schedlist)
-    schedule_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+    schedule_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
     win_lft.pack1(schedule_scroll, True, True)
     
     #### Presentation List
@@ -91,7 +91,7 @@ class Main (gtk.Window):
     preslist.preslist.connect("button-release-event", self._on_pres_rt_click)
     pres_list_scroll = gtk.ScrolledWindow()
     pres_list_scroll.add(preslist.preslist)
-    pres_list_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+    pres_list_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
     win_lft.pack2(pres_list_scroll, True, True)
     
     #Drag and Drop
@@ -109,10 +109,9 @@ class Main (gtk.Window):
     ### Main right area
     win_rt = gtk.VBox()
     #### Slide List
-    slidelist.slidelist.connect("cursor-changed", slidelist.slidelist._on_slide_activate)
     slide_scroll = gtk.ScrolledWindow()
     slide_scroll.add(slidelist.slidelist)
-    slide_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+    slide_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
     win_rt.pack_start(slide_scroll)
     
     #### Preview and Presentation Buttons

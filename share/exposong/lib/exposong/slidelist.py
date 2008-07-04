@@ -27,6 +27,7 @@ class SlideList(gtk.TreeView):
   Class to manipulate the text_area in the presentation program.
   '''
   def __init__(self):
+    self.pres = None
     gtk.TreeView.__init__(self)
     self.set_size_request(280, 200)
     self.set_enable_search(False)
@@ -38,6 +39,7 @@ class SlideList(gtk.TreeView):
     
     self.set_model(gtk.ListStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING))
     #self.set_headers_visible(False)
+    self.connect("cursor-changed", self._on_slide_activate)
     
   def set_slides(self, slides):
     'Set the text to a Song.'
@@ -48,6 +50,7 @@ class SlideList(gtk.TreeView):
   
   def set_presentation(self, pres):
     'Set the active presentation.'
+    self.pres = pres
     slist = self.get_model()
     if pres is None:
       slist.clear()
@@ -59,7 +62,6 @@ class SlideList(gtk.TreeView):
       slist = self.get_model()
       for slide in pres.get_slide_list():
         slist.append(slide)
-    
   
   def get_active_item(self):
     'Return the selected `Slide` object.'
@@ -77,16 +79,26 @@ class SlideList(gtk.TreeView):
       if path[0] > 0:
         path = (path[0]-1,)
         self.set_cursor(path)
+        self.scroll_to_cell(path)
   
   def next_slide(self, widget):
     'Move to the next slide.'
-    (model, s_iter) = self.get_selection().get_selected()
-    if s_iter:
-      path = model.get_path(s_iter)
-      path = (path[0]+1,)
-      self.set_cursor(path)
-    else:
-      self.set_cursor((0,))
+    selection = self.get_selection()
+    (model, itr) = selection.get_selected()
+    if itr:
+      itr2 = model.iter_next(itr)
+      if itr2:
+        selection.select_iter(itr2)
+        self.scroll_to_cell(model.get_path(itr2))
+      elif self.pres and self.pres.timer_loop:
+        selection.select_iter(model.get_iter_first())
+        self.scroll_to_point(0,0)
+    elif model.get_iter_first():
+      selection.select_iter(model.get_iter_first())
+      self.scroll_to_point(0,0)
+    else: #No rows in the slidelist available
+      return False
+    self._on_slide_activate()
   
   def _on_slide_activate(self, *args):
     'Present the selected slide to the screen.'

@@ -64,14 +64,14 @@ class Presentation:
   
     def get_markup(self):
       'Get the text for the slide selection.'
-      if(self.title):
+      if self.title:
         return "<b>" + self.title + "</b>\n" + self.text
       else:
         return self.text
-  
+    
     def to_node(self, document, node):
       'Populate the node element'
-      if(self.title):
+      if self.title:
         node.setAttribute("title", self.title)
       node.appendChild( document.createTextNode(self.text) )
     
@@ -101,7 +101,9 @@ class Presentation:
     self.author = {}
     self.slides = []
     self.timer = None
+    self.timer_loop = False
     self.filename = filename
+    
     if isinstance(dom, xml.dom.Node):
       self.title = get_node_text(dom.getElementsByTagName("title")[0])
       for el in dom.getElementsByTagName("author"):
@@ -110,6 +112,10 @@ class Presentation:
       copyright = dom.getElementsByTagName("copyright")
       if len(copyright):
         self.copyright = get_node_text(copyright[0])
+      timer = dom.getElementsByTagName("timer")
+      if len(timer) > 0:
+        self.timer = int(timer[0].getAttribute("time"))
+        self.timer_loop = bool(timer[0].getAttribute("loop"))
       
       self._set_slides(dom)
   
@@ -185,6 +191,7 @@ class Presentation:
     self._fields['timer_on'] = gtk.CheckButton("Use Timer")
     self._fields['timer_on'].set_active(self.timer is not None)
     self._fields['timer_on'].connect("toggled", lambda chk: self._fields['timer'].set_sensitive(chk.get_active()))
+    self._fields['timer_on'].connect("toggled", lambda chk: self._fields['timer_loop'].set_sensitive(chk.get_active()))
     settings.pack_start(self._fields['timer_on'], False)
     
     hbox = gtk.HBox()
@@ -196,8 +203,13 @@ class Presentation:
     if isinstance(self.timer, (int, float)):
       self._fields['timer'].set_value(self.timer)
     hbox.pack_start(self._fields['timer'], False, False)
-    
     settings.pack_start(hbox, False)
+    
+    self._fields['timer_loop'] = gtk.CheckButton("Loop Slides")
+    self._fields['timer_loop'].set_active(self.timer_loop)
+    self._fields['timer_loop'].set_sensitive(self.timer is not None)
+    settings.pack_start(self._fields['timer_loop'], False, False)
+    
     notebook.append_page(settings, gtk.Label("Settings"))
     
     # TODO: Presentation specific backgrounds.
@@ -206,6 +218,7 @@ class Presentation:
     'Save the fields if the user clicks ok.'
     if self._fields['timer_on'].get_active():
       self.timer = self._fields['timer'].get_value_as_int()
+      self.timer_loop = self._fields['timer_loop'].get_active()
   
   def to_xml(self):
     'Save the data to disk.'
@@ -215,9 +228,18 @@ class Presentation:
     doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
     root = doc.createElement("presentation")
     root.setAttribute("type", self.type)
-    tNode = doc.createElement("title")
-    tNode.appendChild(doc.createTextNode(self.title))
-    root.appendChild(tNode)
+    
+    node = doc.createElement("title")
+    node.appendChild(doc.createTextNode(self.title))
+    root.appendChild(node)
+    
+    if self.timer:
+      node = doc.createElement("timer")
+      node.setAttribute('time', str(self.timer))
+      if self.timer_loop:
+        node.setAttribute('loop', "1")
+      root.appendChild(node)
+    
     for s in self.slides:
       sNode = doc.createElement("slide")
       s.to_node(doc, sNode)

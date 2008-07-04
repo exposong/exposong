@@ -39,9 +39,10 @@ class PresList(gtk.TreeView):
     column.pack_start(textrend, True)
     column.set_attributes(textrend, text=1)
     column.set_sort_column_id(1)
-    column.set_resizable(True)
+    column.set_resizable(False)
     column.set_property('spacing', 4)
     self.append_column(column)
+    self.set_headers_clickable(False)
   
   def get_active_item(self):
     'Return the presentation of the currently selected item.'
