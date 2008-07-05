@@ -17,6 +17,7 @@
 import gtk
 import gobject
 import pango
+import random
 
 import exposong.screen
 
@@ -28,6 +29,7 @@ class SlideList(gtk.TreeView):
   '''
   def __init__(self):
     self.pres = None
+    self.__timer = 0 #Used to stop or reset the timer if the presentation or slide changes.
     gtk.TreeView.__init__(self)
     self.set_size_request(280, 200)
     self.set_enable_search(False)
@@ -41,12 +43,13 @@ class SlideList(gtk.TreeView):
     #self.set_headers_visible(False)
     self.connect("cursor-changed", self._on_slide_activate)
     
-  def set_slides(self, slides):
-    'Set the text to a Song.'
-    slist = self.get_model()
-    slist.clear()
-    for sl in slides:
-      slist.append([sl, sl.get_markup()])
+  #def set_slides(self, slides):
+  #  'Set the text to a Song.'
+  #  slist = self.get_model()
+  #  slist.clear()
+  #  for sl in slides:
+  #    slist.append([sl, sl.get_markup()])
+  #  print 1
   
   def set_presentation(self, pres):
     'Set the active presentation.'
@@ -62,6 +65,7 @@ class SlideList(gtk.TreeView):
       slist = self.get_model()
       for slide in pres.get_slide_list():
         slist.append(slide)
+    self.__timer += 1
   
   def get_active_item(self):
     'Return the selected `Slide` object.'
@@ -93,15 +97,26 @@ class SlideList(gtk.TreeView):
       elif self.pres and self.pres.timer_loop:
         selection.select_iter(model.get_iter_first())
         self.scroll_to_point(0,0)
+      else: #The last slide is active.
+        return False
     elif model.get_iter_first():
       selection.select_iter(model.get_iter_first())
       self.scroll_to_point(0,0)
-    else: #No rows in the slidelist available
+    else: #No slides available.
       return False
-    self._on_slide_activate()
+    exposong.screen.screen.draw()
   
   def _on_slide_activate(self, *args):
     'Present the selected slide to the screen.'
     exposong.screen.screen.draw()
-
+    self.__timer += 1
+    if self.pres.timer:
+      gobject.timeout_add(self.pres.timer*1000, self._set_timer, self.__timer)
+  
+  def _set_timer(self, t):
+    'Starts the timer, or continues a current timer.'
+    if t <> self.__timer:
+      return False
+    self.next_slide(None)
+    return True
 

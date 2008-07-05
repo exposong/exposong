@@ -74,6 +74,34 @@ class PresList(gtk.TreeView):
       return model.get_model()
     return model
   
+  def next_pres(self, *args):
+    'Go to the next presentation.'
+    selection = self.get_selection()
+    (model, itr) = selection.get_selected()
+    if itr:
+      itr2 = model.iter_next(itr)
+      if itr2:
+        selection.select_iter(itr2)
+        self.scroll_to_cell(model.get_path(itr2))
+      else: #The last presentation is active.
+        return False
+    elif model.get_iter_first():
+      selection.select_iter(model.get_iter_first())
+      self.scroll_to_point(0,0)
+    else: #No presentations available.
+      return False
+    self._on_pres_activate()
+  
+  def prev_pres(self, *args):
+    'Go to the previous presentation.'
+    (model, s_iter) = self.get_selection().get_selected()
+    if s_iter:
+      path = model.get_path(s_iter)
+      if path[0] > 0:
+        path = (path[0]-1,)
+        self.set_cursor(path)
+        self.scroll_to_cell(path)
+  
   def _on_pres_activate(self, *args):
     'Change the slides to the current presentation.'
     if self.has_selection():

@@ -195,10 +195,14 @@ class Main (gtk.Window):
             _("Open a presentation from file")),
         ('pres-export', None, _("_Export"), None,
             _("Export presentation")),
-        ('pres-prev', None, _("Previous Slide"), "<Ctrl>comma", None,
+        ('pres-prev', None, _("Previous Presentation"), "<Ctrl><Shift>Left",
+            None, preslist.preslist.prev_pres),
+        ('pres-slide-prev', None, _("Previous Slide"), "<Ctrl>Left", None,
             slidelist.slidelist.prev_slide),
-        ('pres-next', None, _("Next Slide"), "<Ctrl>period", None,
+        ('pres-slide-next', None, _("Next Slide"), "<Ctrl>Right", None,
             slidelist.slidelist.next_slide),
+        ('pres-next', None, _("Previous Presentation"), "<Ctrl><Shift>Right",
+            None, preslist.preslist.next_pres),
         ('Present', gtk.STOCK_FULLSCREEN, _('_Present'), "<Ctrl>p", None,
             screen.screen.show),
         ('Background', gtk.STOCK_CLEAR, _('_Background'), "<Ctrl>b", None,
@@ -240,6 +244,8 @@ class Main (gtk.Window):
             <menuitem action="Hide" />
             <separator />
             <menuitem action="pres-prev" />
+            <menuitem action="pres-slide-prev" />
+            <menuitem action="pres-slide-next" />
             <menuitem action="pres-next" />
           </menu>
           <menu action="Help">
