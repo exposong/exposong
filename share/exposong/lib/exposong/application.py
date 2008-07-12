@@ -79,7 +79,6 @@ class Main (gtk.Window):
     ### Main left area
     win_lft = gtk.VPaned()
     #### Schedule
-    schedlist.schedlist.connect("cursor-changed", schedlist.schedlist._on_schedule_activate)
     schedlist.schedlist.connect("button-release-event", self._on_schedule_rt_click)
     schedule_scroll = gtk.ScrolledWindow()
     schedule_scroll.add(schedlist.schedlist)
@@ -87,22 +86,11 @@ class Main (gtk.Window):
     win_lft.pack1(schedule_scroll, True, True)
     
     #### Presentation List
-    preslist.preslist.connect("cursor-changed", preslist.preslist._on_pres_activate)
     preslist.preslist.connect("button-release-event", self._on_pres_rt_click)
     pres_list_scroll = gtk.ScrolledWindow()
     pres_list_scroll.add(preslist.preslist)
     pres_list_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
     win_lft.pack2(pres_list_scroll, True, True)
-    
-    #Drag and Drop
-    preslist.preslist.enable_model_drag_source(gtk.gdk.BUTTON1_MASK,
-        DRAGDROP_SCHEDULE, gtk.gdk.ACTION_COPY)
-    preslist.preslist.connect("drag-data-get", preslist.preslist._on_drag_get)
-    preslist.preslist.connect("drag-data-received", preslist.preslist._on_pres_drag_received)
-    schedlist.schedlist.enable_model_drag_dest(DRAGDROP_SCHEDULE, gtk.gdk.ACTION_DEFAULT)
-    schedlist.schedlist.connect("drag-drop", schedlist.schedlist._on_pres_drop)
-    schedlist.schedlist.connect("drag-data-received", schedlist.schedlist._on_sched_drag_received)
-    schedlist.schedlist.set_drag_dest_row((1,), gtk.TREE_VIEW_DROP_INTO_OR_BEFORE)
     
     win_h.pack1(win_lft, False, False)
     
@@ -132,19 +120,19 @@ class Main (gtk.Window):
     
     pres_buttons = gtk.VButtonBox()
     self.pbut_present = gtk.Button( _("Present") )
-    self.action_group.get_action('Present').connect_proxy(self.pbut_present)
+    self.main_actions.get_action('Present').connect_proxy(self.pbut_present)
     pres_buttons.add(self.pbut_present)
     self.pbut_background = gtk.Button( _("Background") )
-    self.action_group.get_action('Background').connect_proxy(self.pbut_background)
+    self.main_actions.get_action('Background').connect_proxy(self.pbut_background)
     pres_buttons.add(self.pbut_background)
     self.pbut_logo = gtk.Button( _("Logo") )
-    self.action_group.get_action('Logo').connect_proxy(self.pbut_logo)
+    self.main_actions.get_action('Logo').connect_proxy(self.pbut_logo)
     pres_buttons.add(self.pbut_logo)
     self.pbut_black = gtk.Button( _("Black Screen") )
-    self.action_group.get_action('Black Screen').connect_proxy(self.pbut_black)
+    self.main_actions.get_action('Black Screen').connect_proxy(self.pbut_black)
     pres_buttons.add(self.pbut_black)
     self.pbut_hide = gtk.Button( _("Hide") )
-    self.action_group.get_action('Hide').connect_proxy(self.pbut_hide)
+    self.main_actions.get_action('Hide').connect_proxy(self.pbut_hide)
     pres_buttons.add(self.pbut_hide)
     
     win_rt_btm.pack_end(pres_buttons, False, False, 10)
@@ -167,8 +155,8 @@ class Main (gtk.Window):
     uimanager = gtk.UIManager()
     self.add_accel_group(uimanager.get_accel_group())
     
-    self.action_group = gtk.ActionGroup('exposong')
-    self.action_group.add_actions([('File', None, _('_File') ),
+    self.main_actions = gtk.ActionGroup('main')
+    self.main_actions.add_actions([('File', None, _('_File') ),
         ('Edit', None, _('_Edit') ),
         ('Schedule', None, _("_Schedule") ),
         ('Presentation', None, _('P_resentation')),
@@ -215,7 +203,13 @@ class Main (gtk.Window):
             screen.screen.hide),
         ('HelpContents', gtk.STOCK_HELP, None, None, None, self._show_help),
         ('About', gtk.STOCK_ABOUT, None, None, None, self._on_about)])
-    uimanager.insert_action_group(self.action_group, 0)
+    self.main_actions.get_action("Background").set_sensitive(False)
+    self.main_actions.get_action("Logo").set_sensitive(False)
+    self.main_actions.get_action("Black Screen").set_sensitive(False)
+    self.main_actions.get_action("Hide").set_sensitive(False)
+    self.main_actions.get_action("pres-slide-next").set_sensitive(False)
+    self.main_actions.get_action("pres-slide-prev").set_sensitive(False)
+    uimanager.insert_action_group(self.main_actions, 0)
     uimanager.add_ui_from_string('''
         <menubar name="MenuBar">
           <menu action="File">
@@ -259,23 +253,23 @@ class Main (gtk.Window):
     
     menu = uimanager.get_widget('/MenuBar')
     self.pres_list_menu = gtk.Menu()
-    self.pres_list_menu.append(self.action_group
+    self.pres_list_menu.append(self.main_actions
         .get_action('pres-edit').create_menu_item())
-    self.pres_list_menu.append(self.action_group
+    self.pres_list_menu.append(self.main_actions
         .get_action('pres-delete').create_menu_item())
     self.pres_list_menu.show_all()
     
     self.pres_list_sched_menu = gtk.Menu() #Custom schedule menu
-    self.pres_list_sched_menu.append(self.action_group
+    self.pres_list_sched_menu.append(self.main_actions
         .get_action('pres-edit').create_menu_item())
-    self.pres_list_sched_menu.append(self.action_group
+    self.pres_list_sched_menu.append(self.main_actions
         .get_action('pres-delete-from-schedule').create_menu_item())
     self.pres_list_sched_menu.show_all()
     
     self.sched_list_menu = gtk.Menu()
-    self.sched_list_menu.append(self.action_group
+    self.sched_list_menu.append(self.main_actions
         .get_action('sched-rename').create_menu_item())
-    self.sched_list_menu.append(self.action_group
+    self.sched_list_menu.append(self.main_actions
         .get_action('sched-delete').create_menu_item())
     self.sched_list_menu.show_all()
     

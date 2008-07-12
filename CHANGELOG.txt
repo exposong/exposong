@@ -6,6 +6,10 @@
 
 = Changelog =
 
+== 0.6 ==
+
+ * Disable menu items that can't be used.
+
 == 0.5 ==
 
  * On-screen notifications, for nursury alerts, or any other reason.

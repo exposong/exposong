@@ -66,6 +66,9 @@ class SlideList(gtk.TreeView):
       for slide in pres.get_slide_list():
         slist.append(slide)
     self.__timer += 1
+    men = slist.get_iter_first() is not None
+    exposong.application.main.main_actions.get_action("pres-slide-next").set_sensitive(men)
+    exposong.application.main.main_actions.get_action("pres-slide-prev").set_sensitive(men)
   
   def get_active_item(self):
     'Return the selected `Slide` object.'

@@ -20,6 +20,7 @@ import gobject
 
 import exposong.slidelist
 import exposong.application
+import exposong.schedlist
 
 preslist = None #will hold the PresList instance
 
@@ -43,6 +44,11 @@ class PresList(gtk.TreeView):
     column.set_property('spacing', 4)
     self.append_column(column)
     self.set_headers_clickable(False)
+    self.connect("cursor-changed", self._on_pres_activate)
+    self.connect("drag-data-get", self._on_drag_get)
+    self.connect("drag-data-received", self._on_pres_drag_received)
+    self.enable_model_drag_source(gtk.gdk.BUTTON1_MASK,
+        exposong.application.DRAGDROP_SCHEDULE, gtk.gdk.ACTION_COPY)
   
   def get_active_item(self):
     'Return the presentation of the currently selected item.'
@@ -108,10 +114,17 @@ class PresList(gtk.TreeView):
       exposong.slidelist.slidelist.set_presentation(self.get_active_item().presentation)
     else:
       exposong.slidelist.slidelist.set_presentation(None)
+    #TODO This is not working, may need to change the signal
+    exposong.application.main.main_actions.get_action("pres-edit")\
+        .set_sensitive(self.has_selection())
+    exposong.application.main.main_actions.get_action("pres-delete")\
+        .set_sensitive(self.has_selection())
+    exposong.application.main.main_actions.get_action("pres-delete-from-schedule")\
+        .set_sensitive(self.has_selection() and not self.get_model().builtin)
   
   def _on_pres_edit(self, *args):
     'Edit the presentation.'
-    field = self.get_active_item()
+    field = exposong.slidelist.slidelist.pres
     if not field:
       return False
     if field.edit():

@@ -22,6 +22,7 @@ import gobject
 
 import exposong.prefs
 import exposong.slidelist
+import exposong.application
 
 
 def c2dec(color):
@@ -58,7 +59,7 @@ class Screen:
     else:
       raise Exception("'preview' must be gtk.DrawingArea")
     
-    self.draw()
+    #self.draw()
   
   def auto_locate(self, main):
     '''
@@ -122,12 +123,14 @@ class Screen:
     'Remove the presentation screen from view.'
     self._background = self._black = self._logo = False
     self.window.hide()
+    self._set_menu_items_disabled()
   
   def show(self, *args):
     'Show the presentation screen.'
     self._background = self._black = self._logo = False
     self.window.show_all()
     self.draw()
+    self._set_menu_items_disabled()
   
   def expose(self, widget, event):
     'Redraw `widget`.'
@@ -356,4 +359,13 @@ class Screen:
       ccontext.move_to(sbounds[0]-nbounds[0]-pad, sbounds[1]-nbounds[1]-pad)
       ccontext.show_layout(layout)
     return True
+  
+  def _set_menu_items_disabled(self):
+    'Disable buttons if the presentation is not shown.'
+    enabled = self.pres.window and self.pres.window.is_viewable()
+    actions = exposong.application.main.main_actions
+    actions.get_action("Background").set_sensitive(enabled)
+    actions.get_action("Logo").set_sensitive(enabled)
+    actions.get_action("Black Screen").set_sensitive(enabled)
+    actions.get_action("Hide").set_sensitive(enabled)
 

@@ -21,8 +21,9 @@ import xml.dom
 from glob import *
 from os.path import join
 
-from exposong import DATA_PATH, preslist
+from exposong import DATA_PATH
 import exposong.plugins._abstract
+import exposong.preslist
 
 
 class Schedule(gtk.ListStore):
@@ -30,7 +31,7 @@ class Schedule(gtk.ListStore):
   Schedule of presentations.'
   '''
   def __init__(self, title="", filename = None, builtin = True, filter_func = None):
-    gtk.ListStore.__init__(self, *preslist.PresList.get_model_args())
+    gtk.ListStore.__init__(self, *exposong.preslist.PresList.get_model_args())
     self.title = title
     self.filename = filename
     self.builtin = builtin

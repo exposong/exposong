@@ -20,9 +20,11 @@ import gobject
 import xml.dom
 from glob import *
 
-from exposong import schedule, preslist
-import application
+import exposong.schedule
+import exposong.preslist
+import exposong.application
 
+schedlist = None
 
 class ScheduleList(gtk.TreeView):
   '''
@@ -43,11 +45,16 @@ class ScheduleList(gtk.TreeView):
     column.set_resizable(False)
     column.set_cell_data_func(sched_rend, self._cell_data_func)
     self.append_column(column)
-    
+    self.connect("cursor-changed", self._on_schedule_activate)
+    self.enable_model_drag_dest(exposong.application.DRAGDROP_SCHEDULE,
+        gtk.gdk.ACTION_DEFAULT)
+    self.connect("drag-drop", self._on_pres_drop)
+    self.connect("drag-data-received", self._on_sched_drag_received)
+    self.set_drag_dest_row((1,), gtk.TREE_VIEW_DROP_INTO_OR_BEFORE)
   
   def append(self, parent, row, sort = None):
     'Add an item to the list.'
-    if isinstance(row, schedule.Schedule):
+    if isinstance(row, exposong.schedule.Schedule):
       if sort is None:
         sort = row.title
       else:
@@ -80,16 +87,23 @@ class ScheduleList(gtk.TreeView):
     'Change the presentation list to the current schedule.'
     if self.has_selection():
       sched = self.get_active_item()
-      if isinstance(sched, schedule.Schedule):
-        preslist.preslist.set_model(sched)
-        preslist.preslist.columns_autosize()
+      if isinstance(sched, exposong.schedule.Schedule):
+        exposong.preslist.preslist.set_model(sched)
+        exposong.preslist.preslist.columns_autosize()
         sched.refresh_model()
         if sched.is_reorderable():
-          preslist.preslist.enable_model_drag_dest(
-              application.DRAGDROP_SCHEDULE, gtk.gdk.ACTION_COPY)
-          preslist.preslist.set_headers_clickable(False)
+          exposong.preslist.preslist.enable_model_drag_dest(
+              exposong.application.DRAGDROP_SCHEDULE, gtk.gdk.ACTION_COPY)
         else:
-          preslist.preslist.unset_rows_drag_dest()
+          exposong.preslist.preslist.unset_rows_drag_dest()
+    enable = isinstance(sched, exposong.schedule.Schedule) and not sched.builtin
+    exposong.application.main.main_actions.get_action("pres-delete-from-schedule")\
+        .set_sensitive(not exposong.preslist.preslist.get_model().builtin and\
+        exposong.preslist.preslist.has_selection())
+    exposong.application.main.main_actions.get_action("sched-rename")\
+        .set_sensitive(enable)
+    exposong.application.main.main_actions.get_action("sched-delete")\
+        .set_sensitive(enable)
   
   def _on_sched_delete(self, action):
     'Delete the selected schedule.'
@@ -130,8 +144,8 @@ class ScheduleList(gtk.TreeView):
       model = treeview.get_model()
       path, position = drop_info
       
-      pres = preslist.preslist.get_model().get_value(
-          preslist.preslist.get_model().get_iter_from_string(selection.data),
+      pres = exposong.preslist.preslist.get_model().get_value(
+          exposong.preslist.preslist.get_model().get_iter_from_string(selection.data),
               0).presentation
       sched = model.get_value(model.get_iter(path), 0)
       
@@ -152,7 +166,7 @@ class ScheduleList(gtk.TreeView):
       name += " 1"
     else:
       name += " "+str(int(curnames[len(curnames)-1][-2:]) + 1)
-    sched = schedule.Schedule(name, builtin=False)
+    sched = exposong.schedule.Schedule(name, builtin=False)
     itrnew = self.append(self.custom_schedules, sched)
     pathnew = self.model.get_path(itrnew)
     self.expand_all()
@@ -166,7 +180,7 @@ class ScheduleList(gtk.TreeView):
   def _cell_data_func(self, column, cell, model, iter1):
     'Set whether the cell is editable or not.'
     sched = model.get_value(iter1, 0)
-    cell.set_property('editable', isinstance(sched, schedule.Schedule) and sched.builtin is False)
+    cell.set_property('editable', isinstance(sched, exposong.schedule.Schedule) and sched.builtin is False)
   
   def _rename_schedule(self, text_rend, path, new_text):
     "Rename a schedule in the list and it's filename."
