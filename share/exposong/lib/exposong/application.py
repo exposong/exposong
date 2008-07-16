@@ -70,6 +70,7 @@ class Main (gtk.Window):
     schedlist.schedlist = schedlist.ScheduleList()
     preslist.preslist = preslist.PresList()
     slidelist.slidelist = slidelist.SlideList()
+    preslist.presfilter = preslist.PresFilter()
     
     menu = self._create_menu()
     win_v.pack_start(menu, False)
@@ -86,11 +87,14 @@ class Main (gtk.Window):
     win_lft.pack1(schedule_scroll, True, True)
     
     #### Presentation List
+    pres1 = gtk.VBox()
     preslist.preslist.connect("button-release-event", self._on_pres_rt_click)
     pres_list_scroll = gtk.ScrolledWindow()
     pres_list_scroll.add(preslist.preslist)
     pres_list_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-    win_lft.pack2(pres_list_scroll, True, True)
+    pres1.pack_start(pres_list_scroll, True, True)
+    pres1.pack_start(preslist.presfilter, True, False)
+    win_lft.pack2(pres1, True, True)
     
     win_h.pack1(win_lft, False, False)
     

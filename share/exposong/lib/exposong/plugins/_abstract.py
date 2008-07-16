@@ -146,6 +146,14 @@ class Presentation:
       rval += sl.get_text() + "\n\n"
     tbuf.set_text(rval[:-2])
   
+  def matches(self, text):
+    'Tests to see if the presentation matches `text`.'
+    regex = re.compile("\\b"+re.escape(text), re.I)
+    if regex.search(self.title):
+      return True
+    if hasattr(self.slides[0], 'text') and regex.search(" ".join(s.title+" "+s.text for s in self.slides)):
+      return True
+  
   def edit(self):
     'Run the edit dialog for the presentation.'
     dialog = gtk.Dialog(_("New Presentation"), exposong.application.main, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,

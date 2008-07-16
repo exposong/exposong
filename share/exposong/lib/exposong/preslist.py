@@ -23,6 +23,7 @@ import exposong.application
 import exposong.schedlist
 
 preslist = None #will hold the PresList instance
+presfilter = None #will hold PresFilter instance
 
 class PresList(gtk.TreeView):
   '''
@@ -178,4 +179,35 @@ class PresList(gtk.TreeView):
   def get_model_args():
     'Get the arguments to pass to `gtk.ListStore`.'
     return (gobject.TYPE_PYOBJECT, gobject.TYPE_STRING)
+
+
+class PresFilter(gtk.HBox):
+  def __init__(self):
+    gtk.HBox.__init__(self, False, 0)
+    
+    self.search = gtk.Entry(50)
+    self.search.set_width_chars(12)
+    self.search.connect("activate", self._filter)
+    self.pack_start(self.search, True, True, 0)
+    
+    go = gtk.Button()
+    img = gtk.Image()
+    img.set_from_stock(gtk.STOCK_OK, gtk.ICON_SIZE_BUTTON)
+    go.set_image(img)
+    go.connect("clicked", self._filter)
+    self.pack_start(go, False, True, 0)
+    self.show_all()
+  
+  def _filter(self, *args):
+    'Filters schedlist by the keywords.'
+    if self.search.get_text() == "":
+      preslist.set_model(preslist.get_model())
+    else:
+      filt = preslist.get_model().filter_new()
+      filt.set_visible_func(self._visible_func)
+      preslist.set_model(filt)
+  
+  def _visible_func(self, model, itr):
+    'Tests the row for visibility.'
+    return model.get_value(itr, 0).matches(self.search.get_text())
 
