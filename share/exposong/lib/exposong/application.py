@@ -412,14 +412,17 @@ class Main (gtk.Window):
     'Show the help pages.'
     webbrowser.open(HELP_URL)
   
-  def _quit(self, *args):
-    'Cleans up and exits the program.'
+  def _save_schedules(self):
+    'Save all schedules to disk.'
     model = schedlist.schedlist.get_model()
     sched = model.iter_children(schedlist.schedlist.custom_schedules)
     while sched:
       model.get_value(sched, 0).save()
       sched = model.iter_next(sched)
-    
+  
+  def _quit(self, *args):
+    'Cleans up and exits the program.'
+    self._save_schedules()
     prefs.config.save()
     gtk.main_quit()
 
