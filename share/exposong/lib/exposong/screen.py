@@ -262,7 +262,7 @@ class Screen:
       # TODO
       
       # Footer text
-      ftext = slide.footer_text()
+      ftext = str(slide.footer_text())
       if isinstance(ftext, (unicode, str)) and len(ftext):
         layout = ccontext.create_layout()
         layout.set_text(ftext)
@@ -271,7 +271,7 @@ class Screen:
         
         attrs = pango.AttrList()
         attrs.insert(pango.AttrFontDesc(pango.FontDescription("Sans Bold "+str(int(screenH/54.0))),
-            end_index = len(slide.body_text())+40))
+            end_index = len(ftext)+40))
         layout.set_attributes(attrs)
         
         footer_height = layout.get_pixel_size()[1]

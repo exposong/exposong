@@ -86,6 +86,7 @@ class ExportImport(Plugin, _abstract.Menu):
         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
     dlg.add_filter(_FILTER)
     dlg.set_do_overwrite_confirmation(True)
+    dlg.set_current_name("exposong_library.expo")
     if dlg.run() == gtk.RESPONSE_ACCEPT:
       exposong.application.main._save_schedules() #Make sure schedules are up to date.
       oldpath = os.getcwd()

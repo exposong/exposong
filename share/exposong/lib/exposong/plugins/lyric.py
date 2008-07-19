@@ -39,7 +39,7 @@ information = {
 }
 type_icon = gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH,'lyric.png'))
 
-title_re = re.compile("(chorus|refrain|verse|bridge)", re.I)
+title_re = re.compile("(chorus|refrain|verse|bridge|ending|soprano|alto|tenor|bass)", re.I)
 
 
 class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
@@ -80,7 +80,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       author = ';  '.join( _(k.title())+": "+v for k,v in self.pres.author.iteritems() if v )
       if author:
         jn.append(author)
-      if hasattr(self.pres, "copyright"):
+      if hasattr(self.pres, "copyright") and len(self.pres.copyright):
         jn.append(u"Copyright \xA9 %s" % self.pres.copyright)
       if config['general.ccli']:
         jn.append("CCLI# %s" % config['general.ccli'])
