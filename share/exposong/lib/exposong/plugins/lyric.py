@@ -39,7 +39,7 @@ information = {
 }
 type_icon = gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH,'lyric.png'))
 
-title_re = re.compile("(chorus|refrain|verse|bridge|ending|soprano|alto|tenor|bass)", re.I)
+title_re = re.compile("(chorus|refrain|verse|bridge|end(ing)?|soprano|alto|tenor|bass)\\b", re.I)
 
 
 class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
