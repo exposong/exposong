@@ -21,6 +21,7 @@ import mimetypes
 import shutil
 
 from exposong import DATA_PATH
+from exposong.glob import *
 import exposong.prefs
 import exposong.screen
 import exposong.application
@@ -150,9 +151,10 @@ class BGSelect (gtk.VBox):
     if dlg.run() == gtk.RESPONSE_ACCEPT:
       img = dlg.get_filename()
       dlg.hide()
-      shutil.copyfile(img, os.path.join(DATA_PATH, 'bg', img.rpartition('/')[2]))
-      itr = self.imgmodel.append([img,
-          gtk.gdk.pixbuf_new_from_file_at_size(img, thsz[0], thsz[1])])
+      newimg = find_freefile(os.path.join(DATA_PATH, 'bg', os.path.split(img)[1]))
+      shutil.copyfile(img, newimg)
+      itr = self.imgmodel.append([newimg,
+          gtk.gdk.pixbuf_new_from_file_at_size(newimg, thsz[0], thsz[1])])
       self.imgcombo.set_active_iter(itr)
     else:
       dlg.hide()

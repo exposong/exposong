@@ -92,7 +92,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
         self.rotate = get_rotate_const("n") #TODO Make this possible
       
       if not os.path.isabs(self.image):
-        self.image = DATA_PATH + '/image/' + self.image
+        self.image = os.path.join(DATA_PATH, 'image', self.image)
       if not os.path.isfile(self.image):
         raise ImageNotFoundError(self.image)
     
@@ -117,7 +117,10 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       
       # <img src='..' rotate='n|cw|ccw|ud' />
       img = document.createElement("img")
-      img.setAttribute("src", self.image)
+      if os.path.split(self.image)[0] == os.path.join(DATA_PATH,'image'):
+        img.setAttribute("src", os.path.split(self.image)[1])
+      else:
+        img.setAttribute("src", self.image)
       img.setAttribute("rotate", get_rotate_str(self.rotate))
       node.appendChild(img)
     

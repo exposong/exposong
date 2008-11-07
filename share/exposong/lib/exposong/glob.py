@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import re
 import os
+import os.path
 
 """
 Some basic functions that are useful.
@@ -57,12 +58,21 @@ def check_filename(title, directory, filename = None):
   if not isinstance(filename, str) or not re.match(match, filename):
     if(filename):
       os.remove(os.path.join(directory, filename))
-    filename = tfile + ".xml"
-    index = 0
-    while os.path.exists(os.path.join(directory, filename)):
-      index -= 1
-      filename = tfile + str(index) + ".xml"
+    filename = find_freefile(tfile+".xml")
   return filename
+
+def find_freefile(fl):
+	fl = fl.rpartition(".")
+	fl = [fl[0], "", "."+fl[2]]
+	if fl[0] == "":
+		fl = [fl[2][1:], "", ""]
+		print 2
+	while os.path.exists("".join(fl)):
+		try:
+			fl[1] = str(int(fl[1])-1)
+		except ValueError:
+			fl[1] = "-1"
+	return "".join(fl)
 
 #TODO Have the ability to list multiple directories with one function call to
 # allow the user to have data in more than one place.
