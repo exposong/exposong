@@ -381,6 +381,7 @@ class Main (gtk.Window):
     resp = dialog.run()
     dialog.hide()
     if resp == gtk.RESPONSE_YES:
+      item.on_delete()
       schmod = schedlist.schedlist.get_model()
       
       #Remove from builtin modules

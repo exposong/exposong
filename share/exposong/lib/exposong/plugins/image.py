@@ -22,6 +22,7 @@ import xml.dom
 import xml.dom.minidom
 import pango
 import gobject
+import shutil
 
 from exposong.glob import *
 from exposong import RESOURCE_PATH, DATA_PATH
@@ -93,6 +94,10 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       
       if not os.path.isabs(self.image):
         self.image = os.path.join(DATA_PATH, 'image', self.image)
+      elif not self.image.startswith(os.path.join(DATA_PATH, 'image')):
+        newimg = os.path.join(DATA_PATH, 'image', os.path.split(self.image)[1])
+        shutil.copyfile(self.image, newimg)
+        self.image = newimg
       if not os.path.isfile(self.image):
         raise ImageNotFoundError(self.image)
     
@@ -117,10 +122,10 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       
       # <img src='..' rotate='n|cw|ccw|ud' />
       img = document.createElement("img")
-      if os.path.split(self.image)[0] == os.path.join(DATA_PATH,'image'):
-        img.setAttribute("src", os.path.split(self.image)[1])
-      else:
-        img.setAttribute("src", self.image)
+      #if os.path.split(self.image)[0] == os.path.join(DATA_PATH,'image'):
+      img.setAttribute("src", os.path.split(self.image)[1])
+      #else:
+      #  img.setAttribute("src", self.image)
       img.setAttribute("rotate", get_rotate_str(self.rotate))
       node.appendChild(img)
     
@@ -259,7 +264,14 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     'Remove an image from the presentation.'
     (model, s_iter) = treeview.get_selection().get_selected()
     if s_iter:
+      if model.get_value(s_iter, 0).startswith(DATA_PATH):
+        os.remove(model.get_value(s_iter, 0))
       model.remove(s_iter)
+  
+  def on_delete(self):
+    'Called when the presentation is deleted.'
+    for sl in self.slides:
+      os.remove(sl.image)
   
   @staticmethod
   def get_type():

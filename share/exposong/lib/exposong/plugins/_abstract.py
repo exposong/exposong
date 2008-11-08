@@ -285,6 +285,10 @@ class Presentation:
         if sched:
           sched.append(pres)
         itr = model.iter_next(itr)
+  
+  def on_delete(self):
+    'Called when the presentation is deleted.'
+    pass
 
 
 class Menu:
