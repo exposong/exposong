@@ -53,6 +53,8 @@ class ExportImport(Plugin, _abstract.Menu):
     sched = schedlist.schedlist.get_active_item()
     if not sched:
       return False
+    if not sched.filename:
+      sched.save()
     dlg = gtk.FileChooserDialog("Export Schedule", exposong.application.main,
         gtk.FILE_CHOOSER_ACTION_SAVE, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
