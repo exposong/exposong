@@ -62,17 +62,23 @@ def check_filename(title, directory, filename = None):
   return filename
 
 def find_freefile(fl):
-	fl = fl.rpartition(".")
-	fl = [fl[0], "", "."+fl[2]]
-	if fl[0] == "":
-		fl = [fl[2][1:], "", ""]
-		print 2
-	while os.path.exists("".join(fl)):
-		try:
-			fl[1] = str(int(fl[1])-1)
-		except ValueError:
-			fl[1] = "-1"
-	return "".join(fl)
+  """Find an open filename.
+  
+  This makes sure the file doesn't exist, and if it does, add a -1, or -2,
+  until the file won't overwrite an existing file. Needs changes to work with
+  extensions such as ".tar.gz" which have multiple periods."""
+  fl = fl.rpartition(".")
+  fl = [fl[0], "", "."+fl[2]]
+  if fl[0] == "":
+    #If there's not a dot, just add a number to the end.
+    fl = [fl[2][1:], "", ""]
+  while os.path.exists("".join(fl)):
+    try:
+      fl[1] = str(int(fl[1])-1)
+    except ValueError:
+      #The first time, it will be an empty string, so set it manually.
+      fl[1] = "-1"
+  return "".join(fl)
 
 #TODO Have the ability to list multiple directories with one function call to
 # allow the user to have data in more than one place.

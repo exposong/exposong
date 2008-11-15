@@ -17,8 +17,9 @@
 import gtk
 from exposong.plugins import _abstract, Plugin
 from exposong import DATA_PATH, schedlist
+from exposong.glob import *
 import exposong.application
-import tarfile, os
+import tarfile, tempfile, os, os.path, shutil
 
 """
 Adds functionality to move schedules, or a full library to another exposong
@@ -121,8 +122,65 @@ class ExportImport(Plugin, _abstract.Menu):
         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
     dlg.add_filter(_FILTER)
     if dlg.run() == gtk.RESPONSE_ACCEPT:
-      fname = dlg.get_filename()
-      print fname
+      tar = tarfile.open(dlg.get_filename(), "r:gz")
+      # Make a temporary directory so that no files are overwritten.
+      tmpdir = tempfile.mkdtemp(
+          dlg.get_filename().rpartition(os.sep)[2].partition(".")[0])
+      tar.extractall(tmpdir)
+      tar.close()
+      # TODO: On renaming a presentation, it needs to be updated in a
+      # schedule. Do it for images in presentations as well.
+      if os.path.isdir(os.path.join(tmpdir, "image")):
+        imgs2rename = []
+        for nm in os.listdir(tmpdir):
+          if not os.path.exists(os.path.join(DATA_PATH, "image", nm)):
+            os.rename(os.path.join(tmpdir, "image", nm),
+                os.path.join(DATA_PATH, "image", nm))
+          else:
+            nm2 = find_freefile(os.path.join(DATA_PATH, "image", nm))
+            os.rename(os.path.join(tmpdir, "image", nm), 
+                os.path.join(DATA_PATH, "image", nm2))
+            imgs2rename.append( (nm,nm2) )
+      if os.path.isdir(os.path.join(tmpdir, "pres")):
+        pres2rename = []
+        for nm in os.listdir(tmpdir):
+          #TODO Replace image names
+          if not os.path.exists(os.path.join(DATA_PATH, "pres", nm)):
+            os.rename(os.path.join(tmpdir, "pres", nm),
+                os.path.join(DATA_PATH, "pres", nm))
+          else:
+            nm2 = find_freefile(os.path.join(DATA_PATH, "pres", nm))
+            os.rename(os.path.join(tmpdir, "pres", nm), 
+                os.path.join(DATA_PATH, "pres", nm2))
+            pres2rename.append( (nm,nm2) )
+      if os.path.isdir(os.path.join(tmpdir, "sched")):
+        for nm in os.listdir(tmpdir):
+          #TODO Replace presentation names
+          if not os.path.exists(os.path.join(DATA_PATH, "sched", nm)):
+            os.rename(os.path.join(tmpdir, "sched", nm),
+                os.path.join(DATA_PATH, "sched", nm))
+          else:
+            nm2 = find_freefile(os.path.join(DATA_PATH, "sched", nm))
+            os.rename(os.path.join(tmpdir, "sched", nm),
+                os.path.join(DATA_PATH, "sched", nm2))
+      if os.path.isdir(os.path.join(tmpdir, "bg")):
+        for nm in os.listdir(tmpdir):
+          if not os.path.exists(os.path.join(DATA_PATH, "bg", nm)):
+            os.rename(os.path.join(tmpdir, "bg", nm),
+                os.path.join(DATA_PATH, "bg", nm))
+          else:
+            nm2 = find_freefile(os.path.join(DATA_PATH, "bg", nm))
+            os.rename(os.path.join(tmpdir, "bg", nm),
+                os.path.join(DATA_PATH, "bg", nm2))
+      #for p1 in os.listdir(tmpdir):
+      #  p1abs = os.path.join(tmpdir, p1)
+      #  if os.path.isdir(p1abs):
+      #    for p2 in os.listdir(p1abs):
+      #      flname = find_freefile(os.path.join(DATA_PATH,p1,p2))
+      #      os.rename(os.path.join(tmpdir,p1,p2), flname)
+      #  else:
+      #    print "Error: Not a directory ("+p1abs+")"
+      #shutil.rmtree(tmpdir)
     dlg.hide()
   
   def merge_menu(self, uimanager):
