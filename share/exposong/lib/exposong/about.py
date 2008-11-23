@@ -30,6 +30,7 @@ class About:
     self.dialog.set_version( "0.5" )
     self.dialog.set_copyright(_("Copyright %s") % "2008 Fishhookweb.com")
     self.dialog.set_authors(("Brad Landis","Siegwart Bogatscher", "Alessandro Felici"))
+    self.dialog.set_artists(("Tango (http://tango.freedesktop.org)",))
     if _("Translators Name") is not "Translators Name":
       self.dialog.set_translator_credits(_("Translators Name"))
     self.dialog.set_logo(gtk.gdk.pixbuf_new_from_file(
