@@ -33,7 +33,8 @@ information = {
     'description': __doc__,
     'required': False,
 }
-type_icon = gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH,'text.png'))
+type_icon = gtk.gdk.pixbuf_new_from_file_at_size(
+    join(RESOURCE_PATH,'pres_text.png'), 20, 14)
 
 class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     _abstract.Schedule):
@@ -98,7 +99,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     'Merge new values with the uimanager.'
     factory = gtk.IconFactory()
     factory.add('exposong-text',gtk.IconSet(gtk.gdk.pixbuf_new_from_file(
-        join(RESOURCE_PATH,'text.png'))))
+        join(RESOURCE_PATH,'pres_text.png'))))
     factory.add_default()
     gtk.stock_add([("exposong-text",_("_Text"), gtk.gdk.MOD1_MASK, 
         0, "pymserv")])

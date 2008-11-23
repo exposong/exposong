@@ -37,7 +37,8 @@ information = {
     'description': __doc__,
     'required': False,
 }
-type_icon = gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH,'lyric.png'))
+type_icon = gtk.gdk.pixbuf_new_from_file_at_size(
+    join(RESOURCE_PATH,'pres_lyric.png'), 20, 14)
 
 title_re = re.compile("(chorus|refrain|verse|bridge|end(ing)?|soprano|alto|tenor|bass)\\b", re.I)
 
@@ -241,7 +242,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     'Merge new values with the uimanager.'
     factory = gtk.IconFactory()
     factory.add('exposong-lyric',gtk.IconSet(gtk.gdk.pixbuf_new_from_file(
-        join(RESOURCE_PATH,'lyric.png'))))
+        join(RESOURCE_PATH,'pres_lyric.png'))))
     factory.add_default()
     gtk.stock_add([("exposong-lyric",_("_Lyric"), gtk.gdk.MOD1_MASK, 
         0, "pymserv")])

@@ -38,7 +38,8 @@ information = {
     'description': __doc__,
     'required': False,
 }
-type_icon = gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH,'image.png'))
+type_icon = gtk.gdk.pixbuf_new_from_file_at_size(
+    join(RESOURCE_PATH,'pres_image.png'), 20, 14)
 thsz = (150, 150)
 
 def get_rotate_const(rotate):
@@ -305,7 +306,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     'Merge new values with the uimanager.'
     factory = gtk.IconFactory()
     factory.add('exposong-image',gtk.IconSet(gtk.gdk.pixbuf_new_from_file(
-        join(RESOURCE_PATH,'image.png'))))
+        join(RESOURCE_PATH,'pres_image.png'))))
     factory.add_default()
     gtk.stock_add([("exposong-image",_("_Image"), gtk.gdk.MOD1_MASK, 
         0, "pymserv")])
