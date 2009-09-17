@@ -1,14 +1,18 @@
-+------------------------------------+
-| ExpoSong                           |
-| Version 0.5                        |
-| Copyright (C) 2008 Fishhookweb.com |
-+------------------------------------+
++-----------------------------------------+
+| ExpoSong                                |
+| Version 0.6                             |
+| Copyright (C) 2008-2009 Fishhookweb.com |
++-----------------------------------------+
 
 = About =
 
-ExpoSong is a worship presentation software. Features include, image, lyric, and
-text presentations, image, gradient backgrounds, schedules, on-screen
-notifications, show logo, and more. 
+ExpoSong is a worship presentation software. Features include:
+ * Image, lyric, and text presentations,
+ * Images and gradient backgrounds,
+ * Schedules,
+ * On-screen notifications,
+ * Logo and black screen,
+ * Importing and Exporting Schedules and Full Libraries.
 
 Find out more at http://exposong.org, and http://exposong.googlecode.com .
 

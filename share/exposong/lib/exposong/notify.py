@@ -10,6 +10,8 @@ class Notify(gtk.HBox):
     self.notify.set_width_chars(15) #Prevent it from expanding wider than the preview
     self.notify.set_tooltip_text("Notification Text")
     self.notify.connect("activate", self._on_activate)
+    self.notify.connect("focus-in-event", self._on_focus)
+    self.notify.connect("focus-out-event", self._on_blur)
     self.pack_start(self.notify, True, True, 0)
     
     notify_clear = gtk.Button()
@@ -38,6 +40,16 @@ class Notify(gtk.HBox):
   def _on_activate(self, *args):
     'The user clicked enter on the entry.'
     self._on_save()
+
+  def _on_focus(self, *args):
+    app = exposong.application
+    for k in app.keys_to_disable:
+      app.main.main_actions.get_action(k).disconnect_accelerator()
+  
+  def _on_blur(self, *args):
+    app = exposong.application
+    for k in app.keys_to_disable:
+      app.main.main_actions.get_action(k).connect_accelerator()
 
 notify = Notify()
 

@@ -31,6 +31,7 @@ import exposong.plugins, exposong.plugins._abstract
 import exposong.bgselect, exposong.notify
 
 main = None
+keys_to_disable = ("Present","Hide","Background","Black Screen")
 
 DRAGDROP_SCHEDULE = [("text/treeview-path", 0,0)]
 
@@ -191,15 +192,15 @@ class Main (gtk.Window):
             slidelist.slidelist.next_slide),
         ('pres-next', None, _("Previous Presentation"), "<Ctrl><Shift>Right",
             None, preslist.preslist.next_pres),
-        ('Present', gtk.STOCK_FULLSCREEN, _('_Present'), "<Ctrl>p", None,
+        ('Present', gtk.STOCK_FULLSCREEN, _('_Present'), "p", None,
             screen.screen.show),
-        ('Background', gtk.STOCK_CLEAR, _('_Background'), "<Ctrl>b", None,
+        ('Background', gtk.STOCK_CLEAR, _('_Background'), "b", None,
             screen.screen.to_background),
         ('Logo', None, _('Lo_go'), "<Ctrl>g", None,
             screen.screen.to_logo),
-        ('Black Screen', None, _('Blac_k Screen'), "<Ctrl>k", None,
+        ('Black Screen', None, _('Blac_k Screen'), "k", None,
             screen.screen.to_black),
-        ('Hide', gtk.STOCK_CLOSE, _('Hi_de'), "<Ctrl>h", None,
+        ('Hide', gtk.STOCK_CLOSE, _('Hi_de'), "h", None,
             screen.screen.hide),
         ('HelpContents', gtk.STOCK_HELP, None, None, None, self._show_help),
         ('About', gtk.STOCK_ABOUT, None, None, None, self._on_about)])
