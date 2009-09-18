@@ -91,7 +91,8 @@ class ExportImport(Plugin, _abstract.Menu):
     dlg.set_do_overwrite_confirmation(True)
     dlg.set_current_name("exposong_library.expo")
     if dlg.run() == gtk.RESPONSE_ACCEPT:
-      exposong.application.main._save_schedules() #Make sure schedules are up to date.
+      #Make sure schedules are up to date.
+      exposong.application.main._save_schedules() 
       oldpath = os.getcwd()
       os.chdir(DATA_PATH)
       fname = dlg.get_filename()
@@ -128,41 +129,72 @@ class ExportImport(Plugin, _abstract.Menu):
           dlg.get_filename().rpartition(os.sep)[2].partition(".")[0])
       tar.extractall(tmpdir)
       tar.close()
-      # TODO: On renaming a presentation, it needs to be updated in a
-      # schedule. Do it for images in presentations as well.
       if os.path.isdir(os.path.join(tmpdir, "image")):
         imgs2rename = []
-        for nm in os.listdir(tmpdir):
+        for nm in os.listdir(os.path.join(tmpdir,"image")):
           if not os.path.exists(os.path.join(DATA_PATH, "image", nm)):
+            print os.path.join(DATA_PATH, "image", nm)
             os.rename(os.path.join(tmpdir, "image", nm),
                 os.path.join(DATA_PATH, "image", nm))
           else:
             nm2 = find_freefile(os.path.join(DATA_PATH, "image", nm))
             os.rename(os.path.join(tmpdir, "image", nm), 
                 os.path.join(DATA_PATH, "image", nm2))
-            imgs2rename.append( (nm,nm2) )
+            imgs2rename.append( (nm,nm2.rpartition(os.sep)[2]) )
+
       if os.path.isdir(os.path.join(tmpdir, "pres")):
         pres2rename = []
-        for nm in os.listdir(tmpdir):
-          #TODO Replace image names
+        for nm in os.listdir(os.path.join(tmpdir,"pres")):
+          # Rename Images
+          if len(imgs2rename) > 0:
+            infl = open(os.path.join(tmpdir,"pres",nm),"r")
+            outfl = open(os.path.join(tmpdir,"pres",nm+".1"),"w")
+            for ln in infl:
+              for img in imgs2rename:
+                ln = re.subn(r"\b"+img[0]+r"\b",img[1],ln)[0]
+              outfl.write(ln)
+            infl.close()
+            outfl.close()
+            os.rename(os.path.join(tmpdir,"pres",nm+".1"),
+                os.path.join(tmpdir,"pres",nm))
           if not os.path.exists(os.path.join(DATA_PATH, "pres", nm)):
             os.rename(os.path.join(tmpdir, "pres", nm),
                 os.path.join(DATA_PATH, "pres", nm))
+            exposong.application.main.load_pres(nm)
           else:
-            nm2 = find_freefile(os.path.join(DATA_PATH, "pres", nm))
+            nm2 = find_freefile(os.path.join(DATA_PATH, "pres", nm)) \
+                .rpartition(os.sep)[2]
             os.rename(os.path.join(tmpdir, "pres", nm), 
                 os.path.join(DATA_PATH, "pres", nm2))
+            exposong.application.main.load_pres(nm2)
             pres2rename.append( (nm,nm2) )
+
       if os.path.isdir(os.path.join(tmpdir, "sched")):
-        for nm in os.listdir(tmpdir):
-          #TODO Replace presentation names
+        for nm in os.listdir(os.path.join(tmpdir,"sched")):
+          # Rename presentations
+          if len(pres2rename) > 0:
+            infl = open(os.path.join(tmpdir,"sched",nm),"r")
+            outfl = open(os.path.join(tmpdir,"sched",nm+".1"),"w")
+            for ln in infl:
+              for pres in pres2rename:
+                ln = re.subn(r"\b"+pres[0]+r"\b",pres[1],ln)[0]
+              outfl.write(ln)
+            infl.close()
+            outfl.close()
+            os.rename(os.path.join(tmpdir,"sched",nm+".1"),
+                os.path.join(tmpdir,"sched",nm))
+
           if not os.path.exists(os.path.join(DATA_PATH, "sched", nm)):
             os.rename(os.path.join(tmpdir, "sched", nm),
                 os.path.join(DATA_PATH, "sched", nm))
+            exposong.application.main.load_sched(nm)
           else:
-            nm2 = find_freefile(os.path.join(DATA_PATH, "sched", nm))
+            nm2 = find_freefile(os.path.join(DATA_PATH, "sched", nm)) \
+                .rpartition(os.sep)[2]
             os.rename(os.path.join(tmpdir, "sched", nm),
                 os.path.join(DATA_PATH, "sched", nm2))
+            exposong.application.main.load_sched(nm2)
+
       if os.path.isdir(os.path.join(tmpdir, "bg")):
         for nm in os.listdir(tmpdir):
           if not os.path.exists(os.path.join(DATA_PATH, "bg", nm)):

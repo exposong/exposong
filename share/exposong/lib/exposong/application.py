@@ -148,13 +148,16 @@ class Main (gtk.Window):
     ## Status bar
     self.status_bar = gtk.Statusbar()
     win_v.pack_end(self.status_bar, False)
-    
-    task = self.build_schedule()
-    gobject.idle_add(task.next)
-    
+
+    self.build_all()
+
     self.add(win_v)
     self.show_all()
   
+  def build_all(self):
+    task = self.build_schedule()
+    gobject.idle_add(task.next)
+    
   def _create_menu(self):
     'Set up the menus and popup menus.'
     uimanager = gtk.UIManager()
@@ -276,33 +279,60 @@ class Main (gtk.Window):
     
     return menu
   
+  def load_pres(self,filenm):
+    'Load a single presentation.'
+    directory = join(DATA_PATH, "pres")
+    pres = None
+    try:
+      dom = minidom.parse(join(directory,filenm))
+    except Exception, details:
+      print "Error reading presentation file (%s): %s" % (filenm, details)
+    else:
+      root_elem = dom.documentElement
+      if root_elem.tagName == "presentation" and root_elem.hasAttribute("type"):
+        filetype = root_elem.getAttribute("type")
+        plugins = exposong.plugins.get_plugins_by_capability(
+            exposong.plugins._abstract.Presentation)
+        for plugin in plugins:
+          if str(filetype) == plugin.get_type():
+            pres = plugin(dom.documentElement, filenm)
+            self.library.append(pres)
+            break
+      else:
+        print "%s is not a presentation file." % filenm
+      dom.unlink()
+      del dom
+    
   def build_pres_list(self):
     'Load presentations and add them to self.library.'
     directory = join(DATA_PATH, "pres")
     dir_list = os.listdir(directory)
     for filenm in dir_list:
       if filenm.endswith(".xml"):
-        try:
-          dom = minidom.parse(join(directory,filenm))
-        except Exception, details:
-          print "Error reading presentation file (%s): %s" % (filenm, details)
-        else:
-          root_elem = dom.documentElement
-          if root_elem.tagName == "presentation" and root_elem.hasAttribute("type"):
-            filetype = root_elem.getAttribute("type")
-            plugins = exposong.plugins.get_plugins_by_capability(exposong.plugins._abstract.Presentation)
-            for plugin in plugins:
-              if str(filetype) == plugin.get_type():
-                pres = plugin(dom.documentElement, filenm)
-                self.library.append(pres)
-                break
-          else:
-            print "%s is not a presentation file." % filenm
-          dom.unlink()
-          del dom
+        self.load_pres(filenm)
         yield True
     yield False
   
+  def load_sched(self, filenm):
+    'Load a single schedule.'
+    directory = join(DATA_PATH, "sched")
+    dom = None
+    sched = None
+    try:
+      dom = minidom.parse(os.path.join(directory,filenm))
+    except Exception, details:
+      print "Error reading schedule file (%s): %s" % (os.path.join(directory,filenm), details)
+    if dom:
+      if dom.documentElement.tagName == "schedule":
+        sched = Schedule(filename=filenm)
+        sched.load(dom.documentElement, self.library)
+        schedlist.schedlist.append(schedlist.schedlist.custom_schedules, sched)
+      else:
+        print "%s is not a schedule file." % os.path.join(directory,filenm)
+      dom.unlink()
+      del dom
+    return sched
+
   def build_schedule(self):
     'Add items to the schedule list.'
     #Initialize the Library
@@ -335,21 +365,8 @@ class Main (gtk.Window):
     dir_list = os.listdir(directory)
     for filenm in dir_list:
       if filenm.endswith(".xml"):
-        dom = None
-        try:
-          dom = minidom.parse(directory+"/"+filenm)
-        except Exception, details:
-          print "Error reading schedule file (%s): %s" % (filenm, details)
-        if dom:
-          if dom.documentElement.tagName == "schedule":
-            schedule = Schedule(filename=filenm)
-            schedule.load(dom.documentElement, self.library)
-            schedlist.schedlist.append(schedlist.schedlist.custom_schedules, schedule)
-          else:
-            print "%s is not a schedule file." % filenm
-          dom.unlink()
-          del dom
-      yield True
+        self.load_sched(filenm)
+        yield True
     schedlist.schedlist.expand_all()
     yield False
   

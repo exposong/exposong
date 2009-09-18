@@ -18,6 +18,7 @@ import gtk
 import gtk.gdk
 import gobject
 import xml.dom
+from xml.dom import minidom
 from glob import *
 from os.path import join
 
@@ -142,7 +143,6 @@ class Schedule(gtk.ListStore):
       if item.filename == filename:
         return item.presentation
       itr = self.iter_next(itr)
-
 
 class ScheduleItem:
   '''
