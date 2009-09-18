@@ -9,7 +9,6 @@
 == 0.6 ==
 
  * Presentations can now be searched.
- * Disable menu items that can't be used.
  * Slide timers make the slides move forward automatically. (Only one time for
    now)
  * You can import and export both schedules, or the whole library.
