@@ -22,6 +22,7 @@ import random
 import exposong.screen
 
 slidelist = None #will hold instance of SlideList
+slide_scroll = None
 
 class SlideList(gtk.TreeView):
   '''

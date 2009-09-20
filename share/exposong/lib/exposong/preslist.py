@@ -115,6 +115,7 @@ class PresList(gtk.TreeView):
       exposong.slidelist.slidelist.set_presentation(self.get_active_item().presentation)
     else:
       exposong.slidelist.slidelist.set_presentation(None)
+    exposong.slidelist.slide_scroll.get_vadjustment().set_value(0)
     #TODO This is not working, may need to change the signal
     exposong.application.main.main_actions.get_action("pres-edit")\
         .set_sensitive(self.has_selection())

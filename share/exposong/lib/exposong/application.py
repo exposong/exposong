@@ -102,10 +102,11 @@ class Main (gtk.Window):
     ### Main right area
     win_rt = gtk.VBox()
     #### Slide List
-    slide_scroll = gtk.ScrolledWindow()
-    slide_scroll.add(slidelist.slidelist)
-    slide_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-    win_rt.pack_start(slide_scroll)
+    slidelist.slide_scroll = gtk.ScrolledWindow()
+    slidelist.slide_scroll.add(slidelist.slidelist)
+    slidelist.slide_scroll.set_policy(gtk.POLICY_AUTOMATIC,
+        gtk.POLICY_AUTOMATIC)
+    win_rt.pack_start(slidelist.slide_scroll)
     
     #### Preview and Presentation Buttons
     win_rt_btm = gtk.HBox()
