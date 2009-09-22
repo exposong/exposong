@@ -152,7 +152,8 @@ class PrefsDialog(gtk.Dialog):
       config['pres.notify_bg'] = (ntfc.red, ntfc.green, ntfc.blue)
       
       exposong.screen.screen.set_dirty()
-      del exposong.screen.screen._logo_pbuf
+      if hasattr(self,"_logo_pbuf"):
+        del exposong.screen.screen._logo_pbuf
       exposong.screen.screen.draw()
     
     self.hide()
