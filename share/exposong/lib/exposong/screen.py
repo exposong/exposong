@@ -182,12 +182,15 @@ class Screen:
       try:
         if self.bg_dirty or bgkey not in self.bg_img:
           pixbuf = gtk.gdk.pixbuf_new_from_file(bg)
-          self.bg_img[bgkey] = pixbuf.scale_simple(bounds[0], bounds[1], gtk.gdk.INTERP_BILINEAR)
+          self.bg_img[bgkey] = pixbuf.scale_simple(bounds[0], bounds[1],
+              gtk.gdk.INTERP_BILINEAR)
       except gobject.GError:
         print "Error: Could not open background file."
-        if hasattr(self, 'bg_img'):
+        if hasattr(self, 'bg_img') and bgkey in self.bg_img:
           del self.bg_img[bgkey]
         bg = (0,0,0)
+        #Set back to the default
+        exposong.prefs.config['pres.bg'] = ((0, 13107, 19660), (0, 26214, 39321))
       else:
         ccontext.set_source_pixbuf(self.bg_img[bgkey], 0, 0)
         ccontext.paint()
@@ -246,7 +249,8 @@ class Screen:
     
     slide = exposong.slidelist.slidelist.get_active_item()
     
-    if widget is self.pres and (self._background or self._black or self._logo) or not slide:
+    if widget is self.pres and (self._background or self._black or self._logo) \
+        or not slide:
       #When there's no text to render, just draw the background
       self._set_background(widget, ccontext, (screenW, screenH))
     else:
@@ -270,8 +274,8 @@ class Screen:
         layout.set_width(int(screenW*pango.SCALE * 0.97))
         
         attrs = pango.AttrList()
-        attrs.insert(pango.AttrFontDesc(pango.FontDescription("Sans Bold "+str(int(screenH/54.0))),
-            end_index = len(ftext)+40))
+        attrs.insert(pango.AttrFontDesc(pango.FontDescription("Sans Bold "+
+            str(int(screenH/54.0))), end_index = len(ftext)+40))
         layout.set_attributes(attrs)
         
         footer_height = layout.get_pixel_size()[1]
