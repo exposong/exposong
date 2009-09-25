@@ -41,6 +41,9 @@ class ScheduleList(gtk.TreeView):
     
     sched_rend = gtk.CellRendererText()
     column = gtk.TreeViewColumn( _("Schedule"), sched_rend, text=1)
+    sched_rend.connect("editing-started", exposong.application.main.disable_shortcuts)
+    sched_rend.connect("editing-canceled", exposong.application.main.enable_shortcuts)
+    sched_rend.connect("edited", exposong.application.main.enable_shortcuts)
     sched_rend.connect("edited", self._rename_schedule)
     column.set_resizable(False)
     column.set_cell_data_func(sched_rend, self._cell_data_func)
@@ -51,7 +54,7 @@ class ScheduleList(gtk.TreeView):
     self.connect("drag-drop", self._on_pres_drop)
     self.connect("drag-data-received", self._on_sched_drag_received)
     self.set_drag_dest_row((1,), gtk.TREE_VIEW_DROP_INTO_OR_BEFORE)
-  
+
   def append(self, parent, row, sort = None):
     'Add an item to the list.'
     if isinstance(row, exposong.schedule.Schedule):

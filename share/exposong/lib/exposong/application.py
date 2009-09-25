@@ -121,6 +121,7 @@ class Main (gtk.Window):
     prev_aspect.add(pres_prev)
     prev_box.pack_start(prev_aspect, True, False, 0)
     
+    exposong.notify.notify = exposong.notify.Notify()
     prev_box.pack_start(exposong.notify.notify, True, False, 0)
     win_rt_btm.pack_start(prev_box, True, False, 10)
     
@@ -440,6 +441,16 @@ class Main (gtk.Window):
       model.get_value(sched, 0).save()
       sched = model.iter_next(sched)
   
+  def disable_shortcuts(self, *args):
+    'Disables keyboard shortcuts to allow typing.'
+    for k in keys_to_disable:
+      self.main_actions.get_action(k).disconnect_accelerator()
+
+  def enable_shortcuts(self, *args):
+    'Enables keyboard shortcuts after disabling.'
+    for k in keys_to_disable:
+      self.main_actions.get_action(k).connect_accelerator()
+
   def _quit(self, *args):
     'Cleans up and exits the program.'
     self._save_schedules()

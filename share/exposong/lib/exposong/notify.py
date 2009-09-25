@@ -1,6 +1,21 @@
 #! /usr/bin/env python
+#
+# Copyright (C) 2008 Fishhookweb.com
+#
+# ExpoSong is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import gtk
-import exposong.screen
+import exposong.screen, exposong.application
 
 class Notify(gtk.HBox):
   def __init__(self):
@@ -10,8 +25,8 @@ class Notify(gtk.HBox):
     self.notify.set_width_chars(15) #Prevent it from expanding wider than the preview
     self.notify.set_tooltip_text("Notification Text")
     self.notify.connect("activate", self._on_activate)
-    self.notify.connect("focus-in-event", self._on_focus)
-    self.notify.connect("focus-out-event", self._on_blur)
+    self.notify.connect("focus-in-event", exposong.application.main.disable_shortcuts)
+    self.notify.connect("focus-out-event", exposong.application.main.enable_shortcuts)
     self.pack_start(self.notify, True, True, 0)
     
     notify_clear = gtk.Button()
@@ -41,15 +56,6 @@ class Notify(gtk.HBox):
     'The user clicked enter on the entry.'
     self._on_save()
 
-  def _on_focus(self, *args):
-    app = exposong.application
-    for k in app.keys_to_disable:
-      app.main.main_actions.get_action(k).disconnect_accelerator()
-  
-  def _on_blur(self, *args):
-    app = exposong.application
-    for k in app.keys_to_disable:
-      app.main.main_actions.get_action(k).connect_accelerator()
-
-notify = Notify()
+#notify = Notify()
+notify = None
 

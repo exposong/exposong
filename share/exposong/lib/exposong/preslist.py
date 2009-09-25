@@ -189,8 +189,8 @@ class PresFilter(gtk.HBox):
     self.search = gtk.Entry(50)
     self.search.set_width_chars(12)
     self.search.connect("activate", self._filter)
-    self.search.connect("focus-in-event", self._on_focus)
-    self.search.connect("focus-out-event", self._on_blur)
+    self.search.connect("focus-in-event", exposong.application.main.disable_shortcuts)
+    self.search.connect("focus-out-event", exposong.application.main.enable_shortcuts)
     self.pack_start(self.search, True, True, 0)
     
     go = gtk.Button()
@@ -209,16 +209,6 @@ class PresFilter(gtk.HBox):
       filt = preslist.get_model().filter_new()
       filt.set_visible_func(self._visible_func)
       preslist.set_model(filt)
-
-  def _on_focus(self, *args):
-    app = exposong.application
-    for k in app.keys_to_disable:
-      app.main.main_actions.get_action(k).disconnect_accelerator()
-  
-  def _on_blur(self, *args):
-    app = exposong.application
-    for k in app.keys_to_disable:
-      app.main.main_actions.get_action(k).connect_accelerator()
 
   def _visible_func(self, model, itr):
     'Tests the row for visibility.'
