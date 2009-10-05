@@ -94,7 +94,7 @@ class Main (gtk.Window):
     pres_list_scroll.add(preslist.preslist)
     pres_list_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
     pres1.pack_start(pres_list_scroll, True, True)
-    pres1.pack_start(preslist.presfilter, True, False)
+    pres1.pack_start(preslist.presfilter, False, True, 2)
     win_lft.pack2(pres1, True, True)
     
     win_h.pack1(win_lft, False, False)
