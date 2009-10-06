@@ -1,12 +1,16 @@
-<!ELEMENT presentation (title, author*, copyright?, comments?, slide+) >
-<!ELEMENT title (#PCDATA) >
-<!ELEMENT author (#PCDATA) >
-<!ELEMENT copyright (#PCDATA) >
-<!ELEMENT comments (#PCDATA) >
-<!ELEMENT slide (#PCDATA) >
+<!ELEMENT presentation (title, author*, copyright?, order?, comments?, slide+) >
+<!ELEMENT title CDATA >
+<!ELEMENT author CDATA >
+<!ELEMENT copyright CDATA >
+<!ELEMENT order CDATA >
+<!ELEMENT comments CDATA >
+<!ELEMENT slide (#PCDATA|img) >
+<!ELEMENT img EMPTY >
 
 <!ATTLIST presentation type CDATA "generic" >
 <!ATTLIST presentation created CDATA #REQUIRED >
 <!ATTLIST presentation modified CDATA #REQUIRED >
 <!ATTLIST author type (words|music|both) "both" >
 <!ATTLIST slide title CDATA #IMPLIED >
+<!ATTLIST img src CDATA #REQUIRED >
+<!ATTLIST img rotate (n|ccw|cw|ud) "n" >

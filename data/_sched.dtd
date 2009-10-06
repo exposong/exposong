@@ -1,8 +1,11 @@
-<!ELEMENT schedule (title, presentation) >
-<!ELEMENT title (#PCDATA) >
-<!ELEMENT presentation (file, comments?) >
-<!ELEMENT file (#PCDATA) >
-<!ELEMENT comments (#PCDATA) >
+<!ELEMENT schedule (title, presentation*) >
+<!ELEMENT title CDATA >
+<!ELEMENT presentation (file?, bible?, comments?) >
+<!ELEMENT file CDATA >
+<!ELEMENT bible (verse+) >
+<!ELEMENT verse CDATA >
+<!ELEMENT comments CDATA >
 
+<!ATTLIST bible version CDATA #REQUIRED >
 <!ATTLIST schedule created CDATA #REQUIRED >
 <!ATTLIST schedule modified CDATA #REQUIRED >
