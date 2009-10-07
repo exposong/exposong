@@ -219,10 +219,10 @@ class Main (gtk.Window):
     uimanager.add_ui_from_string('''
         <menubar name="MenuBar">
           <menu action="File">
-            <menuitem action="Quit" />
+            <menuitem action="Quit" position="bot" />
           </menu>
           <menu action="Edit">
-            <menuitem action="Preferences" />
+            <menuitem action="Preferences" position="bot" />
           </menu>
           <menu action="Schedule">
             <menuitem action='sched-new' />
@@ -234,19 +234,17 @@ class Main (gtk.Window):
             <menuitem action="pres-edit" />
             <menuitem action="pres-delete" />
             <menuitem action="pres-delete-from-schedule" />
-            <!--<menuitem action="pres-import" />
-            <menuitem action="pres-export" />-->
             <separator />
-            <menuitem action="Present" />
-            <menuitem action="Background" />
-            <menuitem action="Logo" />
-            <menuitem action="Black Screen" />
-            <menuitem action="Hide" />
+            <menuitem action="Present" position="bot" />
+            <menuitem action="Background" position="bot" />
+            <menuitem action="Logo" position="bot" />
+            <menuitem action="Black Screen" position="bot" />
+            <menuitem action="Hide" position="bot" />
             <separator />
-            <menuitem action="pres-prev" />
-            <menuitem action="pres-slide-prev" />
-            <menuitem action="pres-slide-next" />
-            <menuitem action="pres-next" />
+            <menuitem action="pres-prev" position="bot" />
+            <menuitem action="pres-slide-prev" position="bot" />
+            <menuitem action="pres-slide-next" position="bot" />
+            <menuitem action="pres-next" position="bot" />
           </menu>
           <menu action="Help">
             <menuitem action="HelpContents" />

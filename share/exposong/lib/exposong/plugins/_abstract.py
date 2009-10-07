@@ -139,6 +139,14 @@ class Presentation:
     'Gets the data to add to the presentation list.'
     return (self, self.title)
   
+  def get_order(self):
+    order = []
+    cnt = 0
+    for slide in self.slides:
+      order.append(cnt)
+      cnt += 1
+    return order
+
   def set_text_buffer(self, tbuf):
     'Sets the value of a text buffer.'
     rval = ''

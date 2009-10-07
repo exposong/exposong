@@ -91,7 +91,24 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
   def __init__(self, dom = None, filename = None):
     _abstract.Presentation.__init__(self, dom, filename)
     self.type = 'lyric'
-  
+    self._order = []
+
+    if isinstance(dom, xml.dom.Node):
+      ordernode = dom.getElementsByTagName("order")
+      if len(ordernode) > 0:
+        self._order = get_node_text(ordernode[0]).split()
+        for o in self._order:
+          if o.strip() == "":
+            self._order.remove(o)
+
+  def get_order(self):
+    order = []
+    cnt = 0
+    if len(self._order) > 0:
+      return self._order
+    else:
+      return _abstract.Presentation.get_order(self)
+
   def _edit_tabs(self, notebook):
     'Run the edit dialog for the presentation.'
     vbox = gtk.VBox()
@@ -146,6 +163,17 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     self._fields['copyright'].set_text(self.copyright)
     hbox.pack_start(self._fields['copyright'], True, True, 5)
     vbox.pack_start(hbox, False, True)
+
+    vbox.pack_start(gtk.HSeparator(), False, True)
+
+    hbox = gtk.HBox()
+    label = gtk.Label(_("Order:"))
+    hbox.pack_start(label, False, True, 5)
+    self._fields['order'] = gtk.Entry(50)
+    self._fields['order'].set_text(' '.join(self._order))
+    hbox.pack_start(self._fields['order'], True, True, 5)
+    vbox.pack_start(hbox, False, True)
+
     notebook.append_page(vbox, gtk.Label(_("Information")))
     
     _abstract.Presentation._edit_tabs(self, notebook)
@@ -159,6 +187,11 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     bounds = self._fields['text'].get_buffer().get_bounds()
     sval = self._fields['text'].get_buffer().get_text(bounds[0], bounds[1])
     self.slides = []
+    order = self._fields['order'].get_text().split()
+    for o in order:
+      if o.strip() == "":
+        order.remove(o)
+    self._order = order
     for sl in sval.split("\n\n"):
       self.slides.append(self.Slide(self, sl))
     _abstract.Presentation._edit_save(self)
@@ -185,6 +218,11 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     node.setAttribute('type', 'music')
     node.appendChild(doc.createTextNode(self.author.get('music', '')))
     root.appendChild(node)
+
+    if self._order != "":
+      node = doc.createElement("order")
+      node.appendChild(doc.createTextNode(' '.join(self._order)))
+      root.appendChild(node)
     
     node = doc.createElement("copyright")
     node.appendChild(doc.createTextNode(self.copyright))
