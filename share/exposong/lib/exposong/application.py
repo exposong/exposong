@@ -31,7 +31,7 @@ import exposong.plugins, exposong.plugins._abstract
 import exposong.bgselect, exposong.notify
 
 main = None
-keys_to_disable = ("Present","Hide","Background","Black Screen")
+keys_to_disable = ("Background","Black Screen")
 
 DRAGDROP_SCHEDULE = [("text/treeview-path", 0,0)]
 
@@ -189,23 +189,25 @@ class Main (gtk.Window):
         ('pres-delete-from-schedule', gtk.STOCK_DELETE,
             _("Delete from _Schedule"), None, None,
             preslist.preslist._on_pres_delete_from_schedule),
-        ('pres-prev', None, _("Previous Presentation"), "<Ctrl><Shift>Left",
+        ('pres-prev', None, _("Previous Presentation"), "<Ctrl>Page_Up",
             None, preslist.preslist.prev_pres),
-        ('pres-slide-prev', None, _("Previous Slide"), "<Ctrl>Left", None,
+        ('pres-slide-prev', None, _("Previous Slide"), "Page_Up", None,
             slidelist.slidelist.prev_slide),
-        ('pres-slide-next', None, _("Next Slide"), "<Ctrl>Right", None,
+        ('pres-slide-next', None, _("Next Slide"), "Page_Down", None,
             slidelist.slidelist.next_slide),
-        ('pres-next', None, _("Previous Presentation"), "<Ctrl><Shift>Right",
+        ('pres-next', None, _("Next Presentation"), "<Ctrl>Page_Down",
             None, preslist.preslist.next_pres),
-        ('Present', gtk.STOCK_FULLSCREEN, _('_Present'), "p", None,
+        ('Search', gtk.STOCK_FIND, _('Find Presentation'), "slash",
+            _('Search for a presentation'), preslist.presfilter.focus),
+        ('Present', gtk.STOCK_FULLSCREEN, _('_Present'), "F5", None,
             screen.screen.show),
-        ('Background', gtk.STOCK_CLEAR, _('_Background'), "b", None,
+        ('Background', gtk.STOCK_CLEAR, _('_Background'), "k", None,
             screen.screen.to_background),
         ('Logo', None, _('Lo_go'), "<Ctrl>g", None,
             screen.screen.to_logo),
-        ('Black Screen', None, _('Blac_k Screen'), "k", None,
+        ('Black Screen', None, _('Blac_k Screen'), "b", None,
             screen.screen.to_black),
-        ('Hide', gtk.STOCK_CLOSE, _('Hi_de'), "h", None,
+        ('Hide', gtk.STOCK_CLOSE, _('Hi_de'), "Escape", None,
             screen.screen.hide),
         ('HelpContents', gtk.STOCK_HELP, None, None, None, self._show_help),
         ('About', gtk.STOCK_ABOUT, None, None, None, self._on_about)])
@@ -222,6 +224,8 @@ class Main (gtk.Window):
             <menuitem action="Quit" position="bot" />
           </menu>
           <menu action="Edit">
+            <menuitem action="Search" position="bot" />
+            <separator />
             <menuitem action="Preferences" position="bot" />
           </menu>
           <menu action="Schedule">

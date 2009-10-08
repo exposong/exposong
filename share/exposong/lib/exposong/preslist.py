@@ -204,3 +204,6 @@ class PresFilter(gtk.Entry):
     'Tests the row for visibility.'
     return model.get_value(itr, 0).matches(self.get_text())
 
+  def focus(self, *args):
+    'Sets the focus (for an menu action).'
+    self.grab_focus()
