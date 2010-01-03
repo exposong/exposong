@@ -273,10 +273,7 @@ class Screen:
         layout.set_alignment(pango.ALIGN_CENTER)
         layout.set_width(int(screenW*pango.SCALE * 0.97))
         
-        attrs = pango.AttrList()
-        attrs.insert(pango.AttrFontDesc(pango.FontDescription("Sans Bold "+
-            str(int(screenH/54.0))), end_index = len(ftext)*3))
-        layout.set_attributes(attrs)
+        layout.set_font_description(pango.FontDescription("Sans Bold "+str(int(screenH/54.0))))
         
         footer_height = layout.get_pixel_size()[1]
         
@@ -295,10 +292,7 @@ class Screen:
       layout.set_alignment(pango.ALIGN_CENTER)
       layout.set_width(int(screenW*pango.SCALE * 0.97))
       
-      attrs = pango.AttrList()
-      attrs.insert(pango.AttrFontDesc(pango.FontDescription("Sans Bold "+str(size)) ,
-          end_index = len(str(slide.body_text()))*3))
-      layout.set_attributes(attrs)
+      layout.set_font_description(pango.FontDescription("Sans Bold "+str(size)))
       
       min_sz = 0
       max_sz = int(exposong.prefs.config['pres.max_font_size'])
@@ -321,9 +315,7 @@ class Screen:
             size = size * 2
         else:
           break
-        attrs.insert(pango.AttrFontDesc(pango.FontDescription("Sans Bold "+str(size)),
-          end_index = len(slide.body_text())*3))
-        layout.set_attributes(attrs)
+        layout.set_font_description(pango.FontDescription("Sans Bold "+str(size)))
       
       if exposong.prefs.config['pres.text_shadow']:
         shcol = c2dec(exposong.prefs.config['pres.text_shadow'])
@@ -340,16 +332,11 @@ class Screen:
       layout = ccontext.create_layout()
       layout.set_text(self._notification)
       
-      attrs = pango.AttrList()
       notify_sz = int(screenH/12.0)
-      attrs.insert(pango.AttrFontDesc(pango.FontDescription("Sans Bold "+str(notify_sz)),
-          end_index = len(self._notification)*3))
-      layout.set_attributes(attrs)
+      layout.set_font_description(pango.FontDescription("Sans Bold "+str(notify_sz)))
       while layout.get_pixel_size()[0] > screenW*0.6:
         notify_sz = int(notify_sz*0.89)
-        attrs.insert(pango.AttrFontDesc(pango.FontDescription("Sans Bold "+str(notify_sz)),
-            end_index = len(slide.body_text())*3))
-        layout.set_attributes(attrs)
+        layout.set_font_description(pango.FontDescription("Sans Bold "+str(notify_sz)))
       sbounds = widget.window.get_size()
       nbounds = layout.get_pixel_size()
       pad = notify_sz/14.0
