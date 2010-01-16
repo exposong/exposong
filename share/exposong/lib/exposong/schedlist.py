@@ -48,7 +48,7 @@ class ScheduleList(gtk.TreeView):
     column.set_resizable(False)
     column.set_cell_data_func(sched_rend, self._cell_data_func)
     self.append_column(column)
-    self.connect("cursor-changed", self._on_schedule_activate)
+    self.get_selection().connect("changed", self._on_schedule_activate)
     self.enable_model_drag_dest(exposong.application.DRAGDROP_SCHEDULE,
         gtk.gdk.ACTION_DEFAULT)
     self.connect("drag-drop", self._on_pres_drop)

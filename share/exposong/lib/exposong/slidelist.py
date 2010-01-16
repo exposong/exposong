@@ -30,7 +30,10 @@ class SlideList(gtk.TreeView):
   '''
   def __init__(self):
     self.pres = None
+    self.slide_order = ()
+    self.slide_order_index = -1
     self.__timer = 0 #Used to stop or reset the timer if the presentation or slide changes.
+
     gtk.TreeView.__init__(self)
     self.set_size_request(280, 200)
     self.set_enable_search(False)
@@ -42,15 +45,7 @@ class SlideList(gtk.TreeView):
     
     self.set_model(gtk.ListStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING))
     #self.set_headers_visible(False)
-    self.connect("cursor-changed", self._on_slide_activate)
-    
-  #def set_slides(self, slides):
-  #  'Set the text to a Song.'
-  #  slist = self.get_model()
-  #  slist.clear()
-  #  for sl in slides:
-  #    slist.append([sl, sl.get_markup()])
-  #  print 1
+    self.get_selection().connect("changed", self._on_slide_activate)
   
   def set_presentation(self, pres):
     'Set the active presentation.'
@@ -66,10 +61,14 @@ class SlideList(gtk.TreeView):
       slist = self.get_model()
       for slide in pres.get_slide_list():
         slist.append(slide)
+      self.slide_order = pres.get_order()
+      self.slide_order_index = -1
     self.__timer += 1
     men = slist.get_iter_first() is not None
-    exposong.application.main.main_actions.get_action("pres-slide-next").set_sensitive(men)
-    exposong.application.main.main_actions.get_action("pres-slide-prev").set_sensitive(men)
+    exposong.application.main.main_actions.get_action("pres-slide-next")\
+        .set_sensitive(men)
+    exposong.application.main.main_actions.get_action("pres-slide-prev")\
+        .set_sensitive(men)
   
   def get_active_item(self):
     'Return the selected `Slide` object.'
@@ -79,42 +78,52 @@ class SlideList(gtk.TreeView):
     else:
       return False
   
+  def _move_to_slide(self, widget, mv):
+    'Move to the slide at mv. This ignores slide_order_index.'
+    order_index = self.slide_order_index
+    if self.slide_order_index == -1 and self.get_selection().count_selected_rows() > 0:
+      (model,itr) = self.get_selection().get_selected()
+      cur = model.get_string_from_iter(itr)
+      cnt = 0
+      for o in self.slide_order:
+        if o == int(cur):
+          if cnt+mv in self.slide_order:
+            self.to_slide(self.slide_order[cnt+mv])
+            self.slide_order_index = cnt+mv
+            return True
+          else:
+            return False
+        cnt += 1
+    if order_index == self.slide_order_index and \
+        len(self.slide_order) > order_index+mv and order_index+mv >= 0:
+      self.to_slide(self.slide_order[order_index + mv])
+      self.slide_order_index = order_index + mv
+      return True
+  
   def prev_slide(self, widget):
     'Move to the previous slide.'
-    (model, s_iter) = self.get_selection().get_selected()
-    if s_iter:
-      path = model.get_path(s_iter)
-      if path[0] > 0:
-        path = (path[0]-1,)
-        self.set_cursor(path)
-        self.scroll_to_cell(path)
+    self._move_to_slide(widget, -1)
   
   def next_slide(self, widget):
     'Move to the next slide.'
-    selection = self.get_selection()
-    (model, itr) = selection.get_selected()
+    self._move_to_slide(widget,  1)
+
+  def to_slide(self, slide_num):
+    model = self.get_model()
+    itr = model.iter_nth_child(None, slide_num)
     if itr:
-      itr2 = model.iter_next(itr)
-      if itr2:
-        selection.select_iter(itr2)
-        self.scroll_to_cell(model.get_path(itr2))
-      elif self.pres and self.pres.timer_loop:
-        selection.select_iter(model.get_iter_first())
-        self.scroll_to_point(0,0)
-      else: #The last slide is active.
-        return False
-    elif model.get_iter_first():
-      selection.select_iter(model.get_iter_first())
-      self.scroll_to_point(0,0)
-    else: #No slides available.
-      return False
-    exposong.screen.screen.draw()
+      selection = self.get_selection()
+      selection.select_iter(itr)
+      self.scroll_to_cell(model.get_path(itr))
   
   def _on_slide_activate(self, *args):
     'Present the selected slide to the screen.'
     exposong.screen.screen.draw()
+    self.slide_order_index = -1
+    
+    #Reset the time
     self.__timer += 1
-    if self.pres.timer:
+    if self.pres and self.pres.timer:
       gobject.timeout_add(self.pres.timer*1000, self._set_timer, self.__timer)
   
   def _set_timer(self, t):

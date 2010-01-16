@@ -27,6 +27,7 @@ from exposong.glob import *
 from exposong import RESOURCE_PATH, DATA_PATH
 from exposong.plugins import Plugin, _abstract
 import exposong.application
+import exposong.slidelist
 from exposong.prefs import config
 
 """
@@ -41,6 +42,24 @@ type_icon = gtk.gdk.pixbuf_new_from_file_at_size(
     join(RESOURCE_PATH,'pres_lyric.png'), 20, 14)
 
 title_re = re.compile("(chorus|refrain|verse|bridge|end(ing)?|soprano|alto|tenor|bass)\\b", re.I)
+
+def key_shortcuts(accel_group, acceleratable, keyval, modifier):
+  'Adds the shortcuts to skip to a given slide.'
+  pres = exposong.slidelist.slidelist.pres
+  if pres != None:
+    slnum = None
+    if chr(keyval) == 'c':
+      #print pres.get_slide_from_order('c')
+      slnum = pres.get_slide_from_order('c')
+    elif chr(keyval) >= '0' and chr(keyval) <= '9':
+      slnum = pres.get_slide_from_order("v%s" % chr(keyval))
+    if(slnum != None):
+      exposong.slidelist.slidelist.to_slide(slnum)
+
+_lyrics_accel = gtk.AccelGroup()
+_lyrics_accel.connect_group(ord("c"), 0,0, key_shortcuts)
+for i in range(1,10):
+  _lyrics_accel.connect_group(ord("%d"%i), 0,0, key_shortcuts)
 
 
 class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
@@ -102,12 +121,33 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
             self._order.remove(o)
 
   def get_order(self):
-    order = []
-    cnt = 0
+    'Returns the order in which the slides should be presented.'
     if len(self._order) > 0:
-      return self._order
+      return tuple(self.get_slide_from_order(n) for n in self._order)
     else:
       return _abstract.Presentation.get_order(self)
+
+  def get_slide_from_order(self, order_value):
+    'Gets the slide index.'
+    title = ""
+    try:
+      title = '^'+{'v':'verse','c':'chorus','b':'bridge',
+              'e':'end(ing)?','r':'refrain','s':'soprano',
+              'a':'alto','t':'tenor','b':'bass'}[order_value[0].lower()]
+      if len(order_value) == 1 or order_value[1:] == '1':
+        title += '( 1)?'
+      else:
+        title += ' '+order_value[1:]
+      title += '$'
+    except KeyError:
+      #return _abstract.Presentation.get_slide_from_order(self, order_value)
+      return False
+      
+    i = 0
+    for sl in self.slides:
+      if re.match(title,sl.title.lower()):
+        return i
+      i += 1
 
   def _edit_tabs(self, notebook):
     'Run the edit dialog for the presentation.'
@@ -171,7 +211,14 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     hbox.pack_start(label, False, True, 5)
     self._fields['order'] = gtk.Entry(50)
     self._fields['order'].set_text(' '.join(self._order))
-    hbox.pack_start(self._fields['order'], True, True, 5)
+    vbox2 = gtk.VBox()
+    vbox2.pack_start(self._fields['order'], True, True, 5)
+    label = gtk.Label( _("Input can be any of the following: V1..V9, C, R, B, E, S, A, T, B") )
+    label.set_justify(gtk.JUSTIFY_LEFT)
+    label.set_alignment(0,0.5)
+    label.set_line_wrap(True)
+    vbox2.pack_start(label, True, True, 5)
+    hbox.pack_start(vbox2)
     vbox.pack_start(hbox, False, True)
 
     notebook.append_page(vbox, gtk.Label(_("Information")))
@@ -323,4 +370,14 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
   def get_description():
     'Return the description of the plugin.'
     return "A lyric presentation type."
+
+  @staticmethod
+  def on_select():
+    'Called when the presentation is focused.'
+    exposong.application.main.add_accel_group(_lyrics_accel)
+
+  @staticmethod
+  def on_deselect():
+    'Called when the presentation is blurred.'
+    exposong.application.main.remove_accel_group(_lyrics_accel)
 

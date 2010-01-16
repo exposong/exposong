@@ -140,12 +140,17 @@ class Presentation:
     return (self, self.title)
   
   def get_order(self):
+    'Returns the order in which the slides should be presented.'
     order = []
     cnt = 0
     for slide in self.slides:
-      order.append(cnt)
+      order.append(str(cnt))
       cnt += 1
     return order
+
+  def get_slide_from_order(self, order_value):
+    'Gets the slide index.'
+    return int(order_value)
 
   def set_text_buffer(self, tbuf):
     'Sets the value of a text buffer.'
@@ -298,6 +303,13 @@ class Presentation:
     'Called when the presentation is deleted.'
     pass
 
+  def on_select(self):
+    'Called when the presentation is focused.'
+    pass
+
+  def on_deselect(self):
+    'Called when the presentation is blurred.'
+    pass
 
 class Menu:
   '''

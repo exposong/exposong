@@ -32,6 +32,7 @@ class PresList(gtk.TreeView):
   def __init__(self):
     gtk.TreeView.__init__(self)
     self.set_size_request(-1, 250)
+    self.prev_selection = None
     
     pixbufrend = gtk.CellRendererPixbuf()
     textrend = gtk.CellRendererText()
@@ -45,7 +46,7 @@ class PresList(gtk.TreeView):
     column.set_property('spacing', 4)
     self.append_column(column)
     self.set_headers_clickable(False)
-    self.connect("cursor-changed", self._on_pres_activate)
+    self.get_selection().connect("changed", self._on_pres_activate)
     self.connect("drag-data-get", self._on_drag_get)
     self.connect("drag-data-received", self._on_pres_drag_received)
     self.enable_model_drag_source(gtk.gdk.BUTTON1_MASK,
@@ -111,10 +112,16 @@ class PresList(gtk.TreeView):
   
   def _on_pres_activate(self, *args):
     'Change the slides to the current presentation.'
+    if self.prev_selection != None:
+      self.prev_selection.presentation.on_deselect()
     if self.has_selection():
-      exposong.slidelist.slidelist.set_presentation(self.get_active_item().presentation)
+      exposong.slidelist.slidelist.set_presentation(
+          self.get_active_item().presentation)
+      self.prev_selection = self.get_active_item()
+      self.get_active_item().on_select()
     else:
       exposong.slidelist.slidelist.set_presentation(None)
+      self.prev_selection = None
     exposong.slidelist.slide_scroll.get_vadjustment().set_value(0)
     #TODO This is not working, may need to change the signal
     exposong.application.main.main_actions.get_action("pres-edit")\
