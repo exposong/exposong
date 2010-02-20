@@ -51,13 +51,13 @@ class Prefs:
   def __setitem__(self, key, value):
     'Set a preference.'
     if value == None:
-      self.__delitem__(key, value)
+      self.__delitem__(key)
     else:
       self.cfg[key] = value
   
   def __delitem__(self, key):
     'Deletes a preference.'
-    del self.cfg[key]
+    self.cfg[key] = None
   
   def load(self):
     'Load preferences from file.'
