@@ -57,7 +57,7 @@ class SlideList(gtk.TreeView):
       slist.clear()
       if not hasattr(self, 'pres_type') or self.pres_type is not pres.type:
         self.pres_type = pres.type
-        pres.slide_column(self.column1)
+        pres.slide_column(self.column1, exposong.slidelist.slidelist)
       slist = self.get_model()
       for slide in pres.get_slide_list():
         slist.append(slide)

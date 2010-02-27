@@ -83,6 +83,8 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
         else:
           self.title = ''
           self.text = value
+      
+      self._set_id(value)
   
     @staticmethod
     def get_version():
@@ -149,7 +151,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
         return i
       i += 1
 
-  def _edit_tabs(self, notebook):
+  def _edit_tabs(self, notebook, parent):
     'Run the edit dialog for the presentation.'
     vbox = gtk.VBox()
     vbox.set_border_width(4)
@@ -223,7 +225,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
 
     notebook.append_page(vbox, gtk.Label(_("Information")))
     
-    _abstract.Presentation._edit_tabs(self, notebook)
+    _abstract.Presentation._edit_tabs(self, notebook, parent)
   
   def _edit_save(self):
     'Save the fields if the user clicks ok.'

@@ -150,6 +150,9 @@ class Main (gtk.Window):
     ## Status bar
     self.status_bar = gtk.Statusbar()
     win_v.pack_end(self.status_bar, False)
+    
+    gtk.settings_get_default().set_long_property('gtk-button-images',True,\
+        'application:__init__')
 
     self.build_all()
 

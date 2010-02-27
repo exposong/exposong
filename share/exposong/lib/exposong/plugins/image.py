@@ -87,7 +87,6 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
         if imgdom:
           self.image = imgdom.getAttribute("src")
           self.rotate = get_rotate_const(imgdom.getAttribute("rotate"))
-        
       elif(isinstance(value, str)):
         self.title = ''
         self.image = value
@@ -101,6 +100,8 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
         self.image = newimg
       if not os.path.isfile(self.image):
         raise ImageNotFoundError(self.image)
+      
+      self._set_id(value)
     
     def get_thumb(self):
       if hasattr(self, "image"):
@@ -175,7 +176,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       except ImageNotFoundError, err:
         print "Image not found (%s), slide was not added to the \"%s.\"" % (err.image, self.title)
   
-  def _edit_tabs(self, notebook):
+  def _edit_tabs(self, notebook, parent):
     'Tabs for the dialog.'
     vbox = gtk.VBox()
     vbox.set_border_width(4)
@@ -222,7 +223,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     img_add.connect("clicked", self._on_img_add, imgtree)
     img_del.connect("clicked", self._on_img_del, imgtree)
     
-    _abstract.Presentation._edit_tabs(self, notebook)
+    _abstract.Presentation._edit_tabs(self, notebook, parent)
   
   def _edit_save(self):
     'Save the fields if the user clicks ok.'
@@ -288,15 +289,13 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     'Sets the value of the buffer.'
     pass
   
-  def slide_column(self, col):
+  def slide_column(self, col, list_):
     'Set the column to use images.'
     col.clear()
     img_cr = gtk.CellRendererPixbuf()
     col.pack_start(img_cr, False)
     col.add_attribute(img_cr, 'pixbuf', 1)
-    
-    exposong.slidelist.slidelist.set_model(\
-        gtk.ListStore(gobject.TYPE_PYOBJECT, gobject.TYPE_OBJECT))
+    list_.set_model(gtk.ListStore(gobject.TYPE_PYOBJECT, gobject.TYPE_OBJECT))
   
   def get_slide_list(self):
     'Get the slide list.'

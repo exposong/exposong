@@ -17,6 +17,7 @@
 import re
 import os
 import os.path
+import random, string
 
 """
 Some basic functions that are useful.
@@ -79,6 +80,13 @@ def find_freefile(fl):
       #The first time, it will be an empty string, so set it manually.
       fl[1] = "-1"
   return "".join(fl)
+
+def random_string(len):
+  chars = string.ascii_letters + string.digits
+  p = ""
+  for i in range(len):
+    p += random.choice(chars)
+  return p
 
 #TODO Have the ability to list multiple directories with one function call to
 # allow the user to have data in more than one place.

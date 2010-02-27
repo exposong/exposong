@@ -44,6 +44,10 @@ class Presentation:
   Requires at minimum a title and slides.
   '''
   class Slide:
+    pres = None
+    id = None
+    title = ''
+    text = ''
     '''
     A plain text slide.
   
@@ -57,7 +61,8 @@ class Presentation:
       elif isinstance(value, str):
         self.text = value
         self.title = None
-  
+      self._set_id(value)
+    
     def get_text(self):
       'Get the text for the presentation.'
       return self.text
@@ -73,6 +78,8 @@ class Presentation:
       'Populate the node element'
       if self.title:
         node.setAttribute("title", self.title)
+      if self.id:
+        node.setAttribute("id", self.id)
       node.appendChild( document.createTextNode(self.text) )
     
     def header_text(self):
@@ -90,6 +97,15 @@ class Presentation:
     def draw(self, widget):
       'Overrides all text rendering to render custom slides.'
       return NotImplemented
+      
+    def _set_id(self, value = None):
+      if isinstance(value, xml.dom.Node):
+        self.id = value.getAttribute("id")
+      if not self.id:
+        if(len(self.title) > 0):
+          self.id = str(self.title).replace(" ","").lower()  + '_' + random_string(8)
+        else:
+          self.id = random_string(8)
   
   
   def __init__(self, dom = None, filename = None):
@@ -164,12 +180,14 @@ class Presentation:
     regex = re.compile("\\b"+re.escape(text), re.I)
     if regex.search(self.title):
       return True
-    if hasattr(self.slides[0], 'text') and regex.search(" ".join(s.title+" "+s.text for s in self.slides)):
+    if hasattr(self.slides[0], 'text') and regex.search(" ".join(\
+        s.title+" "+s.text for s in self.slides)):
       return True
   
   def edit(self):
     'Run the edit dialog for the presentation.'
-    dialog = gtk.Dialog(_("New Presentation"), exposong.application.main, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+    dialog = gtk.Dialog(_("New Presentation"), exposong.application.main,\
+        gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,\
         (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
     dialog.set_default_size(340, 400)
     if(self.title):
@@ -181,7 +199,7 @@ class Presentation:
     
     self._fields = dict()
     
-    self._edit_tabs(notebook)
+    self._edit_tabs(notebook, dialog)
     
     notebook.show_all()
     
@@ -197,7 +215,7 @@ class Presentation:
       dialog.hide()
       return False
   
-  def _edit_tabs(self, notebook):
+  def _edit_tabs(self, notebook, parent):
     'Tabs for the dialog.'
     #Slide Timer
     settings = gtk.VBox()
@@ -211,8 +229,10 @@ class Presentation:
     
     self._fields['timer_on'] = gtk.CheckButton("Use Timer")
     self._fields['timer_on'].set_active(self.timer is not None)
-    self._fields['timer_on'].connect("toggled", lambda chk: self._fields['timer'].set_sensitive(chk.get_active()))
-    self._fields['timer_on'].connect("toggled", lambda chk: self._fields['timer_loop'].set_sensitive(chk.get_active()))
+    self._fields['timer_on'].connect("toggled",\
+        lambda chk: self._fields['timer'].set_sensitive(chk.get_active()))
+    self._fields['timer_on'].connect("toggled",\
+        lambda chk: self._fields['timer_loop'].set_sesitive(chk.get_active()))
     settings.pack_start(self._fields['timer_on'], False)
     
     hbox = gtk.HBox()
@@ -270,15 +290,13 @@ class Presentation:
     doc.writexml(outfile)
     doc.unlink()
   
-  def slide_column(self, col):
+  def slide_column(self, col, list_):
     'Set the column to use text.'
     col.clear()
     text_cr = gtk.CellRendererText()
-    #text_cr.ellipsize = pango.ELLIPSIZE_END
     col.pack_start(text_cr, False)
     col.add_attribute(text_cr, 'markup', 1)
-    exposong.slidelist.slidelist.set_model(\
-        gtk.ListStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING))
+    list_.set_model(gtk.ListStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING))
   
   def get_slide_list(self):
     'Get the slide list.'
