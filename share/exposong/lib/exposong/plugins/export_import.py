@@ -56,7 +56,7 @@ class ExportImport(Plugin, _abstract.Menu):
       return False
     if not sched.filename:
       sched.save()
-    dlg = gtk.FileChooserDialog("Export Schedule", exposong.application.main,
+    dlg = gtk.FileChooserDialog(_("Export Schedule"), exposong.application.main,
         gtk.FILE_CHOOSER_ACTION_SAVE, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
     dlg.add_filter(_FILTER)
@@ -82,14 +82,33 @@ class ExportImport(Plugin, _abstract.Menu):
       tar.close()
     dlg.hide()
   
+  def export_song_list(self, *args):
+    'Export an alphabetical song list'
+    dlg = gtk.FileChooserDialog(_("Export Alphabetical Song List"),
+        exposong.application.main, gtk.FILE_CHOOSER_ACTION_SAVE,
+        (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+    dlg.set_do_overwrite_confirmation(True)
+    dlg.set_current_name(_("alphabetical_songs.txt"))
+    dlg.set_current_folder(os.path.expanduser("~"))
+    if dlg.run() == gtk.RESPONSE_ACCEPT:
+      fname = dlg.get_filename()
+      file = open(fname, "w")
+      songs = ""
+      for i in exposong.preslist.preslist.get_model():
+        songs += "%s\n"%i[1]
+      file.write(songs)
+      file.close()
+    dlg.destroy()
+  
   def export_lib(self, *args):
     'Export the full library to file.'
-    dlg = gtk.FileChooserDialog("Export Schedule", exposong.application.main,
+    dlg = gtk.FileChooserDialog(_("Export Library"), exposong.application.main,
         gtk.FILE_CHOOSER_ACTION_SAVE, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
     dlg.add_filter(_FILTER)
     dlg.set_do_overwrite_confirmation(True)
-    dlg.set_current_name("exposong_library.expo")
+    dlg.set_current_name(_("exposong_library.expo"))
     if dlg.run() == gtk.RESPONSE_ACCEPT:
       #Make sure schedules are up to date.
       exposong.application.main._save_schedules() 
@@ -118,7 +137,7 @@ class ExportImport(Plugin, _abstract.Menu):
   
   def import_file(self, *args):
     'Import a schedule or library.'
-    dlg = gtk.FileChooserDialog("Export Schedule", exposong.application.main,
+    dlg = gtk.FileChooserDialog(_("Export Schedule"), exposong.application.main,
         gtk.FILE_CHOOSER_ACTION_OPEN, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
     dlg.add_filter(_FILTER)
@@ -223,7 +242,10 @@ class ExportImport(Plugin, _abstract.Menu):
         ('export-sched', None, _("_Export Schedule"), None,
             None, self.export_sched),
         ('export-lib', None, _("Export _Library"), None,
-            None, self.export_lib)])
+            None, self.export_lib),
+        ('export-song-list', None, _("Export _Alphabetical Song List"), None,
+            None, self.export_song_list)
+        ])
     uimanager.insert_action_group(actiongroup, -1)
     
     #Had to use position='top' to put them above "Quit"
@@ -231,6 +253,7 @@ class ExportImport(Plugin, _abstract.Menu):
       <menubar name="MenuBar">
         <menu action="File">
           <separator position="top" />
+          <menuitem action="export-song-list" position="top" />
           <menuitem action="export-sched" position="top" />
           <menuitem action="export-lib" position="top" />
           <menuitem action="import" position="top" />
