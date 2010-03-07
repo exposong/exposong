@@ -40,13 +40,14 @@ def title_to_filename(title):
   'Returns a filename with letters and underscores only.'
   #TODO May need to translate foreign characters to english, or allow
   # foreign characters in the filename.
-  ret = ''
-  for i in range(len(title)):
-    if title[i].isalnum():
-      ret += title[i].lower()
-    elif ret[len(ret)-1].isalnum() and title[i] not in "'\",.?":
-      ret += '_'
-  return ret
+  new = ""
+  for char in title:
+    if char.isalnum():
+      new += char.lower()
+    elif not new.endswith("_") and char not in "'\",.?":
+      new += "_"
+  
+  return new
 
 def check_filename(title, directory, filename = None):
   '''Gets a filename that is not being used.
