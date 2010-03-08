@@ -61,7 +61,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       label.set_alignment(0.5,0.5)
       hbox.pack_start(label, False, True)
       
-      title = gtk.Entry(45)
+      title = gtk.Entry(80)
       title.set_text(self.title)
       hbox.pack_start(title, True, True)
       dialog.vbox.pack_start(hbox, False, True)
@@ -71,7 +71,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       text.get_buffer().set_text(self.text)
       text_scroll = gtk.ScrolledWindow()
       text_scroll.add(text)
-      text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+      text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
       text_scroll.set_size_request(350, 250)
       dialog.vbox.pack_start(text_scroll, True, True)
       

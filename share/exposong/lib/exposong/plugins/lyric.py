@@ -161,7 +161,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     label = gtk.Label(_("Title:"))
     label.set_alignment(0.5, 0.5)
     hbox.pack_start(label, False, True, 5)
-    self._fields['title'] = gtk.Entry(45)
+    self._fields['title'] = gtk.Entry(80)
     self._fields['title'].set_text(self.title)
     hbox.pack_start(self._fields['title'], True, True)
     
@@ -173,7 +173,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     self.set_text_buffer(self._fields['text'].get_buffer())
     text_scroll = gtk.ScrolledWindow()
     text_scroll.add(self._fields['text'])
-    text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+    text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
     text_scroll.set_size_request(340, 240)
     vbox.pack_start(text_scroll, True, True)
     notebook.append_page(vbox, gtk.Label(_("Edit")))

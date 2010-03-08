@@ -147,8 +147,8 @@ class ScheduleList(gtk.TreeView):
       model = treeview.get_model()
       path, position = drop_info
       
-      pres = exposong.preslist.preslist.get_model().get_value(
-          exposong.preslist.preslist.get_model().get_iter_from_string(selection.data),
+      pres = exposong.preslist.preslist.get_filter_model().get_value(
+          exposong.preslist.preslist.get_filter_model().get_iter_from_string(selection.data),
               0).presentation
       sched = model.get_value(model.get_iter(path), 0)
       

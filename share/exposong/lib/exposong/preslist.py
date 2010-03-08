@@ -82,6 +82,10 @@ class PresList(gtk.TreeView):
       return model.get_model()
     return model
   
+  def get_filter_model(self):
+    'Return the filtered model if filter is active, else the unfiltered model'
+    return gtk.TreeView.get_model(self)
+  
   def next_pres(self, *args):
     'Go to the next presentation.'
     selection = self.get_selection()
