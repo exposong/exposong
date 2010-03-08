@@ -109,9 +109,22 @@ class Screen:
   
   def to_logo(self, button):
     'Set the screen to black.'
-    self._logo = True
-    self._black = self._background = False
-    self.draw()
+    if exposong.prefs.config['pres.logo'] != None:
+      self._logo = True
+      self._black = self._background = False
+      self.draw()
+    else:
+      dialog = gtk.MessageDialog(exposong.application.main, gtk.DIALOG_MODAL,
+        gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
+        _('No Logo set. Do you want to choose a Logo now?'))
+      dialog.set_title( _("Set Logo?") )
+      resp = dialog.run()
+      dialog.hide()
+      if resp == gtk.RESPONSE_YES:
+        exposong.prefs.config.dialog(exposong.application.main)
+        self.to_logo(None)
+      else:
+        self.to_background(None)
   
   def to_background(self, button):
     'Hide text from the screen.'
