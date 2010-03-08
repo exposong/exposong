@@ -19,6 +19,7 @@ import gtk.gdk
 import gobject
 import xml.dom
 from glob import *
+from exposong import DATA_PATH
 
 import exposong.schedule
 import exposong.preslist
@@ -99,7 +100,10 @@ class ScheduleList(gtk.TreeView):
               exposong.application.DRAGDROP_SCHEDULE, gtk.gdk.ACTION_COPY)
         else:
           exposong.preslist.preslist.unset_rows_drag_dest()
-    enable = isinstance(sched, exposong.schedule.Schedule) and not sched.builtin
+    try:
+      enable = isinstance(sched, exposong.schedule.Schedule) and not sched.builtin
+    except UnboundLocalError:
+      enable = False
     exposong.application.main.main_actions.get_action("pres-delete-from-schedule")\
         .set_sensitive(not exposong.preslist.preslist.get_model().builtin and\
         exposong.preslist.preslist.has_selection())
@@ -124,7 +128,7 @@ class ScheduleList(gtk.TreeView):
     dialog.hide()
     if resp == gtk.RESPONSE_YES:
       if item.filename:
-        os.remove("data/sched/"+item.filename)# directory <- for search
+        os.remove(os.path.join(DATA_PATH, "sched",item.filename))# directory <- for search
       self.remove(item)
       self.set_cursor((0,))
   
