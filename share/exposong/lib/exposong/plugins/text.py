@@ -87,9 +87,27 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
         dialog.hide()
         return False
   
+    @staticmethod
+    def get_version():
+      'Return the version number of the plugin.'
+      return (1,0)
+  
+    @staticmethod
+    def get_description():
+      'Return the description of the plugin.'
+      return "A lyric presentation type."
+  
   def __init__(self, dom = None, filename = None):
     _abstract.Presentation.__init__(self, dom, filename)
-    self.type = "text"
+    self._order = []
+
+    if isinstance(dom, xml.dom.Node):
+      ordernode = dom.getElementsByTagName("order")
+      if len(ordernode) > 0:
+        self._order = get_node_text(ordernode[0]).split()
+        for o in self._order:
+          if o.strip() == "":
+            self._order.remove(o)
   
   def _edit_tabs(self, notebook, parent):
     'Tabs for the dialog.'
@@ -144,7 +162,11 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     
     vbox.show_all()
     
-    notebook.append_page(vbox, gtk.Label(_("Edit")))
+    notebook.insert_page(vbox, gtk.Label(_("Edit")), 0)
+    
+    # Ordering Lists   TODO
+    #vbox = gtk.VBox()
+    #notebook.insert_page(vbox, gtk.Label(_("Order")), 1)
     
     _abstract.Presentation._edit_tabs(self, notebook, parent)
   
@@ -180,7 +202,26 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     
   def _slide_delete_dialog(self, btn, parent):
     'Remove the selected slide.'
-    pass
+    (model, itr) = self._fields['slides'].get_selection().get_selected()
+    if not itr:
+      return False
+    model.remove(itr)
+
+  def get_order(self):
+    'Returns the order in which the slides should be presented.'
+    if len(self._order) > 0:
+      return tuple(self.get_slide_from_order(n) for n in self._order)
+    else:
+      return _abstract.Presentation.get_order(self)
+
+  def get_slide_from_order(self, order_value):
+    'Gets the slide index.'
+    i = 0
+    for sl in self.slides:
+      if(sl.id == order_value):
+        return i
+      i += 1
+    return -1
   
   @staticmethod
   def get_type():
@@ -228,7 +269,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
   @classmethod
   def schedule_filter(cls, pres):
     'Called on each presentation, and return True if it can be added.'
-    return isinstance(pres, cls)
+    return pres.__class__ is cls
   
   @staticmethod
   def get_version():

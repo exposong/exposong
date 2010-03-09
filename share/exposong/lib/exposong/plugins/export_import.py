@@ -74,7 +74,7 @@ class ExportImport(Plugin, _abstract.Menu):
       itr = sched.get_iter_first()
       while itr:
         tar.add("pres/"+sched.get_value(itr, 0).filename)
-        if sched.get_value(itr, 0).type == 'image':
+        if sched.get_value(itr, 0).get_type() == 'image':
           for slide in sched.get_value(itr, 0).slides:
             tar.add("image/"+slide.image.rpartition('/')[2])
         itr = sched.iter_next(itr)
@@ -122,7 +122,7 @@ class ExportImport(Plugin, _abstract.Menu):
       itr = library.get_iter_first()
       while itr:
         tar.add("pres/"+library.get_value(itr, 0).filename)
-        if library.get_value(itr, 0).type == 'image':
+        if library.get_value(itr, 0).get_type() == 'image':
           for slide in library.get_value(itr, 0).slides:
             tar.add("image/"+slide.image.rpartition('/')[2])
         itr = library.iter_next(itr)

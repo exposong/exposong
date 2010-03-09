@@ -25,7 +25,7 @@ import re
 
 from exposong.glob import *
 from exposong import RESOURCE_PATH, DATA_PATH
-from exposong.plugins import Plugin, _abstract
+from exposong.plugins import Plugin, _abstract, text
 import exposong.application
 import exposong.slidelist
 from exposong.prefs import config
@@ -62,12 +62,12 @@ for i in range(1,10):
   _lyrics_accel.connect_group(ord("%d"%i), 0,0, key_shortcuts)
 
 
-class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
+class Presentation (text.Presentation, Plugin, _abstract.Menu,
     _abstract.Schedule, _abstract.Screen):
   '''
   Lyric presentation type.
   '''
-  class Slide (Plugin, _abstract.Presentation.Slide):
+  class Slide (text.Presentation.Slide, Plugin):
     '''
     A lyric slide for the presentation.
     '''
@@ -86,16 +86,6 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       
       self._set_id(value)
   
-    @staticmethod
-    def get_version():
-      'Return the version number of the plugin.'
-      return (1,0)
-  
-    @staticmethod
-    def get_description():
-      'Return the description of the plugin.'
-      return "A lyric presentation type."
-  
     def footer_text(self):
       'Draw text on the footer.'
       jn = ['"%s"' % self.pres.title]
@@ -108,19 +98,19 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
         jn.append("CCLI# %s" % config['general.ccli'])
       return '\n'.join(jn)
   
+    @staticmethod
+    def get_version():
+      'Return the version number of the plugin.'
+      return (1,0)
+  
+    @staticmethod
+    def get_description():
+      'Return the description of the plugin.'
+      return "A lyric presentation type."
+  
   
   def __init__(self, dom = None, filename = None):
-    _abstract.Presentation.__init__(self, dom, filename)
-    self.type = 'lyric'
-    self._order = []
-
-    if isinstance(dom, xml.dom.Node):
-      ordernode = dom.getElementsByTagName("order")
-      if len(ordernode) > 0:
-        self._order = get_node_text(ordernode[0]).split()
-        for o in self._order:
-          if o.strip() == "":
-            self._order.remove(o)
+    text.Presentation.__init__(self, dom, filename)
 
   def get_order(self):
     'Returns the order in which the slides should be presented.'
@@ -153,31 +143,6 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
 
   def _edit_tabs(self, notebook, parent):
     'Run the edit dialog for the presentation.'
-    vbox = gtk.VBox()
-    vbox.set_border_width(4)
-    vbox.set_spacing(7)
-    hbox = gtk.HBox()
-    
-    label = gtk.Label(_("Title:"))
-    label.set_alignment(0.5, 0.5)
-    hbox.pack_start(label, False, True, 5)
-    self._fields['title'] = gtk.Entry(80)
-    self._fields['title'].set_text(self.title)
-    hbox.pack_start(self._fields['title'], True, True)
-    
-    vbox.pack_start(hbox, False, True)
-    
-    self._fields['text'] = gtk.TextView()
-    self._fields['text'].set_wrap_mode(gtk.WRAP_WORD)
-    self._fields['text'].get_buffer().connect("changed", self._text_changed)
-    self.set_text_buffer(self._fields['text'].get_buffer())
-    text_scroll = gtk.ScrolledWindow()
-    text_scroll.add(self._fields['text'])
-    text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-    text_scroll.set_size_request(340, 240)
-    vbox.pack_start(text_scroll, True, True)
-    notebook.append_page(vbox, gtk.Label(_("Edit")))
-    
     vbox = gtk.VBox()
     vbox.set_border_width(4)
     vbox.set_spacing(7)
@@ -225,25 +190,15 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
 
     notebook.append_page(vbox, gtk.Label(_("Information")))
     
-    _abstract.Presentation._edit_tabs(self, notebook, parent)
+    text.Presentation._edit_tabs(self, notebook, parent)
   
   def _edit_save(self):
     'Save the fields if the user clicks ok.'
-    self.title = self._fields['title'].get_text()
     self.author['words'] = self._fields['words'].get_text()
     self.author['music'] = self._fields['music'].get_text()
     self.copyright = self._fields['copyright'].get_text()
-    bounds = self._fields['text'].get_buffer().get_bounds()
-    sval = self._fields['text'].get_buffer().get_text(bounds[0], bounds[1])
-    self.slides = []
     order = self._fields['order'].get_text().split()
-    for o in order:
-      if o.strip() == "":
-        order.remove(o)
-    self._order = order
-    for sl in sval.split("\n\n"):
-      self.slides.append(self.Slide(self, sl))
-    _abstract.Presentation._edit_save(self)
+    text.Presentation._edit_save(self)
   
   def to_xml(self):
     'Save the data to disk.'
@@ -252,7 +207,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     
     doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
     root = doc.createElement("presentation")
-    root.setAttribute("type", self.type)
+    root.setAttribute("type", self.get_type())
     
     node = doc.createElement("title")
     node.appendChild(doc.createTextNode(self.title))
@@ -361,7 +316,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
   @classmethod
   def schedule_filter(cls, pres):
     'Called on each presentation, and return True if it can be added.'
-    return isinstance(pres, cls)
+    return pres.__class__ is cls
   
   @staticmethod
   def get_version():

@@ -165,7 +165,6 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
   
   def __init__(self, dom = None, filename = None):
     _abstract.Presentation.__init__(self, dom, filename)
-    self.type = 'image'
   
   def _set_slides(self, dom):
     'Set the slides from xml.'
@@ -337,7 +336,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
   @classmethod
   def schedule_filter(cls, pres):
     'Called on each presentation, and return True if it can be added.'
-    return isinstance(pres, cls)
+    return pres.__class__ is cls
   
   @staticmethod
   def get_version():

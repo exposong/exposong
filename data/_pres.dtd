@@ -2,7 +2,7 @@
 <!ELEMENT title CDATA >
 <!ELEMENT author CDATA >
 <!ELEMENT copyright CDATA >
-<!ELEMENT order CDATA >
+<!ELEMENT order IDREFS >
 <!ELEMENT comments CDATA >
 <!ELEMENT slide (#PCDATA|img) >
 <!ELEMENT img EMPTY >
@@ -12,5 +12,6 @@
 <!ATTLIST presentation modified CDATA #REQUIRED >
 <!ATTLIST author type (words|music|both) "both" >
 <!ATTLIST slide title CDATA #IMPLIED >
+<!ATTLIST slide id ID #REQUIRED >
 <!ATTLIST img src CDATA #REQUIRED >
 <!ATTLIST img rotate (n|ccw|cw|ud) "n" >

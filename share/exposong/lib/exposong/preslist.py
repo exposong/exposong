@@ -62,7 +62,7 @@ class PresList(gtk.TreeView):
   
   def append(self, item):
     'Add a presentation to the list.'
-    self.get_model().append((item, item.title, item.type))
+    self.get_model().append((item, item.title, item.get_type()))
   
   def remove(self, item):
     'Delete a presentation from the list.'

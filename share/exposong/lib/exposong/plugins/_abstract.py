@@ -111,7 +111,6 @@ class Presentation:
   def __init__(self, dom = None, filename = None):
     if self.__class__ is Presentation:
       raise NotImplementedError("This class cannot be instantiated.")
-    self.type = ""
     self.title = ''
     self.copyright = ''
     self.author = {}
@@ -160,7 +159,7 @@ class Presentation:
     order = []
     cnt = 0
     for slide in self.slides:
-      order.append(str(cnt))
+      order.append(cnt)
       cnt += 1
     return order
 
@@ -193,7 +192,8 @@ class Presentation:
     if(self.title):
       dialog.set_title(_("Editing %s") % self.title)
     else:
-      dialog.set_title(_("New %s Presentation") % self.type.title())
+      # TODO get_type() needs to be translated as well. Find the best way to do this.
+      dialog.set_title(_("New %s Presentation") % self.get_type().title())
     notebook = gtk.Notebook()
     dialog.vbox.pack_start(notebook, True, True, 6)
     
@@ -268,7 +268,7 @@ class Presentation:
     
     doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
     root = doc.createElement("presentation")
-    root.setAttribute("type", self.type)
+    root.setAttribute("type", self.get_type())
     
     node = doc.createElement("title")
     node.appendChild(doc.createTextNode(self.title))
