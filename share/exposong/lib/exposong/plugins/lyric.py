@@ -124,8 +124,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     title = ""
     try:
       title = '^'+{'v':'verse','c':'chorus','b':'bridge',
-              'e':'end(ing)?','r':'refrain','s':'soprano',
-              'a':'alto','t':'tenor','b':'bass'}[order_value[0].lower()]
+              'e':'end(ing)?','r':'refrain'}[order_value[0].lower()]
       if len(order_value) == 1 or order_value[1:] == '1':
         title += '( 1)?'
       else:
@@ -180,7 +179,9 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     self._fields['order'].set_text(' '.join(self._order))
     vbox2 = gtk.VBox()
     vbox2.pack_start(self._fields['order'], True, True, 5)
-    label = gtk.Label( _("Input can be any of the following: V1..V9, C, R, B, E, S, A, T, B") )
+    label = gtk.Label( _("Input can be any of the following: %s for verses,\n" + \
+        "%s for chorus, %s for refrain, %s for bridge, %s for ending") % \
+        ("v1..v9","c","s","b","e" ) )
     label.set_justify(gtk.JUSTIFY_LEFT)
     label.set_alignment(0,0.5)
     label.set_line_wrap(True)
@@ -191,14 +192,70 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     notebook.append_page(vbox, gtk.Label(_("Information")))
     
     text.Presentation._edit_tabs(self, notebook, parent)
+    
+    btn = gtk.ToolButton(gtk.STOCK_PASTE)
+    btn.set_label( _("Paste As Text") )
+    btn.connect("clicked", self._paste_as_text, parent)
+    self._slideToolbar.insert(btn, -1)
   
   def _edit_save(self):
     'Save the fields if the user clicks ok.'
     self.author['words'] = self._fields['words'].get_text()
     self.author['music'] = self._fields['music'].get_text()
     self.copyright = self._fields['copyright'].get_text()
-    order = self._fields['order'].get_text().split()
+    self._order = self._fields['order'].get_text().split()
     text.Presentation._edit_save(self)
+  
+  def _paste_as_text(self, *args):
+    'Dialog to paste full lyrics.'
+    dialog = gtk.Dialog(_("Editing Slide"), exposong.application.main,\
+        gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,\
+        (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+    
+    dialog.set_border_width(4)
+    dialog.vbox.set_spacing(7)
+    hbox = gtk.HBox()
+    
+    label = gtk.Label(_("Title:"))
+    label.set_alignment(0.5, 0.5)
+    hbox.pack_start(label, False, True, 5)
+    title = gtk.Entry(80)
+    title.set_text(self.title)
+    hbox.pack_start(title, True, True)
+    
+    dialog.vbox.pack_start(hbox, False, True)
+    
+    text = gtk.TextView()
+    text.set_wrap_mode(gtk.WRAP_WORD)
+    text.get_buffer().connect("changed", self._text_changed)
+    self.set_text_buffer(text.get_buffer())
+    text_scroll = gtk.ScrolledWindow()
+    text_scroll.add(text)
+    text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+    text_scroll.set_size_request(340, 240)
+    dialog.vbox.pack_start(text_scroll, True, True)
+    
+    dialog.vbox.show_all()
+      
+    if dialog.run() == gtk.RESPONSE_ACCEPT:
+      self.title = title.get_text()
+      bounds = text.get_buffer().get_bounds()
+      sval = text.get_buffer().get_text(bounds[0], bounds[1])
+      self.slides = []
+      for sl in sval.split("\n\n"):
+        self.slides.append(self.Slide(self, sl))
+      
+      self._fields['title'].set_text(self.title)
+      slide_model = self._fields['slides'].get_model()
+      slide_model.clear()
+      for sl in self.get_slide_list():
+        slide_model.append(sl)
+      
+      dialog.hide()
+      return True
+    else:
+      dialog.hide()
+      return False
   
   def to_xml(self):
     'Save the data to disk.'

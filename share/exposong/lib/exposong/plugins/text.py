@@ -126,24 +126,26 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     vbox.pack_start(hbox, False, True)
     
     # TODO Add signal detection and make these do something.
-    slideToolbar = gtk.Toolbar()
+    self._slideToolbar = gtk.Toolbar()
     btn = gtk.ToolButton(gtk.STOCK_ADD)
     btn.connect("clicked", self._slide_add_dialog, parent)
-    slideToolbar.insert(btn, -1)
+    self._slideToolbar.insert(btn, -1)
     btn = gtk.ToolButton(gtk.STOCK_EDIT)
     btn.connect("clicked", self._slide_edit_dialog, parent)
-    slideToolbar.insert(btn, -1)
+    self._slideToolbar.insert(btn, -1)
     btn = gtk.ToolButton(gtk.STOCK_DELETE)
     btn.connect("clicked", self._slide_delete_dialog, parent)
-    slideToolbar.insert(btn, -1)
-    slideToolbar.insert(gtk.SeparatorToolItem(), -1)
+    self._slideToolbar.insert(btn, -1)
+    self._slideToolbar.insert(gtk.SeparatorToolItem(), -1)
     
-    vbox.pack_start(slideToolbar, False, True)
+    vbox.pack_start(self._slideToolbar, False, True)
     
     hbox = gtk.HBox()
     self._fields['slides'] = gtk.TreeView()
     self._fields['slides'].set_enable_search(False)
     self._fields['slides'].set_reorderable(True)
+    # Double click to edit
+    self._fields['slides'].connect("row-activated", self._slide_edit_dialog, parent)
     col = gtk.TreeViewColumn( _("Slide") )
     col.set_resizable(False)
     self.slide_column(col, self._fields['slides'])
@@ -179,6 +181,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     while itr:
       self.slides.append(model.get_value(itr,0))
       itr = model.iter_next(itr)
+    del self._slideToolbar
   
   def _slide_add_dialog(self, btn, parent):
     'Create a dialog for a new slide.'
@@ -188,8 +191,9 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       model = self._fields['slides'].get_model()
       model.append( (sl, sl.get_markup()) )
     
-  def _slide_edit_dialog(self, btn, parent):
+  def _slide_edit_dialog(self, *args):
     'Create a dialog for an existing slide.'
+    parent = args[len(args)-1]
     (model, itr) = self._fields['slides'].get_selection().get_selected()
     if not itr:
       return False
