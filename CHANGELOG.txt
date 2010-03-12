@@ -1,10 +1,19 @@
 +-----------------------------------------+
 | ExpoSong                                |
-| Version 0.6                             |
+| Version 0.6.1                           |
 | Copyright (C) 2008-2009 Fishhookweb.com |
 +-----------------------------------------+
 
 = Changelog =
+
+== 0.6.1 ==
+
+ * Edit dialog was modified to allow future features. Slides are now edited
+   individually. Lyrics can be entered the old way using "Paste as Text".
+ * In the Lyrics type, slides can now be ordered.
+ * Shortcuts added for lyric presentations. 1-9 are used for changing verses,
+   and C for Chorus.
+ * Export a list of songs sorted alphabetically.
 
 == 0.6 ==
 
