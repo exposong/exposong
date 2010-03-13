@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-06-28 18:34+0100\n"
+"POT-Creation-Date: 2010-03-13 13:01+0100\n"
 "PO-Revision-Date: 2008-03-12 00:02+0100\n"
-"Last-Translator: Siegwart <siegwart.b@googlemail.com>\n"
+"Last-Translator: Samuel Mehrbrodt <s.mehrbrodt@gmail.com>\n"
 "Language-Team: German\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,31 +21,31 @@ msgstr ""
 msgid "Copyright %s"
 msgstr "Copyright %s"
 
-#: share/exposong/lib/exposong/about.py:33
 #: share/exposong/lib/exposong/about.py:34
+#: share/exposong/lib/exposong/about.py:35
 msgid "Translators Name"
-msgstr "Siegwart Bogatscher"
+msgstr "Siegwart Bogatscher\nSamuel Mehrbrodt"
 
-#: share/exposong/lib/exposong/application.py:135
+#: share/exposong/lib/exposong/application.py:129
 msgid "Present"
 msgstr "Präsentieren"
 
-#: share/exposong/lib/exposong/application.py:138
+#: share/exposong/lib/exposong/application.py:132
 #: share/exposong/lib/exposong/prefs.py:131
 #: share/exposong/lib/exposong/prefs.py:134
 msgid "Background"
 msgstr "Hintergrund"
 
-#: share/exposong/lib/exposong/application.py:141
+#: share/exposong/lib/exposong/application.py:135
 #: share/exposong/lib/exposong/prefs.py:129
 msgid "Logo"
 msgstr "Logo"
 
-#: share/exposong/lib/exposong/application.py:144
+#: share/exposong/lib/exposong/application.py:138
 msgid "Black Screen"
 msgstr "Schwarzer Bildschirm"
 
-#: share/exposong/lib/exposong/application.py:147
+#: share/exposong/lib/exposong/application.py:141
 msgid "Hide"
 msgstr "Verstecken"
 
@@ -67,11 +67,11 @@ msgstr "P_räsentation"
 
 #: share/exposong/lib/exposong/application.py:176
 msgid "_Help"
-msgstr "_Hilfe"
+msgstr "H_ilfe"
 
 #: share/exposong/lib/exposong/application.py:179
 msgid "Create a new schedule"
-msgstr "Erstelle neuen Ablaufplan"
+msgstr "Neuen Ablaufplan erstellen"
 
 #: share/exposong/lib/exposong/application.py:181
 msgid "_Rename"
@@ -102,76 +102,76 @@ msgid "Delete from _Schedule"
 msgstr "Aus _Ablaufplan löschen"
 
 #: share/exposong/lib/exposong/application.py:195
-msgid "_Import"
-msgstr "_Importieren"
-
-#: share/exposong/lib/exposong/application.py:196
-msgid "Open a presentation from file"
-msgstr "Öffne Präsentation aus Datei"
+msgid "Previous Presentation"
+msgstr "Lieder-Präsentation"
 
 #: share/exposong/lib/exposong/application.py:197
-msgid "_Export"
-msgstr "_Exportieren"
-
-#: share/exposong/lib/exposong/application.py:198
-msgid "Export presentation"
-msgstr "Präsentation exportieren"
-
-#: share/exposong/lib/exposong/application.py:199
 msgid "Previous Slide"
 msgstr "Vorherige Folie"
 
-#: share/exposong/lib/exposong/application.py:201
+#: share/exposong/lib/exposong/application.py:199
 msgid "Next Slide"
 msgstr "Nächste Folie"
 
+#: share/exposong/lib/exposong/application.py:201
+msgid "Next Presentation"
+msgstr "Nächste Präsentation"
+
 #: share/exposong/lib/exposong/application.py:203
+msgid "_Find Presentation"
+msgstr "Präsentation _suchen"
+
+#: share/exposong/lib/exposong/application.py:204
+msgid "Search for a presentation"
+msgstr "Nach einer Präsentation suchen"
+
+#: share/exposong/lib/exposong/application.py:205
 msgid "_Present"
 msgstr "_Präsentieren"
 
-#: share/exposong/lib/exposong/application.py:205
-msgid "_Background"
-msgstr "_Hintergrund"
-
 #: share/exposong/lib/exposong/application.py:207
-msgid "Lo_go"
-msgstr "Lo_go"
+msgid "_Background"
+msgstr "Hinter_grund"
 
 #: share/exposong/lib/exposong/application.py:209
+msgid "Lo_go"
+msgstr "_Logo"
+
+#: share/exposong/lib/exposong/application.py:211
 msgid "Blac_k Screen"
 msgstr "_Schwarzer Bildschirm"
 
-#: share/exposong/lib/exposong/application.py:211
+#: share/exposong/lib/exposong/application.py:213
 msgid "Hi_de"
 msgstr "_Verstecken"
 
-#: share/exposong/lib/exposong/application.py:310
+#: share/exposong/lib/exposong/application.py:347
 msgid "Library"
 msgstr "Bibliothek"
 
-#: share/exposong/lib/exposong/application.py:333
+#: share/exposong/lib/exposong/application.py:370
 msgid "Custom Schedules"
 msgstr "Eigene Ablaufpläne"
 
-#: share/exposong/lib/exposong/application.py:380
+#: share/exposong/lib/exposong/application.py:404
 #, python-format
 msgid "Are you sure you want to delete \"%s\" from your library?"
-msgstr "Sind Sie sicher, dass sie \"%s\" aus ihrer Bibliothek löschen möchten?"
+msgstr "Sind Sie sicher, dass Sie \"%s\" aus ihrer Bibliothek löschen möchten?"
 
-#: share/exposong/lib/exposong/application.py:381
+#: share/exposong/lib/exposong/application.py:405
 msgid "Delete Presentation?"
 msgstr "Präsentation löschen?"
 
-#: share/exposong/lib/exposong/bgselect.py:68
+#: share/exposong/lib/exposong/bgselect.py:69
 msgid "Add"
 msgstr "Hinzufügen"
 
-#: share/exposong/lib/exposong/bgselect.py:142
-#: share/exposong/lib/exposong/plugins/image.py:237
+#: share/exposong/lib/exposong/bgselect.py:143
+#: share/exposong/lib/exposong/plugins/image.py:247
 msgid "Image Types"
 msgstr "Bild-Typen"
 
-#: share/exposong/lib/exposong/bgselect.py:146
+#: share/exposong/lib/exposong/bgselect.py:147
 msgid "Add Image"
 msgstr "Bild hinzufügen"
 
@@ -221,147 +221,181 @@ msgid "Notify"
 msgstr "Mitteilung"
 
 #: share/exposong/lib/exposong/prefs.py:136
-#: share/exposong/lib/exposong/preslist.py:36
+#: share/exposong/lib/exposong/preslist.py:39
 msgid "Presentation"
 msgstr "Präsentation"
 
-#: share/exposong/lib/exposong/prefs.py:181
+#: share/exposong/lib/exposong/prefs.py:182
 msgid "Choose File"
 msgstr "Datei auswählen"
 
-#: share/exposong/lib/exposong/schedlist.py:41
+#: share/exposong/lib/exposong/schedlist.py:44
 msgid "Schedule"
 msgstr "Ablaufplan"
 
-#: share/exposong/lib/exposong/schedlist.py:104
+#: share/exposong/lib/exposong/schedlist.py:125
 #, python-format
 msgid "Are you sure you want to delete \"%s\"?"
-msgstr "Sind Sie sicher, dass sie \"%s\" löschen möchten?"
+msgstr "Sind Sie sicher, dass Sie \"%s\" löschen möchten?"
 
-#: share/exposong/lib/exposong/schedlist.py:105
+#: share/exposong/lib/exposong/schedlist.py:126
 msgid "Delete Schedule?"
 msgstr "Ablaufplan löschen?"
 
-#: share/exposong/lib/exposong/schedlist.py:143
+#: share/exposong/lib/exposong/schedlist.py:164
 msgid "New Schedule"
 msgstr "Neuer Ablaufplan"
 
-#: share/exposong/lib/exposong/slidelist.py:34
+#: share/exposong/lib/exposong/screen.py:119
+msgid "No Logo set. Do you want to choose a Logo now?"
+msgstr "Kein Logo festgelegt. Möchten Sie jetzt eine Grafik auswählen?"
+
+#: share/exposong/lib/exposong/screen.py:120
+msgid "Set Logo?"
+msgstr "Logo auswählen?"
+
+#: share/exposong/lib/exposong/slidelist.py:41
+#: share/exposong/lib/exposong/plugins/text.py:149
 msgid "Slide"
 msgstr "Folie"
 
-#: share/exposong/lib/exposong/plugins/_abstract.py:144
+#: share/exposong/lib/exposong/plugins/_abstract.py:188
 msgid "New Presentation"
 msgstr "Neue Präsentation"
 
-#: share/exposong/lib/exposong/plugins/_abstract.py:148
+#: share/exposong/lib/exposong/plugins/_abstract.py:193
 #, python-format
 msgid "Editing %s"
 msgstr "%s bearbeiten"
 
-#: share/exposong/lib/exposong/plugins/_abstract.py:150
+#: share/exposong/lib/exposong/plugins/_abstract.py:196
 #, python-format
 msgid "New %s Presentation"
-msgstr "Neue %s Präsentation"
+msgstr "Neue %s-Präsentation"
 
-#: share/exposong/lib/exposong/plugins/image.py:36
+#: share/exposong/lib/exposong/plugins/export_import.py:30
+msgid "Export/Import Functions"
+msgstr "Export-/Import-Funktionen"
+
+#: share/exposong/lib/exposong/plugins/export_import.py:59
+#: share/exposong/lib/exposong/plugins/export_import.py:140
+msgid "Export Schedule"
+msgstr "Ablaufplan exportieren"
+
+#: share/exposong/lib/exposong/plugins/export_import.py:87
+msgid "Export Alphabetical Song List"
+msgstr "Alphabetische Liederliste exportieren"
+
+#: share/exposong/lib/exposong/plugins/export_import.py:92
+msgid "alphabetical_songs.txt"
+msgstr "alphabetische_lieder.txt"
+
+#: share/exposong/lib/exposong/plugins/export_import.py:106
+msgid "Export Library"
+msgstr "Bibliothek exportieren"
+
+#: share/exposong/lib/exposong/plugins/export_import.py:111
+msgid "exposong_library.expo"
+msgstr "exposong_bibliothek.expo"
+
+#: share/exposong/lib/exposong/plugins/export_import.py:240
+msgid "_Import"
+msgstr "_Importieren"
+
+#: share/exposong/lib/exposong/plugins/export_import.py:241
+msgid "Import a schedule or full library."
+msgstr "Ablaufplan oder Bibliothek importieren"
+
+#: share/exposong/lib/exposong/plugins/export_import.py:242
+msgid "_Export Schedule"
+msgstr "_Ablaufplan exportieren"
+
+#: share/exposong/lib/exposong/plugins/export_import.py:244
+msgid "Export _Library"
+msgstr "Bibliothek _exportieren"
+
+#: share/exposong/lib/exposong/plugins/export_import.py:246
+msgid "Export _Alphabetical Song List"
+msgstr "Alphabetische _Liederliste exportieren"
+
+#: share/exposong/lib/exposong/plugins/image.py:37
 msgid "Image Presentation"
-msgstr "Bilder Präsentation"
+msgstr "Bilder-Präsentation"
 
-#: share/exposong/lib/exposong/plugins/image.py:176
-#: share/exposong/lib/exposong/plugins/lyric.py:101
-#: share/exposong/lib/exposong/plugins/text.py:55
+#: share/exposong/lib/exposong/plugins/image.py:185
+#: share/exposong/lib/exposong/plugins/lyric.py:220
+#: share/exposong/lib/exposong/plugins/text.py:60
+#: share/exposong/lib/exposong/plugins/text.py:119
 msgid "Title:"
 msgstr "Titel:"
 
-#: share/exposong/lib/exposong/plugins/image.py:211
-#: share/exposong/lib/exposong/plugins/lyric.py:119
-#: share/exposong/lib/exposong/plugins/text.py:73
+#: share/exposong/lib/exposong/plugins/image.py:220
+#: share/exposong/lib/exposong/plugins/text.py:167
 msgid "Edit"
 msgstr "Bearbeiten"
 
-#: share/exposong/lib/exposong/plugins/image.py:229
+#: share/exposong/lib/exposong/plugins/image.py:239
 msgid "Add Images"
 msgstr "Bilder hinzufügen"
 
-#: share/exposong/lib/exposong/plugins/image.py:294
+#: share/exposong/lib/exposong/plugins/image.py:309
 msgid "_Image"
 msgstr "_Grafik"
 
-#: share/exposong/lib/exposong/plugins/image.py:319
+#: share/exposong/lib/exposong/plugins/image.py:334
 msgid "Image Presentations"
 msgstr "Bilder-Präsentationen"
 
-#: share/exposong/lib/exposong/plugins/lyric.py:36
+#: share/exposong/lib/exposong/plugins/lyric.py:37
 msgid "Lyric Presentation"
 msgstr "Lieder-Präsentation"
 
-#: share/exposong/lib/exposong/plugins/lyric.py:126
+#: share/exposong/lib/exposong/plugins/lyric.py:150
 msgid "Words:"
 msgstr "Text:"
 
-#: share/exposong/lib/exposong/plugins/lyric.py:134
+#: share/exposong/lib/exposong/plugins/lyric.py:158
 msgid "Music:"
 msgstr "Musik:"
 
-#: share/exposong/lib/exposong/plugins/lyric.py:142
+#: share/exposong/lib/exposong/plugins/lyric.py:166
 msgid "Copyright:"
 msgstr "Copyright:"
 
-#: share/exposong/lib/exposong/plugins/lyric.py:148
+#: share/exposong/lib/exposong/plugins/lyric.py:176
+msgid "Order:"
+msgstr "Reihenfolge:"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:182
+#, python-format
+msgid "Input can be any of the following: %s for verses,\n"
+msgstr "Sie können folgendes eingeben: %s für Strophen,\n"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:192
 msgid "Information"
 msgstr "Informationen"
 
-#: share/exposong/lib/exposong/plugins/lyric.py:245
+#: share/exposong/lib/exposong/plugins/lyric.py:197
+msgid "Paste As Text"
+msgstr "Als Text einfügen"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:211
+#: share/exposong/lib/exposong/plugins/text.py:53
+msgid "Editing Slide"
+msgstr "Folie bearbeiten"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:350
 msgid "_Lyric"
 msgstr "_Liedtext"
 
-#: share/exposong/lib/exposong/plugins/lyric.py:270
+#: share/exposong/lib/exposong/plugins/lyric.py:375
 msgid "Lyric Presentations"
 msgstr "Lieder-Präsentationen"
 
-#: share/exposong/lib/exposong/plugins/text.py:32
+#: share/exposong/lib/exposong/plugins/text.py:31
 msgid "Text Presentation"
 msgstr "Text-Präsentation"
 
-#: share/exposong/lib/exposong/plugins/text.py:102
+#: share/exposong/lib/exposong/plugins/text.py:246
 msgid "_Text"
 msgstr "_Text"
-
-#: share/exposong/lib/exposong/plugins/text.py:127
-msgid "Text Presentations"
-msgstr "Text-Präsentationen"
-
-#~ msgid "Top Left to Bottom Right"
-#~ msgstr "Von links oben nach rechts unten"
-
-#~ msgid "Top to Bottom"
-#~ msgstr "Von oben nach unten"
-
-#~ msgid "Top Right to Bottom Left"
-#~ msgstr "Von rechts oben nach links unten"
-
-#~ msgid "Left to Right"
-#~ msgstr "Von links nach rechts"
-
-#~ msgid "_Solid"
-#~ msgstr "_Einfarbig"
-
-#~ msgid "_Gradiant"
-#~ msgstr "_Gradient"
-
-#~ msgid ""
-#~ "Gradiant Angle\n"
-#~ "(Clockwise From Up)"
-#~ msgstr ""
-#~ "Gradient Winkel\n"
-#~ "(Im Uhrzeigersinn von oben beginnend)"
-
-#~ msgid "_Presentation"
-#~ msgstr "_Präsentation"
-
-#~ msgid "_Hide"
-#~ msgstr "_Verstecken"
-
-#~ msgid "Generic"
-#~ msgstr "Allgemein"

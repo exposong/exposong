@@ -200,7 +200,7 @@ class Main (gtk.Window):
             slidelist.slidelist.next_slide),
         ('pres-next', None, _("Next Presentation"), "<Ctrl>Page_Down",
             None, preslist.preslist.next_pres),
-        ('Search', gtk.STOCK_FIND, _('Find Presentation'), "slash",
+        ('Search', gtk.STOCK_FIND, _('_Find Presentation'), "slash",
             _('Search for a presentation'), preslist.presfilter.focus),
         ('Present', gtk.STOCK_FULLSCREEN, _('_Present'), "F5", None,
             screen.screen.show),

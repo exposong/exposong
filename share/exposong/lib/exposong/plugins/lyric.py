@@ -210,7 +210,8 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     'Dialog to paste full lyrics.'
     dialog = gtk.Dialog(_("Editing Slide"), exposong.application.main,\
         gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,\
-        (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
     
     dialog.set_border_width(4)
     dialog.vbox.set_spacing(7)
