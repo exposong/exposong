@@ -296,15 +296,13 @@ class Main (gtk.Window):
       print "Error reading presentation file (%s): %s" % (filenm, details)
     else:
       root_elem = dom.documentElement
-      if root_elem.tagName == "presentation" and root_elem.hasAttribute("type"):
-        filetype = root_elem.getAttribute("type")
-        plugins = exposong.plugins.get_plugins_by_capability(
-            exposong.plugins._abstract.Presentation)
-        for plugin in plugins:
-          if str(filetype) == plugin.get_type():
-            pres = plugin(dom.documentElement, filenm)
-            self.library.append(pres)
-            break
+      plugins = exposong.plugins.get_plugins_by_capability(
+          exposong.plugins._abstract.Presentation)
+      for plugin in plugins:
+        if plugin.is_type(root_elem):
+          pres = plugin(dom.documentElement, filenm)
+          self.library.append(pres)
+          break
       else:
         print "%s is not a presentation file." % filenm
       dom.unlink()

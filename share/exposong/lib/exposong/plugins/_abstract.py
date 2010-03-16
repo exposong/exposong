@@ -134,6 +134,13 @@ class Presentation:
       
       self._set_slides(dom)
   
+  @classmethod
+  def is_type(class_, dom):
+    if dom.tagName == "presentation" and dom.hasAttribute("type"):
+      if str(dom.getAttribute("type")) == class_.get_type():
+        return True
+    return False
+  
   @staticmethod
   def get_type():
     'Return the presentation type.'
