@@ -89,7 +89,9 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     def footer_text(self):
       'Draw text on the footer.'
       jn = ['"%s"' % self.pres.title]
-      author = ';  '.join( _(k.title())+": "+v for k,v in self.pres.author.iteritems() if v )
+      # Translate 'words' and 'music'
+      trans = {"words":_("words"), "music":_("music")}
+      author = ';  '.join(trans[k].title()+": "+v for k,v in self.pres.author.iteritems() if v )
       if author:
         jn.append(author)
       if hasattr(self.pres, "copyright") and len(self.pres.copyright):

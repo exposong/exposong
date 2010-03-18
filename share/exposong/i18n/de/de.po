@@ -1,11 +1,11 @@
 # German translations for Exposong package.
-# Copyright (C) 2008 Fishhookweb.com
+# Copyright (C) 2008 Exposong.org
 # This file is distributed under the same license as the ExpoSong package.
 # Siegwart <siegwart.b@googlemail.com>, 2008.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: 0.6.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-03-18 15:12+0100\n"
 "PO-Revision-Date: 2008-03-12 00:02+0100\n"
@@ -328,6 +328,7 @@ msgstr "Bilder-Präsentation"
 #: share/exposong/lib/exposong/plugins/lyric.py:223
 #: share/exposong/lib/exposong/plugins/text.py:60
 #: share/exposong/lib/exposong/plugins/text.py:119
+#: share/exposong/lib/exposong/plugins/lyric.py:225
 msgid "Title:"
 msgstr "Titel:"
 
@@ -353,50 +354,59 @@ msgid "Lyric Presentation"
 msgstr "Lieder-Präsentation"
 
 #: share/exposong/lib/exposong/plugins/lyric.py:150
+#: share/exposong/lib/exposong/plugins/lyric.py:152
 msgid "Words:"
 msgstr "Text:"
 
 #: share/exposong/lib/exposong/plugins/lyric.py:158
+#: share/exposong/lib/exposong/plugins/lyric.py:160
 msgid "Music:"
 msgstr "Musik:"
 
 #: share/exposong/lib/exposong/plugins/lyric.py:166
+#: share/exposong/lib/exposong/plugins/lyric.py:168
 msgid "Copyright:"
 msgstr "Copyright:"
 
 #: share/exposong/lib/exposong/plugins/lyric.py:176
+#: share/exposong/lib/exposong/plugins/lyric.py:178
 msgid "Order:"
 msgstr "Reihenfolge:"
 
 #: share/exposong/lib/exposong/plugins/lyric.py:182
+#: share/exposong/lib/exposong/plugins/lyric.py:184
 #, python-format
 msgid ""
 "Input can be any of the following: %(verse)s for verses, %(chorus)s for "
 "chorus, %(refrain)s for refrain, %(bridge)s for bridge, %(ending)s for "
 "ending."
 msgstr ""
-"Sie können folgendes eingeben: %(verse)s für Verse, %(chorus)s für "
-"Chorus, %(refrain)s für Refrain, %(bridge)s für Bridge, %(ending)s für "
-"Ending."
+"Sie können folgendes eingeben: %(verse)s für Verse, %(chorus)s für Chorus, %"
+"(refrain)s für Refrain, %(bridge)s für Bridge, %(ending)s für Ending."
 
 #: share/exposong/lib/exposong/plugins/lyric.py:195
+#: share/exposong/lib/exposong/plugins/lyric.py:197
 msgid "Information"
 msgstr "Informationen"
 
 #: share/exposong/lib/exposong/plugins/lyric.py:200
+#: share/exposong/lib/exposong/plugins/lyric.py:202
 msgid "Paste As Text"
 msgstr "Als Text einfügen"
 
 #: share/exposong/lib/exposong/plugins/lyric.py:214
 #: share/exposong/lib/exposong/plugins/text.py:53
+#: share/exposong/lib/exposong/plugins/lyric.py:216
 msgid "Editing Slide"
 msgstr "Folie bearbeiten"
 
 #: share/exposong/lib/exposong/plugins/lyric.py:350
+#: share/exposong/lib/exposong/plugins/lyric.py:352
 msgid "_Lyric"
 msgstr "_Liedtext"
 
 #: share/exposong/lib/exposong/plugins/lyric.py:375
+#: share/exposong/lib/exposong/plugins/lyric.py:377
 msgid "Lyric Presentations"
 msgstr "Lieder-Präsentationen"
 
@@ -411,3 +421,11 @@ msgstr "_Text"
 #: share/exposong/lib/exposong/plugins/text.py:271
 msgid "Text Presentations"
 msgstr "Text-Präsentation"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:93
+msgid "words"
+msgstr "text"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:93
+msgid "music"
+msgstr "melodie"
