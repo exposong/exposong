@@ -179,9 +179,12 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     self._fields['order'].set_text(' '.join(self._order))
     vbox2 = gtk.VBox()
     vbox2.pack_start(self._fields['order'], True, True, 5)
-    label = gtk.Label( _("Input can be any of the following: %s for verses,\n" + \
-        "%s for chorus, %s for refrain, %s for bridge, %s for ending") % \
-        ("v1..v9","c","s","b","e" ) )
+    label = gtk.Label(_("Input can be any of the following: \
+%(verse)s for verses, %(chorus)s for chorus, %(refrain)s for refrain, \
+%(bridge)s for bridge, %(ending)s for ending.")\
+        %{"verse":"v1...v9","chorus":"c",\
+        "refrain":"r", "bridge":"b",\
+        "ending":"e"})
     label.set_justify(gtk.JUSTIFY_LEFT)
     label.set_alignment(0,0.5)
     label.set_line_wrap(True)

@@ -148,8 +148,8 @@ class ExportImport(Plugin, _abstract.Menu):
           dlg.get_filename().rpartition(os.sep)[2].partition(".")[0])
       tar.extractall(tmpdir)
       tar.close()
+      imgs2rename = []
       if os.path.isdir(os.path.join(tmpdir, "image")):
-        imgs2rename = []
         for nm in os.listdir(os.path.join(tmpdir,"image")):
           if not os.path.exists(os.path.join(DATA_PATH, "image", nm)):
             print os.path.join(DATA_PATH, "image", nm)

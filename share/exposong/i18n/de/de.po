@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-13 13:01+0100\n"
+"POT-Creation-Date: 2010-03-18 15:12+0100\n"
 "PO-Revision-Date: 2008-03-12 00:02+0100\n"
 "Last-Translator: Samuel Mehrbrodt <s.mehrbrodt@gmail.com>\n"
 "Language-Team: German\n"
@@ -24,7 +24,9 @@ msgstr "Copyright %s"
 #: share/exposong/lib/exposong/about.py:34
 #: share/exposong/lib/exposong/about.py:35
 msgid "Translators Name"
-msgstr "Siegwart Bogatscher\nSamuel Mehrbrodt"
+msgstr ""
+"Siegwart Bogatscher\n"
+"Samuel Mehrbrodt"
 
 #: share/exposong/lib/exposong/application.py:129
 msgid "Present"
@@ -145,20 +147,20 @@ msgstr "_Schwarzer Bildschirm"
 msgid "Hi_de"
 msgstr "_Verstecken"
 
-#: share/exposong/lib/exposong/application.py:347
+#: share/exposong/lib/exposong/application.py:345
 msgid "Library"
 msgstr "Bibliothek"
 
-#: share/exposong/lib/exposong/application.py:370
+#: share/exposong/lib/exposong/application.py:368
 msgid "Custom Schedules"
 msgstr "Eigene Ablaufpläne"
 
-#: share/exposong/lib/exposong/application.py:404
+#: share/exposong/lib/exposong/application.py:402
 #, python-format
 msgid "Are you sure you want to delete \"%s\" from your library?"
 msgstr "Sind Sie sicher, dass Sie \"%s\" aus ihrer Bibliothek löschen möchten?"
 
-#: share/exposong/lib/exposong/application.py:405
+#: share/exposong/lib/exposong/application.py:403
 msgid "Delete Presentation?"
 msgstr "Präsentation löschen?"
 
@@ -175,7 +177,7 @@ msgstr "Bild-Typen"
 msgid "Add Image"
 msgstr "Bild hinzufügen"
 
-#: share/exposong/lib/exposong/__init__.py:40
+#: share/exposong/lib/exposong/__init__.py:62
 msgid "en"
 msgstr "de"
 
@@ -259,16 +261,16 @@ msgstr "Logo auswählen?"
 msgid "Slide"
 msgstr "Folie"
 
-#: share/exposong/lib/exposong/plugins/_abstract.py:188
+#: share/exposong/lib/exposong/plugins/_abstract.py:195
 msgid "New Presentation"
 msgstr "Neue Präsentation"
 
-#: share/exposong/lib/exposong/plugins/_abstract.py:193
+#: share/exposong/lib/exposong/plugins/_abstract.py:200
 #, python-format
 msgid "Editing %s"
 msgstr "%s bearbeiten"
 
-#: share/exposong/lib/exposong/plugins/_abstract.py:196
+#: share/exposong/lib/exposong/plugins/_abstract.py:203
 #, python-format
 msgid "New %s Presentation"
 msgstr "Neue %s-Präsentation"
@@ -323,7 +325,7 @@ msgid "Image Presentation"
 msgstr "Bilder-Präsentation"
 
 #: share/exposong/lib/exposong/plugins/image.py:185
-#: share/exposong/lib/exposong/plugins/lyric.py:220
+#: share/exposong/lib/exposong/plugins/lyric.py:223
 #: share/exposong/lib/exposong/plugins/text.py:60
 #: share/exposong/lib/exposong/plugins/text.py:119
 msgid "Title:"
@@ -368,18 +370,24 @@ msgstr "Reihenfolge:"
 
 #: share/exposong/lib/exposong/plugins/lyric.py:182
 #, python-format
-msgid "Input can be any of the following: %s for verses,\n"
-msgstr "Sie können folgendes eingeben: %s für Strophen,\n"
+msgid ""
+"Input can be any of the following: %(verse)s for verses, %(chorus)s for "
+"chorus, %(refrain)s for refrain, %(bridge)s for bridge, %(ending)s for "
+"ending."
+msgstr ""
+"Sie können folgendes eingeben: %(verse)s für Verse, %(chorus)s für "
+"Chorus, %(refrain)s für Refrain, %(bridge)s für Bridge, %(ending)s für "
+"Ending."
 
-#: share/exposong/lib/exposong/plugins/lyric.py:192
+#: share/exposong/lib/exposong/plugins/lyric.py:195
 msgid "Information"
 msgstr "Informationen"
 
-#: share/exposong/lib/exposong/plugins/lyric.py:197
+#: share/exposong/lib/exposong/plugins/lyric.py:200
 msgid "Paste As Text"
 msgstr "Als Text einfügen"
 
-#: share/exposong/lib/exposong/plugins/lyric.py:211
+#: share/exposong/lib/exposong/plugins/lyric.py:214
 #: share/exposong/lib/exposong/plugins/text.py:53
 msgid "Editing Slide"
 msgstr "Folie bearbeiten"
@@ -399,3 +407,7 @@ msgstr "Text-Präsentation"
 #: share/exposong/lib/exposong/plugins/text.py:246
 msgid "_Text"
 msgstr "_Text"
+
+#: share/exposong/lib/exposong/plugins/text.py:271
+msgid "Text Presentations"
+msgstr "Text-Präsentation"
