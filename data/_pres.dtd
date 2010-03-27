@@ -1,6 +1,5 @@
 <!ELEMENT presentation (title, author*, copyright?, order?, comments?, slide+) >
 <!ELEMENT title CDATA >
-<!ELEMENT author CDATA >
 <!ELEMENT copyright CDATA >
 <!ELEMENT order IDREFS >
 <!ELEMENT comments CDATA >
@@ -10,7 +9,6 @@
 <!ATTLIST presentation type CDATA "generic" >
 <!ATTLIST presentation created CDATA #REQUIRED >
 <!ATTLIST presentation modified CDATA #REQUIRED >
-<!ATTLIST author type (words|music|both) "both" >
 <!ATTLIST slide title CDATA #IMPLIED >
 <!ATTLIST slide id ID #REQUIRED >
 <!ATTLIST img src CDATA #REQUIRED >

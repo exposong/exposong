@@ -107,23 +107,20 @@ class Presentation:
         else:
           self.id = random_string(8)
   
+  title = ''
+  copyright = ''
+  slides = []
+  timer = None
+  timer_loop = False
+  filename = None
   
   def __init__(self, dom = None, filename = None):
     if self.__class__ is Presentation:
       raise NotImplementedError("This class cannot be instantiated.")
-    self.title = ''
-    self.copyright = ''
-    self.author = {}
-    self.slides = []
-    self.timer = None
-    self.timer_loop = False
     self.filename = filename
     
     if isinstance(dom, xml.dom.Node):
       self.title = get_node_text(dom.getElementsByTagName("title")[0])
-      for el in dom.getElementsByTagName("author"):
-        atype = el.getAttribute("type")
-        self.author[atype] = get_node_text(el)
       copyright = dom.getElementsByTagName("copyright")
       if len(copyright):
         self.copyright = get_node_text(copyright[0])

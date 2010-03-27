@@ -33,7 +33,7 @@ def get_node_text(node):
   rc = ""
   for child in node.childNodes:
     if child.nodeType == node.TEXT_NODE:
-      rc = rc + child.data
+      rc = rc + child.data.strip()
   return rc
   
 def title_to_filename(title):

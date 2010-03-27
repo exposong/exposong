@@ -22,6 +22,7 @@ import xml.dom
 import xml.dom.minidom
 import pango
 import re
+from datetime import datetime
 
 from exposong.glob import *
 from exposong import RESOURCE_PATH, DATA_PATH
@@ -42,6 +43,12 @@ type_icon = gtk.gdk.pixbuf_new_from_file_at_size(
     join(RESOURCE_PATH,'pres_lyric.png'), 20, 14)
 
 title_re = re.compile("(chorus|refrain|verse|bridge|end(ing)?|soprano|alto|tenor|bass)\\b", re.I)
+auth_types = {
+  "words": _("Words"),
+  "music": _("Music"),
+  "translation": _("Translation"),
+  "_default": _("Written By"),
+  }
 
 def key_shortcuts(accel_group, acceleratable, keyval, modifier):
   'Adds the shortcuts to skip to a given slide.'
@@ -71,11 +78,17 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     '''
     A lyric slide for the presentation.
     '''
+    lang = ''
+    
     def __init__(self, pres, value):
+      lines = []
       self.pres = pres
       if(isinstance(value, xml.dom.Node)):
-        self.text = get_node_text(value)
-        self.title = value.getAttribute("title")
+        self.title = value.getAttribute("name")
+        self.lang = value.getAttribute("lang")
+        self.lines = [_Lines(l) for l in value.getElementsByTagName("lines")]
+        if len(self.lines) > 0:
+          self.text = str(self.lines[0])
       elif(isinstance(value, str)):
         value = value.strip()
         if(title_re.match(value, endpos=30)):
@@ -89,10 +102,9 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     def footer_text(self):
       'Draw text on the footer.'
       jn = ['"%s"' % self.pres.title]
-      # Translate 'words' and 'music'
-      trans = {"words":_("words"), "music":_("music")}
-      author = ';  '.join(trans[k].title()+": "+v for k,v in self.pres.author.iteritems() if v )
-      if author:
+      author = ';  '.join( '%s: %s' % (auth_types.get(a.type,"_default"), str(a)) \
+          for a in _Author.get_authors(self.pres.authors) )
+      if len(author) > 0:
         jn.append(author)
       if hasattr(self.pres, "copyright") and len(self.pres.copyright):
         jn.append(u"Copyright \xA9 %s" % self.pres.copyright)
@@ -100,6 +112,18 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
         jn.append("CCLI# %s" % config['general.ccli'])
       return '\n'.join(jn)
   
+    def to_node(self, doc, node):
+      'Populate the node element'
+      node.setAttribute("lang","en")
+      if self.title:
+        node.setAttribute("name", self.title)
+      lines = doc.createElement("lines")
+      for ln in self.text.split("\n"):
+        line = doc.createElement("line")
+        line.appendChild( doc.createTextNode(ln) )
+        lines.appendChild( line )
+      node.appendChild(lines)
+    
     @staticmethod
     def get_version():
       'Return the version number of the plugin.'
@@ -112,7 +136,32 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
   
   
   def __init__(self, dom = None, filename = None):
-    text.Presentation.__init__(self, dom, filename)
+    self.titles = []
+    self.authors = []
+    self._createdIn = "ExpoSong"
+    self._order = []
+    self.filename = filename
+    
+    if isinstance(dom, xml.dom.Node):
+      props = dom.getElementsByTagName("properties")
+      if len(props) > 0:
+        props = props[0]
+        self.titles = [_Title(t) for t in props.getElementsByTagName("title")]
+        self.authors = [_Author(a) for a in props.getElementsByTagName("author")]
+        copyright = props.getElementsByTagName("copyright")
+        if len(copyright):
+          self.copyright = get_node_text(copyright[0])
+        ordernode = props.getElementsByTagName("verseOrder")
+        if len(ordernode) > 0:
+          self._order = get_node_text(ordernode[0]).split()
+          for o in self._order:
+            if o.strip() == "":
+              self._order.remove(o)
+      
+      slides = dom.getElementsByTagName("verse")
+      for sl in slides:
+        self.slides.append(self.Slide(self, sl))
+    self.title = str(_Title.get_title(self.titles))
 
   def get_order(self):
     'Returns the order in which the slides should be presented.'
@@ -148,21 +197,21 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     vbox.set_border_width(4)
     vbox.set_spacing(7)
     
-    hbox = gtk.HBox()
-    label = gtk.Label(_("Words:"))
-    hbox.pack_start(label, False, True, 5)
-    self._fields['words'] = gtk.Entry(50)
-    self._fields['words'].set_text(self.author.get('words',''))
-    hbox.pack_start(self._fields['words'], True, True, 5)
-    vbox.pack_start(hbox, False, True)
+    #hbox = gtk.HBox()
+    #label = gtk.Label(_("Words:"))
+    #hbox.pack_start(label, False, True, 5)
+    #self._fields['words'] = gtk.Entry(50)
+    #self._fields['words'].set_text(self.author.get('words',''))
+    #hbox.pack_start(self._fields['words'], True, True, 5)
+    #vbox.pack_start(hbox, False, True)
     
-    hbox = gtk.HBox()
-    label = gtk.Label(_("Music:"))
-    hbox.pack_start(label, False, True, 5)
-    self._fields['music'] = gtk.Entry(50)
-    self._fields['music'].set_text(self.author.get('music',''))
-    hbox.pack_start(self._fields['music'], True, True, 5)
-    vbox.pack_start(hbox, False, True)
+    #hbox = gtk.HBox()
+    #label = gtk.Label(_("Music:"))
+    #hbox.pack_start(label, False, True, 5)
+    #self._fields['music'] = gtk.Entry(50)
+    #self._fields['music'].set_text(self.author.get('music',''))
+    #hbox.pack_start(self._fields['music'], True, True, 5)
+    #vbox.pack_start(hbox, False, True)
     
     hbox = gtk.HBox()
     label = gtk.Label(_("Copyright:"))
@@ -181,12 +230,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     self._fields['order'].set_text(' '.join(self._order))
     vbox2 = gtk.VBox()
     vbox2.pack_start(self._fields['order'], True, True, 5)
-    label = gtk.Label(_("Input can be any of the following: \
-%(verse)s for verses, %(chorus)s for chorus, %(refrain)s for refrain, \
-%(bridge)s for bridge, %(ending)s for ending.")\
-        %{"verse":"v1...v9","chorus":"c",\
-        "refrain":"r", "bridge":"b",\
-        "ending":"e"})
+    label = gtk.Label( _("Use the slide titles to modify the order.") )
     label.set_justify(gtk.JUSTIFY_LEFT)
     label.set_alignment(0,0.5)
     label.set_line_wrap(True)
@@ -205,11 +249,23 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
   
   def _edit_save(self):
     'Save the fields if the user clicks ok.'
-    self.author['words'] = self._fields['words'].get_text()
-    self.author['music'] = self._fields['music'].get_text()
+    #self.author['words'] = self._fields['words'].get_text()
+    #self.author['music'] = self._fields['music'].get_text()
     self.copyright = self._fields['copyright'].get_text()
     self._order = self._fields['order'].get_text().split()
-    text.Presentation._edit_save(self)
+    
+    #TODO: This should not always be index 0... But adding multilingual titles
+    # will fix this.
+    self.titles[0] = _Title(self._fields['title'].get_text())
+    self.title = str(_Title.get_title(self.titles))
+    
+    model = self._fields['slides'].get_model()
+    itr = model.get_iter_first()
+    self.slides = []
+    while itr:
+      self.slides.append(model.get_value(itr,0))
+      itr = model.iter_next(itr)
+    del self._slideToolbar
   
   def _paste_as_text(self, *args):
     'Dialog to paste full lyrics.'
@@ -226,7 +282,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     label.set_alignment(0.5, 0.5)
     hbox.pack_start(label, False, True, 5)
     title = gtk.Entry(80)
-    title.set_text(self.title)
+    title.set_text(self._fields['title'].get_text())
     hbox.pack_start(title, True, True)
     
     dialog.vbox.pack_start(hbox, False, True)
@@ -269,40 +325,54 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     self.filename = check_filename(self.title, directory, self.filename)
     
     doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
-    root = doc.createElement("presentation")
-    root.setAttribute("type", self.get_type())
+    root = doc.createElement("song")
+    root.setAttribute("version", "0.7")
+    root.setAttribute("createdIn", self._createdIn)
+    root.setAttribute("modifiedIn", "ExpoSong")
+    root.setAttribute("modifiedDate", datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
     
-    node = doc.createElement("title")
-    node.appendChild(doc.createTextNode(self.title))
-    root.appendChild(node)
+    properties = doc.createElement("properties")
     
-    node = doc.createElement("author")
-    node.setAttribute('type', 'words')
-    node.appendChild(doc.createTextNode(self.author.get('words', '')))
-    root.appendChild(node)
+    titles = doc.createElement("titles")
+    properties.appendChild(titles)
     
-    node = doc.createElement("author")
-    node.setAttribute('type', 'music')
-    node.appendChild(doc.createTextNode(self.author.get('music', '')))
-    root.appendChild(node)
-
+    for t in self.titles:
+      t.to_node(doc, titles)
+    
+    authors = doc.createElement("authors")
+    properties.appendChild(authors)
+    
+    for a in self.authors:
+      a.to_node(doc, authors)
+    
     if self._order != "":
-      node = doc.createElement("order")
+      node = doc.createElement("verseOrder")
       node.appendChild(doc.createTextNode(' '.join(self._order)))
-      root.appendChild(node)
+      properties.appendChild(node)
     
     node = doc.createElement("copyright")
     node.appendChild(doc.createTextNode(self.copyright))
-    root.appendChild(node)
+    properties.appendChild(node)
     
+    lyrics = doc.createElement("lyrics")
     for s in self.slides:
-      sNode = doc.createElement("slide")
+      sNode = doc.createElement("verse")
       s.to_node(doc, sNode)
-      root.appendChild(sNode)
+      lyrics.appendChild(sNode)
+    
+    root.appendChild(properties)
+    root.appendChild(lyrics)
+    
     doc.appendChild(root)
     outfile = open(join(directory, self.filename), 'w')
-    doc.writexml(outfile)
+    doc.writexml(outfile, "\t","\t","\n")
     doc.unlink()
+  
+  @classmethod
+  def is_type(class_, dom):
+    if dom.tagName == "song":
+        return True
+    return False
   
   @staticmethod
   def get_type():
@@ -401,3 +471,91 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     'Called when the presentation is blurred.'
     exposong.application.main.remove_accel_group(_lyrics_accel)
 
+
+
+class _Title:
+  '''
+  Stores a title with attributes.
+  '''
+  title = ""
+  lang = ""
+  
+  def __init__(self, element):
+    'Create a new title'
+    if isinstance(element, xml.dom.Node):
+      self.title = get_node_text(element)
+      self.lang = element.getAttribute("lang")
+    elif isinstance(element, str):
+      self.title = element
+  
+  def __str__(self):
+    return self.title
+  
+  def to_node(self, doc, node):
+    'Create an xml entity from this class.'
+    t = doc.createElement("title")
+    if len(self.lang):
+      t.setAttribute("lang", self.lang)
+    t.appendChild(doc.createTextNode(self.title))
+    node.appendChild(t)
+  
+  @staticmethod
+  def get_title(list_):
+    'Return the current title.'
+    #TODO Get title for current language
+    if len(list_) > 0:
+      return list_[0]
+    else:
+      return _("(No Title)")
+
+class _Author:
+  '''
+  Stores an author with attributes.
+  '''
+  author = ""
+  type = ""
+  lang = ""
+  
+  def __init__(self, element):
+    'Create a new title'
+    if isinstance(element, xml.dom.Node):
+      self.author = get_node_text(element)
+      self.type = element.getAttribute("type")
+      if self.type == 'translation':
+        self.lang = element.getAttribute("lang")
+    if len(self.type) > 0:
+      assert(self.type in auth_types)
+  
+  def __str__(self):
+    'Create a string from this attribute.'
+    return self.author
+  
+  def to_node(self, doc, node):
+    'Create an xml entity from this class.'
+    t = doc.createElement("author")
+    t.setAttribute("type", self.type)
+    if self.type =='translation':
+      t.setAttribute("lang", self.lang)
+    t.appendChild(doc.createTextNode(self.author))
+    node.appendChild(t)
+  
+  @staticmethod
+  def get_authors(list_):
+    'Returns a list of authors for displaying.'
+    #TODO Get current language translator.
+    return (a for a in list_ if a.type in ('words','music'))
+
+class _Lines:
+  '''
+  A group of lines that can be used to separate parts for a lyric.
+  '''
+  part = ""
+  def __init__(self, element = None):
+    self.lines = []
+    if isinstance(element, xml.dom.Node):
+      for ln in element.getElementsByTagName("line"):
+        self.lines.append(get_node_text(ln))
+  
+  def __str__(self):
+    'Get the text value.'
+    return "\n".join(self.lines)
