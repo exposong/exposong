@@ -138,6 +138,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
   def __init__(self, dom = None, filename = None):
     self.titles = []
     self.authors = []
+    self.slides = []
     self._createdIn = "ExpoSong"
     self._order = []
     self.filename = filename
@@ -161,7 +162,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
       slides = dom.getElementsByTagName("verse")
       for sl in slides:
         self.slides.append(self.Slide(self, sl))
-    self.title = str(_Title.get_title(self.titles))
+      self.title = str(_Title.get_title(self.titles))
 
   def get_order(self):
     'Returns the order in which the slides should be presented.'
@@ -184,21 +185,25 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     vbox.set_border_width(4)
     vbox.set_spacing(7)
     
-    #hbox = gtk.HBox()
-    #label = gtk.Label(_("Words:"))
-    #hbox.pack_start(label, False, True, 5)
-    #self._fields['words'] = gtk.Entry(50)
-    #self._fields['words'].set_text(self.author.get('words',''))
-    #hbox.pack_start(self._fields['words'], True, True, 5)
-    #vbox.pack_start(hbox, False, True)
+    hbox = gtk.HBox()
+    label = gtk.Label(_("Words:"))
+    hbox.pack_start(label, False, True, 5)
+    self._fields['words'] = gtk.Entry(50)
+    if 'words' in self.authors:
+      self._fields['words'].set_text(str(self.authors[self.authors.index('words')]))
+    hbox.pack_start(self._fields['words'], True, True, 5)
+    vbox.pack_start(hbox, False, True)
     
-    #hbox = gtk.HBox()
-    #label = gtk.Label(_("Music:"))
-    #hbox.pack_start(label, False, True, 5)
-    #self._fields['music'] = gtk.Entry(50)
-    #self._fields['music'].set_text(self.author.get('music',''))
-    #hbox.pack_start(self._fields['music'], True, True, 5)
-    #vbox.pack_start(hbox, False, True)
+    hbox = gtk.HBox()
+    label = gtk.Label(_("Music:"))
+    hbox.pack_start(label, False, True, 5)
+    self._fields['music'] = gtk.Entry(50)
+    if 'music' in self.authors:
+      self._fields['music'].set_text(str(self.authors[self.authors.index('music')]))
+    hbox.pack_start(self._fields['music'], True, True, 5)
+    vbox.pack_start(hbox, False, True)
+    
+    # TODO Translators
     
     hbox = gtk.HBox()
     label = gtk.Label(_("Copyright:"))
@@ -236,14 +241,22 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
   
   def _edit_save(self):
     'Save the fields if the user clicks ok.'
-    #self.author['words'] = self._fields['words'].get_text()
-    #self.author['music'] = self._fields['music'].get_text()
+    if 'words' in self.authors:
+      self.authors[self.authors.index('words')].author = self._fields['words'].get_text()
+    else:
+      self.authors.append(_Author(author=self._fields['words'].get_text(), type='words'))
+    
+    if 'music' in self.authors:
+      self.authors[self.authors.index('music')].author = self._fields['music'].get_text()
+    else:
+      self.authors.append(_Author(author=self._fields['music'].get_text(), type='music'))
+    
     self.copyright = self._fields['copyright'].get_text()
     self._order = self._fields['order'].get_text().split()
     
     #TODO: This should not always be index 0... But adding multilingual titles
     # will fix this.
-    self.titles[0] = _Title(self._fields['title'].get_text())
+    self.titles[0:0] = ( _Title(self._fields['title'].get_text()), )
     self.title = str(_Title.get_title(self.titles))
     
     model = self._fields['slides'].get_model()
@@ -508,19 +521,26 @@ class _Author:
   type = ""
   lang = ""
   
-  def __init__(self, element):
+  def __init__(self, element = None, author = None, type = None):
     'Create a new title'
     if isinstance(element, xml.dom.Node):
       self.author = get_node_text(element)
       self.type = element.getAttribute("type")
       if self.type == 'translation':
         self.lang = element.getAttribute("lang")
+    elif author != None and type != None:
+      self.author = author
+      self.type = type
     if len(self.type) > 0:
       assert(self.type in auth_types)
   
   def __str__(self):
     'Create a string from this attribute.'
     return self.author
+  
+  def __eq__(self, other):
+    if isinstance(other, str):
+      return self.type == other
   
   def to_node(self, doc, node):
     'Create an xml entity from this class.'

@@ -109,7 +109,6 @@ class Presentation:
   
   title = ''
   copyright = ''
-  slides = []
   timer = None
   timer_loop = False
   filename = None
@@ -118,6 +117,7 @@ class Presentation:
     if self.__class__ is Presentation:
       raise NotImplementedError("This class cannot be instantiated.")
     self.filename = filename
+    self.slides = []
     
     if isinstance(dom, xml.dom.Node):
       self.title = get_node_text(dom.getElementsByTagName("title")[0])
