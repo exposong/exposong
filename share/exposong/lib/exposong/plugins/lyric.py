@@ -172,22 +172,9 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
 
   def get_slide_from_order(self, order_value):
     'Gets the slide index.'
-    title = ""
-    try:
-      title = '^'+{'v':'verse','c':'chorus','b':'bridge',
-              'e':'end(ing)?','r':'refrain'}[order_value[0].lower()]
-      if len(order_value) == 1 or order_value[1:] == '1':
-        title += '( 1)?'
-      else:
-        title += ' '+order_value[1:]
-      title += '$'
-    except KeyError:
-      #return _abstract.Presentation.get_slide_from_order(self, order_value)
-      return False
-      
     i = 0
     for sl in self.slides:
-      if re.match(title,sl.title.lower()):
+      if re.match(order_value,sl.title.lower()):
         return i
       i += 1
 
