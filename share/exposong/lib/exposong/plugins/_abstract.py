@@ -222,48 +222,50 @@ class Presentation:
   def _edit_tabs(self, notebook, parent):
     'Tabs for the dialog.'
     #Slide Timer
-    settings = gtk.VBox()
-    settings.set_border_width(8)
-    settings.set_spacing(7)
-    
-    label = gtk.Label()
-    label.set_markup("<b>Timer</b>")
-    label.set_alignment(0.0, 0.5)
-    settings.pack_start(label, False)
-    
-    self._fields['timer_on'] = gtk.CheckButton("Use Timer")
-    self._fields['timer_on'].set_active(self.timer is not None)
-    self._fields['timer_on'].connect("toggled",\
-        lambda chk: self._fields['timer'].set_sensitive(chk.get_active()))
-    self._fields['timer_on'].connect("toggled",\
-        lambda chk: self._fields['timer_loop'].set_sesitive(chk.get_active()))
-    settings.pack_start(self._fields['timer_on'], False)
-    
-    hbox = gtk.HBox()
-    hbox.set_spacing(18)
-    hbox.pack_start(gtk.Label("Seconds Per Slide"), False, False)
-    
-    self._fields['timer'] = gtk.SpinButton(gtk.Adjustment(1, 1, 25, 1, 3, 10), 1, 0)
-    self._fields['timer'].set_sensitive(self.timer is not None)
-    if isinstance(self.timer, (int, float)):
-      self._fields['timer'].set_value(self.timer)
-    hbox.pack_start(self._fields['timer'], False, False)
-    settings.pack_start(hbox, False)
-    
-    self._fields['timer_loop'] = gtk.CheckButton("Loop Slides")
-    self._fields['timer_loop'].set_active(self.timer_loop)
-    self._fields['timer_loop'].set_sensitive(self.timer is not None)
-    settings.pack_start(self._fields['timer_loop'], False, False)
-    
-    notebook.append_page(settings, gtk.Label("Settings"))
+    if self._has_timer():
+      timer = gtk.VBox()
+      timer.set_border_width(8)
+      timer.set_spacing(7)
+      
+      label = gtk.Label()
+      label.set_markup("<b>Timer</b>")
+      label.set_alignment(0.0, 0.5)
+      timer.pack_start(label, False)
+      
+      self._fields['timer_on'] = gtk.CheckButton("Use Timer")
+      self._fields['timer_on'].set_active(self.timer is not None)
+      self._fields['timer_on'].connect("toggled",\
+          lambda chk: self._fields['timer'].set_sensitive(chk.get_active()))
+      self._fields['timer_on'].connect("toggled",\
+          lambda chk: self._fields['timer_loop'].set_sesitive(chk.get_active()))
+      timer.pack_start(self._fields['timer_on'], False)
+      
+      hbox = gtk.HBox()
+      hbox.set_spacing(18)
+      hbox.pack_start(gtk.Label("Seconds Per Slide"), False, False)
+      
+      self._fields['timer'] = gtk.SpinButton(gtk.Adjustment(1, 1, 25, 1, 3, 10), 1, 0)
+      self._fields['timer'].set_sensitive(self.timer is not None)
+      if isinstance(self.timer, (int, float)):
+        self._fields['timer'].set_value(self.timer)
+      hbox.pack_start(self._fields['timer'], False, False)
+      timer.pack_start(hbox, False)
+      
+      self._fields['timer_loop'] = gtk.CheckButton("Loop Slides")
+      self._fields['timer_loop'].set_active(self.timer_loop)
+      self._fields['timer_loop'].set_sensitive(self.timer is not None)
+      timer.pack_start(self._fields['timer_loop'], False, False)
+      
+      notebook.append_page(timer, gtk.Label( _("Timer") ))
     
     # TODO: Presentation specific backgrounds.
   
   def _edit_save(self):
     'Save the fields if the user clicks ok.'
-    if self._fields['timer_on'].get_active():
-      self.timer = self._fields['timer'].get_value_as_int()
-      self.timer_loop = self._fields['timer_loop'].get_active()
+    if self._has_timer():
+      if self._fields['timer_on'].get_active():
+        self.timer = self._fields['timer'].get_value_as_int()
+        self.timer_loop = self._fields['timer_loop'].get_active()
   
   def to_xml(self):
     'Save the data to disk.'
@@ -320,6 +322,11 @@ class Presentation:
         if sched:
           sched.append(pres)
         itr = model.iter_next(itr)
+  
+  @staticmethod
+  def _has_timer():
+    'Returns boolean to show if we want to have timers.'
+    return True
   
   def on_delete(self):
     'Called when the presentation is deleted.'

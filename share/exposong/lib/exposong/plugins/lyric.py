@@ -413,6 +413,11 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
               
       cont = it.forward_line()
   
+  @staticmethod
+  def _has_timer():
+    'Returns boolean to show if we want to have timers.'
+    return False
+  
   def merge_menu(self, uimanager):
     'Merge new values with the uimanager.'
     factory = gtk.IconFactory()
