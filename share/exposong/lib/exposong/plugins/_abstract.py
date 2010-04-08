@@ -228,11 +228,11 @@ class Presentation:
       timer.set_spacing(7)
       
       label = gtk.Label()
-      label.set_markup("<b>Timer</b>")
+      label.set_markup(_("<b>Timer</b>"))
       label.set_alignment(0.0, 0.5)
       timer.pack_start(label, False)
       
-      self._fields['timer_on'] = gtk.CheckButton("Use Timer")
+      self._fields['timer_on'] = gtk.CheckButton(_("Use Timer"))
       self._fields['timer_on'].set_active(self.timer is not None)
       self._fields['timer_on'].connect("toggled",\
           lambda chk: self._fields['timer'].set_sensitive(chk.get_active()))
@@ -242,7 +242,7 @@ class Presentation:
       
       hbox = gtk.HBox()
       hbox.set_spacing(18)
-      hbox.pack_start(gtk.Label("Seconds Per Slide"), False, False)
+      hbox.pack_start(gtk.Label(_("Seconds Per Slide")), False, False)
       
       self._fields['timer'] = gtk.SpinButton(gtk.Adjustment(1, 1, 25, 1, 3, 10), 1, 0)
       self._fields['timer'].set_sensitive(self.timer is not None)
@@ -251,7 +251,7 @@ class Presentation:
       hbox.pack_start(self._fields['timer'], False, False)
       timer.pack_start(hbox, False)
       
-      self._fields['timer_loop'] = gtk.CheckButton("Loop Slides")
+      self._fields['timer_loop'] = gtk.CheckButton(_("Loop Slides"))
       self._fields['timer_loop'].set_active(self.timer_loop)
       self._fields['timer_loop'].set_sensitive(self.timer is not None)
       timer.pack_start(self._fields['timer_loop'], False, False)

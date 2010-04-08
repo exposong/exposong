@@ -153,11 +153,11 @@ class ExportImport(Plugin, _abstract.Menu):
         for nm in os.listdir(os.path.join(tmpdir,"image")):
           if not os.path.exists(os.path.join(DATA_PATH, "image", nm)):
             print os.path.join(DATA_PATH, "image", nm)
-            os.rename(os.path.join(tmpdir, "image", nm),
+            shutil.move(os.path.join(tmpdir, "image", nm),
                 os.path.join(DATA_PATH, "image", nm))
           else:
             nm2 = find_freefile(os.path.join(DATA_PATH, "image", nm))
-            os.rename(os.path.join(tmpdir, "image", nm), 
+            shutil.move(os.path.join(tmpdir, "image", nm), 
                 os.path.join(DATA_PATH, "image", nm2))
             imgs2rename.append( (nm,nm2.rpartition(os.sep)[2]) )
 
@@ -174,16 +174,16 @@ class ExportImport(Plugin, _abstract.Menu):
               outfl.write(ln)
             infl.close()
             outfl.close()
-            os.rename(os.path.join(tmpdir,"pres",nm+".1"),
+            shutil.move(os.path.join(tmpdir,"pres",nm+".1"),
                 os.path.join(tmpdir,"pres",nm))
           if not os.path.exists(os.path.join(DATA_PATH, "pres", nm)):
-            os.rename(os.path.join(tmpdir, "pres", nm),
+            shutil.move(os.path.join(tmpdir, "pres", nm),
                 os.path.join(DATA_PATH, "pres", nm))
             exposong.application.main.load_pres(nm)
           else:
             nm2 = find_freefile(os.path.join(DATA_PATH, "pres", nm)) \
                 .rpartition(os.sep)[2]
-            os.rename(os.path.join(tmpdir, "pres", nm), 
+            shutil.move(os.path.join(tmpdir, "pres", nm), 
                 os.path.join(DATA_PATH, "pres", nm2))
             exposong.application.main.load_pres(nm2)
             pres2rename.append( (nm,nm2) )
@@ -200,35 +200,35 @@ class ExportImport(Plugin, _abstract.Menu):
               outfl.write(ln)
             infl.close()
             outfl.close()
-            os.rename(os.path.join(tmpdir,"sched",nm+".1"),
+            shutil.move(os.path.join(tmpdir,"sched",nm+".1"),
                 os.path.join(tmpdir,"sched",nm))
 
           if not os.path.exists(os.path.join(DATA_PATH, "sched", nm)):
-            os.rename(os.path.join(tmpdir, "sched", nm),
+            shutil.move(os.path.join(tmpdir, "sched", nm),
                 os.path.join(DATA_PATH, "sched", nm))
             exposong.application.main.load_sched(nm)
           else:
             nm2 = find_freefile(os.path.join(DATA_PATH, "sched", nm)) \
                 .rpartition(os.sep)[2]
-            os.rename(os.path.join(tmpdir, "sched", nm),
+            shutil.move(os.path.join(tmpdir, "sched", nm),
                 os.path.join(DATA_PATH, "sched", nm2))
             exposong.application.main.load_sched(nm2)
 
       if os.path.isdir(os.path.join(tmpdir, "bg")):
         for nm in os.listdir(tmpdir):
           if not os.path.exists(os.path.join(DATA_PATH, "bg", nm)):
-            os.rename(os.path.join(tmpdir, "bg", nm),
+            shutil.move(os.path.join(tmpdir, "bg", nm),
                 os.path.join(DATA_PATH, "bg", nm))
           else:
             nm2 = find_freefile(os.path.join(DATA_PATH, "bg", nm))
-            os.rename(os.path.join(tmpdir, "bg", nm),
+            shutil.move(os.path.join(tmpdir, "bg", nm),
                 os.path.join(DATA_PATH, "bg", nm2))
       #for p1 in os.listdir(tmpdir):
       #  p1abs = os.path.join(tmpdir, p1)
       #  if os.path.isdir(p1abs):
       #    for p2 in os.listdir(p1abs):
       #      flname = find_freefile(os.path.join(DATA_PATH,p1,p2))
-      #      os.rename(os.path.join(tmpdir,p1,p2), flname)
+      #      shutil.move(os.path.join(tmpdir,p1,p2), flname)
       #  else:
       #    print "Error: Not a directory ("+p1abs+")"
       #shutil.rmtree(tmpdir)

@@ -1,20 +1,19 @@
 # German translations for Exposong package.
 # Copyright (C) 2008 Exposong.org
 # This file is distributed under the same license as the ExpoSong package.
-# Siegwart <siegwart.b@googlemail.com>, 2008.
+# Siegwart B. <siegwart.b@googlemail.com>, 2008.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: 0.6.1\n"
+"Project-Id-Version: 0.6.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-18 15:12+0100\n"
-"PO-Revision-Date: 2008-03-12 00:02+0100\n"
+"POT-Creation-Date: 2010-04-07 23:50+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Samuel Mehrbrodt <s.mehrbrodt@gmail.com>\n"
-"Language-Team: German\n"
+"Language-Team: German <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: share/exposong/lib/exposong/about.py:31
 #, python-format
@@ -49,7 +48,7 @@ msgstr "Schwarzer Bildschirm"
 
 #: share/exposong/lib/exposong/application.py:141
 msgid "Hide"
-msgstr "Verstecken"
+msgstr "Ausblenden"
 
 #: share/exposong/lib/exposong/application.py:172
 msgid "_File"
@@ -145,7 +144,7 @@ msgstr "_Schwarzer Bildschirm"
 
 #: share/exposong/lib/exposong/application.py:213
 msgid "Hi_de"
-msgstr "_Verstecken"
+msgstr "_Ausblenden"
 
 #: share/exposong/lib/exposong/application.py:345
 msgid "Library"
@@ -361,7 +360,7 @@ msgstr "Text:"
 #: share/exposong/lib/exposong/plugins/lyric.py:158
 #: share/exposong/lib/exposong/plugins/lyric.py:160
 msgid "Music:"
-msgstr "Musik:"
+msgstr "Melodie:"
 
 #: share/exposong/lib/exposong/plugins/lyric.py:166
 #: share/exposong/lib/exposong/plugins/lyric.py:168
@@ -429,3 +428,23 @@ msgstr "text"
 #: share/exposong/lib/exposong/plugins/lyric.py:93
 msgid "music"
 msgstr "melodie"
+
+#: share/exposong/lib/exposong/plugins/_abstract.py:233
+msgid "<b>Timer</b>"
+msgstr "<b>Timer</b>"
+
+#: share/exposong/lib/exposong/plugins/_abstract.py:237
+msgid "Use Timer"
+msgstr "Timer benutzen"
+
+#: share/exposong/lib/exposong/plugins/_abstract.py:247
+msgid "Seconds Per Slide"
+msgstr "Sekunden pro Folie"
+
+#: share/exposong/lib/exposong/plugins/_abstract.py:256
+msgid "Loop Slides"
+msgstr "Am Ende wiederholen"
+
+#: share/exposong/lib/exposong/plugins/_abstract.py:261
+msgid "Settings"
+msgstr "Einstellungen"
