@@ -87,7 +87,7 @@ class SlideList(gtk.TreeView):
       cnt = 0
       for o in self.slide_order:
         if o == int(cur):
-          if cnt+mv in self.slide_order:
+          if len(self.slide_order) > cnt+mv and cnt+mv > 0:
             self.to_slide(self.slide_order[cnt+mv])
             self.slide_order_index = cnt+mv
             return True

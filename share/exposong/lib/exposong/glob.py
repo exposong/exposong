@@ -30,11 +30,11 @@ def get_node_text(node):
   'Returns the text of a node (XML DOM Object)'
   if(isinstance(node, str)):
     return node
-  rc = ""
+  rc = []
   for child in node.childNodes:
     if child.nodeType == node.TEXT_NODE:
-      rc = rc + child.data.strip()
-  return rc
+      rc.append(child.data)
+  return re.sub('\s+',' ',"".join(rc).strip())
   
 def title_to_filename(title):
   'Returns a filename with letters and underscores only.'
