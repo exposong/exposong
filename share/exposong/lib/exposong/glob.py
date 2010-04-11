@@ -58,9 +58,10 @@ def check_filename(title, directory, filename = None):
   tfile = title_to_filename(title)
   match = "^"+re.escape(tfile)+"(-[0-9]+)?.xml$"
   if not isinstance(filename, str) or not re.match(match, filename):
-    if(filename):
+    if filename:
+      # Remove the old file if the title changed.
       os.remove(os.path.join(directory, filename))
-    filename = find_freefile(tfile+".xml")
+    filename = find_freefile(os.path.join(directory,tfile+".xml"))
   return filename
 
 def find_freefile(fl):

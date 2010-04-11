@@ -44,13 +44,20 @@ class Schedule(gtk.ListStore):
     self.builtin = False
     self.title = get_node_text(dom.getElementsByTagName("title")[0])
     for presNode in dom.getElementsByTagName("presentation"):
-      filenm = comment = ""
+      filenm = ""
+      comment = ""
+      
       try:
         filenm = get_node_text(presNode.getElementsByTagName("file")[0])
         hasFile = True
+      except IndexError:
+        pass
+      
+      try:
         comment = get_node_text(presNode.getElementsByTagName("comment")[0])
       except IndexError:
         pass
+      
       if filenm:
         pres = library.find(filename=filenm)
         if pres:
