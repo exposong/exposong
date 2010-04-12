@@ -14,6 +14,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import os
 import gtk
 import gtk.gdk
 import gobject
@@ -21,6 +23,8 @@ import gobject
 import exposong.slidelist
 import exposong.application
 import exposong.schedlist
+
+from exposong import DATA_PATH
 
 preslist = None #will hold the PresList instance
 presfilter = None #will hold PresFilter instance
@@ -128,12 +132,23 @@ class PresList(gtk.TreeView):
       self.prev_selection = None
     exposong.slidelist.slide_scroll.get_vadjustment().set_value(0)
     #TODO This is not working, may need to change the signal
+    
     exposong.application.main.main_actions.get_action("pres-edit")\
         .set_sensitive(self.has_selection())
-    exposong.application.main.main_actions.get_action("pres-delete")\
-        .set_sensitive(self.has_selection())
-    exposong.application.main.main_actions.get_action("pres-delete-from-schedule")\
-        .set_sensitive(self.has_selection() and not self.get_model().builtin)
+    pres_delete = exposong.application.main.main_actions\
+                  .get_action("pres-delete")
+    pres_delete_from_schedule = exposong.application.main.main_actions\
+                                .get_action("pres-delete-from-schedule")
+    pres_delete.set_sensitive(self.has_selection() and self.get_model().builtin)
+    pres_delete_from_schedule.set_sensitive(self.has_selection()
+                                            and not self.get_model().builtin)
+    # Activate Shortcut for the delete/delete schedule
+    if self.get_model().builtin:
+      pres_delete_from_schedule.disconnect_accelerator()
+      pres_delete.connect_accelerator()
+    else:
+      pres_delete.disconnect_accelerator()
+      pres_delete_from_schedule.connect_accelerator()
   
   def _on_pres_edit(self, *args):
     'Edit the presentation.'
@@ -174,7 +189,39 @@ class PresList(gtk.TreeView):
       sched.move_before(itr_mv, itr_to)
     
     context.finish(True, False)
-  
+
+  def _on_pres_delete(self, *args):
+    'Delete the selected presentation.'
+    item = self.get_active_item()
+    if not item:
+      return False
+    dialog = gtk.MessageDialog(exposong.application.main, gtk.DIALOG_MODAL,
+        gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
+        _('Are you sure you want to delete "%s" from your library?') % item.title)
+    dialog.set_title( _("Delete Presentation?") )
+    resp = dialog.run()
+    dialog.hide()
+    if resp == gtk.RESPONSE_YES:
+      item.on_delete()
+      schmod = exposong.schedlist.schedlist.get_model()
+      
+      #Remove from builtin modules
+      itr = schmod.get_iter_first()
+      while itr:
+        sched = schmod.get_value(itr, 0)
+        if sched:
+          sched.remove_if(presentation=item.presentation)
+        itr = schmod.iter_next(itr)
+      
+      #Remove from custom schedules
+      itr = schmod.iter_children(exposong.schedlist.schedlist.custom_schedules)
+      while itr:
+        sched = schmod.get_value(itr, 0)
+        sched.remove_if(presentation=item.presentation)
+        itr = schmod.iter_next(itr)
+      os.remove(os.path.join(DATA_PATH,"pres",item.filename))
+      self._on_pres_activate()
+
   def _on_pres_delete_from_schedule(self, *args):
     'Remove the schedule from the current schedule.'
     sched, itr = self.get_selection().get_selected()

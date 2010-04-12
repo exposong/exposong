@@ -104,7 +104,7 @@ msgstr "Aus _Ablaufplan löschen"
 
 #: share/exposong/lib/exposong/application.py:195
 msgid "Previous Presentation"
-msgstr "Lieder-Präsentation"
+msgstr "Vorherige Präsentation"
 
 #: share/exposong/lib/exposong/application.py:197
 msgid "Previous Slide"

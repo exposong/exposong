@@ -104,9 +104,7 @@ class ScheduleList(gtk.TreeView):
       enable = isinstance(sched, exposong.schedule.Schedule) and not sched.builtin
     except UnboundLocalError:
       enable = False
-    exposong.application.main.main_actions.get_action("pres-delete-from-schedule")\
-        .set_sensitive(not exposong.preslist.preslist.get_model().builtin and\
-        exposong.preslist.preslist.has_selection())
+
     exposong.application.main.main_actions.get_action("sched-rename")\
         .set_sensitive(enable)
     exposong.application.main.main_actions.get_action("sched-delete")\

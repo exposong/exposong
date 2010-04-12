@@ -152,10 +152,9 @@ class Main (gtk.Window):
     win_v.pack_end(self.status_bar, False)
     
     gtk.settings_get_default().set_long_property('gtk-button-images',True,\
-        'application:__init__')
-
+        'application:__init__')    
     self.build_all()
-
+    
     self.add(win_v)
     self.show_all()
   
@@ -187,10 +186,10 @@ class Main (gtk.Window):
         ('pres-edit', gtk.STOCK_EDIT, None, None,
             _("Edit the currently selected presentation"),
             preslist.preslist._on_pres_edit),
-        ('pres-delete', gtk.STOCK_DELETE, None, None,
-            _("Delete the presentation"), self._on_pres_delete),
+        ('pres-delete', gtk.STOCK_DELETE, None, "Delete",
+            _("Delete the presentation"), preslist.preslist._on_pres_delete),
         ('pres-delete-from-schedule', gtk.STOCK_DELETE,
-            _("Delete from _Schedule"), None, None,
+            _("Delete from _Schedule"), "Delete", None,
             preslist.preslist._on_pres_delete_from_schedule),
         ('pres-prev', None, _("Previous Presentation"), "<Ctrl>Page_Up",
             None, preslist.preslist.prev_pres),
@@ -391,38 +390,6 @@ class Main (gtk.Window):
     if event.button == 3:
       if widget.get_active_item() and not widget.get_active_item().builtin:
         self.sched_list_menu.popup(None, None, None, event.button, event.get_time())
-  
-  def _on_pres_delete(self, *args):
-    'Delete the selected presentation.'
-    item = preslist.preslist.get_active_item()
-    if not item:
-      return False
-    dialog = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
-        gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
-        _('Are you sure you want to delete "%s" from your library?') % item.title)
-    dialog.set_title( _("Delete Presentation?") )
-    resp = dialog.run()
-    dialog.hide()
-    if resp == gtk.RESPONSE_YES:
-      item.on_delete()
-      schmod = schedlist.schedlist.get_model()
-      
-      #Remove from builtin modules
-      itr = schmod.get_iter_first()
-      while itr:
-        sched = schmod.get_value(itr, 0)
-        if sched:
-          sched.remove_if(presentation=item.presentation)
-        itr = schmod.iter_next(itr)
-      
-      #Remove from custom schedules
-      itr = schmod.iter_children(schedlist.schedlist.custom_schedules)
-      while itr:
-        sched = schmod.get_value(itr, 0)
-        sched.remove_if(presentation=item.presentation)
-        itr = schmod.iter_next(itr)
-      os.remove(join(DATA_PATH,"pres",item.filename))
-      preslist.preslist._on_pres_activate()
   
   def _on_about(self, *args):
     'Shows the about dialog.'

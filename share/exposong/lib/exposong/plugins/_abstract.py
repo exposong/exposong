@@ -237,7 +237,7 @@ class Presentation:
       self._fields['timer_on'].connect("toggled",\
           lambda chk: self._fields['timer'].set_sensitive(chk.get_active()))
       self._fields['timer_on'].connect("toggled",\
-          lambda chk: self._fields['timer_loop'].set_sesitive(chk.get_active()))
+          lambda chk: self._fields['timer_loop'].set_sensitive(chk.get_active()))
       timer.pack_start(self._fields['timer_on'], False)
       
       hbox = gtk.HBox()
