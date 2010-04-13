@@ -186,11 +186,12 @@ class Main (gtk.Window):
         ('pres-edit', gtk.STOCK_EDIT, None, None,
             _("Edit the currently selected presentation"),
             preslist.preslist._on_pres_edit),
+        ('pres-remove-from-schedule', gtk.STOCK_REMOVE,
+            _("_Remove from Schedule"), "Delete",
+            _("Remove the presentation from schedule"),
+            preslist.preslist._on_pres_delete_from_schedule),
         ('pres-delete', gtk.STOCK_DELETE, None, "Delete",
             _("Delete the presentation"), preslist.preslist._on_pres_delete),
-        ('pres-delete-from-schedule', gtk.STOCK_DELETE,
-            _("Delete from _Schedule"), "Delete", None,
-            preslist.preslist._on_pres_delete_from_schedule),
         ('pres-prev', None, _("Previous Presentation"), "<Ctrl>Page_Up",
             None, preslist.preslist.prev_pres),
         ('pres-slide-prev', None, _("Previous Slide"), "Page_Up", None,
@@ -238,8 +239,8 @@ class Main (gtk.Window):
           <menu action="Presentation">
             <menu action="pres-new"></menu>
             <menuitem action="pres-edit" />
+            <menuitem action="pres-remove-from-schedule" />
             <menuitem action="pres-delete" />
-            <menuitem action="pres-delete-from-schedule" />
             <separator />
             <menuitem action="Present" position="bot" />
             <menuitem action="Background" position="bot" />
@@ -273,7 +274,7 @@ class Main (gtk.Window):
     self.pres_list_sched_menu.append(self.main_actions
         .get_action('pres-edit').create_menu_item())
     self.pres_list_sched_menu.append(self.main_actions
-        .get_action('pres-delete-from-schedule').create_menu_item())
+        .get_action('pres-remove-from-schedule').create_menu_item())
     self.pres_list_sched_menu.show_all()
     
     self.sched_list_menu = gtk.Menu()

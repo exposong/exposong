@@ -138,17 +138,12 @@ class PresList(gtk.TreeView):
     pres_delete = exposong.application.main.main_actions\
                   .get_action("pres-delete")
     pres_delete_from_schedule = exposong.application.main.main_actions\
-                                .get_action("pres-delete-from-schedule")
-    pres_delete.set_sensitive(self.has_selection() and self.get_model().builtin)
+                                .get_action("pres-remove-from-schedule")
+    pres_delete.set_sensitive(self.has_selection())
     pres_delete_from_schedule.set_sensitive(self.has_selection()
                                             and not self.get_model().builtin)
-    # Activate Shortcut for the delete/delete schedule
-    if self.get_model().builtin:
-      pres_delete_from_schedule.disconnect_accelerator()
-      pres_delete.connect_accelerator()
-    else:
-      pres_delete.disconnect_accelerator()
-      pres_delete_from_schedule.connect_accelerator()
+    pres_delete_from_schedule.set_visible(self.has_selection()
+                                            and not self.get_model().builtin)
   
   def _on_pres_edit(self, *args):
     'Edit the presentation.'
