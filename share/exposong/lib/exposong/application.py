@@ -189,7 +189,7 @@ class Main (gtk.Window):
         ('pres-remove-from-schedule', gtk.STOCK_REMOVE,
             _("_Remove from Schedule"), "Delete",
             _("Remove the presentation from schedule"),
-            preslist.preslist._on_pres_delete_from_schedule),
+            preslist.preslist._on_pres_remove_from_schedule),
         ('pres-delete', gtk.STOCK_DELETE, None, "Delete",
             _("Delete the presentation"), preslist.preslist._on_pres_delete),
         ('pres-prev', None, _("Previous Presentation"), "<Ctrl>Page_Up",

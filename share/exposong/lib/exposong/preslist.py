@@ -136,14 +136,13 @@ class PresList(gtk.TreeView):
     exposong.application.main.main_actions.get_action("pres-edit")\
         .set_sensitive(self.has_selection())
     pres_delete = exposong.application.main.main_actions\
-                  .get_action("pres-delete")
-    pres_delete_from_schedule = exposong.application.main.main_actions\
-                                .get_action("pres-remove-from-schedule")
+        .get_action("pres-delete")
+    pres_remove_from_schedule = exposong.application.main.main_actions\
+        .get_action("pres-remove-from-schedule")
     pres_delete.set_sensitive(self.has_selection())
-    pres_delete_from_schedule.set_sensitive(self.has_selection()
-                                            and not self.get_model().builtin)
-    pres_delete_from_schedule.set_visible(self.has_selection()
-                                            and not self.get_model().builtin)
+    pres_remove_from_schedule.set_sensitive(self.has_selection()
+        and not self.get_model().builtin)
+    pres_remove_from_schedule.set_visible(not self.get_model().builtin)
   
   def _on_pres_edit(self, *args):
     'Edit the presentation.'
@@ -217,7 +216,7 @@ class PresList(gtk.TreeView):
       os.remove(os.path.join(DATA_PATH,"pres",item.filename))
       self._on_pres_activate()
 
-  def _on_pres_delete_from_schedule(self, *args):
+  def _on_pres_remove_from_schedule(self, *args):
     'Remove the schedule from the current schedule.'
     sched, itr = self.get_selection().get_selected()
     if not itr or sched.builtin:
