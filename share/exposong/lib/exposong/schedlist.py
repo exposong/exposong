@@ -94,7 +94,6 @@ class ScheduleList(gtk.TreeView):
       if isinstance(sched, exposong.schedule.Schedule):
         exposong.preslist.preslist.set_model(sched)
         exposong.preslist.preslist.columns_autosize()
-        sched.refresh_model()
         if sched.is_reorderable():
           exposong.preslist.preslist.enable_model_drag_dest(
               exposong.application.DRAGDROP_SCHEDULE, gtk.gdk.ACTION_COPY)

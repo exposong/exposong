@@ -129,15 +129,6 @@ class Schedule(gtk.ListStore):
     'Return the filtered ListModel'
     return self
   
-  def refresh_model(self):
-    'Clears and repopulates the model.'
-    itr = self.get_iter_first()
-    while itr:
-      self.set_value(itr, 1, self.get_value(itr, 0).title)
-      itr = self.iter_next(itr)
-    if self.builtin:
-      self.set_sort_column_id(1, gtk.SORT_ASCENDING)
-  
   def is_reorderable(self):
     'Checks to see if the list should be reorderable.'
     return not self.builtin
@@ -168,5 +159,5 @@ class ScheduleItem:
   
   def get_row(self):
     'Get a row to put into the presentation list.'
-    return (self, self.title)
+    return (self,)
 

@@ -44,8 +44,7 @@ class PresList(gtk.TreeView):
     column.pack_start(pixbufrend, False)
     column.set_cell_data_func(pixbufrend, self._get_row_icon)
     column.pack_start(textrend, True)
-    column.set_attributes(textrend, text=1)
-    column.set_sort_column_id(1)
+    column.set_cell_data_func(textrend, self._get_row_text)
     column.set_resizable(False)
     column.set_property('spacing', 4)
     self.append_column(column)
@@ -80,6 +79,11 @@ class PresList(gtk.TreeView):
     'Return true if an item is selected.'
     return bool(self.get_selection().count_selected_rows())
   
+  def set_model(self, model=None):
+    'Override to sort.'
+    gtk.TreeView.set_model(self, model)
+    self.get_model().set_sort_func(1, self._column_sort)
+    
   def get_model(self):
     model = gtk.TreeView.get_model(self)
     if isinstance(model, (gtk.TreeModelFilter, gtk.TreeModelSort)):
@@ -150,7 +154,6 @@ class PresList(gtk.TreeView):
     if not field:
       return False
     if field.edit():
-      self.get_model().refresh_model()
       self._on_pres_activate()
   
   def _on_drag_get(self, treeview, context, selection, info, timestamp):
@@ -228,10 +231,19 @@ class PresList(gtk.TreeView):
     pres = model.get_value(titer, 0)
     cell.set_property('pixbuf', pres.get_icon())
   
+  def _get_row_text(self, column, cell, model, titer):
+    'Returns the title of the current presentation.'
+    pres = model.get_value(titer, 0)
+    cell.set_property('text', pres.title)
+  
+  def _column_sort(self, treemodel, iter1, iter2):
+    return 0
+    #return treemodel.get_value(iter1,0).title.__cmp__(treemodel.get_value(iter2,0).title)
+  
   @staticmethod
   def get_model_args():
     'Get the arguments to pass to `gtk.ListStore`.'
-    return (gobject.TYPE_PYOBJECT, gobject.TYPE_STRING)
+    return (gobject.TYPE_PYOBJECT,)
 
 
 class PresFilter(gtk.Entry):
