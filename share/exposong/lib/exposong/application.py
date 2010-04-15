@@ -79,15 +79,15 @@ class Main (gtk.Window):
     win_v.pack_start(menu, False)
     
     ## Main Window Area
-    win_h = gtk.HPaned()
+    self.win_h = gtk.HPaned()
     ### Main left area
-    win_lft = gtk.VPaned()
+    self.win_lft = gtk.VPaned()
     #### Schedule
     schedlist.schedlist.connect("button-release-event", self._on_schedule_rt_click)
     schedule_scroll = gtk.ScrolledWindow()
     schedule_scroll.add(schedlist.schedlist)
     schedule_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-    win_lft.pack1(schedule_scroll, True, True)
+    self.win_lft.pack1(schedule_scroll, True, True)
     
     #### Presentation List
     pres1 = gtk.VBox()
@@ -97,9 +97,9 @@ class Main (gtk.Window):
     pres_list_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
     pres1.pack_start(pres_list_scroll, True, True)
     pres1.pack_start(preslist.presfilter, False, True, 2)
-    win_lft.pack2(pres1, True, True)
+    self.win_lft.pack2(pres1, True, True)
     
-    win_h.pack1(win_lft, False, False)
+    self.win_h.pack1(self.win_lft, False, False)
     
     ### Main right area
     win_rt = gtk.VBox()
@@ -146,8 +146,8 @@ class Main (gtk.Window):
     
     win_rt_btm.pack_end(pres_buttons, False, False, 10)
     win_rt.pack_start(win_rt_btm, False, True)
-    win_h.pack2(win_rt, True, False)
-    win_v.pack_start(win_h, True)
+    self.win_h.pack2(win_rt, True, False)
+    win_v.pack_start(self.win_h, True)
     
     ## Status bar
     self.status_bar = gtk.Statusbar()
@@ -160,8 +160,7 @@ class Main (gtk.Window):
     ## Restore State
     self.config = config.Config()
     self.restore_state()
-    self.set_position(gtk.WIN_POS_CENTER)
-    
+        
     self.add(win_v)
     self.show_all()
   
@@ -432,24 +431,35 @@ class Main (gtk.Window):
   def _on_configure_event(self, widget, *args):
     # Size only matters, if not maximized
     if not self.maximized:
-      self.size = self.get_size()
+      self.win_size = self.get_size()
+      self.win_position = self.get_position()
     
   def _on_window_state_event(self, widget, event, *args):
     self.maximized = (event.new_window_state == gtk.gdk.WINDOW_STATE_MAXIMIZED)
 
   def restore_state(self):
-    if self.config.has_option("general", "size"):
-      (x, y) = self.config.get("general", "size").split(",")
-      self.set_default_size(int(x),int(y))
-    if (self.config.has_option("general", "maximized")):
-      if self.config.getboolean("general", "maximized"):
+    if self.config.has_option("main_window", "size"):
+      (x,y) = self.config.get("main_window", "size").split(",")
+      self.set_default_size(int(x), int(y))
+    if self.config.has_option("main_window", "position"):
+      (x,y) = self.config.get("main_window", "position").split(",")
+      self.move(int(x), int(y))
+    if self.config.has_option("main_window", "maximized"):
+      if self.config.getboolean("main_window", "maximized"):
         self.maximize()
+    if self.config.has_option("main_window", "left-paned"):
+      self.win_lft.set_position(int(self.config.get("main_window", "left-paned")))
+    if self.config.has_option("main_window", "main-paned"):
+      self.win_h.set_position(int(self.config.get("main_window", "main-paned")))
 
   def save_state(self):
-    if not self.config.has_section("general"):
-      self.config.add_section("general")
-    self.config.set("general", "maximized", str(self.maximized))
-    self.config.set("general","size", "%s, %s" % (self.size[0], self.size[1]))
+    if not self.config.has_section("main_window"):
+      self.config.add_section("main_window")
+    self.config.set("main_window","size", "%s, %s"%(self.win_size[0], self.win_size[1]))
+    self.config.set("main_window", "position", "%s, %s"%(self.win_position[0], self.win_position[1]))
+    self.config.set("main_window", "maximized", str(self.maximized))
+    self.config.set("main_window", "left-paned", str(self.win_lft.get_position()))
+    self.config.set("main_window", "main-paned", str(self.win_h.get_position()))
     self.config.write()
 
   def _quit(self, *args):
@@ -458,7 +468,6 @@ class Main (gtk.Window):
     prefs.config.save()
     self.save_state()
     gtk.main_quit()
-
 
 def run():
   Main()
