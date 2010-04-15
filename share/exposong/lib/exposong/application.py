@@ -18,13 +18,14 @@
 import gtk
 import gtk.gdk
 import gobject
-from xml.dom import minidom
 import os
 import webbrowser
+
+from xml.dom import minidom
 from os.path import join
 
 from exposong import RESOURCE_PATH, DATA_PATH, SHARED_FILES, HELP_URL
-from exposong import prefs, screen, preslist, schedlist, slidelist
+from exposong import prefs, screen, preslist, schedlist, slidelist, config
 from exposong.about import About
 from exposong.schedule import Schedule # ? where to put library
 import exposong.plugins, exposong.plugins._abstract
@@ -53,8 +54,9 @@ class Main (gtk.Window):
         gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH, 'es32.png')),
         gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH, 'es16.png')))
     self.set_title( "ExpoSong" )
+    self.connect("configure_event", self._on_configure_event)
+    self.connect("window_state_event", self._on_window_state_event)
     self.connect("destroy", self._quit)
-    self.set_default_size(700, 500)
     
     #dynamically load plugins
     exposong.plugins.load_plugins()
@@ -154,6 +156,11 @@ class Main (gtk.Window):
     gtk.settings_get_default().set_long_property('gtk-button-images',True,\
         'application:__init__')    
     self.build_all()
+    
+    ## Restore State
+    self.config = config.Config()
+    self.restore_state()
+    self.set_position(gtk.WIN_POS_CENTER)
     
     self.add(win_v)
     self.show_all()
@@ -422,10 +429,34 @@ class Main (gtk.Window):
     for k in keys_to_disable:
       self.main_actions.get_action(k).connect_accelerator()
 
+  def _on_configure_event(self, widget, *args):
+    # Size only matters, if not maximized
+    if not self.maximized:
+      self.size = self.get_size()
+    
+  def _on_window_state_event(self, widget, event, *args):
+    self.maximized = (event.new_window_state == gtk.gdk.WINDOW_STATE_MAXIMIZED)
+
+  def restore_state(self):
+    if self.config.has_option("general", "size"):
+      (x, y) = self.config.get("general", "size").split(",")
+      self.set_default_size(int(x),int(y))
+    if (self.config.has_option("general", "maximized")):
+      if self.config.getboolean("general", "maximized"):
+        self.maximize()
+
+  def save_state(self):
+    if not self.config.has_section("general"):
+      self.config.add_section("general")
+    self.config.set("general", "maximized", str(self.maximized))
+    self.config.set("general","size", "%s, %s" % (self.size[0], self.size[1]))
+    self.config.write()
+
   def _quit(self, *args):
     'Cleans up and exits the program.'
     self._save_schedules()
     prefs.config.save()
+    self.save_state()
     gtk.main_quit()
 
 
