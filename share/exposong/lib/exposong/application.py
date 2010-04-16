@@ -158,7 +158,7 @@ class Main (gtk.Window):
     self.build_all()
     
     ## Restore State
-    self.config = config.Config()
+    config.config = config.Config()
     self.restore_state()
         
     self.add(win_v)
@@ -430,37 +430,34 @@ class Main (gtk.Window):
 
   def _on_configure_event(self, widget, *args):
     # Size only matters, if not maximized
-    if not self.maximized:
-      self.win_size = self.get_size()
-      self.win_position = self.get_position()
+    if not config.config.has_option("main_window", "maximized") or \
+        not config.config.getboolean("main_window", "maximized"):
+      config.config.set("main_window","size", ','.join(map(str,self.get_size())))
+      config.config.set("main_window", "position", ",".join(map(str,self.get_position())))
     
   def _on_window_state_event(self, widget, event, *args):
-    self.maximized = (event.new_window_state == gtk.gdk.WINDOW_STATE_MAXIMIZED)
+    maximized = (event.new_window_state == gtk.gdk.WINDOW_STATE_MAXIMIZED)
+    config.config.set("main_window", "maximized", str(maximized))
 
   def restore_state(self):
-    if self.config.has_option("main_window", "size"):
-      (x,y) = self.config.get("main_window", "size").split(",")
+    if config.config.has_option("main_window", "size"):
+      (x,y) = config.config.get("main_window", "size").split(",")
       self.set_default_size(int(x), int(y))
-    if self.config.has_option("main_window", "position"):
-      (x,y) = self.config.get("main_window", "position").split(",")
+    if config.config.has_option("main_window", "position"):
+      (x,y) = config.config.get("main_window", "position").split(",")
       self.move(int(x), int(y))
-    if self.config.has_option("main_window", "maximized"):
-      if self.config.getboolean("main_window", "maximized"):
+    if config.config.has_option("main_window", "maximized"):
+      if config.config.getboolean("main_window", "maximized"):
         self.maximize()
-    if self.config.has_option("main_window", "left-paned"):
-      self.win_lft.set_position(int(self.config.get("main_window", "left-paned")))
-    if self.config.has_option("main_window", "main-paned"):
-      self.win_h.set_position(int(self.config.get("main_window", "main-paned")))
+    if config.config.has_option("main_window", "left-paned"):
+      self.win_lft.set_position(int(config.config.get("main_window", "left-paned")))
+    if config.config.has_option("main_window", "main-paned"):
+      self.win_h.set_position(int(config.config.get("main_window", "main-paned")))
 
   def save_state(self):
-    if not self.config.has_section("main_window"):
-      self.config.add_section("main_window")
-    self.config.set("main_window","size", "%s, %s"%(self.win_size[0], self.win_size[1]))
-    self.config.set("main_window", "position", "%s, %s"%(self.win_position[0], self.win_position[1]))
-    self.config.set("main_window", "maximized", str(self.maximized))
-    self.config.set("main_window", "left-paned", str(self.win_lft.get_position()))
-    self.config.set("main_window", "main-paned", str(self.win_h.get_position()))
-    self.config.write()
+    config.config.set("main_window", "left-paned", str(self.win_lft.get_position()))
+    config.config.set("main_window", "main-paned", str(self.win_h.get_position()))
+    config.config.write()
 
   def _quit(self, *args):
     'Cleans up and exits the program.'

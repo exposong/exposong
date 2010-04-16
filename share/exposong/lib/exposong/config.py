@@ -20,16 +20,20 @@ import os
 import shutil
 
 class Config(ConfigParser.SafeConfigParser):
-    def __init__(self):
-        ConfigParser.SafeConfigParser.__init__(self)
-        cfile = os.path.join(os.path.expanduser("~"), ".exposong.cfg")
-        
-        self.configfile = cfile
-        self.read(self.configfile)
+  def __init__(self):
+    ConfigParser.SafeConfigParser.__init__(self)
+    cfile = os.path.join(os.path.expanduser("~"), ".exposong.cfg")
+    
+    self.add_section("main_window")
+    
+    self.configfile = cfile
+    self.read(self.configfile)
 
-    def write(self):
-        tmpname = self.configfile+".new"
-        f=open(tmpname, "w")
-        ConfigParser.SafeConfigParser.write(self, f)
-        f.close()
-        shutil.move(tmpname, self.configfile)
+  def write(self):
+    tmpname = self.configfile+".new"
+    f=open(tmpname, "w")
+    ConfigParser.SafeConfigParser.write(self, f)
+    f.close()
+    shutil.move(tmpname, self.configfile)
+
+config = None
