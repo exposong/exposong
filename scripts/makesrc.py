@@ -21,7 +21,7 @@ import sys, os, os.path
 def getFiles(dir):
   for root, dirs, files in os.walk(dir):
     #Exclude hidden files
-    if '/.' in root or root[0] == '.':
+    if os.sep+'.' in root or root[0] == '.':
       continue
     
     for fl in files:
@@ -30,29 +30,32 @@ def getFiles(dir):
       if fl.endswith('.pyc') or fl.endswith('~'):
         continue
       yield os.path.join(root,fl)
-  
+
+
+def makeSrc():
+  pwd = os.getcwd()
+  os.chdir(sys.argv[2])
+
+  exposongZip = zipfile.ZipFile("%s/exposong-%s.zip" % (pwd, sys.argv[1]), "w")
+
+  for fl in ('README.txt','CHANGELOG.txt','LICENSE.txt','defs.py'):
+    exposongZip.write(fl, os.path.join('exposong',fl))
+  for fl in getFiles('bin'):
+    exposongZip.write(fl, os.path.join('exposong',fl))
+  for fl in getFiles('share'):
+    exposongZip.write(fl, os.path.join('exposong',fl))
+  for fl in getFiles('help'):
+    exposongZip.write(fl, os.path.join('exposong',fl))
+
+  exposongZip.close()
+
 
 if __name__ == "__main__":
   
   if len(sys.argv) < 3:
-    print """Usage: makeZip.py versionString exposongRoot
+    print """Usage: makesrc.py versionString exposongRoot
 File will be output to the current directory in the format "exposong-{versionString}.py".
 """
     exit(2)
-
-  pwd = os.getcwd()
-  os.chdir(sys.argv[2])
-
-  outfile = zipfile.ZipFile("%s/exposong-%s.zip" % (pwd, sys.argv[1]), "w")
-
-  for fl in ('README.txt','CHANGELOG.txt','LICENSE.txt','defs.py'):
-    outfile.write(fl)
-  for fl in getFiles('bin'):
-    outfile.write(fl)
-  for fl in getFiles('share'):
-    outfile.write(fl)
-  for fl in getFiles('help'):
-    outfile.write(fl)
-
-  outfile.close()
+  makeSrc()
 
