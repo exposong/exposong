@@ -18,6 +18,8 @@
 import ConfigParser
 import os
 import shutil
+# NOTE: Do NOT import anything that uses DATA_PATH here. This is almost
+# all of exposong.* .
 
 class Config(ConfigParser.SafeConfigParser):
   def __init__(self):

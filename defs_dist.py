@@ -15,6 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+# Usage:
+# To use this file, move to defs.py in the root folder of exposong.
+
 import os.path
 
 # The variable DATA_PATH can be used to customize where the data will be

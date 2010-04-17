@@ -17,23 +17,30 @@
 
 import os.path, os
 from os.path import abspath, dirname, join, pardir, expanduser
+from exposong import config
 
 SHARED_FILES = abspath(join(dirname(__file__), pardir, pardir))
 LOCALE_PATH = join(SHARED_FILES, 'i18n')
 RESOURCE_PATH = join(SHARED_FILES, 'res')
+DATA_PATH = None
 
-defs = None
-try:
-  __defs = abspath(join(SHARED_FILES, pardir, pardir, "defs.py"))
-  import imp
-  defs = imp.load_source('defs', __defs)
-except IOError:
-  pass
 
-if hasattr(defs, "DATA_PATH") and isinstance(defs.DATA_PATH, str):
-  DATA_PATH = defs.DATA_PATH
+if config.config.has_option("general", "data-path"):
+  DATA_PATH = config.config.get("general", "data-path")
 else:
-  DATA_PATH = join(expanduser("~"),"exposong","data")
+  _defs = None
+  try:
+    _defs_files = abspath(join(SHARED_FILES, pardir, pardir, "defs.py"))
+    import imp
+    _defs = imp.load_source('defs', _defs_files)
+  except IOError:
+    pass
+  
+  if hasattr(_defs, "DATA_PATH") and isinstance(_defs.DATA_PATH, str):
+    DATA_PATH = _defs.DATA_PATH
+  else:
+    DATA_PATH = join(expanduser("~"),"exposong","data")
+  del _defs
 
 # Initialize the data directories. This assumes that if they exist, they are
 # either directories or symlinks. We might need to handle the case where they
