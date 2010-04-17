@@ -25,7 +25,7 @@ from exposong import SHARED_FILES
 class Config(ConfigParser.SafeConfigParser):
   def __init__(self):
     ConfigParser.SafeConfigParser.__init__(self)
-    cfile = os.path.join(os.path.expanduser("~"), ".exposong")
+    cfile = os.path.join(os.path.expanduser("~"), ".exposong.conf")
     
     self.add_section("main_window")
     self.add_section("general")
