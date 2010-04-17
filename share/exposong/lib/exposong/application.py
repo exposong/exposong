@@ -402,7 +402,7 @@ class Main (gtk.Window):
   
   def _on_prefs(self, *args):
     'Shows the preferences dialog.'
-    prefs.prefs.dialog(self)
+    prefs.PrefsDialog(self)
   
   def _show_help(self, *args):
     'Show the help pages.'
@@ -460,7 +460,6 @@ class Main (gtk.Window):
     'Cleans up and exits the program.'
     self._save_schedules()
     self.save_state()
-    prefs.prefs.save()
     config.config.write()
     gtk.main_quit()
 

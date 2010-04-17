@@ -22,7 +22,7 @@ import shutil
 
 from exposong import DATA_PATH
 from exposong.glob import *
-import exposong.prefs
+from exposong.config import config
 import exposong.screen
 import exposong.application
 
@@ -35,10 +35,10 @@ class BGSelect (gtk.VBox):
   def __init__(self):
     gtk.VBox.__init__(self)
     
-    bgtype = exposong.prefs.prefs['screen.bg_type']
-    bgimage = exposong.prefs.prefs['screen.bg_image']    
-    bgcolor1 = exposong.prefs.prefs['screen.bg_color_1']
-    bgcolor2 = exposong.prefs.prefs['screen.bg_color_2']
+    bgtype = config.get("screen","bg_type")
+    bgimage = config.get("screen","bg_image")    
+    bgcolor1 = config.getcolor("screen","bg_color_1")
+    bgcolor2 = config.getcolor("screen","bg_color_2")
     
     # Image Background
     hbox = gtk.HBox()
@@ -83,8 +83,8 @@ class BGSelect (gtk.VBox):
     graddirlist = [ u'\u2192', u'\u2198', u'\u2193', u'\u2199' ]
     for st in graddirlist:
       self.graddir.append_text( st)
-    if exposong.prefs.prefs['screen.bg_angle'] in graddirlist:
-      self.graddir.set_active(graddirlist.index(exposong.prefs.prefs['screen.bg_angle']))
+    if config.get("screen","bg_angle") in graddirlist:
+      self.graddir.set_active(graddirlist.index(config.get("screen","bg_angle")))
     else:
       self.graddir.set_active(0)
     hbox.pack_start(self.graddir, True, True, 2)
@@ -114,7 +114,7 @@ class BGSelect (gtk.VBox):
     itr = imgcombo.get_active_iter()
     if itr:
       mod = imgcombo.get_model()
-      exposong.prefs.prefs['screen.bg_image'] = mod.get_value(itr, 0)
+      config.set("screen", "bg_image", mod.get_value(itr, 0))
       exposong.screen.screen.set_dirty()
       exposong.screen.screen.draw()
   
@@ -122,9 +122,9 @@ class BGSelect (gtk.VBox):
     'The gradient has been modified.'
     grad1 = self.grad1.get_color()
     grad2 = self.grad2.get_color()
-    exposong.prefs.prefs['screen.bg_color_1'] = (grad1.red,grad1.green,grad1.blue)
-    exposong.prefs.prefs['screen.bg_color_2'] = (grad2.red,grad2.green,grad2.blue)
-    exposong.prefs.prefs['screen.bg_angle'] = self.graddir.get_active_text()
+    config.setcolor("screen", "bg_color_1", (grad1.red,grad1.green,grad1.blue))
+    config.setcolor("screen", "bg_color_2", (grad2.red,grad2.green,grad2.blue))
+    config.set("screen", "bg_angle", self.graddir.get_active_text())
     exposong.screen.screen.draw()
   
   def _on_image_radio(self, radio):
@@ -133,7 +133,7 @@ class BGSelect (gtk.VBox):
     self.new_image.set_sensitive(radio.get_active())
     if radio.get_active():
       self._on_image_change(self.imgcombo)
-      exposong.prefs.prefs['screen.bg_type'] = "image"
+      config.set("screen", "bg_type", "image")
   
   def _on_grad_radio(self, radio):
     'The gradient radioButton was changed.'
@@ -142,7 +142,7 @@ class BGSelect (gtk.VBox):
     self.grad2.set_sensitive(radio.get_active())
     if radio.get_active():
       self._on_grad_change()
-      exposong.prefs.prefs['screen.bg_type'] = "color"
+      config.set("screen", "bg_type", "color")
   
   def _on_new_image(self, button):
     'The user added a new image as a background.'

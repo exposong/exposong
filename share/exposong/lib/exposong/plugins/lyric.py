@@ -108,8 +108,8 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
         jn.append(author)
       if hasattr(self.pres, "copyright") and len(self.pres.copyright):
         jn.append(u"Copyright \xA9 %s" % self.pres.copyright)
-      if config['general.ccli']:
-        jn.append("CCLI# %s" % config['general.ccli'])
+      if config.get("general", "ccli"):
+        jn.append("CCLI# %s" % config.get("general", "ccli"))
       return '\n'.join(jn)
   
     def to_node(self, doc, node):

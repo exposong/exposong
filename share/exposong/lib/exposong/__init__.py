@@ -17,13 +17,13 @@
 
 import os.path, os
 from os.path import abspath, dirname, join, pardir, expanduser
-from exposong import config
 
 SHARED_FILES = abspath(join(dirname(__file__), pardir, pardir))
 LOCALE_PATH = join(SHARED_FILES, 'i18n')
 RESOURCE_PATH = join(SHARED_FILES, 'res')
 DATA_PATH = None
 
+from exposong import config
 
 if config.config.has_option("general", "data-path"):
   DATA_PATH = config.config.get("general", "data-path")

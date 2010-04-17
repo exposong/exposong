@@ -28,7 +28,6 @@ from exposong.glob import *
 from exposong import RESOURCE_PATH, DATA_PATH
 from exposong.plugins import Plugin, _abstract
 import exposong.application
-from exposong.prefs import config
 
 """
 Image presentations.

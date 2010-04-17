@@ -18,6 +18,7 @@
 import ConfigParser
 import os
 import shutil
+from exposong import SHARED_FILES
 # NOTE: Do NOT import anything that uses DATA_PATH here. This is almost
 # all of exposong.* .
 
@@ -30,8 +31,30 @@ class Config(ConfigParser.SafeConfigParser):
     self.add_section("general")
     self.add_section("screen")
     
+    self.set('general', 'ccli', '')
+    self.set("screen", "bg_type", 'color')
+    self.set("screen", "bg_image", "")
+    self.setcolor("screen", "bg_color_1", (0, 13107, 19660))
+    self.setcolor("screen", "bg_color_2", (0, 26214, 39321))
+    self.set("screen", "bg_angle", u'\u2198')
+    self.set("screen", "max_font_size", "56.0")
+    self.setcolor("screen", "text_color", (65535, 65535, 65535))
+    self.setcolor("screen", "text_shadow", (0, 0, 0, 26214))
+    self.set("screen", "logo",
+        os.path.join(SHARED_FILES,"res","exposong.png"))
+    self.setcolor("screen", "logo_bg", (65535, 43690, 4369))
+    self.setcolor("screen", "notify_bg", (65535, 0, 0))
+    
     self.configfile = cfile
     self.read(self.configfile)
+  
+  def getcolor(self, section, option):
+    ''
+    return map(int, self.get(section, option).split(','))
+  
+  def setcolor(self, section, option, value):
+    ''
+    self.set(section, option, ','.join(map(str,value)))
 
   def write(self):
     tmpname = self.configfile+".new"
