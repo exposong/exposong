@@ -17,7 +17,8 @@
 import gtk
 import gtk.gdk
 import imp
-import os.path
+import os
+import config
 
 from exposong import SHARED_FILES
 import exposong.screen
@@ -31,14 +32,17 @@ class Prefs:
   '''
   def __init__(self):
     self.cfg = {'general.ccli': '',
-        'pres.max_font_size': 56,
-        'pres.bg': ((0, 13107, 19660), (0, 26214, 39321)),
-        'pres.bg_angle': u'\u2198',
-        'pres.text_color': (65535, 65535, 65535),
-        'pres.text_shadow': (0, 0, 0, 26214),
-        'pres.logo': SHARED_FILES+"/res/exposong-white.png",
-        'pres.logo_bg': (65535, 43690, 4369),
-        'pres.notify_bg': (65535, 0, 0),
+        'screen.bg_type' : 'color',
+        'screen.bg_image' : "",
+        'screen.bg_color_1' : (0, 13107, 19660),
+        'screen.bg_color_2' : (0, 26214, 39321),
+        'screen.bg_angle': u'\u2198',
+        'screen.max_font_size': 56.0,
+        'screen.text_color': (65535, 65535, 65535),
+        'screen.text_shadow': (0, 0, 0, 26214),
+        'screen.logo': os.path.join(SHARED_FILES,"res","exposong-white.png"),
+        'screen.logo_bg': (65535, 43690, 4369),
+        'screen.notify_bg': (65535, 0, 0),
         }
     self.load()
   
@@ -60,32 +64,30 @@ class Prefs:
     self.cfg[key] = None
   
   def load(self):
-    'Load preferences from file.'
-    try:
-      config = imp.load_source('config', os.path.expanduser('~/.exposong_cfg.py'))
-    except IOError:
-      return False
-    for k,v in self.cfg.iteritems():
-      ksp = k.split(".")
-      if hasattr(config, ksp[0]) and hasattr(getattr(config, ksp[0]), ksp[1]):
-        self.cfg[k] = getattr(getattr(config, ksp[0]), ksp[1])
-      
-  def save(self):
-    'Save preferences to file.'
-    cfile = file(os.path.expanduser('~/.exposong_cfg.py'), 'w')
-    
-    cnt = 0
-    cfile.write('class Cfg:\n\tpass\n\n')
-    
-    for key in set(k.split('.')[0] for k in self.cfg.keys()):
-      cfile.write(key+" = Cfg()\n")
-    cfile.write("\n\n")
+    'Load preferences from config module.'
     
     for key, value in self.cfg.iteritems():
-      ln = key+' = '+repr(value)+'\n'
-      cfile.write(ln)
-    
-    cfile.close()
+      (section, option)  = key.split(".")
+      if config.config.has_option(section, option):
+        if type(value) == float:
+          self.cfg[key] = config.config.getfloat(section, option)
+        elif type(value) == tuple:
+          s = config.config.get(section, option)
+          self.cfg[key] = tuple(map(int, s.split(",")))
+        else:
+          self.cfg[key] = config.config.get(section, option)
+      
+  def save(self):
+    'Save preferences to config module.'
+    for key, value in self.cfg.iteritems():
+      (section, option)  = key.split(".")
+      if type(value) == str:
+        pass        
+      elif type(value) == tuple:
+        value = ','.join(map(str,value))
+      else:
+        value = str(value)
+      config.config.set(section, option, value)
   
   def dialog(self, parent):
     'Show the preferences dialog.'
@@ -116,40 +118,40 @@ class PrefsDialog(gtk.Dialog):
     
     notebook.append_page(self.table, gtk.Label( _("General") ))
     
-    #Presentation Page
+    #Screen Page
     self.table = gtk.Table(15, 4)
     self.table.set_row_spacings(10)
     self.table.set_border_width(10)
     
     self._append_section_title( _("Font"), 0)
-    p_txt = self._append_color_setting( _("Text Color"), config['pres.text_color'], 1)
-    p_shad = self._append_color_setting( _("Text Shadow"), config['pres.text_shadow'], 2, True)
-    p_maxsize = self._append_spinner_setting( _("Max Font Size"), gtk.Adjustment(config['pres.max_font_size'], 0, 96, 1), 3)
+    p_txt = self._append_color_setting( _("Text Color"), config['screen.text_color'], 1)
+    p_shad = self._append_color_setting( _("Text Shadow"), config['screen.text_shadow'], 2, True)
+    p_maxsize = self._append_spinner_setting( _("Max Font Size"), gtk.Adjustment(config['screen.max_font_size'], 0, 96, 1), 3)
     
     self._append_section_title( _("Logo"), 5)
-    p_logo = self._append_file_setting( _("Image"), config['pres.logo'], 6)
-    p_logo_bg = self._append_color_setting( _("Background"), config['pres.logo_bg'], 7)
+    p_logo = self._append_file_setting( _("Image"), config['screen.logo'], 6)
+    p_logo_bg = self._append_color_setting( _("Background"), config['screen.logo_bg'], 7)
     
     self._append_section_title( _("Notify"), 9)
-    p_notify_bg = self._append_color_setting( _("Background"), config['pres.notify_bg'], 10)
+    p_notify_bg = self._append_color_setting( _("Background"), config['screen.notify_bg'], 10)
     
-    notebook.append_page(self.table, gtk.Label( _("Presentation")))
+    notebook.append_page(self.table, gtk.Label( _("Screen")))
     
     self.show_all()
     if self.run() == gtk.RESPONSE_ACCEPT:
       config['general.ccli'] = g_ccli.get_text()
       
       txtc = p_txt.get_color()
-      config['pres.text_color'] = (txtc.red, txtc.green, txtc.blue)
+      config['screen.text_color'] = (txtc.red, txtc.green, txtc.blue)
       txts = p_shad.get_color()
-      config['pres.text_shadow'] = (txts.red, txts.green, txts.blue, p_shad.get_alpha())
-      config['pres.max_font_size'] = p_maxsize.get_value()
+      config['screen.text_shadow'] = (txts.red, txts.green, txts.blue, p_shad.get_alpha())
+      config['screen.max_font_size'] = p_maxsize.get_value()
       
-      config['pres.logo'] = p_logo.get_filename()
+      config['screen.logo'] = p_logo.get_filename()
       logoc = p_logo_bg.get_color()
-      config['pres.logo_bg'] = (logoc.red, logoc.green, logoc.blue)
+      config['screen.logo_bg'] = (logoc.red, logoc.green, logoc.blue)
       ntfc = p_notify_bg.get_color()
-      config['pres.notify_bg'] = (ntfc.red, ntfc.green, ntfc.blue)
+      config['screen.notify_bg'] = (ntfc.red, ntfc.green, ntfc.blue)
       
       exposong.screen.screen.set_dirty()
       if hasattr(self,"_logo_pbuf"):
@@ -253,5 +255,5 @@ class PrefsDialog(gtk.Dialog):
       for t in target:
         self._on_toggle(button, t)
 
-config = Prefs()
+prefs = Prefs()
 

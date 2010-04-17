@@ -25,7 +25,7 @@ from xml.dom import minidom
 from os.path import join
 
 from exposong import RESOURCE_PATH, DATA_PATH, SHARED_FILES, HELP_URL
-from exposong import prefs, screen, preslist, schedlist, slidelist, config
+from exposong import config, prefs, screen, preslist, schedlist, slidelist
 from exposong.about import About
 from exposong.schedule import Schedule # ? where to put library
 import exposong.plugins, exposong.plugins._abstract
@@ -157,11 +157,9 @@ class Main (gtk.Window):
         'application:__init__')    
     self.build_all()
     
-    ## Restore State
-    config.config = config.Config()
-    self.restore_state()
-        
     self.add(win_v)
+    
+    self.restore_state()
     self.show_all()
   
   def build_all(self):
@@ -404,7 +402,7 @@ class Main (gtk.Window):
   
   def _on_prefs(self, *args):
     'Shows the preferences dialog.'
-    prefs.config.dialog(self)
+    prefs.prefs.dialog(self)
   
   def _show_help(self, *args):
     'Show the help pages.'
@@ -457,16 +455,15 @@ class Main (gtk.Window):
   def save_state(self):
     config.config.set("main_window", "left-paned", str(self.win_lft.get_position()))
     config.config.set("main_window", "main-paned", str(self.win_h.get_position()))
-    config.config.write()
 
   def _quit(self, *args):
     'Cleans up and exits the program.'
     self._save_schedules()
-    prefs.config.save()
     self.save_state()
+    prefs.prefs.save()
+    config.config.write()
     gtk.main_quit()
 
 def run():
   Main()
   gtk.main()
-

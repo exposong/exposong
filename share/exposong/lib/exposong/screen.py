@@ -109,7 +109,7 @@ class Screen:
   
   def to_logo(self, button):
     'Set the screen to black.'
-    if exposong.prefs.config['pres.logo'] != None:
+    if exposong.prefs.prefs['pres.logo'] != None:
       self._logo = True
       self._black = self._background = False
       self.draw()
@@ -121,7 +121,7 @@ class Screen:
       resp = dialog.run()
       dialog.hide()
       if resp == gtk.RESPONSE_YES:
-        exposong.prefs.config.dialog(exposong.application.main)
+        exposong.prefs.prefs.dialog(exposong.application.main)
         self.to_logo(None)
       else:
         self.to_background(None)
@@ -174,11 +174,11 @@ class Screen:
       if not hasattr(self,"_logo_pbuf"):
         try:
           self._logo_pbuf = gtk.gdk.pixbuf_new_from_file_at_size(
-              exposong.prefs.config['pres.logo'], int(bounds[0]/1.5), int(bounds[1]/1.5))
+              exposong.prefs.prefs['screen.logo'], int(bounds[0]/1.5), int(bounds[1]/1.5))
         except gobject.GError:
           print "Error: Could not open logo file."
           self._logo_pbuf = None
-      bg = c2dec(exposong.prefs.config['pres.logo_bg'])
+      bg = c2dec(exposong.prefs.prefs['screen.logo_bg'])
       ccontext.set_source_rgb(bg[0], bg[1], bg[2])
       ccontext.paint()
       if self._logo_pbuf <> None:
@@ -187,14 +187,16 @@ class Screen:
         ccontext.paint()
       return
     else:
-      bg = exposong.prefs.config['pres.bg']
+      bgtype = exposong.prefs.prefs['screen.bg_type']
+      bgimage = exposong.prefs.prefs['screen.bg_image']    
+      bgcolor1 = exposong.prefs.prefs['screen.bg_color_1']
+      bgcolor2 = exposong.prefs.prefs['screen.bg_color_2']
     
-    if isinstance(bg, str):
-      #Image file
+    if bgtype == 'image':
       bgkey = str(bounds[0])+'x'+str(bounds[1])
       try:
         if self.bg_dirty or bgkey not in self.bg_img:
-          pixbuf = gtk.gdk.pixbuf_new_from_file(bg)
+          pixbuf = gtk.gdk.pixbuf_new_from_file(bgimage)
           self.bg_img[bgkey] = pixbuf.scale_simple(bounds[0], bounds[1],
               gtk.gdk.INTERP_BILINEAR)
       except gobject.GError:
@@ -203,7 +205,8 @@ class Screen:
           del self.bg_img[bgkey]
         bg = (0,0,0)
         #Set back to the default
-        exposong.prefs.config['pres.bg'] = ((0, 13107, 19660), (0, 26214, 39321))
+        exposong.prefs.prefs['screen.bg_color_1'] = (0, 13107, 19660)
+        exposong.prefs.prefs['screen.bg_color_2'] = (0, 26214, 39321)
       else:
         ccontext.set_source_pixbuf(self.bg_img[bgkey], 0, 0)
         ccontext.paint()
@@ -211,8 +214,8 @@ class Screen:
       finally:
         self.bg_dirty = False
     
-    if isinstance(bg, tuple):
-      color = c2dec(bg)
+    elif bgtype == 'color':
+      color = (c2dec(bgcolor1), c2dec(bgcolor2))
     
       if len(color) >= 3 and isinstance(color[0], (float, int)):
         # Draw a solid color
@@ -220,14 +223,13 @@ class Screen:
         ccontext.paint()
       elif isinstance(color[0], tuple):
         # Draw a gradiant
-        
-        if exposong.prefs.config['pres.bg_angle'] == u"\u2193": #Down
+        if exposong.prefs.prefs['screen.bg_angle'] == u"\u2193": #Down
           gr_x1 = gr_y1 = gr_x2 = 0
           gr_y2 = bounds[1]
-        elif exposong.prefs.config['pres.bg_angle'] == u'\u2199': #Down-Left
+        elif exposong.prefs.prefs['screen.bg_angle'] == u'\u2199': #Down-Left
           gr_x2 = gr_y1 = 0
           (gr_x1, gr_y2) = bounds
-        elif exposong.prefs.config['pres.bg_angle'] == u'\u2192': #Right
+        elif exposong.prefs.prefs['screen.bg_angle'] == u'\u2192': #Right
           gr_x1 = gr_y1 = gr_y2 = 0
           gr_x2 = bounds[0]
         else: # Down-Right
@@ -273,7 +275,7 @@ class Screen:
       
       self._set_background(widget, ccontext, (screenW, screenH))
       
-      txcol = c2dec(exposong.prefs.config['pres.text_color'])
+      txcol = c2dec(exposong.prefs.prefs['screen.text_color'])
       screenCenterY = screenH/2
       # Header text
       # TODO
@@ -310,7 +312,7 @@ class Screen:
       layout.set_font_description(pango.FontDescription("Sans Bold "+str(size)))
       
       min_sz = 0
-      max_sz = int(exposong.prefs.config['pres.max_font_size'])
+      max_sz = int(exposong.prefs.prefs['screen.max_font_size'])
       
       #Loop through until the text is between 78% of the height and 94%, or
       #until we get a number that is not a multiple of 4 (2,6,10,14, etc) to
@@ -332,8 +334,8 @@ class Screen:
           break
         layout.set_font_description(pango.FontDescription("Sans Bold "+str(size)))
       
-      if exposong.prefs.config['pres.text_shadow']:
-        shcol = c2dec(exposong.prefs.config['pres.text_shadow'])
+      if exposong.prefs.prefs['screen.text_shadow']:
+        shcol = c2dec(exposong.prefs.prefs['screen.text_shadow'])
         ccontext.set_source_rgba(shcol[0], shcol[1], shcol[2], shcol[3])
         ccontext.move_to(screenW * 0.015 + size*0.1,
             screenCenterY - layout.get_pixel_size()[1]/2.0 + size*0.1)
@@ -357,9 +359,9 @@ class Screen:
       pad = notify_sz/14.0
       ccontext.rectangle(sbounds[0]-nbounds[0]-pad*2, sbounds[1]-nbounds[1]-pad*2,
           sbounds[0], sbounds[1])
-      ccontext.set_source_rgb(exposong.prefs.config['pres.notify_bg'][0],
-          exposong.prefs.config['pres.notify_bg'][1],
-          exposong.prefs.config['pres.notify_bg'][2])
+      ccontext.set_source_rgb(exposong.prefs.prefs['screen.notify_bg'][0],
+          exposong.prefs.prefs['screen.notify_bg'][1],
+          exposong.prefs.prefs['screen.notify_bg'][2])
       ccontext.fill()
       ccontext.set_source_rgb(1.0, 1.0, 1.0)
       ccontext.move_to(sbounds[0]-nbounds[0]-pad, sbounds[1]-nbounds[1]-pad)

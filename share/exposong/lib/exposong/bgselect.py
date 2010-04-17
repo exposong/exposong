@@ -35,7 +35,10 @@ class BGSelect (gtk.VBox):
   def __init__(self):
     gtk.VBox.__init__(self)
     
-    curbg = exposong.prefs.config['pres.bg']
+    bgtype = exposong.prefs.prefs['screen.bg_type']
+    bgimage = exposong.prefs.prefs['screen.bg_image']    
+    bgcolor1 = exposong.prefs.prefs['screen.bg_color_1']
+    bgcolor2 = exposong.prefs.prefs['screen.bg_color_2']
     
     # Image Background
     hbox = gtk.HBox()
@@ -49,7 +52,7 @@ class BGSelect (gtk.VBox):
     cell = gtk.CellRendererPixbuf()
     self.imgcombo.pack_start(cell, True)
     self.imgcombo.add_attribute(cell, 'pixbuf', 1)
-    if isinstance(curbg, str):
+    if bgtype == 'image':
       self.imgradio.set_active(True)
     else:
       self.imgcombo.set_sensitive(False)
@@ -63,7 +66,7 @@ class BGSelect (gtk.VBox):
           path = os.path.join(directory, filenm)
           pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(path, thsz[0], thsz[1])
           itr = self.imgmodel.append([path, pixbuf])
-          if isinstance(curbg, str) and path == curbg:
+          if bgtype == 'image' and path == bgimage:
             self.imgcombo.set_active_iter(itr)
     
     self.new_image = gtk.Button( _("Add"), gtk.STOCK_ADD, False)
@@ -80,8 +83,8 @@ class BGSelect (gtk.VBox):
     graddirlist = [ u'\u2192', u'\u2198', u'\u2193', u'\u2199' ]
     for st in graddirlist:
       self.graddir.append_text( st)
-    if exposong.prefs.config['pres.bg_angle'] in graddirlist:
-      self.graddir.set_active(graddirlist.index(exposong.prefs.config['pres.bg_angle']))
+    if exposong.prefs.prefs['screen.bg_angle'] in graddirlist:
+      self.graddir.set_active(graddirlist.index(exposong.prefs.prefs['screen.bg_angle']))
     else:
       self.graddir.set_active(0)
     hbox.pack_start(self.graddir, True, True, 2)
@@ -90,10 +93,10 @@ class BGSelect (gtk.VBox):
     hbox.pack_start(self.grad1, True, True)
     hbox.pack_start(self.grad2, True, True)
     
-    if isinstance(curbg, tuple):
+    if bgtype == 'color':
       self.gradradio.set_active(True)
-      self.grad1.set_color(gtk.gdk.Color(curbg[0][0], curbg[0][1], curbg[0][2]))
-      self.grad2.set_color(gtk.gdk.Color(curbg[1][0], curbg[1][1], curbg[1][2]))
+      self.grad1.set_color(gtk.gdk.Color(bgcolor1[0], bgcolor1[1], bgcolor1[2]))
+      self.grad2.set_color(gtk.gdk.Color(bgcolor2[0], bgcolor2[1], bgcolor2[2]))
     
     self._on_image_radio(self.imgradio)
     self._on_grad_radio(self.gradradio)
@@ -111,16 +114,18 @@ class BGSelect (gtk.VBox):
     itr = imgcombo.get_active_iter()
     if itr:
       mod = imgcombo.get_model()
-      exposong.prefs.config['pres.bg'] = mod.get_value(itr, 0)
+      exposong.prefs.prefs['screen.bg_image'] = mod.get_value(itr, 0)
       exposong.screen.screen.set_dirty()
+      exposong.screen.screen.draw()
   
   def _on_grad_change(self, *args):
     'The gradient has been modified.'
-    exposong.prefs.config['pres.bg_angle'] = self.graddir.get_active_text()
     grad1 = self.grad1.get_color()
     grad2 = self.grad2.get_color()
-    exposong.prefs.config['pres.bg'] = ((grad1.red,grad1.green,grad1.blue),
-        (grad2.red,grad2.green,grad2.blue))
+    exposong.prefs.prefs['screen.bg_color_1'] = (grad1.red,grad1.green,grad1.blue)
+    exposong.prefs.prefs['screen.bg_color_2'] = (grad2.red,grad2.green,grad2.blue)
+    exposong.prefs.prefs['screen.bg_angle'] = self.graddir.get_active_text()
+    exposong.screen.screen.draw()
   
   def _on_image_radio(self, radio):
     'The image radioButton was changed.'
@@ -128,6 +133,7 @@ class BGSelect (gtk.VBox):
     self.new_image.set_sensitive(radio.get_active())
     if radio.get_active():
       self._on_image_change(self.imgcombo)
+      exposong.prefs.prefs['screen.bg_type'] = "image"
   
   def _on_grad_radio(self, radio):
     'The gradient radioButton was changed.'
@@ -136,6 +142,7 @@ class BGSelect (gtk.VBox):
     self.grad2.set_sensitive(radio.get_active())
     if radio.get_active():
       self._on_grad_change()
+      exposong.prefs.prefs['screen.bg_type'] = "color"
   
   def _on_new_image(self, button):
     'The user added a new image as a background.'
@@ -158,6 +165,3 @@ class BGSelect (gtk.VBox):
       self.imgcombo.set_active_iter(itr)
     else:
       dlg.hide()
-      
-      
-
