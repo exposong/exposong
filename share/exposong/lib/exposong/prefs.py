@@ -20,6 +20,7 @@ import imp
 import os
 import config
 
+from exposong import DATA_PATH
 from exposong import SHARED_FILES
 from exposong.config import config
 import exposong.screen
@@ -48,8 +49,17 @@ class PrefsDialog(gtk.Dialog):
     self.table.set_row_spacings(10)
     self.table.set_border_width(10)
     
-    self._append_section_title(_("Legal"), 0)
-    g_ccli = self._append_text_setting("CCLI #", config.get("general","ccli"), 1)
+    #self._append_section_title(_("Places"), 0)
+    if config.has_option("general", "data-path"):
+      folder = config.get("general", "data-path")
+    else:
+      folder = DATA_PATH
+    g_data = self._append_folder_setting(_("Data folder"), folder, 0)
+    g_data.set_tooltip_text(_("The place where all your presentations,\
+        schedules and background images are stored."))
+    
+    self._append_section_title(_("Legal"), 1)
+    g_ccli = self._append_text_setting("CCLI #", config.get("general","ccli"), 2)
     
     notebook.append_page(self.table, gtk.Label( _("General") ))
     
@@ -80,6 +90,13 @@ class PrefsDialog(gtk.Dialog):
     self.show_all()
     if self.run() == gtk.RESPONSE_ACCEPT:
       config.set("general", "ccli", g_ccli.get_text())
+      if g_data.get_current_folder() != DATA_PATH:
+        config.set("general", "data-path", g_data.get_current_folder())
+        dlg = gtk.MessageDialog(self, gtk.DIALOG_DESTROY_WITH_PARENT,
+        gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
+        _("You will have to restart ExpoSong so that the changes take place."))
+        dlg.run()
+        dlg.destroy()
       
       txtc = p_txt.get_color()
       config.setcolor("screen", "text_color", (txtc.red, txtc.green, txtc.blue))
@@ -126,6 +143,20 @@ class PrefsDialog(gtk.Dialog):
     filech.set_width_chars(15)
     if value:
       filech.set_filename(value)
+    else:
+      filech.set_current_folder(os.path.expanduser('~'))
+    self.table.attach(filech, 2, 4, top, top+1, gtk.FILL, 0, _WIDGET_SPACING)
+    return filech
+
+  def _append_folder_setting(self, label, value, top):
+    'Adds a folder setting and returns the folder widget.'
+    self._get_label(label, top)
+    
+    filech = gtk.FileChooserButton( _("Choose Folder") )
+    filech.set_width_chars(15)
+    filech.set_action(gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
+    if value:
+      filech.set_current_folder(value)
     else:
       filech.set_current_folder(os.path.expanduser('~'))
     self.table.attach(filech, 2, 4, top, top+1, gtk.FILL, 0, _WIDGET_SPACING)
