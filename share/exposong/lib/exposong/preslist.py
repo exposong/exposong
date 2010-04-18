@@ -250,10 +250,28 @@ class PresFilter(gtk.Entry):
   def __init__(self):
     gtk.Entry.__init__(self, 50)
     
+    self.set_icon_from_stock(gtk.ENTRY_ICON_PRIMARY, gtk.STOCK_FIND)
     self.set_width_chars(12)
-    self.connect("changed", self._filter)
+    
+    self.connect("icon-press", self._on_icon_pressed)
+    self.connect("changed", self._on_changed)
     self.connect("focus-in-event", exposong.application.main.disable_shortcuts)
     self.connect("focus-out-event", exposong.application.main.enable_shortcuts)
+    
+  def _on_icon_pressed(self, widget, icon, mouse_button):
+    'Clear the search entry'
+    if icon == gtk.ENTRY_ICON_SECONDARY:
+      self.set_text("")
+  
+  def _on_changed(self, widget):
+    if self.get_text() == "":
+      self.set_icon_from_stock(gtk.ENTRY_ICON_SECONDARY, None)
+      self.modify_base(gtk.STATE_NORMAL, None)
+    else:
+      self.set_icon_from_stock(gtk.ENTRY_ICON_SECONDARY, gtk.STOCK_CLEAR)
+      # set a yellow background color if filter is active
+      self.modify_base(gtk.STATE_NORMAL, gtk.gdk.Color(63479, 63479, 48830))
+    self._filter()
   
   def _filter(self, *args):
     'Filters schedlist by the keywords.'
