@@ -62,23 +62,26 @@ class Screen:
     
     #self.draw()
   
-  def auto_locate(self, main):
+  def reposition(self, parent):
     '''
     Finds the best location for the screen.
     
     If the user is using one monitor, use the bottom right corner for
     the presentation screen, otherwise, use the 2nd monitor.
     '''
-    screen = main.get_screen()
-    num_monitors = screen.get_n_monitors()
-    if(num_monitors > 1):
-      scr_geom = screen.get_monitor_geometry(1)
-      geometry = (scr_geom.x, scr_geom.y, scr_geom.width, scr_geom.height)
+    if config.has_option('screen','monitor'):
+      geometry = map(int, config.get('screen', 'monitor').split(','))
     else:
-      # No 2nd monitor, so preview it small in the corner of the screen
-      scr_geom = screen.get_monitor_geometry(0)
-      main.move(0,0)
-      geometry = (scr_geom.width/2, scr_geom.height/2, scr_geom.width/2, scr_geom.height/2)
+      screen = parent.get_screen()
+      num_monitors = screen.get_n_monitors()
+      if(num_monitors > 1):
+        scr_geom = screen.get_monitor_geometry(1)
+        geometry = (scr_geom.x, scr_geom.y, scr_geom.width, scr_geom.height)
+      else:
+        # No 2nd monitor, so preview it small in the corner of the screen
+        scr_geom = screen.get_monitor_geometry(0)
+        parent.move(0,0)
+        geometry = (scr_geom.width/2, scr_geom.height/2, scr_geom.width/2, scr_geom.height/2)
     self.window.move(geometry[0], geometry[1])
     self.window.resize(geometry[2], geometry[3])
     self.aspect = float(geometry[2])/geometry[3]

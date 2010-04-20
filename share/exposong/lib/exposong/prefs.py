@@ -16,9 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import gtk
 import gtk.gdk
-import imp
 import os
-import config
 
 from exposong import DATA_PATH
 from exposong import SHARED_FILES
@@ -85,6 +83,33 @@ class PrefsDialog(gtk.Dialog):
     p_notify_bg = self._append_color_setting( _("Background"),
         config.getcolor("screen","notify_bg"), 10)
     
+    monitor_nm = monitors_geom = tuple()
+    sel = 0
+    screen = parent.get_screen()
+    num_monitors = screen.get_n_monitors()
+    if num_monitors <= 1:
+      monitor_nm = ( _("Primary (Bottom-Right)"), _("Primary (Full)"))
+      _g1 = screen.get_monitor_geometry(0)
+      _g2 = "%dx%d+%d+%d" % ((_g1.width/2, _g1.height/2)*2)
+      monitor_geom = ( _g2 ,
+          getGeometryFromRect(_g1) )
+      sel = monitor_nm[0]
+    else:
+      # I think computers max out at 3 monitors. We should find documentation.
+      monitor_nm = ( _("Primary"), _("Secondary"), _("Tertiary"), _("Monitor 4"),
+          _("Monitor 5") )[0:num_monitors]
+      monitor_geom = tuple(getGeometryFromRect(screen.get_monitor_geometry(n))
+          for n in range(len(monitor_nm)))
+      sel = monitor_nm[1]
+    
+    if config.has_option('screen','monitor'):
+      cur = config.get('screen', 'monitor')
+      if cur in monitor_geom:
+        sel = monitor_nm[monitor_geom.index(config.get('screen','monitor'))]
+    
+    self._append_section_title( _("Position"), 11)
+    p_monitor = self._append_combo_setting( _("Monitor"), monitor_nm, sel, 12)
+    
     notebook.append_page(self.table, gtk.Label( _("Screen")))
     
     self.show_all()
@@ -110,6 +135,8 @@ class PrefsDialog(gtk.Dialog):
       config.setcolor("screen", "logo_bg", (logoc.red, logoc.green, logoc.blue))
       ntfc = p_notify_bg.get_color()
       config.setcolor("screen", "notify_bg", (ntfc.red, ntfc.green, ntfc.blue))
+      
+      config.set('screen','monitor', monitor_geom[p_monitor.get_active()])
       
       exposong.screen.screen.set_dirty()
       if hasattr(self,"_logo_pbuf"):
@@ -198,7 +225,7 @@ class PrefsDialog(gtk.Dialog):
     combo = gtk.combo_box_new_text()
     for i in range(len(options)):
       combo.append_text(options[i])
-      if isinstance(value, str) and options[i] == value:
+      if options[i] == value:
         combo.set_active(i)
     self.table.attach(combo, 2, 4, top, top+1, gtk.FILL, 0, _WIDGET_SPACING)
     return combo
@@ -226,3 +253,6 @@ class PrefsDialog(gtk.Dialog):
     elif isinstance(target, (tuple, list)):
       for t in target:
         self._on_toggle(button, t)
+
+def getGeometryFromRect(_g1):
+  return ','.join( map(str, (_g1.x, _g1.y, _g1.width, _g1.height)) )

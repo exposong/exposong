@@ -68,7 +68,7 @@ class Main (gtk.Window):
     #These have to be initialized for the menus to render properly
     pres_prev = gtk.DrawingArea()
     screen.screen = screen.Screen(pres_prev)
-    screen.screen.auto_locate(self)
+    screen.screen.reposition(self)
     
     schedlist.schedlist = schedlist.ScheduleList()
     preslist.preslist = preslist.PresList()
