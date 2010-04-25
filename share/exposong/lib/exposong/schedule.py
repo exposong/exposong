@@ -14,14 +14,15 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import gtk
 import gtk.gdk
 import gobject
 import xml.dom
 from xml.dom import minidom
-from glob import *
 from os.path import join
 
+from glob import *
 from exposong import DATA_PATH
 import exposong.plugins._abstract
 import exposong.preslist

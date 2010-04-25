@@ -427,17 +427,19 @@ class Main (gtk.Window):
       self.main_actions.get_action(k).connect_accelerator()
 
   def _on_configure_event(self, widget, *args):
-    # Size only matters, if not maximized
+    'Sets the size and position in the config (matters, if not maximized)'
     if not config.config.has_option("main_window", "maximized") or \
         not config.config.getboolean("main_window", "maximized"):
       config.config.set("main_window","size", ','.join(map(str,self.get_size())))
       config.config.set("main_window", "position", ",".join(map(str,self.get_position())))
     
   def _on_window_state_event(self, widget, event, *args):
+    'Sees if window is maximized or not and sets it in the config'
     maximized = (event.new_window_state == gtk.gdk.WINDOW_STATE_MAXIMIZED)
     config.config.set("main_window", "maximized", str(maximized))
 
   def restore_state(self):
+    'Restores window position and size and also size of the two panes'
     if config.config.has_option("main_window", "size"):
       (x,y) = config.config.get("main_window", "size").split(",")
       self.set_default_size(int(x), int(y))
@@ -453,6 +455,7 @@ class Main (gtk.Window):
       self.win_h.set_position(int(config.config.get("main_window", "main-paned")))
 
   def save_state(self):
+    'Saves the state of the panes in the window'
     config.config.set("main_window", "left-paned", str(self.win_lft.get_position()))
     config.config.set("main_window", "main-paned", str(self.win_h.get_position()))
 

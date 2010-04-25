@@ -14,10 +14,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import re
 import os
 import os.path
-import random, string
+import random
+import string
 
 """
 Some basic functions that are useful.

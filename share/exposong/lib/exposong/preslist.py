@@ -23,7 +23,6 @@ import gobject
 import exposong.slidelist
 import exposong.application
 import exposong.schedlist
-
 from exposong import DATA_PATH
 
 preslist = None #will hold the PresList instance

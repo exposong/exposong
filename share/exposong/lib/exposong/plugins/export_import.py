@@ -14,12 +14,18 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import gtk
+import os
+import os.path
+import shutil
+import tempfile
+import tarfile
+
 from exposong.plugins import _abstract, Plugin
 from exposong import DATA_PATH, schedlist
 from exposong.glob import *
 import exposong.application
-import tarfile, tempfile, os, os.path, shutil
 
 """
 Adds functionality to move schedules, or a full library to another exposong

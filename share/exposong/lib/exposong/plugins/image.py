@@ -15,14 +15,15 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import gtk
 import gtk.gdk
-from os.path import join
 import xml.dom
 import xml.dom.minidom
 import pango
 import gobject
 import shutil
+from os.path import join
 
 from exposong.glob import *
 from exposong import RESOURCE_PATH, DATA_PATH
