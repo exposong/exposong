@@ -51,7 +51,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     
     def _edit_window(self, parent):
       'Create a new window for editing.'
-      dialog = gtk.Dialog(_("Editing Slide"), exposong.application.main,\
+      dialog = gtk.Dialog(_("Editing Slide"), parent,\
           gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,\
           (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
       

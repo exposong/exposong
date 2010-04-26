@@ -120,7 +120,8 @@ class PrefsDialog(gtk.Dialog):
         config.set("general", "data-path", g_data.get_current_folder())
         dlg = gtk.MessageDialog(self, gtk.DIALOG_DESTROY_WITH_PARENT,
         gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
-        _("You will have to restart ExpoSong so that the changes take place."))
+        _("You will have to restart ExpoSong so that the new data folder\
+            will be used."))
         dlg.run()
         dlg.destroy()
       

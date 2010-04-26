@@ -20,6 +20,7 @@ import gtk.gdk
 import gobject
 import os
 import webbrowser
+import threading
 
 from xml.dom import minidom
 from os.path import join
@@ -150,8 +151,8 @@ class Main (gtk.Window):
     win_v.pack_start(self.win_h, True)
     
     ## Status bar
-    self.status_bar = gtk.Statusbar()
-    win_v.pack_end(self.status_bar, False)
+    self.statusbar = gtk.Statusbar()
+    win_v.pack_end(self.statusbar, False)
     
     gtk.settings_get_default().set_long_property('gtk-button-images',True,\
         'application:__init__')    
@@ -161,6 +162,7 @@ class Main (gtk.Window):
     
     self.restore_state()
     self.show_all()
+    self.update_status(_("Ready."), 1)
   
   def build_all(self):
     task = self.build_schedule()
@@ -378,6 +380,16 @@ class Main (gtk.Window):
         yield True
     schedlist.schedlist.expand_all()
     yield False
+  
+  def update_status(self, message, context_id, seconds=5):
+    'Set a notification on the statusbar'
+    msg_id = self.statusbar.push(context_id, message)
+    t = threading.Timer(seconds, self.remove_status, (msg_id, context_id))
+    t.start()
+    
+  def remove_status(self, msg_id="", context_id=""):
+    'Called to remove the statusbar notification after a number of seconds'
+    self.statusbar.remove_message(context_id, msg_id)
   
   def _on_pres_rt_click(self, widget, event):
     'The user right clicked in the presentation list area.'
