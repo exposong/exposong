@@ -91,7 +91,7 @@ class PrefsDialog(gtk.Dialog):
     if num_monitors <= 1:
       monitor_nm = ( _("Primary (Bottom-Right)"), _("Primary (Full)"))
       _g1 = screen.get_monitor_geometry(0)
-      _g2 = "%dx%d+%d+%d" % ((_g1.width/2, _g1.height/2)*2)
+      _g2 = "%d,%d,%d,%d" % ((_g1.width/2, _g1.height/2)*2)
       monitor_geom = ( _g2 ,
           getGeometryFromRect(_g1) )
       sel = monitor_nm[0]

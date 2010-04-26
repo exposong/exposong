@@ -82,6 +82,7 @@ class Main (gtk.Window):
     ## Main Window Area
     self.win_h = gtk.HPaned()
     ### Main left area
+    left_vbox = gtk.VBox()
     self.win_lft = gtk.VPaned()
     #### Schedule
     schedlist.schedlist.connect("button-release-event", self._on_schedule_rt_click)
@@ -91,16 +92,16 @@ class Main (gtk.Window):
     self.win_lft.pack1(schedule_scroll, True, True)
     
     #### Presentation List
-    pres1 = gtk.VBox()
     preslist.preslist.connect("button-release-event", self._on_pres_rt_click)
-    pres_list_scroll = gtk.ScrolledWindow()
-    pres_list_scroll.add(preslist.preslist)
-    pres_list_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-    pres1.pack_start(pres_list_scroll, True, True)
-    pres1.pack_start(preslist.presfilter, False, True, 2)
-    self.win_lft.pack2(pres1, True, True)
+    preslist_scroll = gtk.ScrolledWindow()
+    preslist_scroll.add(preslist.preslist)
+    preslist_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+    self.win_lft.pack2(preslist_scroll, True, True)
+    left_vbox.pack_start(self.win_lft, True, True)
+    left_vbox.pack_start(preslist.presfilter, False, True, 2)
     
-    self.win_h.pack1(self.win_lft, False, False)
+    left_vbox.show_all()
+    self.win_h.pack1(left_vbox, False, False)
     
     ### Main right area
     win_rt = gtk.VBox()
@@ -158,11 +159,13 @@ class Main (gtk.Window):
         'application:__init__')    
     self.build_all()
     
+    win_v.show_all()
     self.add(win_v)
     
-    self.restore_state()
+    self.restore_window()
     self.show_all()
     self.update_status(_("Ready."), 1)
+    gobject.idle_add(self.restore_panes)
   
   def build_all(self):
     task = self.build_schedule()
@@ -380,7 +383,7 @@ class Main (gtk.Window):
         yield True
     schedlist.schedlist.expand_all()
     yield False
-  
+    
   def update_status(self, message, context_id, seconds=5):
     'Set a notification on the statusbar'
     msg_id = self.statusbar.push(context_id, message)
@@ -390,7 +393,7 @@ class Main (gtk.Window):
   def remove_status(self, msg_id="", context_id=""):
     'Called to remove the statusbar notification after a number of seconds'
     self.statusbar.remove_message(context_id, msg_id)
-  
+    
   def _on_pres_rt_click(self, widget, event):
     'The user right clicked in the presentation list area.'
     if event.button == 3:
@@ -450,8 +453,8 @@ class Main (gtk.Window):
     maximized = (event.new_window_state == gtk.gdk.WINDOW_STATE_MAXIMIZED)
     config.config.set("main_window", "maximized", str(maximized))
 
-  def restore_state(self):
-    'Restores window position and size and also size of the two panes'
+  def restore_window(self):
+    'Restores window position and size.'
     if config.config.has_option("main_window", "size"):
       (x,y) = config.config.get("main_window", "size").split(",")
       self.set_default_size(int(x), int(y))
@@ -461,6 +464,9 @@ class Main (gtk.Window):
     if config.config.has_option("main_window", "maximized"):
       if config.config.getboolean("main_window", "maximized"):
         self.maximize()
+
+  def restore_panes(self):
+    'Restores the size of the two panes'
     if config.config.has_option("main_window", "left-paned"):
       self.win_lft.set_position(int(config.config.get("main_window", "left-paned")))
     if config.config.has_option("main_window", "main-paned"):
