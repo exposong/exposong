@@ -84,32 +84,33 @@ class PrefsDialog(gtk.Dialog):
     p_notify_bg = self._append_color_setting( _("Background"),
         config.getcolor("screen","notify_bg"), 10)
     
-    monitor_nm = monitors_geom = tuple()
+    monitor_name = monitor_geom = tuple()
     sel = 0
     screen = parent.get_screen()
     num_monitors = screen.get_n_monitors()
     if num_monitors <= 1:
-      monitor_nm = ( _("Primary (Bottom-Right)"), _("Primary (Full)"))
+      monitor_name = ( _("Primary (Bottom-Right)"), _("Primary (Full)"))
       _g1 = screen.get_monitor_geometry(0)
       _g2 = "%d,%d,%d,%d" % ((_g1.width/2, _g1.height/2)*2)
       monitor_geom = ( _g2 ,
           getGeometryFromRect(_g1) )
-      sel = monitor_nm[0]
+      sel = monitor_name[0]
     else:
       # I think computers max out at 3 monitors. We should find documentation.
-      monitor_nm = ( _("Primary"), _("Secondary"), _("Tertiary"), _("Monitor 4"),
-          _("Monitor 5") )[0:num_monitors]
+      monitor_name = ( _("Primary"), _("Secondary"), _("Tertiary"),
+          _("Monitor 4"), _("Monitor 5") )[0:num_monitors]
       monitor_geom = tuple(getGeometryFromRect(screen.get_monitor_geometry(n))
-          for n in range(len(monitor_nm)))
-      sel = monitor_nm[1]
+          for n in range(len(monitor_name)))
+      sel = monitor_name[1]
     
     if config.has_option('screen','monitor'):
       cur = config.get('screen', 'monitor')
       if cur in monitor_geom:
-        sel = monitor_nm[monitor_geom.index(config.get('screen','monitor'))]
+        sel = monitor_name[monitor_geom.index(config.get('screen','monitor'))]
     
     self._append_section_title( _("Position"), 11)
-    p_monitor = self._append_combo_setting( _("Monitor"), monitor_nm, sel, 12)
+    p_monitor = self._append_combo_setting( _("Monitor"), monitor_name, sel,
+        12)
     
     notebook.append_page(self.table, gtk.Label( _("Screen")))
     
@@ -119,8 +120,8 @@ class PrefsDialog(gtk.Dialog):
       if g_data.get_current_folder() != DATA_PATH:
         config.set("general", "data-path", g_data.get_current_folder())
         dlg = gtk.MessageDialog(self, gtk.DIALOG_DESTROY_WITH_PARENT,
-        gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
-        _("You will have to restart ExpoSong so that the new data folder\
+            gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
+            _("You will have to restart ExpoSong so that the new data folder\
             will be used."))
         dlg.run()
         dlg.destroy()
@@ -139,6 +140,7 @@ class PrefsDialog(gtk.Dialog):
       config.setcolor("screen", "notify_bg", (ntfc.red, ntfc.green, ntfc.blue))
       
       config.set('screen','monitor', monitor_geom[p_monitor.get_active()])
+      exposong.screen.screen.reposition(parent)
       
       exposong.screen.screen.set_dirty()
       if hasattr(self,"_logo_pbuf"):
