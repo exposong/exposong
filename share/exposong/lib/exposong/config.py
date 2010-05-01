@@ -24,6 +24,12 @@ from exposong import SHARED_FILES
 # all of exposong.* .
 
 class Config(ConfigParser.SafeConfigParser):
+  """
+  Manages user preferences in the system.
+  """
+  # Put this here for easy access 
+  NoOptionError = ConfigParser.NoOptionError
+  
   def __init__(self):
     ConfigParser.SafeConfigParser.__init__(self)
     cfile = os.path.join(os.path.expanduser("~"), ".exposong.conf")
@@ -50,17 +56,19 @@ class Config(ConfigParser.SafeConfigParser):
     self.read(self.configfile)
   
   def getcolor(self, section, option):
-    ''
+    "Returns a tuple of integers."
     return map(int, self.get(section, option).split(','))
   
   def setcolor(self, section, option, value):
-    ''
+    "Sets a value from a tuple of integers."
     self.set(section, option, ','.join(map(str,value)))
 
   def write(self):
+    "Save the config to file."
     tmpname = self.configfile+".new"
-    with open(tmpname, 'w') as f:
-      ConfigParser.SafeConfigParser.write(self, f)
+    f = open(tmpname, 'w')
+    ConfigParser.SafeConfigParser.write(self, f)
+    f.close()
     
     shutil.move(tmpname, self.configfile)
 

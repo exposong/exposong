@@ -73,10 +73,12 @@ class PrefsDialog(gtk.Dialog):
     p_shad = self._append_color_setting( _("Text Shadow"),
         config.getcolor("screen","text_shadow"), 2, True)
     p_maxsize = self._append_spinner_setting( _("Max Font Size"),
-        gtk.Adjustment(config.getfloat("screen","max_font_size"), 0, 96, 1), 3)
+        gtk.Adjustment(config.getfloat("screen","max_font_size"), 0, 96, 1),
+        3)
     
     self._append_section_title( _("Logo"), 5)
-    p_logo = self._append_file_setting( _("Image"), config.get("screen","logo"), 6)
+    p_logo = self._append_file_setting( _("Image"),
+        config.get("screen","logo"), 6)
     p_logo_bg = self._append_color_setting( _("Background"),
         config.getcolor("screen","logo_bg"), 7)
     
@@ -84,29 +86,30 @@ class PrefsDialog(gtk.Dialog):
     p_notify_bg = self._append_color_setting( _("Background"),
         config.getcolor("screen","notify_bg"), 10)
     
-    monitor_name = monitor_geom = tuple()
+    # Monitor Selection
+    monitor_name = tuple()
     sel = 0
     screen = parent.get_screen()
     num_monitors = screen.get_n_monitors()
-    if num_monitors <= 1:
-      monitor_name = ( _("Primary (Bottom-Right)"), _("Primary (Full)"))
-      _g1 = screen.get_monitor_geometry(0)
-      _g2 = "%d,%d,%d,%d" % ((_g1.width/2, _g1.height/2)*2)
-      monitor_geom = ( _g2 ,
-          getGeometryFromRect(_g1) )
-      sel = monitor_name[0]
-    else:
-      # I think computers max out at 3 monitors. We should find documentation.
-      monitor_name = ( _("Primary"), _("Secondary"), _("Tertiary"),
-          _("Monitor 4"), _("Monitor 5") )[0:num_monitors]
-      monitor_geom = tuple(getGeometryFromRect(screen.get_monitor_geometry(n))
-          for n in range(len(monitor_name)))
+    monitor_name = ( _("Primary"), _("Primary (Bottom-Right)"),
+        _("Secondary"), _("Tertiary"), _("Monitor 4") )[0:num_monitors+1]
+    monitor_value = ('1', '1h', '2', '3', '4')[0:num_monitors+1]
+    if num_monitors == 1:
       sel = monitor_name[1]
+    else:
+      sel = monitor_name[2]
     
-    if config.has_option('screen','monitor'):
-      cur = config.get('screen', 'monitor')
-      if cur in monitor_geom:
-        sel = monitor_name[monitor_geom.index(config.get('screen','monitor'))]
+    try:
+      if config.get('screen', 'monitor') == '1':
+        sel = monitor_name[0]
+      if config.get('screen', 'monitor') == '1h':
+        sel = monitor_name[1]
+      else:
+        sel = monitor_name[config.getint('screen', 'monitor')]
+    except config.NoOptionError:
+      pass
+    except IndexError:
+      pass
     
     self._append_section_title( _("Position"), 11)
     p_monitor = self._append_combo_setting( _("Monitor"), monitor_name, sel,
@@ -139,7 +142,7 @@ class PrefsDialog(gtk.Dialog):
       ntfc = p_notify_bg.get_color()
       config.setcolor("screen", "notify_bg", (ntfc.red, ntfc.green, ntfc.blue))
       
-      config.set('screen','monitor', monitor_geom[p_monitor.get_active()])
+      config.set('screen','monitor', monitor_value[p_monitor.get_active()])
       exposong.screen.screen.reposition(parent)
       
       exposong.screen.screen.set_dirty()

@@ -70,11 +70,21 @@ class Screen:
     If the user is using one monitor, use the bottom right corner for
     the presentation screen, otherwise, use the 2nd monitor.
     '''
+    geometry = None
+    screen = parent.get_screen()
+    num_monitors = screen.get_n_monitors()
+    
     if config.has_option('screen','monitor'):
-      geometry = map(int, config.get('screen', 'monitor').split(','))
-    else:
-      screen = parent.get_screen()
-      num_monitors = screen.get_n_monitors()
+      if config.get('screen', 'monitor') == '1h':
+        scr_geom = screen.get_monitor_geometry(0)
+        geometry = (scr_geom.width/2, scr_geom.height/2,
+            scr_geom.width/2, scr_geom.height/2)
+      elif num_monitors >= config.getint('screen','monitor'):
+        scr_geom = screen.get_monitor_geometry(
+            config.getint('screen','monitor')-1)
+        geometry = (scr_geom.x, scr_geom.y, scr_geom.width, scr_geom.height)
+    
+    if geometry == None:
       if(num_monitors > 1):
         scr_geom = screen.get_monitor_geometry(1)
         geometry = (scr_geom.x, scr_geom.y, scr_geom.width, scr_geom.height)
