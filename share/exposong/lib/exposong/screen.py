@@ -174,7 +174,7 @@ class Screen:
     self.draw()
   
   def _set_background(self, widget, ccontext = None, bounds = None):
-    'Set the background of `widget` to `color`.'
+    'Set the background of `widget` to a color or image.'
     if not widget.window:
       return False
     
@@ -184,7 +184,8 @@ class Screen:
       bounds = widget.window.get_size()
     
     if self._black and widget is self.pres:
-      bg = (0, 0, 0)
+      bgtype = 'color'
+      bgcolor1 = bgcolor2 = (0, 0, 0)
     elif self._logo and widget is self.pres:
       if not hasattr(self,"_logo_pbuf"):
         try:
@@ -305,7 +306,8 @@ class Screen:
           layout.set_alignment(pango.ALIGN_CENTER)
           layout.set_width(int(screenW*pango.SCALE * 0.97))
           
-          layout.set_font_description(pango.FontDescription("Sans Bold "+str(int(screenH/54.0))))
+          layout.set_font_description(pango.FontDescription(
+            "Sans Bold "+str(int(screenH/54.0))))
           
           footer_height = layout.get_pixel_size()[1]
           
