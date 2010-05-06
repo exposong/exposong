@@ -189,36 +189,41 @@ class Presentation:
       return True
   
   def edit(self):
-    'Run the edit dialog for the presentation.'
-    dialog = gtk.Dialog(_("New Presentation"), exposong.application.main,\
+    'Run the edit edit_dialog for the presentation.'
+    edit_dialog = gtk.Dialog(_("New Presentation"), exposong.application.main,\
         gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,\
         (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
-    dialog.set_default_size(340, 400)
+    edit_dialog.set_default_size(340, 400)
     if(self.title):
-      dialog.set_title(_("Editing %s") % self.title)
+      edit_dialog.set_title(_("Editing %s") % self.title)
     else:
       # TODO get_type() needs to be translated as well. Find the best way to do this.
-      dialog.set_title(_("New %s Presentation") % self.get_type().title())
+      edit_dialog.set_title(_("New %s Presentation") % self.get_type().title())
     notebook = gtk.Notebook()
-    dialog.vbox.pack_start(notebook, True, True, 6)
+    edit_dialog.vbox.pack_start(notebook, True, True, 6)
     
     self._fields = dict()
     
-    self._edit_tabs(notebook, dialog)
+    self._edit_tabs(notebook, edit_dialog)
     
     notebook.show_all()
     
-    if dialog.run() == gtk.RESPONSE_ACCEPT:
-      self._edit_save()
-      del(self._fields)
-      
-      self.to_xml()
-      
-      dialog.hide()
-      return True
-    else:
-      dialog.hide()
-      return False
+    while True:
+      if edit_dialog.run() == gtk.RESPONSE_ACCEPT:
+        if self._fields['title'].get_text() == "":
+          info_dialog = gtk.MessageDialog(edit_dialog, gtk.DIALOG_DESTROY_WITH_PARENT,
+              gtk.MESSAGE_INFO, gtk.BUTTONS_OK, _("Please enter a Title"))
+          info_dialog.run()
+          info_dialog.destroy()
+        else:
+          self._edit_save()
+          del(self._fields)
+          self.to_xml()
+          edit_dialog.destroy()
+          return True
+      else:
+        edit_dialog.destroy()
+        return False
   
   def _edit_tabs(self, notebook, parent):
     'Tabs for the dialog.'
