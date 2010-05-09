@@ -92,11 +92,13 @@ class Screen:
         # No 2nd monitor, so preview it small in the corner of the screen
         scr_geom = screen.get_monitor_geometry(0)
         parent.move(0,0)
-        geometry = (scr_geom.width/2, scr_geom.height/2, scr_geom.width/2, scr_geom.height/2)
+        geometry = (scr_geom.width/2, scr_geom.height/2,
+                    scr_geom.width/2, scr_geom.height/2)
     self.window.move(geometry[0], geometry[1])
     self.window.resize(geometry[2], geometry[3])
     self.aspect = float(geometry[2])/geometry[3]
-    self.preview.set_size_request(int(preview_height*self.aspect), preview_height)
+    self.preview.set_size_request(int(preview_height*self.aspect),
+                                  preview_height)
   
   #def set_background(self, **keys):
   # 'Set the background color.'
@@ -159,6 +161,7 @@ class Screen:
     self.window.show_all()
     self.draw()
     self._set_menu_items_disabled()
+    exposong.slidelist.slidelist.grab_focus()
   
   def expose(self, widget, event):
     'Redraw `widget`.'
@@ -190,7 +193,8 @@ class Screen:
       if not hasattr(self,"_logo_pbuf"):
         try:
           self._logo_pbuf = gtk.gdk.pixbuf_new_from_file_at_size(
-              config.get("screen", "logo"), int(bounds[0]/1.5), int(bounds[1]/1.5))
+              config.get("screen", "logo"),
+                  int(bounds[0]/1.5), int(bounds[1]/1.5))
         except gobject.GError:
           print "Error: Could not open logo file."
           self._logo_pbuf = None
@@ -198,8 +202,9 @@ class Screen:
       ccontext.set_source_rgb(bg[0], bg[1], bg[2])
       ccontext.paint()
       if self._logo_pbuf <> None:
-        ccontext.set_source_pixbuf(self._logo_pbuf, (bounds[0]-self._logo_pbuf.get_width())/2,\
-        (bounds[1]-self._logo_pbuf.get_height())/2)
+        ccontext.set_source_pixbuf(self._logo_pbuf,
+            (bounds[0]-self._logo_pbuf.get_width())/2,\
+            (bounds[1]-self._logo_pbuf.get_height())/2)
         ccontext.paint()
       return
     else:
@@ -268,7 +273,8 @@ class Screen:
     
     ccontext = widget.window.cairo_create()
     screenW, screenH = widget.window.get_size()
-    if widget is self.preview and self.pres.window and self.pres.window.is_viewable():
+    if widget is self.preview and self.pres.window and\
+        self.pres.window.is_viewable():
       #Scale if the presentation window size is available
       win_sz = self.pres.window.get_size()
       width = int(float(preview_height)*win_sz[0]/win_sz[1])
@@ -280,7 +286,7 @@ class Screen:
     
     slide = exposong.slidelist.slidelist.get_active_item()
     
-    if widget is self.pres and (self._background or self._black or self._logo) \
+    if widget is self.pres and (self._background or self._black or self._logo)\
         or not slide:
       #When there's no text to render, just draw the background
       self._set_background(widget, ccontext, (screenW, screenH))
@@ -326,7 +332,8 @@ class Screen:
       layout.set_alignment(pango.ALIGN_CENTER)
       layout.set_width(int(screenW*pango.SCALE * 0.97))
       
-      layout.set_font_description(pango.FontDescription("Sans Bold "+str(size)))
+      layout.set_font_description(
+          pango.FontDescription("Sans Bold "+str(size)))
       
       min_sz = 0
       max_sz = config.getfloat("screen", "max_font_size")

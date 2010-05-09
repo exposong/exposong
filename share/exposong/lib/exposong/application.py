@@ -85,7 +85,8 @@ class Main (gtk.Window):
     left_vbox = gtk.VBox()
     self.win_lft = gtk.VPaned()
     #### Schedule
-    schedlist.schedlist.connect("button-release-event", self._on_schedule_rt_click)
+    schedlist.schedlist.connect("button-release-event",
+                                self._on_schedule_rt_click)
     schedule_scroll = gtk.ScrolledWindow()
     schedule_scroll.add(schedlist.schedlist)
     schedule_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -119,8 +120,8 @@ class Main (gtk.Window):
     win_rt_btm.pack_start(bgsel, False, True, 10)
     #wrap it so that the aspect ratio is kept
     prev_box = gtk.VBox()
-    prev_aspect = gtk.AspectFrame(None, 0.5, 0.5, exposong.screen.screen.aspect,
-        False)
+    prev_aspect = gtk.AspectFrame(None, 0.5, 0.5,
+                                  exposong.screen.screen.aspect, False)
     prev_aspect.set_shadow_type(gtk.SHADOW_NONE)
     prev_aspect.add(pres_prev)
     prev_box.pack_start(prev_aspect, True, False, 0)
@@ -134,7 +135,8 @@ class Main (gtk.Window):
     self.main_actions.get_action('Present').connect_proxy(self.pbut_present)
     pres_buttons.add(self.pbut_present)
     self.pbut_background = gtk.Button( _("Background") )
-    self.main_actions.get_action('Background').connect_proxy(self.pbut_background)
+    self.main_actions.get_action('Background').connect_proxy(
+        self.pbut_background)
     pres_buttons.add(self.pbut_background)
     self.pbut_logo = gtk.Button( _("Logo") )
     self.main_actions.get_action('Logo').connect_proxy(self.pbut_logo)
@@ -183,7 +185,8 @@ class Main (gtk.Window):
         ('Presentation', None, _('P_resentation')),
         ('Help', None, _('_Help')),
         ('Quit', gtk.STOCK_QUIT, None, None, None, self._quit),
-        ('Preferences', gtk.STOCK_PREFERENCES, None, None, None, self._on_prefs),
+        ('Preferences', gtk.STOCK_PREFERENCES,
+            None, None, None, self._on_prefs),
         ('sched-new', gtk.STOCK_NEW, None, None, _("Create a new schedule"),
             schedlist.schedlist._on_new),
         ('sched-rename', None, _("_Rename"), None,
@@ -268,7 +271,8 @@ class Main (gtk.Window):
           </menu>
         </menubar>''')
     
-    for mod in exposong.plugins.get_plugins_by_capability(exposong.plugins._abstract.Menu):
+    for mod in exposong.plugins.get_plugins_by_capability(
+        exposong.plugins._abstract.Menu):
       mod().merge_menu(uimanager)
     
     menu = uimanager.get_widget('/MenuBar')
@@ -335,7 +339,8 @@ class Main (gtk.Window):
     try:
       dom = minidom.parse(os.path.join(directory,filenm))
     except Exception, details:
-      print "Error reading schedule file (%s): %s" % (os.path.join(directory,filenm), details)
+      print "Error reading schedule file (%s): %s" % (
+        os.path.join(directory,filenm), details)
     if dom:
       if dom.documentElement.tagName == "schedule":
         sched = Schedule(filename=filenm)
@@ -445,8 +450,10 @@ class Main (gtk.Window):
     'Sets the size and position in the config (matters, if not maximized)'
     if not config.config.has_option("main_window", "maximized") or \
         not config.config.getboolean("main_window", "maximized"):
-      config.config.set("main_window","size", ','.join(map(str,self.get_size())))
-      config.config.set("main_window", "position", ",".join(map(str,self.get_position())))
+      config.config.set("main_window","size", ','.join(
+          map(str,self.get_size())))
+      config.config.set("main_window", "position", ",".join(
+          map(str,self.get_position())))
     
   def _on_window_state_event(self, widget, event, *args):
     'Sees if window is maximized or not and sets it in the config'
@@ -468,14 +475,18 @@ class Main (gtk.Window):
   def restore_panes(self):
     'Restores the size of the two panes'
     if config.config.has_option("main_window", "left-paned"):
-      self.win_lft.set_position(int(config.config.get("main_window", "left-paned")))
+      self.win_lft.set_position(int(config.config.get(
+          "main_window", "left-paned")))
     if config.config.has_option("main_window", "main-paned"):
-      self.win_h.set_position(int(config.config.get("main_window", "main-paned")))
+      self.win_h.set_position(int(config.config.get(
+          "main_window", "main-paned")))
 
   def save_state(self):
     'Saves the state of the panes in the window'
-    config.config.set("main_window", "left-paned", str(self.win_lft.get_position()))
-    config.config.set("main_window", "main-paned", str(self.win_h.get_position()))
+    config.config.set("main_window", "left-paned",
+                      str(self.win_lft.get_position()))
+    config.config.set("main_window", "main-paned",
+                      str(self.win_h.get_position()))
 
   def _quit(self, *args):
     'Cleans up and exits the program.'
