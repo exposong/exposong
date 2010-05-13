@@ -17,9 +17,27 @@
 import os.path, os
 from os.path import abspath, dirname, join, pardir, expanduser
 
-SHARED_FILES = abspath(join(dirname(__file__), pardir, pardir))
-LOCALE_PATH = join(SHARED_FILES, 'i18n')
-RESOURCE_PATH = join(SHARED_FILES, 'res')
+
+# Find shared files
+
+usr_dir = abspath(join('/', 'usr', 'share', 'exposong'))
+#running from bin/exposong
+if os.path.exists(abspath(join(pardir, 'share', 'exposong', 'lib'))):
+  SHARED_FILES = abspath(join(dirname(__file__), pardir, pardir))
+  LOCALE_PATH = join(SHARED_FILES, 'i18n')
+  RESOURCE_PATH = join(SHARED_FILES, 'res')
+  HELP_PATH = abspath(join(SHARED_FILES, pardir, pardir, 'help'))
+# running from /usr/share/exposong
+elif os.path.exists(usr_dir):
+  SHARED_FILES = usr_dir
+  LOCALE_PATH = join(SHARED_FILES, 'i18n')
+  RESOURCE_PATH = join(SHARED_FILES, 'images')
+  HELP_PATH = join(SHARED_FILES, 'help')
+else:
+  print "Program files not found. Will now exit"
+  exit(0)
+
+# Find DATA_PATH
 DATA_PATH = None
 
 from exposong import config
@@ -65,9 +83,7 @@ gettext.textdomain('exposong')
 import __builtin__
 __builtin__._ = gettext.gettext
 
-HELP_URL = abspath(join(SHARED_FILES, pardir, pardir, 'help', _('en') ,
-    'index.html'))
-    
+HELP_URL = join(HELP_PATH, _('en') , 'index.html')
+
 #import the main application
 from exposong.application import run
-

@@ -16,9 +16,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
-from os.path import dirname, join, pardir
+from os.path import dirname, join, pardir, abspath, exists
 
-sys.path.insert(0, join(dirname(__file__), pardir, 'share', 'exposong', 'lib'))
+# running from bin/exposong
+if exists(join(dirname(__file__), pardir, 'share', 'exposong', 'lib')): 
+  sys.path.insert(0, join(dirname(__file__), pardir, 'share', 'exposong', 'lib'))
 
 import exposong
 exposong.run()
