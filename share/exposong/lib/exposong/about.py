@@ -27,7 +27,7 @@ class About:
     self.dialog = gtk.AboutDialog()
     self.dialog.set_transient_for(parent)
     self.dialog.set_name("ExpoSong")
-    self.dialog.set_version( "0.6.2" )
+    self.dialog.set_version( "0.7" )
     self.dialog.set_copyright(_("Copyright %s") % "2008-2010 Exposong.org")
     self.dialog.set_authors(("Brad Landis", "Samuel Mehrbrodt", "Siegwart Bogatscher",))
     self.dialog.set_artists(("Tango (http://tango.freedesktop.org)",))

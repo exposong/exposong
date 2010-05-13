@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=ExpoSong
+Comment=A Worship presentation software
+Exec=/usr/bin/exposong
+Icon=/usr/share/exposong/images/es32.png
+Terminal=false
+Type=Application
+Categories=Multimedia;Office

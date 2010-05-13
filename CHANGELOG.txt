@@ -1,10 +1,16 @@
 +-----------------------------------------+
 | ExpoSong                                |
-| Version 0.6.2                           |
-| Copyright (C) 2008-2010 Fishhookweb.com |
+| Version 0.7                             |
+| Copyright (C) 2008-2010 Exposong.org    |
 +-----------------------------------------+
 
 = Changelog =
+
+== 0.7 ==
+ * Using OpenLyrics to store Lyrics (http://openlyrics.info)
+ * Save and restore the main window's state
+ * New config format
+ * setup.py script
 
 == 0.6.2 ==
 

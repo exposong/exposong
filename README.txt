@@ -1,6 +1,6 @@
 +-----------------------------------------+
 | ExpoSong                                |
-| Version 0.6.2                           |
+| Version 0.7                             |
 | Copyright (C) 2008-2010 Fishhookweb.com |
 +-----------------------------------------+
 
@@ -22,8 +22,8 @@ Find out more at http://exposong.org, and http://exposong.googlecode.com .
 Please see [http://code.google.com/p/exposong/wiki/Installation] for instructions
 on how to install and run this program.
 
-Start the program with bin/exposong.py by either double clicking if possible, or
+Start the program with bin/exposong by either double clicking if possible, or
 using the following command in the terminal/command line in the folder for the
 program:
-	python bin/exposong.py
+	python bin/exposong
 
