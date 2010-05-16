@@ -26,6 +26,7 @@ import exposong.preslist
 import exposong.application
 
 schedlist = None
+DRAGDROP_SCHEDULE = [("text/treeview-path", gtk.TARGET_SAME_APP, 4121)]
 
 class ScheduleList(gtk.TreeView):
   '''
@@ -42,19 +43,23 @@ class ScheduleList(gtk.TreeView):
     
     sched_rend = gtk.CellRendererText()
     column = gtk.TreeViewColumn( _("Schedule"), sched_rend, text=1)
-    sched_rend.connect("editing-started", exposong.application.main.disable_shortcuts)
-    sched_rend.connect("editing-canceled", exposong.application.main.enable_shortcuts)
+    
+    sched_rend.connect("editing-started",
+        exposong.application.main.disable_shortcuts)
+    sched_rend.connect("editing-canceled",
+        exposong.application.main.enable_shortcuts)
     sched_rend.connect("edited", exposong.application.main.enable_shortcuts)
     sched_rend.connect("edited", self._rename_schedule)
     column.set_resizable(False)
     column.set_cell_data_func(sched_rend, self._cell_data_func)
     self.append_column(column)
     self.get_selection().connect("changed", self._on_schedule_activate)
-    self.enable_model_drag_dest(exposong.application.DRAGDROP_SCHEDULE,
+    
+    self.enable_model_drag_dest(DRAGDROP_SCHEDULE,
         gtk.gdk.ACTION_DEFAULT)
     self.connect("drag-drop", self._on_pres_drop)
     self.connect("drag-data-received", self._on_sched_drag_received)
-    self.set_drag_dest_row((1,), gtk.TREE_VIEW_DROP_INTO_OR_BEFORE)
+    #self.set_drag_dest_row((1,), gtk.TREE_VIEW_DROP_INTO_OR_BEFORE)
 
   def append(self, parent, row, sort = None):
     'Add an item to the list.'
@@ -95,8 +100,8 @@ class ScheduleList(gtk.TreeView):
         exposong.preslist.preslist.set_model(sched)
         exposong.preslist.preslist.columns_autosize()
         if sched.is_reorderable():
-          exposong.preslist.preslist.enable_model_drag_dest(
-              exposong.application.DRAGDROP_SCHEDULE, gtk.gdk.ACTION_COPY)
+          exposong.preslist.preslist.enable_model_drag_dest(DRAGDROP_SCHEDULE,
+              gtk.gdk.ACTION_DEFAULT)
         else:
           exposong.preslist.preslist.unset_rows_drag_dest()
     try:
@@ -149,14 +154,15 @@ class ScheduleList(gtk.TreeView):
       path, position = drop_info
       
       pres = exposong.preslist.preslist.get_filter_model().get_value(
-          exposong.preslist.preslist.get_filter_model().get_iter_from_string(selection.data),
-              0).presentation
+          exposong.preslist.preslist.get_filter_model().get_iter_from_string(
+              selection.data), 0).presentation
       sched = model.get_value(model.get_iter(path), 0)
       
       sched.append(pres)
       context.finish(True, False)
-      exposong.application.main.update_status(_("Added Presentation \"%s\" to Schedule \"%s\""%(pres.title, sched.title)),
-        exposong.application.main.statusbar.get_context_id("Schedule"))
+      exposong.application.main.update_status(
+          _('Added Presentation "%s" to Schedule "%s"')%(pres.title,
+          sched.title), exposong.application.main.statusbar.get_context_id("Schedule"))
   
   def _on_new(self, *args):
     'Create a new schedule.'

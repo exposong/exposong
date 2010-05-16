@@ -34,8 +34,6 @@ import exposong.bgselect, exposong.notify
 main = None
 keys_to_disable = ("Background","Black Screen")
 
-DRAGDROP_SCHEDULE = [("text/treeview-path", 0,0)]
-
 
 class Main (gtk.Window):
   '''
