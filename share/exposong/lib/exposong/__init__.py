@@ -22,7 +22,9 @@ from os.path import abspath, dirname, join, pardir, expanduser
 
 usr_dir = abspath(join('/', 'usr', 'share', 'exposong'))
 #running from bin/exposong
-if os.path.exists(abspath(join(pardir, 'share', 'exposong', 'lib'))):
+bin_path = abspath(join(dirname(__file__), pardir, pardir, pardir, pardir,
+                        'bin', 'exposong'))
+if os.path.exists(bin_path):
   SHARED_FILES = abspath(join(dirname(__file__), pardir, pardir))
   LOCALE_PATH = join(SHARED_FILES, 'i18n')
   RESOURCE_PATH = join(SHARED_FILES, 'res')

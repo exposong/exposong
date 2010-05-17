@@ -194,7 +194,7 @@ class Presentation:
         (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
     edit_dialog.set_default_size(340, 400)
     if(self.title):
-      edit_dialog.set_title(_("Editing %s") % self.title)
+      edit_dialog.set_title(_('Editing "%s"') % self.title)
     else:
       # TODO get_type() needs to be translated as well. Find the best way to do this.
       edit_dialog.set_title(_("New %s Presentation") % self.get_type().title())
