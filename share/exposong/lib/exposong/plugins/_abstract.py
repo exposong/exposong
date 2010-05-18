@@ -19,6 +19,7 @@ import gtk.gdk
 import gobject
 import xml.dom
 import xml.dom.minidom
+import pprint
 from os.path import join
 
 from exposong.glob import *
@@ -180,12 +181,13 @@ class Presentation:
   
   def matches(self, text):
     'Tests to see if the presentation matches `text`.'
-    regex = re.compile("\\b"+re.escape(text), re.I)
+    regex = re.compile("\\b"+re.escape(text), re.U|re.I)
     if regex.search(self.title):
       return True
-    if hasattr(self.slides[0], 'text') and regex.search(" ".join(\
-        s.title+" "+s.text for s in self.slides)):
-      return True
+    if self.slides:
+      if hasattr(self.slides[0], 'text') and regex.search(" ".join(\
+          s.title+" "+s.text for s in self.slides)):
+        return True
   
   def edit(self):
     'Run the edit edit_dialog for the presentation.'
