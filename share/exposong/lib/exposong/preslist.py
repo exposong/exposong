@@ -249,10 +249,9 @@ class PresList(gtk.TreeView):
 class PresFilter(gtk.Entry):
   def __init__(self):
     gtk.Entry.__init__(self, 50)
+    self.set_width_chars(12)
     
     self.use_icons = gtk.gtk_version[0] >= 2 and gtk.gtk_version[1] > 16
-      
-    self.set_width_chars(12)
     if self.use_icons:
       self.set_icon_from_stock(gtk.ENTRY_ICON_PRIMARY, gtk.STOCK_FIND)
     

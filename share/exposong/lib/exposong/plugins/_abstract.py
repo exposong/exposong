@@ -19,7 +19,6 @@ import gtk.gdk
 import gobject
 import xml.dom
 import xml.dom.minidom
-import pprint
 from os.path import join
 
 from exposong.glob import *

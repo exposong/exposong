@@ -163,8 +163,9 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     vbox.pack_start(text_scroll, True, True)
     
     vbox.show_all()
-    
     notebook.insert_page(vbox, gtk.Label(_("Edit")), 0)
+    
+    self._fields['title'].grab_focus()
     
     # Ordering Lists   TODO
     #vbox = gtk.VBox()
