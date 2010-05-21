@@ -42,7 +42,9 @@ information = {
 type_icon = gtk.gdk.pixbuf_new_from_file_at_size(
     join(RESOURCE_PATH,'pres_lyric.png'), 20, 14)
 
-title_re = re.compile("(chorus|refrain|verse|bridge|end(ing)?|soprano|alto|tenor|bass)\\b", re.I)
+title_re = re.compile(
+    "(chorus|refrain|verse|bridge|end(ing)?|soprano|alto|tenor|bass)\\b",
+    re.I)
 auth_types = {
   "words": _("Words"),
   "music": _("Music"),

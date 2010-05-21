@@ -69,24 +69,40 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       text = gtk.TextView()
       text.set_wrap_mode(gtk.WRAP_WORD)
       text.get_buffer().set_text(self.text)
+      text.get_buffer().set_modified(False)
       text_scroll = gtk.ScrolledWindow()
       text_scroll.add(text)
       text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-      text_scroll.set_size_request(350, 250)
+      text_scroll.set_size_request(400, 250)
       dialog.vbox.pack_start(text_scroll, True, True)
       
       dialog.vbox.show_all()
       
-      if dialog.run() == gtk.RESPONSE_ACCEPT:
+      while True:
+        if dialog.run() == gtk.RESPONSE_ACCEPT:
+          break
+        else:
+          if text.get_buffer().get_modified():
+            continue_dialog = gtk.MessageDialog(parent, gtk.DIALOG_MODAL,
+                gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
+                _('Unsaved Changes exist. Do you really want to continue \
+without saving?'))
+            resp = continue_dialog.run()
+            continue_dialog.destroy()
+            if resp == gtk.RESPONSE_YES:
+              dialog.destroy()
+              return False
+          else:
+            break
+      
+      dialog.destroy()
+      if text.get_buffer().get_modified() or title.get_text() != "":
         self.title = title.get_text()
         bounds = text.get_buffer().get_bounds()
         self.text = text.get_buffer().get_text(bounds[0], bounds[1])
-        dialog.hide()
         return True
-      else:
-        dialog.hide()
-        return False
-  
+      return False
+    
     @staticmethod
     def get_version():
       'Return the version number of the plugin.'

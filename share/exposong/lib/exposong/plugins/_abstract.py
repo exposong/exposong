@@ -215,6 +215,7 @@ class Presentation:
               gtk.MESSAGE_INFO, gtk.BUTTONS_OK, _("Please enter a Title"))
           info_dialog.run()
           info_dialog.destroy()
+          self._fields["title"].grab_focus()
         else:
           self._edit_save()
           del(self._fields)

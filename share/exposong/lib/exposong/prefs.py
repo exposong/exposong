@@ -124,7 +124,7 @@ class PrefsDialog(gtk.Dialog):
         dlg = gtk.MessageDialog(self, gtk.DIALOG_DESTROY_WITH_PARENT,
             gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
             _("You will have to restart ExpoSong so that the new data folder\
-            will be used."))
+will be used."))
         dlg.run()
         dlg.destroy()
       
