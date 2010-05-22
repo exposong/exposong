@@ -161,8 +161,9 @@ class ScheduleList(gtk.TreeView):
       sched.append(pres)
       context.finish(True, False)
       exposong.application.main.update_status(
-          _('Added Presentation "%s" to Schedule "%s"')%(pres.title,
-          sched.title), exposong.application.main.statusbar.get_context_id("Schedule"))
+          _('Added Presentation "%(presentation)s" to Schedule "%(schedule)s"')%
+          {"presentation":pres.title, "schedule": sched.title},
+          exposong.application.main.statusbar.get_context_id("Schedule"))
   
   def _on_new(self, *args):
     'Create a new schedule.'

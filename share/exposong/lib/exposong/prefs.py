@@ -53,8 +53,8 @@ class PrefsDialog(gtk.Dialog):
     else:
       folder = DATA_PATH
     g_data = self._append_folder_setting(_("Data folder"), folder, 0)
-    g_data.set_tooltip_text(_("The place where all your presentations,\
-        schedules and background images are stored."))
+    g_data.set_tooltip_text(_("The place where all your presentations, \
+schedules and background images are stored."))
     
     self._append_section_title(_("Legal"), 1)
     g_ccli = self._append_text_setting("CCLI #", config.get("general","ccli"), 2)
