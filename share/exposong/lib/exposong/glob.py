@@ -70,16 +70,16 @@ def check_filename(title, path):
     if filename:
       # Remove the old file if the title changed.
       os.remove(os.path.join(directory, filename))
-    filename = find_freefile(os.path.join(directory,tfile+".xml"))
-  return filename
+    path = find_freefile(os.path.join(directory,tfile+".xml"))
+  return path
 
-def find_freefile(fl):
+def find_freefile(filename):
   """Find an open filename.
   
   This makes sure the file doesn't exist, and if it does, add a -1, or -2,
   until the file won't overwrite an existing file. Needs changes to work with
   extensions such as ".tar.gz" which have multiple periods."""
-  fl = fl.rpartition(".")
+  fl = filename.rpartition(".")
   fl = [fl[0], "", "."+fl[2]]
   if fl[0] == "":
     #If there's not a dot, just add a number to the end.
