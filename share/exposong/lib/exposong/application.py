@@ -22,7 +22,6 @@ import webbrowser
 import threading
 
 from xml.dom import minidom
-from os.path import join
 
 from exposong import RESOURCE_PATH, DATA_PATH, SHARED_FILES, HELP_URL
 from exposong import config, prefs, screen, preslist, schedlist, slidelist
@@ -46,11 +45,11 @@ class Main (gtk.Window):
     
     gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
     gtk.window_set_default_icon_list(
-        gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH, 'es128.png')),
-        gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH, 'es64.png')),
-        gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH, 'es48.png')),
-        gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH, 'es32.png')),
-        gtk.gdk.pixbuf_new_from_file(join(RESOURCE_PATH, 'es16.png')))
+        gtk.gdk.pixbuf_new_from_file(os.path.join(RESOURCE_PATH, 'es128.png')),
+        gtk.gdk.pixbuf_new_from_file(os.path.join(RESOURCE_PATH, 'es64.png')),
+        gtk.gdk.pixbuf_new_from_file(os.path.join(RESOURCE_PATH, 'es48.png')),
+        gtk.gdk.pixbuf_new_from_file(os.path.join(RESOURCE_PATH, 'es32.png')),
+        gtk.gdk.pixbuf_new_from_file(os.path.join(RESOURCE_PATH, 'es16.png')))
     self.set_title( "ExpoSong" )
     self.connect("configure_event", self._on_configure_event)
     self.connect("window_state_event", self._on_window_state_event)
@@ -270,7 +269,7 @@ class Main (gtk.Window):
     
     for mod in exposong.plugins.get_plugins_by_capability(
         exposong.plugins._abstract.Menu):
-      mod().merge_menu(uimanager)
+      mod.merge_menu(uimanager)
     
     menu = uimanager.get_widget('/MenuBar')
     self.pres_list_menu = gtk.Menu()
@@ -298,43 +297,48 @@ class Main (gtk.Window):
   
   def load_pres(self,filenm):
     'Load a single presentation.'
-    directory = join(DATA_PATH, "pres")
     pres = None
-    try:
-      dom = minidom.parse(join(directory,filenm))
-    except Exception, details:
-      print "Error reading presentation file (%s): %s" % (filenm, details)
+    plugins = exposong.plugins.get_plugins_by_capability(
+        exposong.plugins._abstract.Presentation)
+    for plugin in plugins:
+      try:
+        pres = plugin(filenm)
+        self.library.append(pres)
+        break
+      except exposong.plugins._abstract.WrongPresentationType, details:
+        continue
+      except Exception:
+        print 'Error in filename "%s".' % filenm
+        raise
     else:
-      root_elem = dom.documentElement
-      plugins = exposong.plugins.get_plugins_by_capability(
-          exposong.plugins._abstract.Presentation)
-      for plugin in plugins:
-        if plugin.is_type(root_elem):
-          pres = plugin(dom.documentElement, filenm)
-          self.library.append(pres)
-          break
-      else:
-        print "%s is not a presentation file." % filenm
-      dom.unlink()
-      del dom
+      print '"%s" is not a presentation file.' % filenm
+    
+    #try:
+    #  dom = minidom.parse(os.path.join(directory,filenm))
+    #except Exception, details:
+    #  print "Error reading presentation file (%s): %s" % (filenm, details)
+    #else:
+    #  root_elem = dom.documentElement
+    #  
+    #  dom.unlink()
+    #  del dom
     
   def build_pres_list(self):
     'Load presentations and add them to self.library.'
-    directory = join(DATA_PATH, "pres")
+    directory = os.path.join(DATA_PATH, "pres")
     dir_list = os.listdir(directory)
     for filenm in dir_list:
       if filenm.endswith(".xml"):
-        self.load_pres(filenm)
+        self.load_pres(os.path.join(directory, filenm))
         yield True
     yield False
   
   def load_sched(self, filenm):
     'Load a single schedule.'
-    directory = join(DATA_PATH, "sched")
     dom = None
     sched = None
     try:
-      dom = minidom.parse(os.path.join(directory,filenm))
+      dom = minidom.parse(filenm)
     except Exception, details:
       print "Error reading schedule file (%s): %s" % (
         os.path.join(directory,filenm), details)
@@ -352,7 +356,7 @@ class Main (gtk.Window):
   def build_schedule(self):
     'Add items to the schedule list.'
     #Initialize the Library
-    directory = join(DATA_PATH, "sched")
+    directory = os.path.join(DATA_PATH, "sched")
     self.library = Schedule( _("Library"))
     task = self.build_pres_list()
     gobject.idle_add(task.next, priority=gobject.PRIORITY_DEFAULT_IDLE-1)
@@ -381,7 +385,7 @@ class Main (gtk.Window):
     dir_list = os.listdir(directory)
     for filenm in dir_list:
       if filenm.endswith(".xml"):
-        self.load_sched(filenm)
+        self.load_sched(os.path.join(directory,filenm))
         yield True
     schedlist.schedlist.expand_all()
     yield False

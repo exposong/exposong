@@ -17,7 +17,6 @@
 import gtk, gtk.gdk, gobject
 import xml.dom
 import xml.dom.minidom
-from os.path import join
 
 from exposong.glob import *
 from exposong import RESOURCE_PATH
@@ -33,7 +32,7 @@ information = {
     'required': False,
 }
 type_icon = gtk.gdk.pixbuf_new_from_file_at_size(
-    join(RESOURCE_PATH,'pres_text.png'), 20, 14)
+    os.path.join(RESOURCE_PATH,'pres_text.png'), 20, 14)
 
 class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     _abstract.Schedule):
@@ -97,6 +96,7 @@ without saving?'))
       
       dialog.destroy()
       if text.get_buffer().get_modified() or title.get_text() != "":
+        # Should the second comparison here be: title.get_text() != self.title ?
         self.title = title.get_text()
         bounds = text.get_buffer().get_bounds()
         self.text = text.get_buffer().get_text(bounds[0], bounds[1])
@@ -113,10 +113,12 @@ without saving?'))
       'Return the description of the plugin.'
       return "A lyric presentation type."
   
-  def __init__(self, dom = None, filename = None):
-    _abstract.Presentation.__init__(self, dom, filename)
+  def __init__(self, filename=''):
+    _abstract.Presentation.__init__(self, filename)
     self._order = []
 
+    # TODO Separate to new function _process_dom or likewise.
+    dom = None
     if isinstance(dom, xml.dom.Node):
       ordernode = dom.getElementsByTagName("order")
       if len(ordernode) > 0:
@@ -137,7 +139,7 @@ without saving?'))
     hbox.pack_start(label, False, True, 5)
     
     self._fields['title'] = gtk.Entry(45)
-    self._fields['title'].set_text(self.title)
+    self._fields['title'].set_text(self.get_title())
     hbox.pack_start(self._fields['title'], True, True)
     vbox.pack_start(hbox, False, True)
     
@@ -191,7 +193,7 @@ without saving?'))
   
   def _edit_save(self):
     'Save the fields if the user clicks ok.'
-    self.title = self._fields['title'].get_text()
+    self._title = self._fields['title'].get_text()
     model = self._fields['slides'].get_model()
     itr = model.get_iter_first()
     self.slides = []
@@ -254,21 +256,22 @@ without saving?'))
     'Return the pixbuf icon.'
     return type_icon
   
-  def merge_menu(self, uimanager):
+  @classmethod
+  def merge_menu(cls, uimanager):
     'Merge new values with the uimanager.'
     factory = gtk.IconFactory()
     factory.add('exposong-text',gtk.IconSet(gtk.gdk.pixbuf_new_from_file(
-        join(RESOURCE_PATH,'pres_text.png'))))
+        os.path.join(RESOURCE_PATH,'pres_text.png'))))
     factory.add_default()
     gtk.stock_add([("exposong-text",_("_Text"), gtk.gdk.MOD1_MASK, 
         0, "pymserv")])
     
     actiongroup = gtk.ActionGroup('exposong-text')
     actiongroup.add_actions([("pres-new-text", 'exposong-text', None, None,
-        None, self._on_pres_new)])
+        None, cls._on_pres_new)])
     uimanager.insert_action_group(actiongroup, -1)
     
-    self.menu_merge_id = uimanager.add_ui_from_string("""
+    cls.menu_merge_id = uimanager.add_ui_from_string("""
       <menubar name='MenuBar'>
         <menu action="Presentation">
             <menu action="pres-new">
@@ -278,9 +281,10 @@ without saving?'))
       </menubar>
       """)
   
-  def unmerge_menu(self, uimanager):
+  @classmethod
+  def unmerge_menu(cls, uimanager):
     'Remove merged items from the menu.'
-    uimanager.remove_ui(self.menu_merge_id)
+    uimanager.remove_ui(cls.menu_merge_id)
   
   @classmethod
   def schedule_name(cls):

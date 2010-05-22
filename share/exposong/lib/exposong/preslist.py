@@ -234,7 +234,7 @@ class PresList(gtk.TreeView):
   def _get_row_text(self, column, cell, model, titer):
     'Returns the title of the current presentation.'
     pres = model.get_value(titer, 0)
-    cell.set_property('text', pres.title)
+    cell.set_property('text', pres.get_title())
   
   def _column_sort(self, treemodel, iter1, iter2):
     return 0

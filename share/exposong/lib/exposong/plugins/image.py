@@ -22,7 +22,6 @@ import xml.dom.minidom
 import pango
 import gobject
 import shutil
-from os.path import join
 
 from exposong.glob import *
 from exposong import RESOURCE_PATH, DATA_PATH
@@ -38,7 +37,7 @@ information = {
     'required': False,
 }
 type_icon = gtk.gdk.pixbuf_new_from_file_at_size(
-    join(RESOURCE_PATH,'pres_image.png'), 20, 14)
+    os.path.join(RESOURCE_PATH,'pres_image.png'), 20, 14)
 thsz = (150, 150)
 
 def get_rotate_const(rotate):
@@ -162,8 +161,8 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       ccontext.paint()
       return
   
-  def __init__(self, dom = None, filename = None):
-    _abstract.Presentation.__init__(self, dom, filename)
+  def __init__(self, filename=''):
+    _abstract.Presentation.__init__(self, filename)
   
   def _set_slides(self, dom):
     'Set the slides from xml.'
@@ -299,21 +298,22 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     'Get the slide list.'
     return tuple( (sl, sl.get_thumb()) for sl in self.slides)
   
-  def merge_menu(self, uimanager):
+  @classmethod
+  def merge_menu(cls, uimanager):
     'Merge new values with the uimanager.'
     factory = gtk.IconFactory()
     factory.add('exposong-image',gtk.IconSet(gtk.gdk.pixbuf_new_from_file(
-        join(RESOURCE_PATH,'pres_image.png'))))
+        os.path.join(RESOURCE_PATH,'pres_image.png'))))
     factory.add_default()
     gtk.stock_add([("exposong-image",_("_Image"), gtk.gdk.MOD1_MASK, 
         0, "pymserv")])
     
     actiongroup = gtk.ActionGroup('exposong-image')
     actiongroup.add_actions([("pres-new-image", 'exposong-image', None, None,
-        None, self._on_pres_new)])
+        None, cls._on_pres_new)])
     uimanager.insert_action_group(actiongroup, -1)
     
-    self.menu_merge_id = uimanager.add_ui_from_string("""
+    cls.menu_merge_id = uimanager.add_ui_from_string("""
       <menubar name='MenuBar'>
         <menu action="Presentation">
             <menu action="pres-new">
@@ -323,9 +323,10 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       </menubar>
       """)
   
-  def unmerge_menu(self, uimanager):
+  @classmethod
+  def unmerge_menu(cls, uimanager):
     'Remove merged items from the menu.'
-    uimanager.remove_ui(self.menu_merge_id)
+    uimanager.remove_ui(cls.menu_merge_id)
   
   @classmethod
   def schedule_name(cls):

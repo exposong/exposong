@@ -50,12 +50,20 @@ def title_to_filename(title):
   
   return new
 
-def check_filename(title, directory, filename = None):
+def check_filename(title, path):
   '''Gets a filename that is not being used.
   
   If a cur_name is supplied, it checks to see if it
   matches the current filename, or if not, deletes the
   file and returns the new filename.'''
+  if os.path.isdir(path):
+    directory = path
+    filename = ''
+  elif os.path.isfile(path):
+    (directory, filename) = os.path.split(path)
+  else:
+    raise ValueError('Could not find file "%s"' % path)
+  
   tfile = title_to_filename(title)
   match = "^"+re.escape(tfile)+"(-[0-9]+)?.xml$"
   if not isinstance(filename, str) or not re.match(match, filename):

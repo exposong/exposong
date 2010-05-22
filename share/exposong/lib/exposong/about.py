@@ -17,7 +17,7 @@
 import gtk
 import gtk.gdk
 import webbrowser
-from os.path import join
+import os.path
 
 from exposong import RESOURCE_PATH
 
@@ -34,7 +34,7 @@ class About:
     if _("Translators Name") is not "Translators Name":
       self.dialog.set_translator_credits(_("Translators Name"))
     self.dialog.set_logo(gtk.gdk.pixbuf_new_from_file(
-        join(RESOURCE_PATH, "exposong.png")))
+        os.path.join(RESOURCE_PATH, "exposong.png")))
     self.dialog.set_website("http://exposong.org")
     self.dialog.set_modal(False)
     self.dialog.run()

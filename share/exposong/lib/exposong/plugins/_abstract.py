@@ -19,7 +19,7 @@ import gtk.gdk
 import gobject
 import xml.dom
 import xml.dom.minidom
-from os.path import join
+from xml.parsers.expat import ExpatError
 
 from exposong.glob import *
 from exposong import DATA_PATH
@@ -107,35 +107,58 @@ class Presentation:
         else:
           self.id = random_string(8)
   
-  title = ''
+  _title = ''
   copyright = ''
   timer = None
   timer_loop = False
   filename = None
   
-  def __init__(self, dom = None, filename = None):
+  def __init__(self, filename=''):
     if self.__class__ is Presentation:
       raise NotImplementedError("This class cannot be instantiated.")
-    self.filename = filename
+    if filename:
+      self.filename = filename
     self.slides = []
     
-    if isinstance(dom, xml.dom.Node):
-      self.title = get_node_text(dom.getElementsByTagName("title")[0])
-      copyright = dom.getElementsByTagName("copyright")
-      if len(copyright):
-        self.copyright = get_node_text(copyright[0])
-      timer = dom.getElementsByTagName("timer")
-      if len(timer) > 0:
-        self.timer = int(timer[0].getAttribute("time"))
-        self.timer_loop = bool(timer[0].getAttribute("loop"))
+    if filename:
+      fl = open(filename, 'r')
+      if not self.is_type(fl):
+        fl.close()
+        raise WrongPresentationType
+      fl.close()
       
-      self._set_slides(dom)
+      dom = None
+      try:
+        dom = xml.dom.minidom.parse(filename)
+        root = dom.documentElement
+      except IOError as details:
+        print "Error reading presentation file (%s): %s" % (filename, details)
+      except ExpatError as details:
+        print "Error reading presentation file (%s): %s" % (filename, details)
+      else:
+        self._title = get_node_text(root.getElementsByTagName("title")[0])
+        copyright = root.getElementsByTagName("copyright")
+        if len(copyright):
+          self.copyright = get_node_text(copyright[0])
+        timer = root.getElementsByTagName("timer")
+        if len(timer) > 0:
+          self.timer = int(timer[0].getAttribute("time"))
+          self.timer_loop = bool(timer[0].getAttribute("loop"))
+        
+        self._set_slides(dom)
+      finally:
+        if dom:
+          dom.unlink()
   
   @classmethod
-  def is_type(class_, dom):
-    if dom.tagName == "presentation" and dom.hasAttribute("type"):
-      if str(dom.getAttribute("type")) == class_.get_type():
-        return True
+  def is_type(cls, fl):
+    match = '<presentation\\b[^>]*\\btype=[\'"]%s[\'"]' % cls.get_type()
+    lncnt = 0
+    for ln in fl:
+        if lncnt > 4: break
+        if re.search(match, ln):
+            return True
+        lncnt += 1
     return False
   
   @staticmethod
@@ -156,7 +179,11 @@ class Presentation:
   
   def get_row(self):
     'Gets the data to add to the presentation list.'
-    return (self, self.title)
+    return (self, self.get_title())
+  
+  def get_title(self):
+    'Get the presentation title.'
+    return self._title
   
   def get_order(self):
     'Returns the order in which the slides should be presented.'
@@ -181,7 +208,7 @@ class Presentation:
   def matches(self, text):
     'Tests to see if the presentation matches `text`.'
     regex = re.compile("\\b"+re.escape(text), re.U|re.I)
-    if regex.search(self.title):
+    if regex.search(self.get_title()):
       return True
     if self.slides:
       if hasattr(self.slides[0], 'text') and regex.search(" ".join(\
@@ -194,8 +221,8 @@ class Presentation:
         gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,\
         (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
     edit_dialog.set_default_size(340, 400)
-    if(self.title):
-      edit_dialog.set_title(_('Editing "%s"') % self.title)
+    if(self.get_title()):
+      edit_dialog.set_title(_('Editing "%s"') % self.get_title())
     else:
       # TODO get_type() needs to be translated as well. Find the best way to do this.
       edit_dialog.set_title(_("New %s Presentation") % self.get_type().title())
@@ -276,15 +303,18 @@ class Presentation:
   
   def to_xml(self):
     'Save the data to disk.'
-    directory = join(DATA_PATH, 'pres')
-    self.filename = check_filename(self.title, directory, self.filename)
+    if self.filename:
+      self.filename = check_filename(self.get_title(), self.filename)
+    else:
+      self.filename = check_filename(self.get_title(),
+          os.path.join(DATA_PATH, "pres"))
     
     doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
     root = doc.createElement("presentation")
     root.setAttribute("type", self.get_type())
     
     node = doc.createElement("title")
-    node.appendChild(doc.createTextNode(self.title))
+    node.appendChild(doc.createTextNode(self.get_title()))
     root.appendChild(node)
     
     if self.timer:
@@ -299,7 +329,7 @@ class Presentation:
       s.to_node(doc, sNode)
       root.appendChild(sNode)
     doc.appendChild(root)
-    outfile = open(join(directory, self.filename), 'w')
+    outfile = open(self.filename, 'w')
     doc.writexml(outfile)
     doc.unlink()
   
@@ -315,8 +345,9 @@ class Presentation:
     'Get the slide list.'
     return tuple( (sl, sl.get_markup()) for sl in self.slides)
   
-  def _on_pres_new(self, action):
-    pres = self.__class__()
+  @classmethod
+  def _on_pres_new(cls, action):
+    pres = cls()
     if pres.edit():
       sched = exposong.schedlist.schedlist.get_active_item()
       if sched and not sched.builtin:
@@ -351,10 +382,13 @@ class Menu:
   '''
   Subclasses can modify the menu using uimanager.
   '''
-  def merge_menu(self, uimanager):
+  @classmethod
+  def merge_menu(cls, uimanager):
     'Merge new values with the uimanager.'
     raise NotImplementedError
-  def unmerge_menu(self, uimanager):
+  
+  @classmethod
+  def unmerge_menu(cls, uimanager):
     'Remove merged items from the menu.'
     raise NotImplementedError
 
@@ -382,3 +416,8 @@ class Screen:
     'Draw anywhere on the screen.'
     return NotImplemented
 
+class WrongPresentationType(ValueError):
+  '''
+  The file read was not a valid file for this type.
+  '''
+    

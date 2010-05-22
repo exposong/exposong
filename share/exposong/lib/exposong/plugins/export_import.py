@@ -238,9 +238,11 @@ class ExportImport(Plugin, _abstract.Menu):
       #    print "Error: Not a directory ("+p1abs+")"
       #shutil.rmtree(tmpdir)
     dlg.hide()
-  
-  def merge_menu(self, uimanager):
+
+  @classmethod
+  def merge_menu(cls, uimanager):
     'Merge new values with the uimanager.'
+    self = cls()
     actiongroup = gtk.ActionGroup('export-import')
     actiongroup.add_actions([('import', None, _("_Import"), None,
             _("Import a schedule or full library."), self.import_file),
@@ -254,7 +256,7 @@ class ExportImport(Plugin, _abstract.Menu):
     uimanager.insert_action_group(actiongroup, -1)
     
     #Had to use position='top' to put them above "Quit"
-    self.menu_merge_id = uimanager.add_ui_from_string("""
+    cls.menu_merge_id = uimanager.add_ui_from_string("""
       <menubar name="MenuBar">
         <menu action="File">
           <separator position="top" />
@@ -266,7 +268,8 @@ class ExportImport(Plugin, _abstract.Menu):
       </menubar>
       """)
   
-  def unmerge_menu(self, uimanager):
+  @classmethod
+  def unmerge_menu(cls, uimanager):
     'Remove merged items from the menu.'
-    uimanager.remove_ui(self.menu_merge_id)
+    uimanager.remove_ui(cls.menu_merge_id)
 

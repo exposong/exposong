@@ -19,7 +19,6 @@ import gtk.gdk
 import gobject
 import xml.dom
 from xml.dom import minidom
-from os.path import join
 
 from glob import *
 from exposong import DATA_PATH
@@ -48,7 +47,8 @@ class Schedule(gtk.ListStore):
       comment = ""
       
       try:
-        filenm = get_node_text(presNode.getElementsByTagName("file")[0])
+        filenm = os.path.split(get_node_text(
+            presNode.getElementsByTagName("file")[0]))[1]
         hasFile = True
       except IndexError:
         pass
@@ -67,8 +67,7 @@ class Schedule(gtk.ListStore):
       
   def save(self):
     'Write schedule to disk.'
-    directory = join(DATA_PATH, 'sched')
-    self.filename = check_filename(self.title, directory, self.filename)
+    self.filename = check_filename(self.title, self.filename)
     dom = xml.dom.getDOMImplementation().createDocument(None, None, None)
     root = dom.createElement("schedule")
     root.setAttribute("created", "0")
@@ -91,7 +90,7 @@ class Schedule(gtk.ListStore):
       root.appendChild(pNode)
       itr = self.iter_next(itr)
     dom.appendChild(root)
-    outfile = open(join(directory, self.filename), 'w')
+    outfile = open(self.filename, 'w')
     dom.writexml(outfile)
     dom.unlink()
   
@@ -138,7 +137,7 @@ class Schedule(gtk.ListStore):
     itr = self.get_iter_first()
     while itr:
       item = self.get_value(itr, 0)
-      if item.filename == filename:
+      if os.path.split(item.filename)[1] == filename:
         return item.presentation
       itr = self.iter_next(itr)
 
