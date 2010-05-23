@@ -152,7 +152,7 @@ class Presentation:
   
   @classmethod
   def is_type(cls, fl):
-    match = '<presentation\\b[^>]*\\btype=[\'"]%s[\'"]' % cls.get_type()
+    match = r'<presentation\b[^>]*\btype=[\'"]%s[\'"]' % cls.get_type()
     lncnt = 0
     for ln in fl:
         if lncnt > 4: break
@@ -237,13 +237,7 @@ class Presentation:
     
     while True:
       if edit_dialog.run() == gtk.RESPONSE_ACCEPT:
-        if self._fields['title'].get_text() == "":
-          info_dialog = gtk.MessageDialog(edit_dialog, gtk.DIALOG_DESTROY_WITH_PARENT,
-              gtk.MESSAGE_INFO, gtk.BUTTONS_OK, _("Please enter a Title"))
-          info_dialog.run()
-          info_dialog.destroy()
-          self._fields["title"].grab_focus()
-        else:
+        if self._is_editing_complete(edit_dialog):
           self._edit_save()
           del(self._fields)
           self.to_xml()
@@ -300,6 +294,10 @@ class Presentation:
       if self._fields['timer_on'].get_active():
         self.timer = self._fields['timer'].get_value_as_int()
         self.timer_loop = self._fields['timer_loop'].get_active()
+  
+  def _is_editing_complete(self, parent):
+    "Test to see if all fields have been filled which are required."
+    return True
   
   def to_xml(self):
     'Save the data to disk.'

@@ -171,7 +171,8 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       try:
         self.slides.append(self.Slide(self, sl))
       except ImageNotFoundError, err:
-        print "Image not found (%s), slide was not added to the \"%s.\"" % (err.image, self.title)
+        print "Image not found (%s), slide was not added to the \"%s.\"" % \
+            (err.image, self._title)
   
   def _edit_tabs(self, notebook, parent):
     'Tabs for the dialog.'
@@ -185,7 +186,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     hbox.pack_start(label, False, True, 5)
     
     self._fields['title'] = gtk.Entry(45)
-    self._fields['title'].set_text(self.title)
+    self._fields['title'].set_text(self._title)
     hbox.pack_start(self._fields['title'], True, True)
     vbox.pack_start(hbox, False, True)
     
@@ -224,13 +225,23 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
   
   def _edit_save(self):
     'Save the fields if the user clicks ok.'
-    self.title = self._fields['title'].get_text()
+    self._title = self._fields['title'].get_text()
     self.slides = []
     itr = self._fields['images'].get_iter_first()
     while itr:
       self.slides.append(self.Slide(self, self._fields['images'].get_value(itr, 0)))
       itr = self._fields['images'].iter_next(itr)
     _abstract.Presentation._edit_save(self)
+  
+  def _is_editing_complete(self, parent):
+    "Test to see if all fields have been filled which are required."
+    if self._fields['title'].get_text() == "":
+      info_dialog = gtk.MessageDialog(parent, gtk.DIALOG_DESTROY_WITH_PARENT,
+          gtk.MESSAGE_INFO, gtk.BUTTONS_OK, _("Please enter a Title"))
+      info_dialog.run()
+      info_dialog.destroy()
+      return False
+    return _abstract.Presentation._is_editing_complete(self)
   
   def _on_img_add(self, button, treeview):
     'Add an image to the presentation.'

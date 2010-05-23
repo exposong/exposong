@@ -202,6 +202,16 @@ without saving?'))
       itr = model.iter_next(itr)
     del self._slideToolbar
   
+  def _is_editing_complete(self, parent):
+    "Test to see if all fields have been filled which are required."
+    if self._fields['title'].get_text() == "":
+      info_dialog = gtk.MessageDialog(parent, gtk.DIALOG_DESTROY_WITH_PARENT,
+          gtk.MESSAGE_INFO, gtk.BUTTONS_OK, _("Please enter a Title"))
+      info_dialog.run()
+      info_dialog.destroy()
+      return False
+    return _abstract.Presentation._is_editing_complete(self)
+  
   def _slide_add_dialog(self, btn, parent):
     'Create a dialog for a new slide.'
     sl = self.Slide(self,None)

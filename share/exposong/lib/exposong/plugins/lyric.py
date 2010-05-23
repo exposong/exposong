@@ -17,6 +17,7 @@
 
 import gtk
 import gtk.gdk
+import gobject
 import pango
 import re
 import os.path
@@ -144,10 +145,9 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
   
   def get_order(self):
     'Returns the order in which the slides should be presented.'
-    order = self.song.props.verse_order.split()
-    if len(order) > 0:
-      return tuple(self.get_slide_from_order(n) for n in order
-          if isinstance(self.get_slide_from_order(n),int))
+    if len(self.song.props.verse_order) > 0:
+      return tuple(self.get_slide_from_order(n) for n in
+          self.song.props.verse_order if self.get_slide_from_order(n) >= 0)
     else:
       return _abstract.Presentation.get_order(self)
 
@@ -159,17 +159,200 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
         return i
       i += 1
     print "Slide in order does not exist: %s" % order_value
-  
-  def edit(self):
-    return NotImplemented
+    return -1
   
   def _edit_tabs(self, notebook, parent):
     'Run the edit dialog for the presentation.'
     vbox = gtk.VBox()
     vbox.set_border_width(4)
     vbox.set_spacing(7)
+    hbox = gtk.HBox()
     
-    # TODO Titles, Authors
+    #label = gtk.Label(_("Title:"))
+    #label.set_alignment(0.5, 0.5)
+    #hbox.pack_start(label, False, True, 5)
+    
+    #self._fields['title'] = gtk.Entry(45)
+    #self._fields['title'].set_text(self.get_title())
+    #hbox.pack_start(self._fields['title'], True, True)
+    #vbox.pack_start(hbox, False, True)
+    
+    self._slideToolbar = gtk.Toolbar()
+    btn = gtk.ToolButton(gtk.STOCK_ADD)
+    btn.connect("clicked", self._slide_add_dialog, parent)
+    self._slideToolbar.insert(btn, -1)
+    btn = gtk.ToolButton(gtk.STOCK_EDIT)
+    btn.connect("clicked", self._slide_edit_dialog, parent)
+    self._slideToolbar.insert(btn, -1)
+    btn = gtk.ToolButton(gtk.STOCK_DELETE)
+    btn.connect("clicked", self._slide_delete_dialog, parent)
+    self._slideToolbar.insert(btn, -1)
+    self._slideToolbar.insert(gtk.SeparatorToolItem(), -1)
+    #btn = gtk.ToolButton(gtk.STOCK_PASTE)
+    #btn.set_label( _("Paste As Text") )
+    #btn.connect("clicked", self._paste_as_text, parent)
+    #self._slideToolbar.insert(btn, -1)
+    
+    vbox.pack_start(self._slideToolbar, False, True)
+    
+    hbox = gtk.HBox()
+    self._fields['slides'] = gtk.TreeView()
+    self._fields['slides'].set_enable_search(False)
+    self._fields['slides'].set_reorderable(True)
+    # Double click to edit
+    self._fields['slides'].connect("row-activated", self._slide_edit_dialog, parent)
+    col = gtk.TreeViewColumn( _("Slide") )
+    col.set_resizable(False)
+    self.slide_column(col, self._fields['slides'])
+    self._fields['slides'].append_column(col)
+    
+    # Add the slides
+    slide_model = self._fields['slides'].get_model()
+    for sl in self.get_slide_list():
+      slide_model.append(sl)
+    
+    text_scroll = gtk.ScrolledWindow()
+    text_scroll.add(self._fields['slides'])
+    text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+    text_scroll.set_size_request(400, 250)
+    vbox.pack_start(text_scroll, True, True)
+    
+    vbox.show_all()
+    notebook.insert_page(vbox, gtk.Label(_("Edit")), 0)
+    
+    # Information Tab
+    
+    vbox = gtk.VBox()
+    vbox.set_border_width(4)
+    vbox.set_spacing(7)
+    
+    #Title field
+    self._fields['title'] = gtk.ListStore(gobject.TYPE_STRING,
+        gobject.TYPE_STRING)
+    for title in self.song.props.titles:
+      self._fields['title'].append( (title, title.lang) )
+    title_list = gtk.TreeView(self._fields['title'])
+    title_list.set_reorderable(True)
+    cell = gtk.CellRendererText()
+    cell.set_property('editable', True)
+    cell.connect('edited', self._edit_treeview_cell, self._fields['title'], 0)
+    col = gtk.TreeViewColumn( _('Title'))
+    col.pack_start(cell)
+    col.set_resizable(True)
+    col.add_attribute(cell, 'text', 0)
+    title_list.append_column(col)
+    cell = gtk.CellRendererText()
+    cell.set_property('editable', True)
+    cell.connect('edited', self._edit_treeview_cell, self._fields['title'], 1)
+    col = gtk.TreeViewColumn( _('Language'))
+    col.pack_start(cell)
+    col.set_resizable(True)
+    col.add_attribute(cell, 'text', 1)
+    title_list.append_column(col)
+    scroll = gtk.ScrolledWindow()
+    scroll.add(title_list)
+    scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+    vbox.pack_start(scroll, True, True)
+    
+    #Author field
+    self._fields['author'] = gtk.ListStore(gobject.TYPE_STRING,
+        gobject.TYPE_STRING, gobject.TYPE_STRING)
+    for author in self.song.props.authors:
+      self._fields['author'].append( (author, author.type, author.lang) )
+    author_list = gtk.TreeView(self._fields['author'])
+    author_list.set_reorderable(True)
+    cell = gtk.CellRendererText()
+    cell.set_property('editable', True)
+    cell.connect('edited', self._edit_treeview_cell, self._fields['author'], 0)
+    col = gtk.TreeViewColumn( _('Author'))
+    col.pack_start(cell)
+    col.set_resizable(True)
+    col.add_attribute(cell, 'text', 0)
+    author_list.append_column(col)
+    cell = gtk.CellRendererText()
+    cell.set_property('editable', True)
+    cell.connect('edited', self._edit_treeview_cell, self._fields['author'], 1)
+    col = gtk.TreeViewColumn( _('Type'))
+    col.pack_start(cell)
+    col.set_resizable(True)
+    col.add_attribute(cell, 'text', 1)
+    author_list.append_column(col)
+    cell = gtk.CellRendererText()
+    cell.set_property('editable', True)
+    cell.connect('edited', self._edit_treeview_cell, self._fields['author'], 2)
+    col = gtk.TreeViewColumn( _('Language'))
+    col.pack_start(cell)
+    col.set_resizable(True)
+    col.add_attribute(cell, 'text', 2)
+    author_list.append_column(col)
+    scroll = gtk.ScrolledWindow()
+    scroll.add(author_list)
+    scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+    vbox.pack_start(scroll, True, True)
+    
+    #Songbook field
+    self._fields['songbook'] = gtk.ListStore(gobject.TYPE_STRING,
+        gobject.TYPE_STRING)
+    for songbook in self.song.props.songbooks:
+      self._fields['songbook'].append( (songbook.name, songbook.entry) )
+    songbook_list = gtk.TreeView(self._fields['songbook'])
+    songbook_list.set_reorderable(True)
+    cell = gtk.CellRendererText()
+    cell.set_property('editable', True)
+    cell.connect('edited', self._edit_treeview_cell, self._fields['songbook'], 0)
+    col = gtk.TreeViewColumn( _('Songbook Name'))
+    col.pack_start(cell)
+    col.set_resizable(True)
+    col.add_attribute(cell, 'text', 0)
+    songbook_list.append_column(col)
+    cell = gtk.CellRendererText()
+    cell.set_property('editable', True)
+    cell.connect('edited', self._edit_treeview_cell, self._fields['songbook'], 1)
+    col = gtk.TreeViewColumn( _('Entry')) # As in songbook number
+    col.pack_start(cell)
+    col.set_resizable(True)
+    col.add_attribute(cell, 'text', 1)
+    songbook_list.append_column(col)
+    scroll = gtk.ScrolledWindow()
+    scroll.add(songbook_list)
+    scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+    vbox.pack_start(scroll, True, True)
+    
+    #Theme field
+    self._fields['theme'] = gtk.ListStore(gobject.TYPE_STRING,
+        gobject.TYPE_STRING, gobject.TYPE_STRING)
+    for theme in self.song.props.themes:
+      self._fields['theme'].append( (theme, theme.lang, theme.id) )
+    theme_list = gtk.TreeView(self._fields['theme'])
+    theme_list.set_reorderable(True)
+    cell = gtk.CellRendererText()
+    cell.set_property('editable', True)
+    cell.connect('edited', self._edit_treeview_cell, self._fields['theme'], 0)
+    col = gtk.TreeViewColumn( _('Theme'))
+    col.pack_start(cell)
+    col.set_resizable(True)
+    col.add_attribute(cell, 'text', 0)
+    theme_list.append_column(col)
+    cell = gtk.CellRendererText()
+    cell.set_property('editable', True)
+    cell.connect('edited', self._edit_treeview_cell, self._fields['theme'], 1)
+    col = gtk.TreeViewColumn( _('Language'))
+    col.pack_start(cell)
+    col.set_resizable(True)
+    col.add_attribute(cell, 'text', 1)
+    theme_list.append_column(col)
+    cell = gtk.CellRendererText()
+    cell.set_property('editable', True)
+    cell.connect('edited', self._edit_treeview_cell, self._fields['theme'], 2)
+    col = gtk.TreeViewColumn( _('ID'))
+    col.pack_start(cell)
+    col.set_resizable(True)
+    col.add_attribute(cell, 'text', 2)
+    theme_list.append_column(col)
+    scroll = gtk.ScrolledWindow()
+    scroll.add(theme_list)
+    scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+    vbox.pack_start(scroll, True, True)
     
     hbox = gtk.HBox()
     label = gtk.Label(_("Copyright:"))
@@ -181,53 +364,30 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
 
     vbox.pack_start(gtk.HSeparator(), False, True)
 
-    hbox = gtk.HBox()
-    label = gtk.Label(_("Order:"))
-    hbox.pack_start(label, False, True, 5)
-    self._fields['order'] = gtk.Entry(50)
-    self._fields['order'].set_text(self.song.props.verse_order)
-    vbox2 = gtk.VBox()
-    vbox2.pack_start(self._fields['order'], True, True, 5)
-    label = gtk.Label( _("Use the slide titles to modify the order.") )
-    label.set_justify(gtk.JUSTIFY_LEFT)
-    label.set_alignment(0,0.5)
-    label.set_line_wrap(True)
-    vbox2.pack_start(label, True, True, 5)
-    hbox.pack_start(vbox2)
-    vbox.pack_start(hbox, False, True)
+    
 
     notebook.append_page(vbox, gtk.Label(_("Information")))
     
-    text.Presentation._edit_tabs(self, notebook, parent)
-    
-    btn = gtk.ToolButton(gtk.STOCK_PASTE)
-    btn.set_label( _("Paste As Text") )
-    btn.connect("clicked", self._paste_as_text, parent)
-    self._slideToolbar.insert(btn, -1)
+    _abstract.Presentation._edit_tabs(self, notebook, parent)
   
   def _edit_save(self):
     'Save the fields if the user clicks ok.'
-    if 'words' in self.authors:
-      self.authors[self.authors.index('words')].author = self._fields['words'].get_text()
-    else:
-      self.authors.append(_Author(author=self._fields['words'].get_text(), type='words'))
-    
-    if 'music' in self.authors:
-      self.authors[self.authors.index('music')].author = self._fields['music'].get_text()
-    else:
-      self.authors.append(_Author(author=self._fields['music'].get_text(), type='music'))
-    
     self.song.props.copyright = self._fields['copyright'].get_text()
     self.song.props.order = self._fields['order'].get_text().split()
     
     
-    model = self._fields['slides'].get_model()
-    itr = model.get_iter_first()
-    self.slides = []
-    while itr:
-      self.slides.append(model.get_value(itr,0))
-      itr = model.iter_next(itr)
+    ## TODO: Slides
+    #model = self._fields['slides'].get_model()
+    #itr = model.get_iter_first()
+    #self.slides = []
+    #while itr:
+    #  self.slides.append(model.get_value(itr,0))
+    #  itr = model.iter_next(itr)
     del self._slideToolbar
+  
+  def _edit_treeview_cell(self, cell, path, new_text, model, column):
+    "Change the value of a cell."
+    model.set_value(model.get_iter(path), column, new_text)
   
   def _paste_as_text(self, *args):
     'Dialog to paste full lyrics.'
@@ -281,6 +441,10 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
       dialog.hide()
       return False
   
+  def _is_editing_complete(self, parent):
+    "Test to see if all fields have been filled which are required."
+    return _abstract.Presentation._is_editing_complete(self)
+  
   def to_xml(self):
     'Save the data to disk.'
     if self.filename:
@@ -292,14 +456,14 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     self.song.write(self.filename)
   
   def get_title(self):
-    assert(self.song.props.titles[0])
+    #assert(self.song.props.titles[0])
     return str(self.song.props.titles[0])
   
   title = property(get_title)
   
   @classmethod
   def is_type(cls, fl):
-    match = '<song\\b'
+    match = r'<song\b'
     lncnt = 0
     for ln in fl:
         if lncnt > 3: break
