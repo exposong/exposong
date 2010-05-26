@@ -86,17 +86,18 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
       lines = []
       self.pres = pres
       
-      self.title = verse.name
-      self.lang = verse.lang
-      lineList = []
-      if len(verse.lines) > 1:
-        for i in range(max(len(l.lines) for l in verse.lines)):
-          for lines in verse.lines:
-            if i < len(lines.lines):
-              lineList.append("%s: %s" % (lines.part, lines.lines[i]))
-        self.text = '\n'.join(lineList)
-      elif len(verse.lines) == 1:
-        self.text = '\n'.join(str(l) for l in verse.lines[0].lines)
+      if verse:
+        self.title = verse.name
+        self.lang = verse.lang
+        lineList = []
+        if len(verse.lines) > 1:
+          for i in range(max(len(l.lines) for l in verse.lines)):
+            for lines in verse.lines:
+              if i < len(lines.lines):
+                lineList.append("%s: %s" % (lines.part, lines.lines[i]))
+          self.text = '\n'.join(lineList)
+        elif len(verse.lines) == 1:
+          self.text = '\n'.join(str(l) for l in verse.lines[0].lines)
   
     def footer_text(self):
       'Draw text on the footer.'
@@ -166,16 +167,6 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     vbox = gtk.VBox()
     vbox.set_border_width(4)
     vbox.set_spacing(7)
-    hbox = gtk.HBox()
-    
-    #label = gtk.Label(_("Title:"))
-    #label.set_alignment(0.5, 0.5)
-    #hbox.pack_start(label, False, True, 5)
-    
-    #self._fields['title'] = gtk.Entry(45)
-    #self._fields['title'].set_text(self.get_title())
-    #hbox.pack_start(self._fields['title'], True, True)
-    #vbox.pack_start(hbox, False, True)
     
     self._slideToolbar = gtk.Toolbar()
     btn = gtk.ToolButton(gtk.STOCK_ADD)
@@ -220,19 +211,28 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     vbox.show_all()
     notebook.insert_page(vbox, gtk.Label(_("Edit")), 0)
     
-    # Information Tab
-    
-    vbox = gtk.VBox()
-    vbox.set_border_width(4)
-    vbox.set_spacing(7)
+    notebook2 = gtk.Notebook()
+    notebook2.set_tab_pos(gtk.POS_LEFT)
     
     #Title field
+    vbox = gtk.VBox()
+    vbox.set_spacing(7)
     self._fields['title'] = gtk.ListStore(gobject.TYPE_STRING,
         gobject.TYPE_STRING)
     for title in self.song.props.titles:
       self._fields['title'].append( (title, title.lang) )
     title_list = gtk.TreeView(self._fields['title'])
     title_list.set_reorderable(True)
+    #Toolbar
+    toolbar = gtk.Toolbar()
+    button = gtk.ToolButton(gtk.STOCK_ADD)
+    button.connect('clicked', self._add_treeview_row, title_list)
+    toolbar.insert(button, -1)
+    button = gtk.ToolButton(gtk.STOCK_DELETE)
+    button.connect('clicked', self._del_treeview_row, title_list)
+    toolbar.insert(button, -1)
+    vbox.pack_start(toolbar, False, True)
+    #Columns
     cell = gtk.CellRendererText()
     cell.set_property('editable', True)
     cell.connect('edited', self._edit_treeview_cell, self._fields['title'], 0)
@@ -253,14 +253,27 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     scroll.add(title_list)
     scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
     vbox.pack_start(scroll, True, True)
+    notebook2.append_page(vbox, gtk.Label( _('Title')) )
     
     #Author field
+    vbox = gtk.VBox()
+    vbox.set_spacing(7)
     self._fields['author'] = gtk.ListStore(gobject.TYPE_STRING,
         gobject.TYPE_STRING, gobject.TYPE_STRING)
     for author in self.song.props.authors:
       self._fields['author'].append( (author, author.type, author.lang) )
     author_list = gtk.TreeView(self._fields['author'])
     author_list.set_reorderable(True)
+    #Toolbar
+    toolbar = gtk.Toolbar()
+    button = gtk.ToolButton(gtk.STOCK_ADD)
+    button.connect('clicked', self._add_treeview_row, author_list)
+    toolbar.insert(button, -1)
+    button = gtk.ToolButton(gtk.STOCK_DELETE)
+    button.connect('clicked', self._del_treeview_row, author_list)
+    toolbar.insert(button, -1)
+    vbox.pack_start(toolbar, False, True)
+    #Columns
     cell = gtk.CellRendererText()
     cell.set_property('editable', True)
     cell.connect('edited', self._edit_treeview_cell, self._fields['author'], 0)
@@ -289,14 +302,27 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     scroll.add(author_list)
     scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
     vbox.pack_start(scroll, True, True)
+    notebook2.append_page(vbox, gtk.Label( _('Author')) )
     
     #Songbook field
+    vbox = gtk.VBox()
+    vbox.set_spacing(7)
     self._fields['songbook'] = gtk.ListStore(gobject.TYPE_STRING,
         gobject.TYPE_STRING)
     for songbook in self.song.props.songbooks:
       self._fields['songbook'].append( (songbook.name, songbook.entry) )
     songbook_list = gtk.TreeView(self._fields['songbook'])
     songbook_list.set_reorderable(True)
+    #Toolbar
+    toolbar = gtk.Toolbar()
+    button = gtk.ToolButton(gtk.STOCK_ADD)
+    button.connect('clicked', self._add_treeview_row, songbook_list)
+    toolbar.insert(button, -1)
+    button = gtk.ToolButton(gtk.STOCK_DELETE)
+    button.connect('clicked', self._del_treeview_row, songbook_list)
+    toolbar.insert(button, -1)
+    vbox.pack_start(toolbar, False, True)
+    #Columns
     cell = gtk.CellRendererText()
     cell.set_property('editable', True)
     cell.connect('edited', self._edit_treeview_cell, self._fields['songbook'], 0)
@@ -317,14 +343,27 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     scroll.add(songbook_list)
     scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
     vbox.pack_start(scroll, True, True)
+    notebook2.append_page(vbox, gtk.Label( _('Songbook')) )
     
     #Theme field
+    vbox = gtk.VBox()
+    vbox.set_spacing(7)
     self._fields['theme'] = gtk.ListStore(gobject.TYPE_STRING,
         gobject.TYPE_STRING, gobject.TYPE_STRING)
     for theme in self.song.props.themes:
       self._fields['theme'].append( (theme, theme.lang, theme.id) )
     theme_list = gtk.TreeView(self._fields['theme'])
     theme_list.set_reorderable(True)
+    #Toolbar
+    toolbar = gtk.Toolbar()
+    button = gtk.ToolButton(gtk.STOCK_ADD)
+    button.connect('clicked', self._add_treeview_row, theme_list)
+    toolbar.insert(button, -1)
+    button = gtk.ToolButton(gtk.STOCK_DELETE)
+    button.connect('clicked', self._del_treeview_row, theme_list)
+    toolbar.insert(button, -1)
+    vbox.pack_start(toolbar, False, True)
+    #Columns
     cell = gtk.CellRendererText()
     cell.set_property('editable', True)
     cell.connect('edited', self._edit_treeview_cell, self._fields['theme'], 0)
@@ -353,6 +392,10 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     scroll.add(theme_list)
     scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
     vbox.pack_start(scroll, True, True)
+    notebook2.append_page(vbox, gtk.Label( _('Theme')) )
+    
+    vbox = gtk.VBox()
+    vbox.set_spacing(7)
     
     hbox = gtk.HBox()
     label = gtk.Label(_("Copyright:"))
@@ -361,12 +404,55 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     self._fields['copyright'].set_text(self.song.props.copyright)
     hbox.pack_start(self._fields['copyright'], True, True, 5)
     vbox.pack_start(hbox, False, True)
-
-    vbox.pack_start(gtk.HSeparator(), False, True)
-
     
+    hbox = gtk.HBox()
+    label = gtk.Label(_("CCLI Number:"))
+    hbox.pack_start(label, False, True, 5)
+    self._fields['ccli_no'] = gtk.Entry(50)
+    self._fields['ccli_no'].set_text(self.song.props.ccli_no)
+    hbox.pack_start(self._fields['ccli_no'], True, True, 5)
+    vbox.pack_start(hbox, False, True)
+    
+    hbox = gtk.HBox()
+    label = gtk.Label(_("Tempo:"))
+    hbox.pack_start(label, False, True, 5)
+    self._fields['tempo'] = gtk.Entry(50)
+    self._fields['tempo'].set_text(self.song.props.tempo)
+    hbox.pack_start(self._fields['tempo'], True, True, 5)
+    self._fields['tempo_type'] = gtk.combo_box_entry_new_text()
+    self._fields['tempo_type'].append_text("BPM")
+    self._fields['tempo_type'].append_text("Text")
+    self._fields['tempo_type'].child.set_text(self.song.props.tempo_type)
+    hbox.pack_start(self._fields['tempo_type'], True, True, 5)
+    vbox.pack_start(hbox, False, True)
 
-    notebook.append_page(vbox, gtk.Label(_("Information")))
+    hbox = gtk.HBox()
+    label = gtk.Label(_("Verse Order:"))
+    hbox.pack_start(label, False, True, 5)
+    self._fields['verse_order'] = gtk.Entry(50)
+    self._fields['verse_order'].set_text(" ".join(self.song.props.verse_order))
+    hbox.pack_start(self._fields['verse_order'], True, True, 5)
+    vbox.pack_start(hbox, False, True)
+    
+    hbox = gtk.HBox()
+    label = gtk.Label(_("Release Date:"))
+    hbox.pack_start(label, False, True, 5)
+    self._fields['release_date'] = gtk.Entry(50)
+    self._fields['release_date'].set_text(self.song.props.release_date)
+    hbox.pack_start(self._fields['release_date'], True, True, 5)
+    vbox.pack_start(hbox, False, True)
+    
+    hbox = gtk.HBox()
+    label = gtk.Label(_("Transposition:"))
+    hbox.pack_start(label, False, True, 5)
+    self._fields['transposition'] = gtk.SpinButton(gtk.Adjustment(0, -12, 12,
+        1, 0, 0), 1.0, 0)
+    self._fields['transposition'].set_value(int(self.song.props.transposition))
+    hbox.pack_start(self._fields['transposition'], True, True, 5)
+    vbox.pack_start(hbox, False, True)
+    
+    notebook2.append_page(vbox, gtk.Label(_("Other")))
+    notebook.append_page(notebook2, gtk.Label(_("Information")))
     
     _abstract.Presentation._edit_tabs(self, notebook, parent)
   
@@ -388,6 +474,16 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
   def _edit_treeview_cell(self, cell, path, new_text, model, column):
     "Change the value of a cell."
     model.set_value(model.get_iter(path), column, new_text)
+  
+  def _add_treeview_row(self, button, treeview):
+    model = treeview.get_model()
+    itr = model.append()
+    treeview.set_cursor(model.get_path(itr), treeview.get_column(0), True)
+  
+  def _del_treeview_row(self, button, treeview):
+    (model, itr) = treeview.get_selection().get_selected()
+    if itr:
+      model.remove(itr)
   
   def _paste_as_text(self, *args):
     'Dialog to paste full lyrics.'
@@ -443,7 +539,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
   
   def _is_editing_complete(self, parent):
     "Test to see if all fields have been filled which are required."
-    return _abstract.Presentation._is_editing_complete(self)
+    return _abstract.Presentation._is_editing_complete(self, parent)
   
   def to_xml(self):
     'Save the data to disk.'
@@ -456,7 +552,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     self.song.write(self.filename)
   
   def get_title(self):
-    #assert(self.song.props.titles[0])
+    if len(self.song.props.titles) == 0: return False
     return str(self.song.props.titles[0])
   
   title = property(get_title)

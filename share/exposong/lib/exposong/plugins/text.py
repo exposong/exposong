@@ -92,15 +92,17 @@ without saving?'))
               dialog.destroy()
               return False
           else:
-            break
+            dialog.destroy()
+            return False
       
-      dialog.destroy()
       if text.get_buffer().get_modified() or title.get_text() != "":
         # Should the second comparison here be: title.get_text() != self.title ?
         self.title = title.get_text()
         bounds = text.get_buffer().get_bounds()
         self.text = text.get_buffer().get_text(bounds[0], bounds[1])
+        dialog.destroy()
         return True
+      dialog.destroy()
       return False
     
     @staticmethod
