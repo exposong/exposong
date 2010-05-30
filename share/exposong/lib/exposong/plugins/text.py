@@ -22,6 +22,7 @@ from exposong.glob import *
 from exposong import RESOURCE_PATH
 from exposong.plugins import Plugin, _abstract
 import exposong.application
+import slideedit
 
 """
 Plain text presentations.
@@ -48,62 +49,10 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       _abstract.Presentation.Slide.__init__(self, pres, value)
     
     def _edit_window(self, parent):
-      'Create a new window for editing.'
-      dialog = gtk.Dialog(_("Editing Slide"), parent,\
-          gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,\
-          (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
-      
-      dialog.set_border_width(4)
-      dialog.vbox.set_spacing(7)
-      hbox = gtk.HBox()
-      label = gtk.Label(_("Title:"))
-      label.set_alignment(0.5,0.5)
-      hbox.pack_start(label, False, True)
-      
-      title = gtk.Entry(80)
-      title.set_text(self.title)
-      hbox.pack_start(title, True, True)
-      dialog.vbox.pack_start(hbox, False, True)
-      
-      text = gtk.TextView()
-      text.set_wrap_mode(gtk.WRAP_WORD)
-      text.get_buffer().set_text(self.text)
-      text.get_buffer().set_modified(False)
-      text_scroll = gtk.ScrolledWindow()
-      text_scroll.add(text)
-      text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-      text_scroll.set_size_request(400, 250)
-      dialog.vbox.pack_start(text_scroll, True, True)
-      
-      dialog.vbox.show_all()
-      
-      while True:
-        if dialog.run() == gtk.RESPONSE_ACCEPT:
-          break
-        else:
-          if text.get_buffer().get_modified():
-            continue_dialog = gtk.MessageDialog(parent, gtk.DIALOG_MODAL,
-                gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
-                _('Unsaved Changes exist. Do you really want to continue \
-without saving?'))
-            resp = continue_dialog.run()
-            continue_dialog.destroy()
-            if resp == gtk.RESPONSE_YES:
-              dialog.destroy()
-              return False
-          else:
-            dialog.destroy()
-            return False
-      
-      if text.get_buffer().get_modified() or title.get_text() != "":
-        # Should the second comparison here be: title.get_text() != self.title ?
-        self.title = title.get_text()
-        bounds = text.get_buffer().get_bounds()
-        self.text = text.get_buffer().get_text(bounds[0], bounds[1])
-        dialog.destroy()
-        return True
-      dialog.destroy()
-      return False
+      slide = slideedit.SlideEdit(parent, self.title, self.text)
+      self.title = slide.get_slide_name()
+      self.text = slide.get_slide_text()
+      return True
     
     @staticmethod
     def get_version():
@@ -212,7 +161,7 @@ without saving?'))
       info_dialog.run()
       info_dialog.destroy()
       return False
-    return _abstract.Presentation._is_editing_complete(self)
+    return _abstract.Presentation._is_editing_complete(self, self)
   
   def _slide_add_dialog(self, btn, parent):
     'Create a dialog for a new slide.'
