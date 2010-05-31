@@ -19,6 +19,7 @@ import gtk
 import gtk.gdk
 import gobject
 
+import searchentry
 import exposong.slidelist
 import exposong.application
 import exposong.schedlist
@@ -245,54 +246,3 @@ class PresList(gtk.TreeView):
   def get_model_args():
     'Get the arguments to pass to `gtk.ListStore`.'
     return (gobject.TYPE_PYOBJECT,)
-
-
-class PresFilter(gtk.Entry):
-  def __init__(self):
-    gtk.Entry.__init__(self, 50)
-    self.set_width_chars(12)
-    
-    self.use_icons = gtk.gtk_version[0] >= 2 and gtk.gtk_version[1] > 16
-    if self.use_icons:
-      self.set_icon_from_stock(gtk.ENTRY_ICON_PRIMARY, gtk.STOCK_FIND)
-    
-    self.connect("icon-press", self._on_icon_pressed)
-    self.connect("changed", self._on_changed)
-    self.connect("focus-in-event", exposong.application.main.disable_shortcuts)
-    self.connect("focus-out-event", exposong.application.main.enable_shortcuts)
-    
-  def _on_icon_pressed(self, widget, icon, mouse_button):
-    'Clear the search entry'
-    if icon == gtk.ENTRY_ICON_SECONDARY:
-      self.set_text("")
-    elif icon == gtk.ENTRY_ICON_PRIMARY:
-      self.focus()
-  
-  def _on_changed(self, widget):
-    if self.get_text() == "":
-      if self.use_icons:
-        self.set_icon_from_stock(gtk.ENTRY_ICON_SECONDARY, None)
-      self.modify_base(gtk.STATE_NORMAL, None)
-    else:
-      if self.use_icons:
-        self.set_icon_from_stock(gtk.ENTRY_ICON_SECONDARY, gtk.STOCK_CLEAR)
-      # set a yellow background color if filter is active
-      self.modify_base(gtk.STATE_NORMAL, gtk.gdk.Color(63479, 63479, 48830))
-    self._filter()
-  
-  def _filter(self, *args):
-    'Filters schedlist by the keywords.'
-    if self.get_text() == "":
-      preslist.set_model(preslist.get_model())
-    else:
-      filt = preslist.get_model().filter_new()
-      filt.set_visible_func(self._visible_func)
-      preslist.set_model(filt)
-
-  def _visible_func(self, model, itr):
-    'Tests the row for visibility.'
-    return model.get_value(itr, 0).matches(self.get_text())
-
-  def focus(self, *args):
-    'Sets the focus (for an menu action).'
-    self.grab_focus()

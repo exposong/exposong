@@ -24,7 +24,8 @@ import threading
 from xml.dom import minidom
 
 from exposong import RESOURCE_PATH, DATA_PATH, SHARED_FILES, HELP_URL
-from exposong import config, prefs, screen, preslist, schedlist, slidelist
+from exposong import config, prefs, screen, schedlist
+from exposong import preslist, presfilter, slidelist
 from exposong.about import About
 from exposong.schedule import Schedule # ? where to put library
 import exposong.plugins, exposong.plugins._abstract
@@ -70,7 +71,7 @@ class Main (gtk.Window):
     schedlist.schedlist = schedlist.ScheduleList()
     preslist.preslist = preslist.PresList()
     slidelist.slidelist = slidelist.SlideList()
-    preslist.presfilter = preslist.PresFilter()
+    preslist.presfilter = presfilter.PresFilter()
     
     menu = self._create_menu()
     win_v.pack_start(menu, False)
