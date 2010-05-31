@@ -65,7 +65,7 @@ class PresList(gtk.TreeView):
   
   def append(self, item):
     'Add a presentation to the list.'
-    self.get_model().append((item, item.title, item.get_type()))
+    self.get_model().append((item, item.get_title(), item.get_type()))
   
   def remove(self, item):
     'Delete a presentation from the list.'
@@ -194,7 +194,8 @@ class PresList(gtk.TreeView):
       return False
     dialog = gtk.MessageDialog(exposong.application.main, gtk.DIALOG_MODAL,
         gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
-        _('Are you sure you want to delete "%s" from your library?') % item.title)
+        _('Are you sure you want to delete "%s" from your library?') %
+        item.get_title())
     dialog.set_title( _("Delete Presentation?") )
     resp = dialog.run()
     dialog.hide()
