@@ -118,13 +118,16 @@ class Screen:
       self.preview.queue_draw()
   
   def to_black(self, button):
-    'Set the screen to black.'
-    self._black = True
-    self._background = self._logo = False
-    self.draw()
+    'Set the screen to black / show the presentation if screen was black'
+    if self._black:
+      self.show()
+    else:
+      self._black = True
+      self._background = self._logo = False
+      self.draw()
   
   def to_logo(self, button):
-    'Set the screen to black.'
+    'Set the screen to a the ExpoSong logo or a user-defined one.'
     if config.has_option("screen", "logo"):
       self._logo = True
       self._black = self._background = False
