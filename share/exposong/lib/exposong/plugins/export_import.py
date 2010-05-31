@@ -142,7 +142,7 @@ class ExportImport(Plugin, _abstract.Menu):
   
   def import_file(self, *args):
     'Import a schedule or library.'
-    dlg = gtk.FileChooserDialog(_("Export Schedule"), exposong.application.main,
+    dlg = gtk.FileChooserDialog(_("Import"), exposong.application.main,
         gtk.FILE_CHOOSER_ACTION_OPEN, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
     dlg.add_filter(_FILTER)
