@@ -241,7 +241,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       info_dialog.run()
       info_dialog.destroy()
       return False
-    return _abstract.Presentation._is_editing_complete(self)
+    return _abstract.Presentation._is_editing_complete(self, self)
   
   def _on_img_add(self, button, treeview):
     'Add an image to the presentation.'

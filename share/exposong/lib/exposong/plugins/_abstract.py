@@ -255,10 +255,11 @@ class Presentation:
       timer.set_border_width(8)
       timer.set_spacing(7)
       
-      label = gtk.Label()
-      label.set_markup(_("<b>Timer</b>"))
-      label.set_alignment(0.0, 0.5)
-      timer.pack_start(label, False)
+      # Might be used later if more things get on this tab
+      #label = gtk.Label()
+      #label.set_markup(_("<b>Timer</b>"))
+      #label.set_alignment(0.0, 0.5)
+      #timer.pack_start(label, False)
       
       self._fields['timer_on'] = gtk.CheckButton(_("Use Timer"))
       self._fields['timer_on'].set_active(self.timer is not None)
@@ -266,13 +267,17 @@ class Presentation:
           lambda chk: self._fields['timer'].set_sensitive(chk.get_active()))
       self._fields['timer_on'].connect("toggled",\
           lambda chk: self._fields['timer_loop'].set_sensitive(chk.get_active()))
+      self._fields['timer_on'].connect("toggled",\
+          lambda chk: self._fields['timer_seconds'].set_sensitive(chk.get_active()))
       timer.pack_start(self._fields['timer_on'], False)
       
+      self._fields['timer_seconds'] = gtk.Label(_("Seconds Per Slide"))
+      self._fields['timer_seconds'].set_sensitive(self.timer is not None)
       hbox = gtk.HBox()
       hbox.set_spacing(18)
-      hbox.pack_start(gtk.Label(_("Seconds Per Slide")), False, False)
+      hbox.pack_start(self._fields['timer_seconds'], False, False)
       
-      self._fields['timer'] = gtk.SpinButton(gtk.Adjustment(1, 1, 25, 1, 3, 10), 1, 0)
+      self._fields['timer'] = gtk.SpinButton(gtk.Adjustment(1, 1, 25, 1, 3, 0), 1, 0)
       self._fields['timer'].set_sensitive(self.timer is not None)
       if isinstance(self.timer, (int, float)):
         self._fields['timer'].set_value(self.timer)

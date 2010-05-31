@@ -152,6 +152,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       self.slides.append(model.get_value(itr,0))
       itr = model.iter_next(itr)
     del self._slideToolbar
+    _abstract.Presentation._edit_save(self)
   
   def _is_editing_complete(self, parent):
     "Test to see if all fields have been filled which are required."
