@@ -19,7 +19,6 @@ import gtk
 import gtk.gdk
 import gobject
 
-import searchentry
 import exposong.slidelist
 import exposong.application
 import exposong.schedlist
