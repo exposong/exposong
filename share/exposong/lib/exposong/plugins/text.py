@@ -158,7 +158,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     "Test to see if all fields have been filled which are required."
     if self._fields['title'].get_text() == "":
       info_dialog = gtk.MessageDialog(parent, gtk.DIALOG_DESTROY_WITH_PARENT,
-          gtk.MESSAGE_INFO, gtk.BUTTONS_OK, _("Please enter a Title"))
+          gtk.MESSAGE_INFO, gtk.BUTTONS_OK, _("Please enter a Title."))
       info_dialog.run()
       info_dialog.destroy()
       return False

@@ -40,7 +40,7 @@ information = {
     'name': _("Lyric Presentation"),
     'description': __doc__,
     'required': False,
-}
+    }
 type_icon = gtk.gdk.pixbuf_new_from_file_at_size(
     os.path.join(RESOURCE_PATH,'pres_lyric.png'), 20, 14)
 
@@ -129,7 +129,6 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     self.filename = filename
     self.slides = []
     
-    
     if filename:
       fl = open(filename, 'r')
       if not self.is_type(fl):
@@ -165,8 +164,6 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
   def _edit_tabs(self, notebook, parent):
     'Run the edit dialog for the presentation.'
     vbox = gtk.VBox()
-    vbox.set_border_width(4)
-    vbox.set_spacing(7)
     
     self._slideToolbar = gtk.Toolbar()
     btn = gtk.ToolButton(gtk.STOCK_ADD)
@@ -208,42 +205,50 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     text_scroll.set_size_request(400, 250)
     vbox.pack_start(text_scroll, True, True)
     
-    vbox.show_all()
-    notebook.insert_page(vbox, gtk.Label(_("Edit")), 0)
+    hbox = gtk.HBox()
+    label = gtk.Label(_("Verse Order:"))
+    hbox.pack_start(label, False, True, 5)
+    self._fields['verse_order'] = gtk.Entry(50)
+    self._fields['verse_order'].set_text(" ".join(self.song.props.verse_order))
+    hbox.pack_start(self._fields['verse_order'], True, True, 5)
+    vbox.pack_start(hbox, False, True)
     
-    notebook2 = gtk.Notebook()
-    notebook2.set_tab_pos(gtk.POS_LEFT)
+    vbox.show_all()
+    notebook.insert_page(vbox, gtk.Label(_("Verses")), 0)
     
     #Title field
     vbox = gtk.VBox()
-    vbox.set_spacing(7)
     self._fields['title'] = gtk.ListStore(gobject.TYPE_STRING,
         gobject.TYPE_STRING)
     for title in self.song.props.titles:
       self._fields['title'].append( (title, title.lang) )
     title_list = gtk.TreeView(self._fields['title'])
+    title_list.connect('row-activated', self._title_dlg, True)
     title_list.set_reorderable(True)
+    # TODO Add row-activated signal for editing.
     #Toolbar
     toolbar = gtk.Toolbar()
     button = gtk.ToolButton(gtk.STOCK_ADD)
-    button.connect('clicked', self._add_treeview_row, title_list)
+    button.connect('clicked', self._title_dlg_btn, title_list)
+    toolbar.insert(button, -1)
+    button = gtk.ToolButton(gtk.STOCK_EDIT)
+    button.connect('clicked', self._title_dlg_btn, title_list, True)
+    title_list.get_selection().connect('changed', self._disable_button, button)
     toolbar.insert(button, -1)
     button = gtk.ToolButton(gtk.STOCK_DELETE)
     button.connect('clicked', self._del_treeview_row, title_list)
+    title_list.get_selection().connect('changed', self._disable_button, button)
     toolbar.insert(button, -1)
     vbox.pack_start(toolbar, False, True)
-    #Columns
+    title_list.get_selection().emit('changed')
+    #Table
     cell = gtk.CellRendererText()
-    cell.set_property('editable', True)
-    cell.connect('edited', self._edit_treeview_cell, self._fields['title'], 0)
     col = gtk.TreeViewColumn( _('Title'))
     col.pack_start(cell)
     col.set_resizable(True)
     col.add_attribute(cell, 'text', 0)
     title_list.append_column(col)
     cell = gtk.CellRendererText()
-    cell.set_property('editable', True)
-    cell.connect('edited', self._edit_treeview_cell, self._fields['title'], 1)
     col = gtk.TreeViewColumn( _('Language'))
     col.pack_start(cell)
     col.set_resizable(True)
@@ -253,48 +258,45 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     scroll.add(title_list)
     scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
     vbox.pack_start(scroll, True, True)
-    notebook2.append_page(vbox, gtk.Label( _('Title')) )
+    notebook.append_page(vbox, gtk.Label( _('Title')) )
     
     #Author field
     vbox = gtk.VBox()
-    vbox.set_spacing(7)
     self._fields['author'] = gtk.ListStore(gobject.TYPE_STRING,
         gobject.TYPE_STRING, gobject.TYPE_STRING)
     for author in self.song.props.authors:
       self._fields['author'].append( (author, author.type, author.lang) )
     author_list = gtk.TreeView(self._fields['author'])
+    author_list.connect('row-activated', self._author_dlg, True)
     author_list.set_reorderable(True)
     #Toolbar
     toolbar = gtk.Toolbar()
     button = gtk.ToolButton(gtk.STOCK_ADD)
-    button.connect('clicked', self._add_treeview_row, author_list)
+    button.connect('clicked', self._author_dlg_btn, author_list)
+    toolbar.insert(button, -1)
+    button = gtk.ToolButton(gtk.STOCK_EDIT)
+    button.connect('clicked', self._author_dlg_btn, author_list, True)
+    author_list.get_selection().connect('changed', self._disable_button, button)
     toolbar.insert(button, -1)
     button = gtk.ToolButton(gtk.STOCK_DELETE)
     button.connect('clicked', self._del_treeview_row, author_list)
+    author_list.get_selection().connect('changed', self._disable_button, button)
     toolbar.insert(button, -1)
     vbox.pack_start(toolbar, False, True)
-    #Columns
+    author_list.get_selection().emit('changed')
+    #Table
     cell = gtk.CellRendererText()
-    cell.set_property('editable', True)
-    cell.connect('edited', self._edit_treeview_cell, self._fields['author'], 0)
-    col = gtk.TreeViewColumn( _('Author'))
-    col.pack_start(cell)
+    col = gtk.TreeViewColumn( _('Author'), cell)
     col.set_resizable(True)
     col.add_attribute(cell, 'text', 0)
     author_list.append_column(col)
     cell = gtk.CellRendererText()
-    cell.set_property('editable', True)
-    cell.connect('edited', self._edit_treeview_cell, self._fields['author'], 1)
-    col = gtk.TreeViewColumn( _('Type'))
-    col.pack_start(cell)
+    col = gtk.TreeViewColumn( _('Type'), cell)
     col.set_resizable(True)
     col.add_attribute(cell, 'text', 1)
     author_list.append_column(col)
     cell = gtk.CellRendererText()
-    cell.set_property('editable', True)
-    cell.connect('edited', self._edit_treeview_cell, self._fields['author'], 2)
-    col = gtk.TreeViewColumn( _('Language'))
-    col.pack_start(cell)
+    col = gtk.TreeViewColumn( _('Language'), cell)
     col.set_resizable(True)
     col.add_attribute(cell, 'text', 2)
     author_list.append_column(col)
@@ -302,87 +304,47 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     scroll.add(author_list)
     scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
     vbox.pack_start(scroll, True, True)
-    notebook2.append_page(vbox, gtk.Label( _('Author')) )
-    
-    #Songbook field
-    vbox = gtk.VBox()
-    vbox.set_spacing(7)
-    self._fields['songbook'] = gtk.ListStore(gobject.TYPE_STRING,
-        gobject.TYPE_STRING)
-    for songbook in self.song.props.songbooks:
-      self._fields['songbook'].append( (songbook.name, songbook.entry) )
-    songbook_list = gtk.TreeView(self._fields['songbook'])
-    songbook_list.set_reorderable(True)
-    #Toolbar
-    toolbar = gtk.Toolbar()
-    button = gtk.ToolButton(gtk.STOCK_ADD)
-    button.connect('clicked', self._add_treeview_row, songbook_list)
-    toolbar.insert(button, -1)
-    button = gtk.ToolButton(gtk.STOCK_DELETE)
-    button.connect('clicked', self._del_treeview_row, songbook_list)
-    toolbar.insert(button, -1)
-    vbox.pack_start(toolbar, False, True)
-    #Columns
-    cell = gtk.CellRendererText()
-    cell.set_property('editable', True)
-    cell.connect('edited', self._edit_treeview_cell, self._fields['songbook'], 0)
-    col = gtk.TreeViewColumn( _('Songbook Name'))
-    col.pack_start(cell)
-    col.set_resizable(True)
-    col.add_attribute(cell, 'text', 0)
-    songbook_list.append_column(col)
-    cell = gtk.CellRendererText()
-    cell.set_property('editable', True)
-    cell.connect('edited', self._edit_treeview_cell, self._fields['songbook'], 1)
-    col = gtk.TreeViewColumn( _('Entry')) # As in songbook number
-    col.pack_start(cell)
-    col.set_resizable(True)
-    col.add_attribute(cell, 'text', 1)
-    songbook_list.append_column(col)
-    scroll = gtk.ScrolledWindow()
-    scroll.add(songbook_list)
-    scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
-    vbox.pack_start(scroll, True, True)
-    notebook2.append_page(vbox, gtk.Label( _('Songbook')) )
+    notebook.append_page(vbox, gtk.Label( _('Author')) )
     
     #Theme field
     vbox = gtk.VBox()
-    vbox.set_spacing(7)
     self._fields['theme'] = gtk.ListStore(gobject.TYPE_STRING,
         gobject.TYPE_STRING, gobject.TYPE_STRING)
     for theme in self.song.props.themes:
       self._fields['theme'].append( (theme, theme.lang, theme.id) )
     theme_list = gtk.TreeView(self._fields['theme'])
+    theme_list.connect('row-activated', self._theme_dlg, True)
     theme_list.set_reorderable(True)
     #Toolbar
     toolbar = gtk.Toolbar()
     button = gtk.ToolButton(gtk.STOCK_ADD)
-    button.connect('clicked', self._add_treeview_row, theme_list)
+    button.connect('clicked', self._theme_dlg_btn, theme_list)
+    toolbar.insert(button, -1)
+    button = gtk.ToolButton(gtk.STOCK_EDIT)
+    button.connect('clicked', self._theme_dlg_btn, theme_list, True)
+    theme_list.get_selection().connect('changed', self._disable_button, button)
     toolbar.insert(button, -1)
     button = gtk.ToolButton(gtk.STOCK_DELETE)
     button.connect('clicked', self._del_treeview_row, theme_list)
+    theme_list.get_selection().connect('changed', self._disable_button, button)
     toolbar.insert(button, -1)
     vbox.pack_start(toolbar, False, True)
+    theme_list.get_selection().emit('changed')
+    #Table
     #Columns
     cell = gtk.CellRendererText()
-    cell.set_property('editable', True)
-    cell.connect('edited', self._edit_treeview_cell, self._fields['theme'], 0)
     col = gtk.TreeViewColumn( _('Theme'))
     col.pack_start(cell)
     col.set_resizable(True)
     col.add_attribute(cell, 'text', 0)
     theme_list.append_column(col)
     cell = gtk.CellRendererText()
-    cell.set_property('editable', True)
-    cell.connect('edited', self._edit_treeview_cell, self._fields['theme'], 1)
     col = gtk.TreeViewColumn( _('Language'))
     col.pack_start(cell)
     col.set_resizable(True)
     col.add_attribute(cell, 'text', 1)
     theme_list.append_column(col)
     cell = gtk.CellRendererText()
-    cell.set_property('editable', True)
-    cell.connect('edited', self._edit_treeview_cell, self._fields['theme'], 2)
     col = gtk.TreeViewColumn( _('ID'))
     col.pack_start(cell)
     col.set_resizable(True)
@@ -392,8 +354,52 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     scroll.add(theme_list)
     scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
     vbox.pack_start(scroll, True, True)
-    notebook2.append_page(vbox, gtk.Label( _('Theme')) )
+    notebook.append_page(vbox, gtk.Label( _('Theme')) )
     
+    #Songbook field
+    vbox = gtk.VBox()
+    self._fields['songbook'] = gtk.ListStore(gobject.TYPE_STRING,
+        gobject.TYPE_STRING)
+    for songbook in self.song.props.songbooks:
+      self._fields['songbook'].append( (songbook.name, songbook.entry) )
+    songbook_list = gtk.TreeView(self._fields['songbook'])
+    songbook_list.connect('row-activated', self._songbook_dlg, True)
+    songbook_list.set_reorderable(True)
+    #Toolbar
+    toolbar = gtk.Toolbar()
+    button = gtk.ToolButton(gtk.STOCK_ADD)
+    button.connect('clicked', self._songbook_dlg_btn, songbook_list)
+    toolbar.insert(button, -1)
+    button = gtk.ToolButton(gtk.STOCK_EDIT)
+    button.connect('clicked', self._songbook_dlg_btn, songbook_list, True)
+    songbook_list.get_selection().connect('changed', self._disable_button, button)
+    toolbar.insert(button, -1)
+    button = gtk.ToolButton(gtk.STOCK_DELETE)
+    button.connect('clicked', self._del_treeview_row, songbook_list)
+    songbook_list.get_selection().connect('changed', self._disable_button, button)
+    toolbar.insert(button, -1)
+    vbox.pack_start(toolbar, False, True)
+    songbook_list.get_selection().emit('changed')
+    #Columns
+    cell = gtk.CellRendererText()
+    col = gtk.TreeViewColumn( _('Songbook Name'))
+    col.pack_start(cell)
+    col.set_resizable(True)
+    col.add_attribute(cell, 'text', 0)
+    songbook_list.append_column(col)
+    cell = gtk.CellRendererText()
+    col = gtk.TreeViewColumn( _('Entry')) # As in songbook number
+    col.pack_start(cell)
+    col.set_resizable(True)
+    col.add_attribute(cell, 'text', 1)
+    songbook_list.append_column(col)
+    scroll = gtk.ScrolledWindow()
+    scroll.add(songbook_list)
+    scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+    vbox.pack_start(scroll, True, True)
+    notebook.append_page(vbox, gtk.Label( _('Songbook')) )
+    
+    #Other
     vbox = gtk.VBox()
     vbox.set_spacing(7)
     
@@ -425,14 +431,6 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     self._fields['tempo_type'].child.set_text(self.song.props.tempo_type)
     hbox.pack_start(self._fields['tempo_type'], True, True, 5)
     vbox.pack_start(hbox, False, True)
-
-    hbox = gtk.HBox()
-    label = gtk.Label(_("Verse Order:"))
-    hbox.pack_start(label, False, True, 5)
-    self._fields['verse_order'] = gtk.Entry(50)
-    self._fields['verse_order'].set_text(" ".join(self.song.props.verse_order))
-    hbox.pack_start(self._fields['verse_order'], True, True, 5)
-    vbox.pack_start(hbox, False, True)
     
     hbox = gtk.HBox()
     label = gtk.Label(_("Release Date:"))
@@ -451,16 +449,18 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     hbox.pack_start(self._fields['transposition'], True, True, 5)
     vbox.pack_start(hbox, False, True)
     
-    notebook2.append_page(vbox, gtk.Label(_("Other")))
-    notebook.append_page(notebook2, gtk.Label(_("Information")))
+    notebook.append_page(vbox, gtk.Label(_("Other")))
     
+    title_list.columns_autosize()
+    author_list.columns_autosize()
+    theme_list.columns_autosize()
+    songbook_list.columns_autosize()
     _abstract.Presentation._edit_tabs(self, notebook, parent)
   
   def _edit_save(self):
     'Save the fields if the user clicks ok.'
     self.song.props.copyright = self._fields['copyright'].get_text()
     self.song.props.order = self._fields['order'].get_text().split()
-    
     
     ## TODO: Slides
     #model = self._fields['slides'].get_model()
@@ -483,7 +483,298 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
   def _del_treeview_row(self, button, treeview):
     (model, itr) = treeview.get_selection().get_selected()
     if itr:
-      model.remove(itr)
+      model.remove(itr)  
+  
+  def _title_dlg_btn(self, btn, treeview, edit=False):
+    "Add or edit a title."
+    path = None
+    col = None
+    if edit:
+      (model, itr) = treeview.get_selection().get_selected()
+      path = model.get_path(itr)
+    self._title_dlg(treeview, path, col, edit)
+  
+  def _title_dlg(self, treeview, path, col, edit=False):
+    "Add or edit a title."
+    dialog = gtk.Dialog(_("New Title"), treeview.get_toplevel(),\
+        gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,\
+        (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+        gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+    dialog.set_border_width(4)
+    dialog.vbox.set_spacing(7)
+    
+    hbox = gtk.HBox()
+    label = gtk.Label(_("Title:"))
+    hbox.pack_start(label, False, True, 5)
+    title = gtk.Entry()
+    hbox.pack_start(title, True, True, 5)
+    dialog.vbox.pack_start(hbox, False, True)
+    hbox = gtk.HBox()
+    label = gtk.Label(_("Language Code:"))
+    hbox.pack_start(label, False, True, 5)
+    lang = self._language_combo()
+    hbox.pack_start(lang, True, True, 5)
+    dialog.vbox.pack_start(hbox, True, True)
+    dialog.vbox.show_all()
+    
+    model = treeview.get_model()
+    if edit:
+      itr = model.get_iter(path)
+      if model.get_value(itr,0):
+        dialog.set_title( _('Editing Title "%s"') % model.get_value(itr,0) )
+        title.set_text( model.get_value(itr,0) )
+      if model.get_value(itr,1):
+        lang.child.set_text( str(model.get_value(itr,1)) )
+    while True:
+      if dialog.run() == gtk.RESPONSE_ACCEPT:
+        if not title.get_text():
+          info_dialog = gtk.MessageDialog(treeview.get_toplevel(),
+              gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
+              _("Please enter a Title."))
+          info_dialog.run()
+          info_dialog.destroy()
+        else:
+          if edit:
+            model.set_value(itr, 0, title.get_text())
+            model.set_value(itr, 1, lang.get_active_text())
+          else:
+            self._fields['title'].append( (title.get_text(),
+                lang.get_active_text()) )
+          dialog.hide()
+          return True
+      else:
+        dialog.hide()
+        return False
+  
+  def _author_dlg_btn(self, btn, treeview, edit=False):
+    "Add or edit an author."
+    path = None
+    col = None
+    if edit:
+      (model, itr) = treeview.get_selection().get_selected()
+      path = model.get_path(itr)
+    self._author_dlg(treeview, path, col, edit)
+  
+  def _author_dlg(self, treeview, path, col, edit=False):
+    "Add or edit an author."
+    dialog = gtk.Dialog(_("New Author"), treeview.get_toplevel(),\
+        gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,\
+        (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+        gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+    dialog.set_border_width(4)
+    dialog.vbox.set_spacing(7)
+    
+    hbox = gtk.HBox()
+    label = gtk.Label(_("Author Name:"))
+    hbox.pack_start(label, False, True, 5)
+    author = gtk.Entry()
+    hbox.pack_start(author, True, True, 5)
+    dialog.vbox.pack_start(hbox, False, True)
+    hbox = gtk.HBox()
+    label = gtk.Label(_("Type:"))
+    hbox.pack_start(label, False, True, 5)
+    type_list = gtk.ListStore(str, str)
+    # TODO:  NULL type author may need to be named better
+    type_list.append( ('', _('General Author')) )
+    type_list.append( ('words', _('Words')) )
+    type_list.append( ('music', _('Music')) )
+    type_list.append( ('translation', _('Translation')) )
+    type = gtk.ComboBox(type_list)
+    cell = gtk.CellRendererText()
+    type.pack_start(cell, True)
+    type.add_attribute(cell, 'text', 1)
+    hbox.pack_start(type, True, True, 5)
+    type.set_active(0)
+    dialog.vbox.pack_start(hbox, False, True)
+    hbox = gtk.HBox()
+    label = gtk.Label(_("Language Code:"))
+    hbox.pack_start(label, False, True, 5)
+    lang = self._language_combo()
+    hbox.pack_start(lang, True, True, 5)
+    dialog.vbox.pack_start(hbox, True, True)
+    dialog.vbox.show_all()
+    
+    model = treeview.get_model()
+    if edit:
+      itr = model.get_iter(path)
+      if model.get_value(itr, 0):
+        dialog.set_title( _('Editing Author "%s"') % model.get_value(itr,0) )
+        author.set_text( model.get_value(itr,0) )
+      try:
+        type.set_active(['','words','music','translation'].index(
+            model.get_value(itr,1)))
+      except ValueError:
+        pass
+      if model.get_value(itr, 2):
+        lang.child.set_text( str(model.get_value(itr, 2)) )
+    while True:
+      if dialog.run() == gtk.RESPONSE_ACCEPT:
+        if not author.get_text():
+          info_dialog = gtk.MessageDialog(treeview.get_toplevel(),
+              gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
+              _("Please enter an Author Name."))
+          info_dialog.run()
+          info_dialog.destroy()
+        else:
+          if edit:
+            model.set_value(itr, 0, author.get_text())
+            model.set_value(itr, 1,
+                type_list.get_value(type.get_active_iter(),0))
+            # TODO how to set text value? Append current value to model and select it?
+            model.set_value(itr, 2, lang.get_active_text())
+          else:
+            self._fields['author'].append( (author.get_text(),
+                type_list.get_value(type.get_active_iter(),0),
+                lang.get_active_text()))
+          dialog.hide()
+          return True
+      else:
+        dialog.hide()
+        return False
+  
+  def _theme_dlg_btn(self, btn, treeview, edit=False):
+    "Add or edit a theme."
+    path = None
+    col = None
+    if edit:
+      (model, itr) = treeview.get_selection().get_selected()
+      path = model.get_path(itr)
+    self._theme_dlg(treeview, path, col, edit)
+  
+  def _theme_dlg(self, treeview, path, col, edit=False):
+    "Add or edit a theme."
+    dialog = gtk.Dialog(_("New Theme"), treeview.get_toplevel(),\
+        gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,\
+        (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+        gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+    dialog.set_border_width(4)
+    dialog.vbox.set_spacing(7)
+    
+    hbox = gtk.HBox()
+    label = gtk.Label(_("Theme Name:"))
+    hbox.pack_start(label, False, True, 5)
+    theme = gtk.Entry()
+    hbox.pack_start(theme, True, True, 5)
+    dialog.vbox.pack_start(hbox, False, True)
+    hbox = gtk.HBox()
+    label = gtk.Label(_("Language Code:"))
+    hbox.pack_start(label, False, True, 5)
+    lang = self._language_combo()
+    hbox.pack_start(lang, True, True, 5)
+    dialog.vbox.pack_start(hbox, True, True)
+    dialog.vbox.show_all()
+    
+    model = treeview.get_model()
+    if edit:
+      itr = model.get_iter(path)
+      if model.get_value(itr, 0):
+        dialog.set_title( _('Editing Theme "%s"') % model.get_value(itr,0) )
+        theme.set_text( model.get_value(itr,0) )
+      if model.get_value(itr, 1):
+        lang.child.set_text( model.get_value(itr, 1) )
+    while True:
+      if dialog.run() == gtk.RESPONSE_ACCEPT:
+        if not theme.get_text():
+          info_dialog = gtk.MessageDialog(treeview.get_toplevel(),
+              gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
+              _("Please enter an Theme Name."))
+          info_dialog.run()
+          info_dialog.destroy()
+        else:
+          if edit:
+            model.set_value(itr, 0, theme.get_text())
+            # TODO Need to keep 'words', etc, not the translation of it.
+            model.set_value(itr, 1, lang.get_active_text())
+          else:
+            self._fields['theme'].append( (theme.get_text(),
+                lang.get_active_text(), -1) )
+          dialog.hide()
+          return True
+      else:
+        dialog.hide()
+        return False
+  
+  def _songbook_dlg_btn(self, btn, treeview, edit=False):
+    "Add or edit a songbook."
+    path = None
+    col = None
+    if edit:
+      (model, itr) = treeview.get_selection().get_selected()
+      path = model.get_path(itr)
+    self._songbook_dlg(treeview, path, col, edit)
+  
+  def _songbook_dlg(self, treeview, path, col, edit=False):
+    "Add or edit a songbook."
+    dialog = gtk.Dialog(_("New songbook"), treeview.get_toplevel(),\
+        gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,\
+        (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+        gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+    dialog.set_border_width(4)
+    dialog.vbox.set_spacing(7)
+    
+    hbox = gtk.HBox()
+    label = gtk.Label(_("Songbook Name:"))
+    hbox.pack_start(label, False, True, 5)
+    songbook = gtk.Entry()
+    hbox.pack_start(songbook, True, True, 5)
+    dialog.vbox.pack_start(hbox, False, True)
+    hbox = gtk.HBox()
+    label = gtk.Label(_("Entry:"))
+    hbox.pack_start(label, False, True, 5)
+    entry = gtk.Entry()
+    hbox.pack_start(entry, True, True, 5)
+    dialog.vbox.pack_start(hbox, True, True)
+    dialog.vbox.show_all()
+    
+    model = treeview.get_model()
+    if edit:
+      itr = model.get_iter(path)
+      if model.get_value(itr, 0):
+        dialog.set_title( _('Editing Songbook "%s"') % model.get_value(itr,0) )
+        songbook.set_text( model.get_value(itr,0) )
+      if model.get_value(itr, 1):
+        entry.set_text( model.get_value(itr, 1) )
+    while True:
+      if dialog.run() == gtk.RESPONSE_ACCEPT:
+        if not songbook.get_text():
+          info_dialog = gtk.MessageDialog(treeview.get_toplevel(),
+              gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
+              _("Please enter an Songbook."))
+          info_dialog.run()
+          info_dialog.destroy()
+        else:
+          if edit:
+            model.set_value(itr, 0, songbook.get_text())
+            # TODO Need to keep 'words', etc, not the translation of it.
+            model.set_value(itr, 1, entry.get_text())
+          else:
+            self._fields['songbook'].append( (songbook.get_text(),
+                entry.get_text()) )
+          dialog.hide()
+          return True
+      else:
+        dialog.hide()
+        return False
+  
+  def _language_combo(self):
+    "Gets the active"
+    list = gtk.ListStore(str)
+    # TODO:  NULL type author may need to be named better
+    list.append( ('en',) )
+    list.append( ('en_US',) )
+    list.append( ('en_GB',) )
+    list.append( ('de',) )
+    list.append( ('de_DE',) )
+    
+    lang = gtk.ComboBoxEntry(list)
+    #cell = gtk.CellRendererText()
+    #lang.pack_start(cell, True)
+    #lang.add_attribute(cell, 'text', 0)
+    return lang
+  
+  def _disable_button(self, sel, button):
+    'Disable `buttons` if selection is empty.'
+    button.set_sensitive(sel.count_selected_rows() > 0)
   
   def _paste_as_text(self, *args):
     'Dialog to paste full lyrics.'
@@ -516,7 +807,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     dialog.vbox.pack_start(text_scroll, True, True)
     
     dialog.vbox.show_all()
-      
+    
     if dialog.run() == gtk.RESPONSE_ACCEPT:
       # TODO Titles, Authors
       bounds = text.get_buffer().get_bounds()
