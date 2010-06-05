@@ -27,6 +27,7 @@ from datetime import datetime
 
 from exposong.glob import *
 from exposong import RESOURCE_PATH, DATA_PATH
+from exposong import gui
 from exposong.plugins import Plugin, _abstract, text
 import exposong.application
 import exposong.slidelist
@@ -184,6 +185,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     vbox.pack_start(self._slideToolbar, False, True)
     
     hbox = gtk.HBox()
+    # TODO We only need to reference the model, not the view.
     self._fields['slides'] = gtk.TreeView()
     self._fields['slides'].set_enable_search(False)
     self._fields['slides'].set_reorderable(True)
@@ -205,13 +207,10 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     text_scroll.set_size_request(400, 250)
     vbox.pack_start(text_scroll, True, True)
     
-    hbox = gtk.HBox()
-    label = gtk.Label(_("Verse Order:"))
-    hbox.pack_start(label, False, True, 5)
-    self._fields['verse_order'] = gtk.Entry(50)
-    self._fields['verse_order'].set_text(" ".join(self.song.props.verse_order))
-    hbox.pack_start(self._fields['verse_order'], True, True, 5)
-    vbox.pack_start(hbox, False, True)
+    table = gui.Table(1)
+    self._fields['verse_order'] = gui.append_text(table, _("Verse Order:"),
+        " ".join(self.song.props.verse_order), 0)
+    vbox.pack_start(table, False, True)
     
     vbox.show_all()
     notebook.insert_page(vbox, gtk.Label(_("Verses")), 0)
@@ -233,11 +232,13 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     toolbar.insert(button, -1)
     button = gtk.ToolButton(gtk.STOCK_EDIT)
     button.connect('clicked', self._title_dlg_btn, title_list, True)
-    title_list.get_selection().connect('changed', self._disable_button, button)
+    title_list.get_selection().connect('changed', gui.treesel_disable_widget,
+        button)
     toolbar.insert(button, -1)
     button = gtk.ToolButton(gtk.STOCK_DELETE)
     button.connect('clicked', self._del_treeview_row, title_list)
-    title_list.get_selection().connect('changed', self._disable_button, button)
+    title_list.get_selection().connect('changed', gui.treesel_disable_widget,
+        button)
     toolbar.insert(button, -1)
     vbox.pack_start(toolbar, False, True)
     title_list.get_selection().emit('changed')
@@ -276,11 +277,13 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     toolbar.insert(button, -1)
     button = gtk.ToolButton(gtk.STOCK_EDIT)
     button.connect('clicked', self._author_dlg_btn, author_list, True)
-    author_list.get_selection().connect('changed', self._disable_button, button)
+    author_list.get_selection().connect('changed', gui.treesel_disable_widget,
+        button)
     toolbar.insert(button, -1)
     button = gtk.ToolButton(gtk.STOCK_DELETE)
     button.connect('clicked', self._del_treeview_row, author_list)
-    author_list.get_selection().connect('changed', self._disable_button, button)
+    author_list.get_selection().connect('changed', gui.treesel_disable_widget,
+        button)
     toolbar.insert(button, -1)
     vbox.pack_start(toolbar, False, True)
     author_list.get_selection().emit('changed')
@@ -322,11 +325,13 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     toolbar.insert(button, -1)
     button = gtk.ToolButton(gtk.STOCK_EDIT)
     button.connect('clicked', self._theme_dlg_btn, theme_list, True)
-    theme_list.get_selection().connect('changed', self._disable_button, button)
+    theme_list.get_selection().connect('changed', gui.treesel_disable_widget,
+        button)
     toolbar.insert(button, -1)
     button = gtk.ToolButton(gtk.STOCK_DELETE)
     button.connect('clicked', self._del_treeview_row, theme_list)
-    theme_list.get_selection().connect('changed', self._disable_button, button)
+    theme_list.get_selection().connect('changed', gui.treesel_disable_widget,
+        button)
     toolbar.insert(button, -1)
     vbox.pack_start(toolbar, False, True)
     theme_list.get_selection().emit('changed')
@@ -372,11 +377,13 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     toolbar.insert(button, -1)
     button = gtk.ToolButton(gtk.STOCK_EDIT)
     button.connect('clicked', self._songbook_dlg_btn, songbook_list, True)
-    songbook_list.get_selection().connect('changed', self._disable_button, button)
+    songbook_list.get_selection().connect('changed', gui.treesel_disable_widget,
+        button)
     toolbar.insert(button, -1)
     button = gtk.ToolButton(gtk.STOCK_DELETE)
     button.connect('clicked', self._del_treeview_row, songbook_list)
-    songbook_list.get_selection().connect('changed', self._disable_button, button)
+    songbook_list.get_selection().connect('changed', gui.treesel_disable_widget,
+        button)
     toolbar.insert(button, -1)
     vbox.pack_start(toolbar, False, True)
     songbook_list.get_selection().emit('changed')
@@ -400,61 +407,24 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     notebook.append_page(vbox, gtk.Label( _('Songbook')) )
     
     #Other
-    vbox = gtk.VBox()
-    vbox.set_spacing(7)
+    table = gui.Table(20)
     
-    hbox = gtk.HBox()
-    label = gtk.Label(_("Copyright:"))
-    hbox.pack_start(label, False, True, 5)
-    self._fields['copyright'] = gtk.Entry(50)
-    self._fields['copyright'].set_text(self.song.props.copyright)
-    hbox.pack_start(self._fields['copyright'], True, True, 5)
-    vbox.pack_start(hbox, False, True)
+    self._fields['copyright'] = gui.append_text(table, _("Copyright:"),
+        self.song.props.copyright, 0)
+    self._fields['ccli_no'] = gui.append_text(table, _("CCLI Number:"),
+        self.song.props.ccli_no, 1)
+    self._fields['tempo'] = gui.append_text(table, _("Tempo:"),
+        self.song.props.tempo, 2)
+    # TODO Put a spinner for BPM, Combo for a string setting on same line.
+    self._fields['tempo_type'] = gui.append_combo(table, _("Tempo Type:"),
+        (_("bpm"), _("Text")), self.song.props.tempo_type, 3)
+    self._fields['release_date'] = gui.append_text(table, _("Release Date:"),
+        self.song.props.release_date, 4)
+    self._fields['transpos'] = gui.append_spinner(table, _("Transposition:"),
+        gtk.Adjustment(int(self.song.props.transposition), -12, 12), 5)
     
-    hbox = gtk.HBox()
-    label = gtk.Label(_("CCLI Number:"))
-    hbox.pack_start(label, False, True, 5)
-    self._fields['ccli_no'] = gtk.Entry(50)
-    self._fields['ccli_no'].set_text(self.song.props.ccli_no)
-    hbox.pack_start(self._fields['ccli_no'], True, True, 5)
-    vbox.pack_start(hbox, False, True)
+    notebook.append_page(table, gtk.Label(_("Other")))
     
-    hbox = gtk.HBox()
-    label = gtk.Label(_("Tempo:"))
-    hbox.pack_start(label, False, True, 5)
-    self._fields['tempo'] = gtk.Entry(50)
-    self._fields['tempo'].set_text(self.song.props.tempo)
-    hbox.pack_start(self._fields['tempo'], True, True, 5)
-    self._fields['tempo_type'] = gtk.combo_box_entry_new_text()
-    self._fields['tempo_type'].append_text("BPM")
-    self._fields['tempo_type'].append_text("Text")
-    self._fields['tempo_type'].child.set_text(self.song.props.tempo_type)
-    hbox.pack_start(self._fields['tempo_type'], True, True, 5)
-    vbox.pack_start(hbox, False, True)
-    
-    hbox = gtk.HBox()
-    label = gtk.Label(_("Release Date:"))
-    hbox.pack_start(label, False, True, 5)
-    self._fields['release_date'] = gtk.Entry(50)
-    self._fields['release_date'].set_text(self.song.props.release_date)
-    hbox.pack_start(self._fields['release_date'], True, True, 5)
-    vbox.pack_start(hbox, False, True)
-    
-    hbox = gtk.HBox()
-    label = gtk.Label(_("Transposition:"))
-    hbox.pack_start(label, False, True, 5)
-    self._fields['transposition'] = gtk.SpinButton(gtk.Adjustment(0, -12, 12,
-        1, 0, 0), 1.0, 0)
-    self._fields['transposition'].set_value(int(self.song.props.transposition))
-    hbox.pack_start(self._fields['transposition'], True, True, 5)
-    vbox.pack_start(hbox, False, True)
-    
-    notebook.append_page(vbox, gtk.Label(_("Other")))
-    
-    title_list.columns_autosize()
-    author_list.columns_autosize()
-    theme_list.columns_autosize()
-    songbook_list.columns_autosize()
     _abstract.Presentation._edit_tabs(self, notebook, parent)
   
   def _edit_save(self):
@@ -500,31 +470,23 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
         gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,\
         (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
-    dialog.set_border_width(4)
-    dialog.vbox.set_spacing(7)
-    
-    hbox = gtk.HBox()
-    label = gtk.Label(_("Title:"))
-    hbox.pack_start(label, False, True, 5)
-    title = gtk.Entry()
-    hbox.pack_start(title, True, True, 5)
-    dialog.vbox.pack_start(hbox, False, True)
-    hbox = gtk.HBox()
-    label = gtk.Label(_("Language Code:"))
-    hbox.pack_start(label, False, True, 5)
-    lang = self._language_combo()
-    hbox.pack_start(lang, True, True, 5)
-    dialog.vbox.pack_start(hbox, True, True)
-    dialog.vbox.show_all()
+    table = gui.Table(2)
+    dialog.vbox.pack_start(table, True, True)
     
     model = treeview.get_model()
+    title_value = lang_value = None
     if edit:
       itr = model.get_iter(path)
       if model.get_value(itr,0):
         dialog.set_title( _('Editing Title "%s"') % model.get_value(itr,0) )
-        title.set_text( model.get_value(itr,0) )
+        title_value = model.get_value(itr,0)
       if model.get_value(itr,1):
-        lang.child.set_text( str(model.get_value(itr,1)) )
+        lang_value = model.get_value(itr,1)
+    
+    title = gui.append_text(table, _("Title:"), title_value, 0)
+    lang = gui.append_language_combo(table, lang_value, 1)
+    dialog.vbox.show_all()
+    
     while True:
       if dialog.run() == gtk.RESPONSE_ACCEPT:
         if not title.get_text():
@@ -561,52 +523,28 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
         gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,\
         (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
-    dialog.set_border_width(4)
-    dialog.vbox.set_spacing(7)
-    
-    hbox = gtk.HBox()
-    label = gtk.Label(_("Author Name:"))
-    hbox.pack_start(label, False, True, 5)
-    author = gtk.Entry()
-    hbox.pack_start(author, True, True, 5)
-    dialog.vbox.pack_start(hbox, False, True)
-    hbox = gtk.HBox()
-    label = gtk.Label(_("Type:"))
-    hbox.pack_start(label, False, True, 5)
-    type_list = gtk.ListStore(str, str)
-    # TODO:  NULL type author may need to be named better
-    type_list.append( ('', _('General Author')) )
-    type_list.append( ('words', _('Words')) )
-    type_list.append( ('music', _('Music')) )
-    type_list.append( ('translation', _('Translation')) )
-    type = gtk.ComboBox(type_list)
-    cell = gtk.CellRendererText()
-    type.pack_start(cell, True)
-    type.add_attribute(cell, 'text', 1)
-    hbox.pack_start(type, True, True, 5)
-    type.set_active(0)
-    dialog.vbox.pack_start(hbox, False, True)
-    hbox = gtk.HBox()
-    label = gtk.Label(_("Language Code:"))
-    hbox.pack_start(label, False, True, 5)
-    lang = self._language_combo()
-    hbox.pack_start(lang, True, True, 5)
-    dialog.vbox.pack_start(hbox, True, True)
-    dialog.vbox.show_all()
+    table = gui.Table(3)
+    dialog.vbox.pack_start(table, True, True)
     
     model = treeview.get_model()
+    author_value = type_value = lang_value = None
     if edit:
       itr = model.get_iter(path)
-      if model.get_value(itr, 0):
+      if model.get_value(itr,0):
         dialog.set_title( _('Editing Author "%s"') % model.get_value(itr,0) )
-        author.set_text( model.get_value(itr,0) )
-      try:
-        type.set_active(['','words','music','translation'].index(
-            model.get_value(itr,1)))
-      except ValueError:
-        pass
-      if model.get_value(itr, 2):
-        lang.child.set_text( str(model.get_value(itr, 2)) )
+      author_value = model.get_value(itr,0)
+      type_value = model.get_value(itr,1)
+      lang_value = model.get_value(itr,2)
+    author = gui.append_text(table, _('Author Name:'), author_value, 0)
+    type = gui.append_combo2(table, _('Author Type:'),
+        (('', _("None")),) + tuple(auth_types.iteritems()), type_value, 1)
+    tmodel = type.get_model()
+    lang = gui.append_language_combo(table, lang_value, 2)
+    type.connect('changed', lambda combo: lang.set_sensitive(
+        tmodel.get_value(type.get_active_iter(),0)=='translation') )
+    type.emit('changed')
+    dialog.vbox.show_all()
+    
     while True:
       if dialog.run() == gtk.RESPONSE_ACCEPT:
         if not author.get_text():
@@ -619,12 +557,12 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
           if edit:
             model.set_value(itr, 0, author.get_text())
             model.set_value(itr, 1,
-                type_list.get_value(type.get_active_iter(),0))
-            # TODO how to set text value? Append current value to model and select it?
-            model.set_value(itr, 2, lang.get_active_text())
+                tmodel.get_value(type.get_active_iter(),0))
+            if tmodel.get_value(type.get_active_iter(),0) == 'translation':
+              model.set_value(itr, 2, lang.get_active_text())
           else:
             self._fields['author'].append( (author.get_text(),
-                type_list.get_value(type.get_active_iter(),0),
+                tmodel.get_value(type.get_active_iter(),0),
                 lang.get_active_text()))
           dialog.hide()
           return True
@@ -647,31 +585,21 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
         gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,\
         (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
-    dialog.set_border_width(4)
-    dialog.vbox.set_spacing(7)
-    
-    hbox = gtk.HBox()
-    label = gtk.Label(_("Theme Name:"))
-    hbox.pack_start(label, False, True, 5)
-    theme = gtk.Entry()
-    hbox.pack_start(theme, True, True, 5)
-    dialog.vbox.pack_start(hbox, False, True)
-    hbox = gtk.HBox()
-    label = gtk.Label(_("Language Code:"))
-    hbox.pack_start(label, False, True, 5)
-    lang = self._language_combo()
-    hbox.pack_start(lang, True, True, 5)
-    dialog.vbox.pack_start(hbox, True, True)
-    dialog.vbox.show_all()
+    table = gui.Table(2)
+    dialog.vbox.pack_start(table, True, True)
     
     model = treeview.get_model()
+    theme_value = lang_value = None
     if edit:
       itr = model.get_iter(path)
-      if model.get_value(itr, 0):
+      if model.get_value(itr,0):
         dialog.set_title( _('Editing Theme "%s"') % model.get_value(itr,0) )
-        theme.set_text( model.get_value(itr,0) )
-      if model.get_value(itr, 1):
-        lang.child.set_text( model.get_value(itr, 1) )
+      theme_value = model.get_value(itr,0)
+      lang_value = model.get_value(itr,1)
+    theme = gui.append_text(table, _('Theme Name:'), theme_value, 0)
+    lang = gui.append_language_combo(table, lang_value, 1)
+    dialog.vbox.show_all()
+    
     while True:
       if dialog.run() == gtk.RESPONSE_ACCEPT:
         if not theme.get_text():
@@ -683,7 +611,6 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
         else:
           if edit:
             model.set_value(itr, 0, theme.get_text())
-            # TODO Need to keep 'words', etc, not the translation of it.
             model.set_value(itr, 1, lang.get_active_text())
           else:
             self._fields['theme'].append( (theme.get_text(),
@@ -709,31 +636,21 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
         gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,\
         (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
-    dialog.set_border_width(4)
-    dialog.vbox.set_spacing(7)
-    
-    hbox = gtk.HBox()
-    label = gtk.Label(_("Songbook Name:"))
-    hbox.pack_start(label, False, True, 5)
-    songbook = gtk.Entry()
-    hbox.pack_start(songbook, True, True, 5)
-    dialog.vbox.pack_start(hbox, False, True)
-    hbox = gtk.HBox()
-    label = gtk.Label(_("Entry:"))
-    hbox.pack_start(label, False, True, 5)
-    entry = gtk.Entry()
-    hbox.pack_start(entry, True, True, 5)
-    dialog.vbox.pack_start(hbox, True, True)
-    dialog.vbox.show_all()
+    table = gui.Table(2)
+    dialog.vbox.pack_start(table, True, True)
     
     model = treeview.get_model()
+    songbook_value = entry_value = None
     if edit:
       itr = model.get_iter(path)
-      if model.get_value(itr, 0):
+      if model.get_value(itr,0):
         dialog.set_title( _('Editing Songbook "%s"') % model.get_value(itr,0) )
-        songbook.set_text( model.get_value(itr,0) )
-      if model.get_value(itr, 1):
-        entry.set_text( model.get_value(itr, 1) )
+      songbook_value = model.get_value(itr,0)
+      entry_value = model.get_value(itr,1)
+    songbook = gui.append_text(table, _('Songbook Name:'), songbook_value, 0)
+    entry = gui.append_text(table, _('Entry:'), entry_value, 1)
+    dialog.vbox.show_all()
+    
     while True:
       if dialog.run() == gtk.RESPONSE_ACCEPT:
         if not songbook.get_text():
@@ -755,26 +672,6 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
       else:
         dialog.hide()
         return False
-  
-  def _language_combo(self):
-    "Gets the active"
-    list = gtk.ListStore(str)
-    # TODO:  NULL type author may need to be named better
-    list.append( ('en',) )
-    list.append( ('en_US',) )
-    list.append( ('en_GB',) )
-    list.append( ('de',) )
-    list.append( ('de_DE',) )
-    
-    lang = gtk.ComboBoxEntry(list)
-    #cell = gtk.CellRendererText()
-    #lang.pack_start(cell, True)
-    #lang.add_attribute(cell, 'text', 0)
-    return lang
-  
-  def _disable_button(self, sel, button):
-    'Disable `buttons` if selection is empty.'
-    button.set_sensitive(sel.count_selected_rows() > 0)
   
   def _paste_as_text(self, *args):
     'Dialog to paste full lyrics.'
