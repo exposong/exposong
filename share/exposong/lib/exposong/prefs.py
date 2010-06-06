@@ -51,7 +51,7 @@ class PrefsDialog(gtk.Dialog):
 schedules and background images are stored."))
     
     gui.append_section_title(table, _("Legal"), 1)
-    g_ccli = gui.append_text(table, "CCLI #", config.get("general","ccli"), 2)
+    g_ccli = gui.append_entry(table, "CCLI #", config.get("general","ccli"), 2)
     
     notebook.append_page(table, gtk.Label( _("General") ))
     

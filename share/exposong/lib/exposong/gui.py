@@ -25,12 +25,12 @@ _WIDGET_SPACING = 4
 def Table(rows):
   'Returns a gtk Table.'
   table = gtk.Table(rows, 4)
-  table.set_row_spacings(10)
-  table.set_border_width(10)
+  table.set_row_spacings(8)
+  table.set_border_width(6)
   return table
 
-def append_text(table, label, value, top, max_len = 0):
-  'Adds a text setting and returns the text widget.'
+def append_entry(table, label, value, top, max_len = 0):
+  'Adds a text entry widget to a table and returns it.'
   set_label(table, label, top)
   
   entry = gtk.Entry(max_len)
@@ -39,8 +39,22 @@ def append_text(table, label, value, top, max_len = 0):
   table.attach(entry, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, _WIDGET_SPACING)
   return entry
 
+def append_textview(table, label, value, top):
+  'Adds a textview widget to a table and returns it'
+  set_label(table, label, top)
+  
+  textview = gtk.TextView()
+  textview.set_size_request(250, 200)
+  if value:
+    textview.get_buffer().set_text(value)
+  scroll = gtk.ScrolledWindow()
+  scroll.add(textview)
+  scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+  table.attach(scroll, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL,
+      gtk.EXPAND|gtk.FILL, _WIDGET_SPACING)
+
 def append_file(table, label, value, top):
-  'Adds a file setting and returns the file widget.'
+  'Adds a file widget to a table and returns it.'
   set_label(table, label, top)
   
   filech = gtk.FileChooserButton( _("Choose File") )
@@ -53,7 +67,7 @@ def append_file(table, label, value, top):
   return filech
 
 def append_folder(table, label, value, top):
-  'Adds a folder setting and returns the folder widget.'
+  'Adds a folder widget to a table and returns it.'
   set_label(table, label, top)
   
   filech = gtk.FileChooserButton( _("Choose Folder") )
@@ -67,7 +81,7 @@ def append_folder(table, label, value, top):
   return filech
 
 def append_color(table, label, value, top, alpha=False):
-  'Adds a color setting and returns the color widget.'
+  'Adds a color widget to a table and returns it.'
   set_label(table, label, top)
   
   if isinstance(value[0], tuple):
@@ -89,7 +103,7 @@ def append_color(table, label, value, top, alpha=False):
     return button
 
 def append_spinner(table, label, adjustment, top):
-  'Adds a spinner setting and returns the spinner widget.'
+  'Adds a spinner widget to a table and returns it.'
   set_label(table, label, top)
   
   spinner = gtk.SpinButton(adjustment, 2.0)
@@ -97,7 +111,7 @@ def append_spinner(table, label, adjustment, top):
   return spinner
 
 def append_combo(table, label, options, value, top):
-  'Adds a combo setting and returns the combo widget.'
+  'Adds a combo widget to a table and returns it.'
   set_label(table, label, top)
   
   combo = gtk.combo_box_new_text()
@@ -109,7 +123,7 @@ def append_combo(table, label, options, value, top):
   return combo
 
 def append_combo2(table, label, options, value, top):
-  '''Adds a combo setting with translation and returns the combo widget.
+  '''Adds a combo widget to a table and returns it.
   
   options: a list of tuples containing the stored value as a string and the
   translated string.'''
@@ -130,7 +144,7 @@ def append_combo2(table, label, options, value, top):
   return combo
 
 def append_radio(table, label, active, top, group = None):
-  'Adds a radio setting and returns the radio widget.'
+  'Adds a radio widget to a table and returns it.'
   radio = gtk.RadioButton(group, label)
   radio.set_alignment(0.0, 0.5)
   radio.set_active(active)
@@ -172,8 +186,8 @@ def set_label(table, label, top):
     label = gtk.Label(label)
     label.set_alignment(0.0, 0.0)
   if isinstance(label, gtk.Widget):
-    table.attach(label, 1, 2, top, top+1, gtk.FILL, 0, _LABEL_SPACING)
+    table.attach(label, 1, 2, top, top+1, gtk.FILL, gtk.FILL, _LABEL_SPACING)
 
 def treesel_disable_widget(sel, widget):
-  'Disable `widget` if selection is empty.'
+  'Disable `widget` if a tree selection is empty.'
   widget.set_sensitive(sel.count_selected_rows() > 0)

@@ -208,7 +208,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     vbox.pack_start(text_scroll, True, True)
     
     table = gui.Table(1)
-    self._fields['verse_order'] = gui.append_text(table, _("Verse Order:"),
+    self._fields['verse_order'] = gui.append_entry(table, _("Verse Order:"),
         " ".join(self.song.props.verse_order), 0)
     vbox.pack_start(table, False, True)
     
@@ -307,7 +307,14 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     scroll.add(author_list)
     scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
     vbox.pack_start(scroll, True, True)
-    notebook.append_page(vbox, gtk.Label( _('Author')) )
+    table = gui.Table(2)
+    self._fields['copyright'] = gui.append_entry(table, _('Copyright:'),
+        self.song.props.copyright, 0)
+    self._fields['ccli_no'] = gui.append_entry(table, _("CCLI Number:"),
+        self.song.props.ccli_no, 1)
+    vbox.pack_start(table, False, True)
+    notebook.append_page(vbox, gtk.Label( _('Ownership')) )
+    
     
     #Theme field
     vbox = gtk.VBox()
@@ -404,25 +411,30 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     scroll.add(songbook_list)
     scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
     vbox.pack_start(scroll, True, True)
-    notebook.append_page(vbox, gtk.Label( _('Songbook')) )
     
-    #Other
-    table = gui.Table(20)
-    
-    self._fields['copyright'] = gui.append_text(table, _("Copyright:"),
-        self.song.props.copyright, 0)
-    self._fields['ccli_no'] = gui.append_text(table, _("CCLI Number:"),
-        self.song.props.ccli_no, 1)
-    self._fields['tempo'] = gui.append_text(table, _("Tempo:"),
-        self.song.props.tempo, 2)
+    table = gui.Table(4)
+    self._fields['transpos'] = gui.append_spinner(table, _("Transposition:"),
+        gtk.Adjustment(int(self.song.props.transposition), -12, 12), 0)
+    self._fields['tempo'] = gui.append_entry(table, _("Tempo:"),
+        self.song.props.tempo, 1)
     # TODO Put a spinner for BPM, Combo for a string setting on same line.
     self._fields['tempo_type'] = gui.append_combo(table, _("Tempo Type:"),
-        (_("bpm"), _("Text")), self.song.props.tempo_type, 3)
-    self._fields['release_date'] = gui.append_text(table, _("Release Date:"),
-        self.song.props.release_date, 4)
-    self._fields['transpos'] = gui.append_spinner(table, _("Transposition:"),
-        gtk.Adjustment(int(self.song.props.transposition), -12, 12), 5)
+        (_("bpm"), _("Text")), self.song.props.tempo_type, 2)
+    key_list = ('Ab', 'A', 'A#', 'Bb', 'B', 'C', 'C#', 'Db', 'D', 'D#', 'Eb',
+        'E', 'F', 'F#', 'Gb', 'G', 'G#')
+    self._fields['key'] = gui.append_combo(table, _('Key:'), key_list,
+        self.song.props.key, 3)
+    vbox.pack_start(table, False, True)
     
+    notebook.append_page(vbox, gtk.Label( _('Music Info')) )
+    
+    #Other
+    table = gui.Table(2)
+    # TODO Change release_date to calendar
+    self._fields['release_date'] = gui.append_entry(table, _("Release Date:"),
+        self.song.props.release_date, 0)
+    self._fields['comments'] = gui.append_textview(table, _('Comments:'),
+        '\n'.join(self.song.props.comments), 1)
     notebook.append_page(table, gtk.Label(_("Other")))
     
     _abstract.Presentation._edit_tabs(self, notebook, parent)
@@ -440,15 +452,6 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     #  self.slides.append(model.get_value(itr,0))
     #  itr = model.iter_next(itr)
     del self._slideToolbar
-  
-  def _edit_treeview_cell(self, cell, path, new_text, model, column):
-    "Change the value of a cell."
-    model.set_value(model.get_iter(path), column, new_text)
-  
-  def _add_treeview_row(self, button, treeview):
-    model = treeview.get_model()
-    itr = model.append()
-    treeview.set_cursor(model.get_path(itr), treeview.get_column(0), True)
   
   def _del_treeview_row(self, button, treeview):
     (model, itr) = treeview.get_selection().get_selected()
@@ -483,7 +486,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
       if model.get_value(itr,1):
         lang_value = model.get_value(itr,1)
     
-    title = gui.append_text(table, _("Title:"), title_value, 0)
+    title = gui.append_entry(table, _("Title:"), title_value, 0)
     lang = gui.append_language_combo(table, lang_value, 1)
     dialog.vbox.show_all()
     
@@ -535,7 +538,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
       author_value = model.get_value(itr,0)
       type_value = model.get_value(itr,1)
       lang_value = model.get_value(itr,2)
-    author = gui.append_text(table, _('Author Name:'), author_value, 0)
+    author = gui.append_entry(table, _('Author Name:'), author_value, 0)
     type = gui.append_combo2(table, _('Author Type:'),
         (('', _("None")),) + tuple(auth_types.iteritems()), type_value, 1)
     tmodel = type.get_model()
@@ -596,7 +599,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
         dialog.set_title( _('Editing Theme "%s"') % model.get_value(itr,0) )
       theme_value = model.get_value(itr,0)
       lang_value = model.get_value(itr,1)
-    theme = gui.append_text(table, _('Theme Name:'), theme_value, 0)
+    theme = gui.append_entry(table, _('Theme Name:'), theme_value, 0)
     lang = gui.append_language_combo(table, lang_value, 1)
     dialog.vbox.show_all()
     
@@ -647,8 +650,8 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
         dialog.set_title( _('Editing Songbook "%s"') % model.get_value(itr,0) )
       songbook_value = model.get_value(itr,0)
       entry_value = model.get_value(itr,1)
-    songbook = gui.append_text(table, _('Songbook Name:'), songbook_value, 0)
-    entry = gui.append_text(table, _('Entry:'), entry_value, 1)
+    songbook = gui.append_entry(table, _('Songbook Name:'), songbook_value, 0)
+    entry = gui.append_entry(table, _('Entry:'), entry_value, 1)
     dialog.vbox.show_all()
     
     while True:
