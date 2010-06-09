@@ -52,6 +52,7 @@ def append_textview(table, label, value, top):
   scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
   table.attach(scroll, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL,
       gtk.EXPAND|gtk.FILL, _WIDGET_SPACING)
+  return textview
 
 def append_file(table, label, value, top):
   'Adds a file widget to a table and returns it.'

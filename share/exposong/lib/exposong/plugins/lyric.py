@@ -259,9 +259,18 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     scroll.add(title_list)
     scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
     vbox.pack_start(scroll, True, True)
+    table = gui.Table(3)
+    self._fields['variant'] = gui.append_entry(table, _("Variant:"),
+        self.song.props.variant, 0)
+    self._fields['custom_version'] = gui.append_entry(table,
+        _("Custom Version:"), self.song.props.custom_version, 1)
+    # TODO Change release_date to calendar
+    self._fields['release_date'] = gui.append_entry(table, _("Release Date:"),
+        self.song.props.release_date, 2)
+    vbox.pack_start(table, False, True)
     notebook.append_page(vbox, gtk.Label( _('Title')) )
     
-    #Author field
+    #Ownership Tab
     vbox = gtk.VBox()
     self._fields['author'] = gtk.ListStore(gobject.TYPE_STRING,
         gobject.TYPE_STRING, gobject.TYPE_STRING)
@@ -307,11 +316,13 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     scroll.add(author_list)
     scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
     vbox.pack_start(scroll, True, True)
-    table = gui.Table(2)
+    table = gui.Table(3)
     self._fields['copyright'] = gui.append_entry(table, _('Copyright:'),
         self.song.props.copyright, 0)
     self._fields['ccli_no'] = gui.append_entry(table, _("CCLI Number:"),
         self.song.props.ccli_no, 1)
+    self._fields['publisher'] = gui.append_entry(table, _("Publisher:"),
+        self.song.props.publisher, 2)
     vbox.pack_start(table, False, True)
     notebook.append_page(vbox, gtk.Label( _('Ownership')) )
     
@@ -366,6 +377,11 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     scroll.add(theme_list)
     scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
     vbox.pack_start(scroll, True, True)
+    
+    table = gui.Table(1)
+    self._fields['keywords'] = gui.append_entry(table, _("Keywords:"),
+        self.song.props.keywords, 0)
+    vbox.pack_start(table, False, True)
     notebook.append_page(vbox, gtk.Label( _('Theme')) )
     
     #Songbook field
@@ -413,8 +429,9 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     vbox.pack_start(scroll, True, True)
     
     table = gui.Table(4)
-    self._fields['transpos'] = gui.append_spinner(table, _("Transposition:"),
-        gtk.Adjustment(int(self.song.props.transposition), -12, 12), 0)
+    self._fields['transposition'] = gui.append_spinner(table,
+        _("Transposition:"), gtk.Adjustment(int(self.song.props.transposition),
+        -12, 12), 0)
     self._fields['tempo'] = gui.append_entry(table, _("Tempo:"),
         self.song.props.tempo, 1)
     # TODO Put a spinner for BPM, Combo for a string setting on same line.
@@ -425,24 +442,51 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     self._fields['key'] = gui.append_combo(table, _('Key:'), key_list,
         self.song.props.key, 3)
     vbox.pack_start(table, False, True)
-    
     notebook.append_page(vbox, gtk.Label( _('Music Info')) )
     
     #Other
-    table = gui.Table(2)
-    # TODO Change release_date to calendar
-    self._fields['release_date'] = gui.append_entry(table, _("Release Date:"),
-        self.song.props.release_date, 0)
+    table = gui.Table(1)
     self._fields['comments'] = gui.append_textview(table, _('Comments:'),
-        '\n'.join(self.song.props.comments), 1)
+        '\n'.join(self.song.props.comments), 0)
     notebook.append_page(table, gtk.Label(_("Other")))
     
     _abstract.Presentation._edit_tabs(self, notebook, parent)
   
   def _edit_save(self):
     'Save the fields if the user clicks ok.'
+    self.song.props.verse_order = self._fields['verse_order'].get_text().split()
+    self.song.props.variant = self._fields['variant'].get_text()
+    self.song.props.custom_version = self._fields['custom_version'].get_text()
+    self.song.props.release_date = self._fields['release_date'].get_text()
     self.song.props.copyright = self._fields['copyright'].get_text()
-    self.song.props.order = self._fields['order'].get_text().split()
+    self.song.props.ccli_no = self._fields['ccli_no'].get_text()
+    self.song.props.publisher = self._fields['publisher'].get_text()
+    self.song.props.keywords = self._fields['keywords'].get_text()
+    self.song.props.transposition = self._fields['transposition'].get_text()
+    self.song.props.tempo = self._fields['tempo'].get_text()
+    self.song.props.tempo_type = self._fields['tempo_type'].get_active_text()
+    self.song.props.key = self._fields['key'].get_active_text()
+    
+    self.song.props.titles = []
+    for row in self._fields['title']:
+      self.song.props.titles.append(openlyrics.Title(*row))
+    
+    self.song.props.authors = []
+    for row in self._fields['author']:
+      self.song.props.authors.append(openlyrics.Author(*row))
+    
+    self.song.props.songbooks = []
+    for row in self._fields['songbook']:
+      self.song.props.songbooks.append(openlyrics.Songbook(*row))
+    
+    self.song.props.themes = []
+    for row in self._fields['theme']:
+      self.song.props.themes.append(openlyrics.Theme(*row))
+    
+    self.song.props.comments = self._fields['comments'].get_buffer().get_text(
+        *self._fields['comments'].get_buffer().get_bounds()).split('\n')
+    
+    
     
     ## TODO: Slides
     #model = self._fields['slides'].get_model()
