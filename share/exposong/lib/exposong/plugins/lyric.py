@@ -164,37 +164,42 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
   
   def _edit_tabs(self, notebook, parent):
     'Run the edit dialog for the presentation.'
+    
+    #Slides
     vbox = gtk.VBox()
-    
-    self._slideToolbar = gtk.Toolbar()
-    btn = gtk.ToolButton(gtk.STOCK_ADD)
-    btn.connect("clicked", self._slide_add_dialog, parent)
-    self._slideToolbar.insert(btn, -1)
-    btn = gtk.ToolButton(gtk.STOCK_EDIT)
-    btn.connect("clicked", self._slide_edit_dialog, parent)
-    self._slideToolbar.insert(btn, -1)
-    btn = gtk.ToolButton(gtk.STOCK_DELETE)
-    btn.connect("clicked", self._slide_delete_dialog, parent)
-    self._slideToolbar.insert(btn, -1)
-    self._slideToolbar.insert(gtk.SeparatorToolItem(), -1)
-    #btn = gtk.ToolButton(gtk.STOCK_PASTE)
-    #btn.set_label( _("Paste As Text") )
-    #btn.connect("clicked", self._paste_as_text, parent)
-    #self._slideToolbar.insert(btn, -1)
-    
-    vbox.pack_start(self._slideToolbar, False, True)
-    
-    hbox = gtk.HBox()
-    # TODO We only need to reference the model, not the view.
     self._fields['slides'] = gtk.TreeView()
     self._fields['slides'].set_enable_search(False)
     self._fields['slides'].set_reorderable(True)
+    toolbar = gtk.Toolbar()
+    button = gtk.ToolButton(gtk.STOCK_ADD)
+    button.connect("clicked", self._slide_add_dialog, parent)
+    toolbar.insert(button, -1)
+    button = gtk.ToolButton(gtk.STOCK_EDIT)
+    button.connect("clicked", self._slide_edit_dialog, parent)
+    self._fields['slides'].get_selection().connect('changed',
+        gui.treesel_disable_widget, button)
+    toolbar.insert(button, -1)
+    button = gtk.ToolButton(gtk.STOCK_DELETE)
+    button.connect("clicked", self._slide_delete_dialog, parent)
+    self._fields['slides'].get_selection().connect('changed',
+        gui.treesel_disable_widget, button)
+    toolbar.insert(button, -1)
+    toolbar.insert(gtk.SeparatorToolItem(), -1)
+    #button = gtk.ToolButton(gtk.STOCK_PASTE)
+    #button.set_label( _("Paste As Text") )
+    #button.connect("clicked", self._paste_as_text, parent)
+    #toolbar.insert(button, -1)
+    vbox.pack_start(toolbar, False, True)
+    
+    hbox = gtk.HBox()
+    # TODO We only need to reference the model, not the view.
     # Double click to edit
     self._fields['slides'].connect("row-activated", self._slide_edit_dialog, parent)
     col = gtk.TreeViewColumn( _("Slide") )
     col.set_resizable(False)
     self.slide_column(col, self._fields['slides'])
     self._fields['slides'].append_column(col)
+    self._fields['slides'].get_selection().emit('changed')
     
     # Add the slides
     slide_model = self._fields['slides'].get_model()
@@ -495,7 +500,6 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     #while itr:
     #  self.slides.append(model.get_value(itr,0))
     #  itr = model.iter_next(itr)
-    del self._slideToolbar
   
   def _del_treeview_row(self, button, treeview):
     (model, itr) = treeview.get_selection().get_selected()
@@ -722,55 +726,8 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
   
   def _paste_as_text(self, *args):
     'Dialog to paste full lyrics.'
-    dialog = gtk.Dialog(_("Editing Slide"), exposong.application.main,\
-        gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,\
-        (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
-    
-    dialog.set_border_width(4)
-    dialog.vbox.set_spacing(7)
-    hbox = gtk.HBox()
-    
-    label = gtk.Label(_("Title:"))
-    label.set_alignment(0.5, 0.5)
-    hbox.pack_start(label, False, True, 5)
-    title = gtk.Entry(80)
-    title.set_text(self._fields['title'].get_text())
-    hbox.pack_start(title, True, True)
-    
-    dialog.vbox.pack_start(hbox, False, True)
-    
-    text = gtk.TextView()
-    text.set_wrap_mode(gtk.WRAP_WORD)
-    text.get_buffer().connect("changed", self._text_changed)
-    self.set_text_buffer(text.get_buffer())
-    text_scroll = gtk.ScrolledWindow()
-    text_scroll.add(text)
-    text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-    text_scroll.set_size_request(340, 240)
-    dialog.vbox.pack_start(text_scroll, True, True)
-    
-    dialog.vbox.show_all()
-    
-    if dialog.run() == gtk.RESPONSE_ACCEPT:
-      # TODO Titles, Authors
-      bounds = text.get_buffer().get_bounds()
-      sval = text.get_buffer().get_text(bounds[0], bounds[1])
-      self.slides = []
-      for sl in sval.split("\n\n"):
-        self.slides.append(self.Slide(self, sl))
-      
-      self._fields['title'].set_text(self.get_title())
-      slide_model = self._fields['slides'].get_model()
-      slide_model.clear()
-      for sl in self.get_slide_list():
-        slide_model.append(sl)
-      
-      dialog.hide()
-      return True
-    else:
-      dialog.hide()
-      return False
+    # TODO Redo this dialog
+    pass
   
   def _is_editing_complete(self, parent):
     "Test to see if all fields have been filled which are required."
