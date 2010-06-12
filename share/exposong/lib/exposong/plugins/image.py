@@ -293,10 +293,6 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     'Return the pixbuf icon.'
     return type_icon
   
-  def set_text_buffer(self, tbuf):
-    'Sets the value of the buffer.'
-    pass
-  
   def slide_column(self, col, list_):
     'Set the column to use images.'
     col.clear()

@@ -45,9 +45,8 @@ information = {
 type_icon = gtk.gdk.pixbuf_new_from_file_at_size(
     os.path.join(RESOURCE_PATH,'pres_lyric.png'), 20, 14)
 
-title_re = re.compile(
-    "(chorus|refrain|verse|bridge|end(ing)?|soprano|alto|tenor|bass)\\b",
-    re.I)
+#TODO These do not remain in order, so when creating the pull-down, the items
+#are in arbitrary order.
 auth_types = {
   "words": _("Words"),
   "music": _("Music"),
@@ -731,6 +730,13 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
   
   def _is_editing_complete(self, parent):
     "Test to see if all fields have been filled which are required."
+    if len(self._fields['title']) == 0:
+      info_dialog = gtk.MessageDialog(parent, gtk.DIALOG_DESTROY_WITH_PARENT,
+          gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
+          _("You must enter at least one title."))
+      info_dialog.run()
+      info_dialog.destroy()
+      return False
     return _abstract.Presentation._is_editing_complete(self, parent)
   
   def to_xml(self):
@@ -769,35 +775,6 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
   def get_icon():
     'Return the pixbuf icon.'
     return type_icon
-  
-  def set_text_buffer(self, tbuf):
-    'Sets the value of a text buffer.'
-    it1 = tbuf.get_start_iter()
-    titleTag = tbuf.create_tag("titleTag", weight=pango.WEIGHT_BOLD, background="orange")
-    
-    for sl in self.slides:
-      if(hasattr(sl, 'title') and len(sl.title) > 0):
-        tbuf.insert_with_tags(it1, sl.title, titleTag)
-        tbuf.insert(it1, "\n")
-      tbuf.insert(it1, sl.get_text())
-      if(sl is not self.slides[len(self.slides)-1]):
-        tbuf.insert(it1, "\n\n")
-  
-  def _text_changed(self, tbuf):
-    it = tbuf.get_start_iter()
-    tbuf.remove_tag_by_name("titleTag", it, tbuf.get_end_iter())
-    cont = True
-    while cont:
-      end_ln = it.copy().forward_search('\n', gtk.TEXT_SEARCH_VISIBLE_ONLY)
-      if(not end_ln):
-        end_ln = tbuf.get_end_iter()
-      else:
-        end_ln = end_ln[1]
-      line = it.get_text(end_ln)
-      if(title_re.match(line, endpos=30)):
-        tbuf.apply_tag_by_name("titleTag", it, end_ln)
-              
-      cont = it.forward_line()
   
   @staticmethod
   def _has_timer():

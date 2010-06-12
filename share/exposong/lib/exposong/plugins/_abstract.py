@@ -198,13 +198,6 @@ class Presentation:
     'Gets the slide index.'
     return int(order_value)
 
-  def set_text_buffer(self, tbuf):
-    'Sets the value of a text buffer.'
-    rval = ''
-    for sl in self.slides:
-      rval += sl.get_text() + "\n\n"
-    tbuf.set_text(rval[:-2])
-  
   def matches(self, text):
     'Tests to see if the presentation matches `text`.'
     regex = re.compile("\\b"+re.escape(text), re.U|re.I)
