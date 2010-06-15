@@ -33,6 +33,7 @@ import exposong.application
 import exposong.slidelist
 from exposong.prefs import config
 import openlyrics
+import undobuffer
 
 """
 Lyric presentations.
@@ -45,8 +46,8 @@ information = {
 type_icon = gtk.gdk.pixbuf_new_from_file_at_size(
     os.path.join(RESOURCE_PATH,'pres_lyric.png'), 20, 14)
 
-#TODO These do not remain in order, so when creating the pull-down, the items
-#are in arbitrary order.
+# TODO These do not remain in order, so when creating the pull-down, the items
+# are in arbitrary order.
 auth_types = {
   "words": _("Words"),
   "music": _("Music"),
@@ -98,7 +99,12 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
           self.text = '\n'.join(lineList)
         elif len(verse.lines) == 1:
           self.text = '\n'.join(str(l) for l in verse.lines[0].lines)
-  
+    
+    def set_attributes(self, layout):
+      'Set attributes on a pango.Layout object.'
+      #TODO
+      pass
+    
     def footer_text(self):
       'Draw text on the footer.'
       jn = ['"%s"' % self.pres.title]
@@ -113,7 +119,14 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
         jn.append("Song CCLI ID# %s; CCLI# %s" % (self.pres.song.props.ccli_no,
             config.get("general", "ccli")))
       return '\n'.join(jn)
-  
+    
+    def _edit_window(self, parent):
+      editor = SlideEdit(parent, self.title, self.text)
+      if editor.changed:
+        self.title = editor.get_slide_name()
+        self.text = editor.get_slide_text()
+      return True
+    
     @staticmethod
     def get_version():
       'Return the version number of the plugin.'
@@ -163,61 +176,6 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
   
   def _edit_tabs(self, notebook, parent):
     'Run the edit dialog for the presentation.'
-    
-    #Slides
-    vbox = gtk.VBox()
-    self._fields['slides'] = gtk.TreeView()
-    self._fields['slides'].set_enable_search(False)
-    self._fields['slides'].set_reorderable(True)
-    toolbar = gtk.Toolbar()
-    button = gtk.ToolButton(gtk.STOCK_ADD)
-    button.connect("clicked", self._slide_add_dialog, parent)
-    toolbar.insert(button, -1)
-    button = gtk.ToolButton(gtk.STOCK_EDIT)
-    button.connect("clicked", self._slide_edit_dialog, parent)
-    self._fields['slides'].get_selection().connect('changed',
-        gui.treesel_disable_widget, button)
-    toolbar.insert(button, -1)
-    button = gtk.ToolButton(gtk.STOCK_DELETE)
-    button.connect("clicked", self._slide_delete_dialog, parent)
-    self._fields['slides'].get_selection().connect('changed',
-        gui.treesel_disable_widget, button)
-    toolbar.insert(button, -1)
-    toolbar.insert(gtk.SeparatorToolItem(), -1)
-    #button = gtk.ToolButton(gtk.STOCK_PASTE)
-    #button.set_label( _("Paste As Text") )
-    #button.connect("clicked", self._paste_as_text, parent)
-    #toolbar.insert(button, -1)
-    vbox.pack_start(toolbar, False, True)
-    
-    hbox = gtk.HBox()
-    # TODO We only need to reference the model, not the view.
-    # Double click to edit
-    self._fields['slides'].connect("row-activated", self._slide_edit_dialog, parent)
-    col = gtk.TreeViewColumn( _("Slide") )
-    col.set_resizable(False)
-    self.slide_column(col, self._fields['slides'])
-    self._fields['slides'].append_column(col)
-    self._fields['slides'].get_selection().emit('changed')
-    
-    # Add the slides
-    slide_model = self._fields['slides'].get_model()
-    for sl in self.get_slide_list():
-      slide_model.append(sl)
-    
-    text_scroll = gtk.ScrolledWindow()
-    text_scroll.add(self._fields['slides'])
-    text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
-    text_scroll.set_size_request(400, 250)
-    vbox.pack_start(text_scroll, True, True)
-    
-    table = gui.Table(1)
-    self._fields['verse_order'] = gui.append_entry(table, _("Verse Order:"),
-        " ".join(self.song.props.verse_order), 0)
-    vbox.pack_start(table, False, True)
-    
-    vbox.show_all()
-    notebook.insert_page(vbox, gtk.Label(_("Verses")), 0)
     
     #Title field
     vbox = gtk.VBox()
@@ -455,6 +413,14 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     notebook.append_page(table, gtk.Label(_("Other")))
     
     _abstract.Presentation._edit_tabs(self, notebook, parent)
+    
+    # Add verses and slide order.
+    text.Presentation._edit_tabs(self, notebook, parent)
+    table = gui.Table(1)
+    self._fields['verse_order'] = gui.append_entry(table, _("Verse Order:"),
+        " ".join(self.song.props.verse_order), 0)
+    notebook.get_nth_page(0).pack_start(table, False, True)
+    table.show_all()
   
   def _edit_save(self):
     'Save the fields if the user clicks ok.'
@@ -490,20 +456,17 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     self.song.props.comments = self._fields['comments'].get_buffer().get_text(
         *self._fields['comments'].get_buffer().get_bounds()).split('\n')
     
-    
-    
     ## TODO: Slides
-    #model = self._fields['slides'].get_model()
-    #itr = model.get_iter_first()
+    #itr = self._fields['slides'].get_iter_first()
     #self.slides = []
     #while itr:
-    #  self.slides.append(model.get_value(itr,0))
-    #  itr = model.iter_next(itr)
+    #  self.slides.append(self._fields['slides'].get_value(itr,0))
+    #  itr = self._fields['slides'].iter_next(itr)
   
   def _del_treeview_row(self, button, treeview):
     (model, itr) = treeview.get_selection().get_selected()
     if itr:
-      model.remove(itr)  
+      model.remove(itr)
   
   def _title_dlg_btn(self, btn, treeview, edit=False):
     "Add or edit a title."
@@ -842,3 +805,132 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     exposong.application.main.remove_accel_group(_lyrics_accel)
 
 
+#TODO Maybe inherit from text.SlideEdit?
+class SlideEdit(gtk.Dialog):
+  'Create a new window for editing a single slide.'
+  def __init__(self, parent, slide):
+    gtk.Dialog.__init__(self, _("Editing Slide"), parent,\
+        gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
+    
+    cancelbutton = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
+    cancelbutton.connect("clicked", self._quit_without_save)
+    okbutton = self.add_button(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
+    okbutton.connect("clicked", self._quit_with_save)
+    
+    self.connect("delete-event", self._quit_without_save)
+    
+    self.slide_name = slide.title
+    self.slide_text = slide.text
+    self.changed = False
+    
+    self.set_border_width(4)
+    self.vbox.set_spacing(7)
+    hbox = gtk.HBox()
+    label = gtk.Label(_("Title:"))
+    label.set_alignment(0.5,0.5)
+    hbox.pack_start(label, False, True)
+    
+    title_list = gtk.ListStore(str, str)
+    for i in range(1,5):
+      title_list.append( ("v%d"%i, "Verse %d"%i) )
+    title_list.append( ("c", "Chorus") )
+    title_list.append( ("p", "Pre-Chorus") )
+    title_list.append( ("b", "Bridge") )
+    title_list.append( ("p", "Pre-Chorus") )
+    title_list.append( ("e", "Ending") )
+    self.title_entry = gtk.ComboBoxEntry(title_list, 0)
+    self.title_entry.child.set_text(self.slide_name)
+    cell = gtk.CellRendererText()
+    self.title_entry.pack_start(cell, True)
+    self.title_entry.add_attribute(cell, 'text', 1)
+    hbox.pack_start(self.title_entry, True, True)
+    self.vbox.pack_start(hbox, False, True)
+    
+    editSlideToolbar = gtk.Toolbar()
+    self.undo_btn = gtk.ToolButton(gtk.STOCK_UNDO)
+    self.undo_btn.set_sensitive(False)
+    self.undo_btn.connect("clicked", self._undo)
+    editSlideToolbar.insert(self.undo_btn, -1)
+    self.redo_btn = gtk.ToolButton(gtk.STOCK_REDO)
+    self.redo_btn.set_sensitive(False)
+    self.redo_btn.connect("clicked", self._redo)
+    editSlideToolbar.insert(self.redo_btn, -1)
+    self.vbox.pack_start(editSlideToolbar, False, True)
+    
+    self.buffer = undobuffer.UndoableBuffer()
+    self.buffer.begin_not_undoable_action()
+    self.buffer.set_text(self.slide_text)
+    self.buffer.end_not_undoable_action()
+    self.buffer.set_modified(False)
+    self.buffer.connect("changed", self._on_text_changed)
+    
+    text = gtk.TextView()
+    text.set_wrap_mode(gtk.WRAP_WORD)
+    text.set_buffer(self.buffer)
+    text_scroll = gtk.ScrolledWindow()
+    text_scroll.add(text)
+    text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+    text_scroll.set_size_request(400, 250)
+    self.vbox.pack_start(text_scroll, True, True)
+    
+    self.vbox.show_all()
+    
+    self.run()
+  
+  def get_slide_name(self):
+    'Returns the name of the edited slide'
+    return self.slide_name
+  
+  def get_slide_text(self):
+    'Returns the text of the edited slide'
+    return self.slide_text
+  
+  def _save(self):
+    self.slide_name = self.title_entry.child.get_text()
+    bounds = self.buffer.get_bounds()
+    self.slide_text = self.buffer.get_text(bounds[0], bounds[1])
+    self.changed = True
+      
+  def _ok_to_continue(self):
+    if self.buffer.can_undo or\
+        self.title_entry.child.get_text() != self.slide_name:
+      dlg = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
+          gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO,
+          _('Unsaved Changes exist. Do you really want to continue without saving?'))
+      resp = dlg.run()
+      dlg.destroy()
+      if resp == gtk.RESPONSE_NO:
+        return False
+      elif resp == gtk.RESPONSE_YES:
+        self._save()
+    return True
+  
+  def _on_text_changed(self, event):
+    self.undo_btn.set_sensitive(self.buffer.can_undo)
+    self.redo_btn.set_sensitive(self.buffer.can_redo)
+    if self.buffer.can_undo:
+      if not self.get_title().startswith("*"):
+        self.set_title("*%s"%self.get_title())
+    else:
+      self.set_title(self.get_title().lstrip("*"))
+  
+  def _undo(self, event):
+    self.buffer.undo()
+  
+  def _redo(self, event):
+    self.buffer.redo()
+  
+  def _quit_with_save(self, event, *args):
+    if self.title_entry.child.get_text() == "":
+      info_dialog = gtk.MessageDialog(self, gtk.DIALOG_DESTROY_WITH_PARENT,
+          gtk.MESSAGE_INFO, gtk.BUTTONS_OK, _("Please enter a Title."))
+      info_dialog.run()
+      info_dialog.destroy()
+      self.title_entry.grab_focus()
+      return False
+    self._save()
+    self.destroy()
+  
+  def _quit_without_save(self, event, *args):
+    if self._ok_to_continue():
+      self.destroy()

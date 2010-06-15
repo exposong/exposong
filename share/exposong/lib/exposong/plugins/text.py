@@ -49,9 +49,10 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       _abstract.Presentation.Slide.__init__(self, pres, value)
     
     def _edit_window(self, parent):
-      slide = SlideEdit(parent, self.title, self.text)
-      self.title = slide.get_slide_name()
-      self.text = slide.get_slide_text()
+      editor = SlideEdit(parent, self)
+      if editor.changed:
+        self.title = editor.get_slide_name()
+        self.text = editor.get_slide_text()
       return True
     
     @staticmethod
@@ -94,39 +95,39 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     hbox.pack_start(self._fields['title'], True, True)
     vbox.pack_start(hbox, False, True)
     
-    # TODO Add signal detection and make these do something.
-    self._slideToolbar = gtk.Toolbar()
-    btn = gtk.ToolButton(gtk.STOCK_ADD)
-    btn.connect("clicked", self._slide_add_dialog, parent)
-    self._slideToolbar.insert(btn, -1)
-    btn = gtk.ToolButton(gtk.STOCK_EDIT)
-    btn.connect("clicked", self._slide_edit_dialog, parent)
-    self._slideToolbar.insert(btn, -1)
-    btn = gtk.ToolButton(gtk.STOCK_DELETE)
-    btn.connect("clicked", self._slide_delete_dialog, parent)
-    self._slideToolbar.insert(btn, -1)
-    self._slideToolbar.insert(gtk.SeparatorToolItem(), -1)
+    self._fields['slides'] = gtk.ListStore(gobject.TYPE_PYOBJECT, str)
+    # Add the slides
+    for sl in self.get_slide_list():
+      self._fields['slides'].append(sl)
     
-    vbox.pack_start(self._slideToolbar, False, True)
-    
-    hbox = gtk.HBox()
-    self._fields['slides'] = gtk.TreeView()
-    self._fields['slides'].set_enable_search(False)
-    self._fields['slides'].set_reorderable(True)
+    slide_list = gtk.TreeView(self._fields['slides'])
+    slide_list.set_enable_search(False)
+    slide_list.set_reorderable(True)
     # Double click to edit
-    self._fields['slides'].connect("row-activated", self._slide_edit_dialog, parent)
+    slide_list.connect("row-activated", self._slide_dlg, True)
     col = gtk.TreeViewColumn( _("Slide") )
     col.set_resizable(False)
-    self.slide_column(col, self._fields['slides'])
-    self._fields['slides'].append_column(col)
+    cell = gtk.CellRendererText()
+    col.pack_start(cell, False)
+    col.add_attribute(cell, 'markup', 1)
+    slide_list.append_column(col)
     
-    # Add the slides
-    slide_model = self._fields['slides'].get_model()
-    for sl in self.get_slide_list():
-      slide_model.append(sl)
+    toolbar = gtk.Toolbar()
+    btn = gtk.ToolButton(gtk.STOCK_ADD)
+    btn.connect("clicked", self._slide_dlg_btn, slide_list)
+    toolbar.insert(btn, -1)
+    btn = gtk.ToolButton(gtk.STOCK_EDIT)
+    btn.connect("clicked", self._slide_dlg_btn, slide_list, True)
+    toolbar.insert(btn, -1)
+    btn = gtk.ToolButton(gtk.STOCK_DELETE)
+    btn.connect("clicked", self._slide_delete_dialog, parent)
+    toolbar.insert(btn, -1)
+    toolbar.insert(gtk.SeparatorToolItem(), -1)
+    
+    vbox.pack_start(toolbar, False, True)
     
     text_scroll = gtk.ScrolledWindow()
-    text_scroll.add(self._fields['slides'])
+    text_scroll.add(slide_list)
     text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
     text_scroll.set_size_request(400, 250)
     vbox.pack_start(text_scroll, True, True)
@@ -145,13 +146,11 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
   def _edit_save(self):
     'Save the fields if the user clicks ok.'
     self._title = self._fields['title'].get_text()
-    model = self._fields['slides'].get_model()
-    itr = model.get_iter_first()
+    itr = self._fields['slides'].get_iter_first()
     self.slides = []
     while itr:
-      self.slides.append(model.get_value(itr,0))
-      itr = model.iter_next(itr)
-    del self._slideToolbar
+      self.slides.append(self._fields['slides'].get_value(itr,0))
+      itr = self._fields['slides'].iter_next(itr)
     _abstract.Presentation._edit_save(self)
   
   def _is_editing_complete(self, parent):
@@ -164,30 +163,40 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       return False
     return _abstract.Presentation._is_editing_complete(self, self)
   
-  def _slide_add_dialog(self, btn, parent):
+  def _slide_dlg_btn(self, btn, treeview, edit=False):
+    "Add or edit a title."
+    path = None
+    col = None
+    if edit:
+      (model, itr) = treeview.get_selection().get_selected()
+      path = model.get_path(itr)
+    self._slide_dlg(treeview, path, col, edit)
+  
+  def _slide_dlg(self, treeview, path, col, edit=False):
     'Create a dialog for a new slide.'
-    sl = self.Slide(self,None)
-    if(sl._edit_window(parent)):
-      sl._set_id()
-      model = self._fields['slides'].get_model()
-      model.append( (sl, sl.get_markup()) )
+    model = treeview.get_model()
+    if edit:
+      itr = model.get_iter(path)
+      if not itr:
+        return False
+      sl = model.get_value(itr, 0)
+      old_title = sl.title
+    else:
+      sl = self.Slide(self,None)
     
-  def _slide_edit_dialog(self, *args):
-    'Create a dialog for an existing slide.'
-    parent = args[len(args)-1]
-    (model, itr) = self._fields['slides'].get_selection().get_selected()
-    if not itr:
-      return False
-    sl = model.get_value(itr, 0)
-    old_title = sl.title
-    sel_path = model.get_path(itr)
-    if(sl._edit_window(parent)):
-      if(len(old_title) == 0 or old_title <> sl.title): sl._set_id()
-      model.set(itr, 0, sl, 1, sl.get_markup())
+    if sl._edit_window(treeview.get_toplevel()):
+      if edit:
+        if len(old_title) == 0 or old_title <> sl.title:
+          sl._set_id()
+        model.set(itr, 0, sl, 1, sl.get_markup())
+      else:
+        sl._set_id()
+        model.append( (sl, sl.get_markup()) )
     
   def _slide_delete_dialog(self, btn, parent):
     'Remove the selected slide.'
-    (model, itr) = self._fields['slides'].get_selection().get_selected()
+    # TODO
+    #(model, itr) = self._fields['slides'].get_selection().get_selected()
     if not itr:
       return False
     model.remove(itr)
@@ -271,7 +280,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
 
 class SlideEdit(gtk.Dialog):
   'Create a new window for editing a single slide.'
-  def __init__(self, parent, slide_name, slide_text):
+  def __init__(self, parent, slide):
     gtk.Dialog.__init__(self, _("Editing Slide"), parent,\
         gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
     
@@ -282,9 +291,9 @@ class SlideEdit(gtk.Dialog):
     
     self.connect("delete-event", self._quit_without_save)
     
-    
-    self.slide_name = slide_name
-    self.slide_text = slide_text
+    self.slide_name = slide.title
+    self.slide_text = slide.text
+    self.changed = False
     
     self.set_border_width(4)
     self.vbox.set_spacing(7)
@@ -294,7 +303,7 @@ class SlideEdit(gtk.Dialog):
     hbox.pack_start(label, False, True)
     
     self.title_entry = gtk.Entry()
-    self.title_entry.set_text(slide_name)
+    self.title_entry.set_text(self.slide_name)
     hbox.pack_start(self.title_entry, True, True)
     self.vbox.pack_start(hbox, False, True)
     
@@ -341,6 +350,7 @@ class SlideEdit(gtk.Dialog):
     self.slide_name = self.title_entry.get_text()
     bounds = self.buffer.get_bounds()
     self.slide_text = self.buffer.get_text(bounds[0], bounds[1])
+    self.changed = True
       
   def _ok_to_continue(self):
     if self.buffer.can_undo or\

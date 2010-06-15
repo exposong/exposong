@@ -82,6 +82,10 @@ class Presentation:
         node.setAttribute("id", self.id)
       node.appendChild( document.createTextNode(self.text) )
     
+    def set_attributes(self, layout):
+      'Set attributes on a pango.Layout object.'
+      return NotImplemented
+    
     def header_text(self):
       'Draw on the header.'
       return NotImplemented
@@ -335,6 +339,7 @@ class Presentation:
     text_cr = gtk.CellRendererText()
     col.pack_start(text_cr, False)
     col.add_attribute(text_cr, 'markup', 1)
+    #TODO Should we be setting the model here?
     list_.set_model(gtk.ListStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING))
   
   def get_slide_list(self):

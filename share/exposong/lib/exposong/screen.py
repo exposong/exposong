@@ -92,12 +92,12 @@ class Screen:
         scr_geom = screen.get_monitor_geometry(0)
         parent.move(0,0)
         geometry = (scr_geom.width/2, scr_geom.height/2,
-                    scr_geom.width/2, scr_geom.height/2)
+            scr_geom.width/2, scr_geom.height/2)
     self.window.move(geometry[0], geometry[1])
     self.window.resize(geometry[2], geometry[3])
     self.aspect = float(geometry[2])/geometry[3]
     self.preview.set_size_request(int(preview_height*self.aspect),
-                                  preview_height)
+        preview_height)
   
   #def set_background(self, **keys):
   # 'Set the background color.'
@@ -195,8 +195,8 @@ class Screen:
       if not hasattr(self,"_logo_pbuf"):
         try:
           self._logo_pbuf = gtk.gdk.pixbuf_new_from_file_at_size(
-              config.get("screen", "logo"),
-                  int(bounds[0]/1.5), int(bounds[1]/1.5))
+              config.get("screen", "logo"), int(bounds[0]/1.5),
+              int(bounds[1]/1.5))
         except gobject.GError:
           print "Error: Could not open logo file."
           self._logo_pbuf = None
