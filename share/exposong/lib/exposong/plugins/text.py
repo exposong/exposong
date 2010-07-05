@@ -50,6 +50,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     
     def _edit_window(self, parent):
       editor = SlideEdit(parent, self)
+      editor.run()
       if editor.changed:
         self.title = editor.get_slide_name()
         self.text = editor.get_slide_text()
@@ -128,7 +129,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     
     text_scroll = gtk.ScrolledWindow()
     text_scroll.add(slide_list)
-    text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+    text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
     text_scroll.set_size_request(400, 250)
     vbox.pack_start(text_scroll, True, True)
     
@@ -182,7 +183,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       sl = model.get_value(itr, 0)
       old_title = sl.title
     else:
-      sl = self.Slide(self,None)
+      sl = self.Slide(self, None)
     
     if sl._edit_window(treeview.get_toplevel()):
       if edit:
@@ -291,19 +292,19 @@ class SlideEdit(gtk.Dialog):
     
     self.connect("delete-event", self._quit_without_save)
     
-    self.slide_name = slide.title
+    self.slide_title = slide.title
     self.slide_text = slide.text
     self.changed = False
     
     self.set_border_width(4)
     self.vbox.set_spacing(7)
     hbox = gtk.HBox()
-    label = gtk.Label(_("Title:"))
-    label.set_alignment(0.5,0.5)
-    hbox.pack_start(label, False, True)
+    self._title_label = gtk.Label(_("Title:"))
+    self._title_label.set_alignment(0.5,0.5)
+    hbox.pack_start(self._title_label, False, True)
     
     self.title_entry = gtk.Entry()
-    self.title_entry.set_text(self.slide_name)
+    self.title_entry.set_text(self.slide_title)
     hbox.pack_start(self.title_entry, True, True)
     self.vbox.pack_start(hbox, False, True)
     
@@ -318,16 +319,16 @@ class SlideEdit(gtk.Dialog):
     editSlideToolbar.insert(self.redo_btn, -1)
     self.vbox.pack_start(editSlideToolbar, False, True)
     
-    self.buffer = undobuffer.UndoableBuffer()
-    self.buffer.begin_not_undoable_action()
-    self.buffer.set_text(self.slide_text)
-    self.buffer.end_not_undoable_action()
-    self.buffer.set_modified(False)
-    self.buffer.connect("changed", self._on_text_changed)
+    self._buffer = undobuffer.UndoableBuffer()
+    self._buffer.begin_not_undoable_action()
+    self._buffer.set_text(self.slide_text)
+    self._buffer.end_not_undoable_action()
+    self._buffer.set_modified(False)
+    self._buffer.connect("changed", self._on_text_changed)
     
     text = gtk.TextView()
-    text.set_wrap_mode(gtk.WRAP_WORD)
-    text.set_buffer(self.buffer)
+    text.set_wrap_mode(gtk.WRAP_NONE)
+    text.set_buffer(self._buffer)
     text_scroll = gtk.ScrolledWindow()
     text_scroll.add(text)
     text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -335,26 +336,29 @@ class SlideEdit(gtk.Dialog):
     self.vbox.pack_start(text_scroll, True, True)
     
     self.vbox.show_all()
-    
-    self.run()
   
   def get_slide_name(self):
     'Returns the name of the edited slide'
-    return self.slide_name
+    return self.slide_title
   
   def get_slide_text(self):
     'Returns the text of the edited slide'
     return self.slide_text
   
+  def set_slide_title_editable(self, editable=True):
+    'Should be False when using "Edit current Slide"'
+    self._title_entry.set_sensitive(False)
+    self._title_label.set_sensitive(False)
+  
   def _save(self):
-    self.slide_name = self.title_entry.get_text()
-    bounds = self.buffer.get_bounds()
-    self.slide_text = self.buffer.get_text(bounds[0], bounds[1])
+    self.slide_title = self.title_entry.get_text()
+    bounds = self._buffer.get_bounds()
+    self.slide_text = self._buffer.get_text(bounds[0], bounds[1])
     self.changed = True
       
   def _ok_to_continue(self):
-    if self.buffer.can_undo or\
-        self.title_entry.get_text() != self.slide_name:
+    if self._buffer.can_undo or\
+        self.title_entry.get_text() != self.slide_title:
       dlg = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
           gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO,
           _('Unsaved Changes exist. Do you really want to continue without saving?'))
@@ -362,24 +366,22 @@ class SlideEdit(gtk.Dialog):
       dlg.destroy()
       if resp == gtk.RESPONSE_NO:
         return False
-      elif resp == gtk.RESPONSE_YES:
-        self._save()
     return True
   
   def _on_text_changed(self, event):
-    self.undo_btn.set_sensitive(self.buffer.can_undo)
-    self.redo_btn.set_sensitive(self.buffer.can_redo)
-    if self.buffer.can_undo:
+    self.undo_btn.set_sensitive(self._buffer.can_undo)
+    self.redo_btn.set_sensitive(self._buffer.can_redo)
+    if self._buffer.can_undo:
       if not self.get_title().startswith("*"):
         self.set_title("*%s"%self.get_title())
     else:
       self.set_title(self.get_title().lstrip("*"))
   
   def _undo(self, event):
-    self.buffer.undo()
+    self._buffer.undo()
   
   def _redo(self, event):
-    self.buffer.redo()
+    self._buffer.redo()
   
   def _quit_with_save(self, event, *args):
     if self.title_entry.get_text() == "":

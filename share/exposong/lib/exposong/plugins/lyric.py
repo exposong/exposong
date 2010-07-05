@@ -121,7 +121,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
       return '\n'.join(jn)
     
     def _edit_window(self, parent):
-      editor = SlideEdit(parent, self.title, self.text)
+      editor = SlideEdit(parent, self)
       if editor.changed:
         self.title = editor.get_slide_name()
         self.text = editor.get_slide_text()

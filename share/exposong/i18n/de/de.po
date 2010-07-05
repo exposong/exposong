@@ -201,7 +201,7 @@ msgstr "Allgemein"
 
 #: share/exposong/lib/exposong/prefs.py:69
 msgid "Font"
-msgstr "Schriftart"
+msgstr "Schrift"
 
 #: share/exposong/lib/exposong/prefs.py:70
 msgid "Text Color"
