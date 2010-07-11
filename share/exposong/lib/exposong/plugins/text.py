@@ -280,7 +280,9 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
 
 
 class SlideEdit(gtk.Dialog):
-  'Create a new window for editing a single slide.'
+  """Create a new window for editing a single slide.
+     Contains a title field, a toolbar and a TextView.
+  """
   def __init__(self, parent, slide):
     gtk.Dialog.__init__(self, _("Editing Slide"), parent,\
         gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
@@ -298,32 +300,19 @@ class SlideEdit(gtk.Dialog):
     
     self.set_border_width(4)
     self.vbox.set_spacing(7)
-    hbox = gtk.HBox()
-    self._title_label = gtk.Label(_("Title:"))
-    self._title_label.set_alignment(0.5,0.5)
-    hbox.pack_start(self._title_label, False, True)
     
-    self.title_entry = gtk.Entry()
-    self.title_entry.set_text(self.slide_title)
-    hbox.pack_start(self.title_entry, True, True)
-    self.vbox.pack_start(hbox, False, True)
+    # Title
+    self.vbox.pack_start(self._add_title_box(), False, True)
     
-    editSlideToolbar = gtk.Toolbar()
-    self.undo_btn = gtk.ToolButton(gtk.STOCK_UNDO)
-    self.undo_btn.set_sensitive(False)
-    self.undo_btn.connect("clicked", self._undo)
-    editSlideToolbar.insert(self.undo_btn, -1)
-    self.redo_btn = gtk.ToolButton(gtk.STOCK_REDO)
-    self.redo_btn.set_sensitive(False)
-    self.redo_btn.connect("clicked", self._redo)
-    editSlideToolbar.insert(self.redo_btn, -1)
-    self.vbox.pack_start(editSlideToolbar, False, True)
+    # Toolbar
+    self._toolbar = gtk.Toolbar()
+    self.undo_btn = self._add_toolbar_item(gtk.ToolButton(gtk.STOCK_UNDO),
+                                           self._undo, False)
+    self.redo_btn = self._add_toolbar_item(gtk.ToolButton(gtk.STOCK_REDO),
+                                           self._redo, False)
+    self.vbox.pack_start(self._toolbar, False, True)
     
-    self._buffer = undobuffer.UndoableBuffer()
-    self._buffer.begin_not_undoable_action()
-    self._buffer.set_text(self.slide_text)
-    self._buffer.end_not_undoable_action()
-    self._buffer.set_modified(False)
+    self._buffer = self._add_buffer()
     self._buffer.connect("changed", self._on_text_changed)
     
     text = gtk.TextView()
@@ -336,6 +325,33 @@ class SlideEdit(gtk.Dialog):
     self.vbox.pack_start(text_scroll, True, True)
     
     self.vbox.show_all()
+    
+  
+  def _add_title_box(self):
+    hbox = gtk.HBox()
+    self._title_label = gtk.Label(_("Title:"))
+    self._title_label.set_alignment(0.5,0.5)
+    hbox.pack_start(self._title_label, False, True)
+    
+    self._title_entry = gtk.Entry()
+    self._title_entry.set_text(self.slide_title)
+    hbox.pack_start(self._title_entry, True, True)
+    return hbox
+    
+  def _add_toolbar_item(self, toolbutton, proxy, sensitive=True):
+    btn = toolbutton
+    btn.set_sensitive(False)
+    btn.connect("clicked", proxy)
+    self._toolbar.insert(btn, -1)
+    return btn
+  
+  def _add_buffer(self):
+    buffer = undobuffer.UndoableBuffer()
+    buffer.begin_not_undoable_action()
+    buffer.set_text(self.slide_text)
+    buffer.end_not_undoable_action()
+    buffer.set_modified(False)
+    return buffer
   
   def get_slide_title(self):
     'Returns the title of the edited slide'
@@ -345,20 +361,15 @@ class SlideEdit(gtk.Dialog):
     'Returns the text of the edited slide'
     return self.slide_text
   
-  def set_slide_title_editable(self, editable=True):
-    'Should be False when using "Edit current Slide"'
-    self._title_entry.set_sensitive(editable)
-    self._title_label.set_sensitive(editable)
-  
   def _save(self):
-    self.slide_title = self.title_entry.get_text()
+    self.slide_title = self._get_title_value()
     bounds = self._buffer.get_bounds()
     self.slide_text = self._buffer.get_text(bounds[0], bounds[1])
     self.changed = True
       
   def _ok_to_continue(self):
     if self._buffer.can_undo or\
-        self.title_entry.get_text() != self.slide_title:
+        self._get_title_value() != self.slide_title:
       dlg = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
           gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO,
           _('Unsaved Changes exist. Do you really want to continue without saving?'))
@@ -382,14 +393,17 @@ class SlideEdit(gtk.Dialog):
   
   def _redo(self, event):
     self._buffer.redo()
+    
+  def _get_title_value(self):
+    return self._title_entry.get_text()
   
   def _quit_with_save(self, event, *args):
-    if self.title_entry.get_text() == "":
+    if self._get_title_value() == "":
       info_dialog = gtk.MessageDialog(self, gtk.DIALOG_DESTROY_WITH_PARENT,
           gtk.MESSAGE_INFO, gtk.BUTTONS_OK, _("Please enter a Title."))
       info_dialog.run()
       info_dialog.destroy()
-      self.title_entry.grab_focus()
+      self._title_entry.grab_focus()
       return False
     self._save()
     self.destroy()
