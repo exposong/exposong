@@ -19,11 +19,12 @@ import gtk.gdk
 import gobject
 import xml.dom
 
-from glob import *
-from exposong import DATA_PATH
 import exposong.schedule
 import exposong.preslist
 import exposong.application
+from glob import *
+from exposong import DATA_PATH
+from exposong import statusbar
 
 schedlist = None
 DRAGDROP_SCHEDULE = [("text/treeview-path", gtk.TARGET_SAME_APP, 4121)]
@@ -160,10 +161,9 @@ class ScheduleList(gtk.TreeView):
       
       sched.append(pres)
       context.finish(True, False)
-      exposong.application.main.update_status(
-          _('Added Presentation "%(presentation)s" to Schedule "%(schedule)s"')%
-          {"presentation":pres.title, "schedule": sched.title},
-          exposong.application.main.statusbar.get_context_id("Schedule"))
+      statusbar.statusbar.output(
+          _('Added Presentation >%(presentation)s< to Schedule >%(schedule)s<')%
+          {"presentation":pres.title, "schedule": sched.title})
   
   def _on_new(self, *args):
     'Create a new schedule.'

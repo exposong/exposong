@@ -25,7 +25,7 @@ from xml.dom import minidom
 
 from exposong import RESOURCE_PATH, DATA_PATH, SHARED_FILES, HELP_URL
 from exposong import config, prefs, screen, schedlist
-from exposong import preslist, presfilter, slidelist
+from exposong import preslist, presfilter, slidelist, statusbar
 from exposong.about import About
 from exposong.schedule import Schedule # ? where to put library
 import exposong.plugins, exposong.plugins._abstract
@@ -69,9 +69,9 @@ class Main (gtk.Window):
     screen.screen.reposition(self)
     
     schedlist.schedlist = schedlist.ScheduleList()
+    preslist.presfilter = presfilter.PresFilter()
     preslist.preslist = preslist.PresList()
     slidelist.slidelist = slidelist.SlideList()
-    preslist.presfilter = presfilter.PresFilter()
     
     menu = self._create_menu()
     win_v.pack_start(menu, False)
@@ -151,8 +151,8 @@ class Main (gtk.Window):
     win_v.pack_start(self.win_h, True)
     
     ## Status bar
-    self.statusbar = gtk.Statusbar()
-    win_v.pack_end(self.statusbar, False)
+    statusbar.statusbar = statusbar.timedStatusbar()
+    win_v.pack_end(statusbar.statusbar, False)
     
     gtk.settings_get_default().set_long_property('gtk-button-images',True,\
         'application:__init__')    
@@ -163,7 +163,6 @@ class Main (gtk.Window):
     
     self.restore_window()
     self.show_all()
-    self.update_status(_("Ready."), 1)
     gobject.idle_add(self.restore_panes)
   
   def build_all(self):
@@ -332,6 +331,7 @@ class Main (gtk.Window):
       if filenm.endswith(".xml"):
         self.load_pres(os.path.join(directory, filenm))
         yield True
+    statusbar.statusbar.output(_("Ready"))
     yield False
   
   def load_sched(self, filenm):
@@ -390,16 +390,6 @@ class Main (gtk.Window):
         yield True
     schedlist.schedlist.expand_all()
     yield False
-    
-  def update_status(self, message, context_id, seconds=5):
-    'Set a notification on the statusbar'
-    msg_id = self.statusbar.push(context_id, message)
-    t = threading.Timer(seconds, self.remove_status, (msg_id, context_id))
-    t.start()
-    
-  def remove_status(self, msg_id="", context_id=""):
-    'Called to remove the statusbar notification after a number of seconds'
-    self.statusbar.remove_message(context_id, msg_id)
     
   def _on_pres_rt_click(self, widget, event):
     'The user right clicked in the presentation list area.'

@@ -52,7 +52,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       editor = SlideEdit(parent, self)
       editor.run()
       if editor.changed:
-        self.title = editor.get_slide_name()
+        self.title = editor.get_slide_title()
         self.text = editor.get_slide_text()
       return True
     
@@ -337,8 +337,8 @@ class SlideEdit(gtk.Dialog):
     
     self.vbox.show_all()
   
-  def get_slide_name(self):
-    'Returns the name of the edited slide'
+  def get_slide_title(self):
+    'Returns the title of the edited slide'
     return self.slide_title
   
   def get_slide_text(self):
@@ -347,8 +347,8 @@ class SlideEdit(gtk.Dialog):
   
   def set_slide_title_editable(self, editable=True):
     'Should be False when using "Edit current Slide"'
-    self._title_entry.set_sensitive(False)
-    self._title_label.set_sensitive(False)
+    self._title_entry.set_sensitive(editable)
+    self._title_label.set_sensitive(editable)
   
   def _save(self):
     self.slide_title = self.title_entry.get_text()
