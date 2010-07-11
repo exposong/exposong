@@ -66,6 +66,7 @@ class ExportImport(Plugin, _abstract.Menu):
         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
     dlg.add_filter(_FILTER)
     dlg.set_do_overwrite_confirmation(True)
+    dlg.set_current_folder(os.path.expanduser("~"))
     dlg.set_current_name(sched.filename.partition(".")[0]+".expo")
     if dlg.run() == gtk.RESPONSE_ACCEPT:
       exposong.application.main._save_schedules() #Make sure schedules are up to date.
@@ -85,7 +86,7 @@ class ExportImport(Plugin, _abstract.Menu):
         itr = sched.iter_next(itr)
       os.chdir(oldpath)
       tar.close()
-    dlg.hide()
+    dlg.destroy()
   
   def export_song_list(self, *args):
     'Export an alphabetical song list'
@@ -107,18 +108,17 @@ class ExportImport(Plugin, _abstract.Menu):
     dlg.destroy()
   
   def export_lib(self, *args):
-    'Export the full library to file.'
+    'Export the full library to tar-compressed file.'
     dlg = gtk.FileChooserDialog(_("Export Library"), exposong.application.main,
         gtk.FILE_CHOOSER_ACTION_SAVE, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
     dlg.add_filter(_FILTER)
     dlg.set_do_overwrite_confirmation(True)
     dlg.set_current_name(_("exposong_library.expo"))
+    dlg.set_current_folder(os.path.expanduser("~"))
     if dlg.run() == gtk.RESPONSE_ACCEPT:
       #Make sure schedules are up to date.
       exposong.application.main._save_schedules() 
-      oldpath = os.getcwd()
-      os.chdir(DATA_PATH)
       fname = dlg.get_filename()
       if not fname.endswith(".expo"):
         fname += ".expo"
@@ -126,19 +126,21 @@ class ExportImport(Plugin, _abstract.Menu):
       library = exposong.application.main.library
       itr = library.get_iter_first()
       while itr:
-        tar.add("pres/"+library.get_value(itr, 0).filename)
+        fn = library.get_value(itr, 0).filename
+        tar.add(fn, os.path.join("pres", os.path.split(fn)[1]))
         if library.get_value(itr, 0).get_type() == 'image':
           for slide in library.get_value(itr, 0).slides:
-            tar.add("image/"+slide.image.rpartition('/')[2])
+            tar.add(slide.image,
+                    os.path.join("image", os.path.split(slide.image)[1]))
         itr = library.iter_next(itr)
       model = schedlist.schedlist.get_model()
       itr = model.iter_children(schedlist.schedlist.custom_schedules)
       while itr:
-        tar.add("sched/"+model.get_value(itr, 0).filename)
+        fn = model.get_value(itr, 0).filename
+        tar.add(fn, os.path.join("sched", os.path.split(fn)[1]))
         itr = model.iter_next(itr)
-      os.chdir(oldpath)
       tar.close()
-    dlg.hide()
+    dlg.destroy()
   
   def import_file(self, *args):
     'Import a schedule or library.'
@@ -146,11 +148,12 @@ class ExportImport(Plugin, _abstract.Menu):
         gtk.FILE_CHOOSER_ACTION_OPEN, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
     dlg.add_filter(_FILTER)
+    dlg.set_current_folder(os.path.expanduser("~"))
     if dlg.run() == gtk.RESPONSE_ACCEPT:
       tar = tarfile.open(dlg.get_filename(), "r:gz")
       # Make a temporary directory so that no files are overwritten.
       tmpdir = tempfile.mkdtemp(
-          dlg.get_filename().rpartition(os.sep)[2].partition(".")[0])
+          os.path.split(dlg.get_filename())[1].rstrip(".expo"))
       tar.extractall(tmpdir)
       tar.close()
       imgs2rename = []
@@ -237,7 +240,7 @@ class ExportImport(Plugin, _abstract.Menu):
       #  else:
       #    print "Error: Not a directory ("+p1abs+")"
       #shutil.rmtree(tmpdir)
-    dlg.hide()
+    dlg.destroy()
 
   @classmethod
   def merge_menu(cls, uimanager):
