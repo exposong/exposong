@@ -44,41 +44,44 @@ def title_to_filename(title):
   new = ""
   for char in title:
     if char.isalnum():
-      new += char.lower()
+      new += char
     elif not new.endswith("_") and char not in "'\",.?":
       new += "_"
-  
+      
   return new
 
-def check_filename(title, path):
-  '''Gets a filename that is not being used.
+def check_filename(title, filepath):
+  '''
+  Checks title to match with file.
+  Deletes file if not and returns the new filename
+  If filepath is a directory, it will return the complete filepath
+  '''
+  title_filename = title_to_filename(title)
   
-  If a cur_name is supplied, it checks to see if it
-  matches the current filename, or if not, deletes the
-  file and returns the new filename.'''
-  if os.path.isdir(path):
-    directory = path
-    filename = ''
-  elif os.path.isfile(path):
-    (directory, filename) = os.path.split(path)
+  if title_filename == os.path.basename(filepath):
+    return filepath
+  elif os.path.isdir(filepath):
+    new_path = os.path.join(filepath, find_freefile(title_filename))
+  elif os.path.isfile(filepath): #title does not match
+    os.remove(filepath)
+    new_path = os.path.join(os.path.basename(filepath),
+                            find_freefile(title_filename))
   else:
-    raise ValueError('Could not find file "%s"' % path)
+    raise ValueError('Could not find file "%s"' % filepath)
   
-  tfile = title_to_filename(title)
-  match = "^"+re.escape(tfile)+"(-[0-9]+)?.xml$"
-  if not isinstance(filename, str) or not re.match(match, filename):
-    if filename:
-      # Remove the old file if the title changed.
-      os.remove(os.path.join(directory, filename))
-    path = find_freefile(os.path.join(directory,tfile+".xml"))
-  return path
+  if not new_path.endswith(".xml"):
+    new_path += ".xml"
+  
+  return new_path 
 
 def find_freefile(filename):
-  """Find an open filename.
+  """
+  Find an open filename.
   
   This makes sure the file doesn't exist, and if it does, add a -1, or -2,
   until the file won't overwrite an existing file. Needs changes to work with
-  extensions such as ".tar.gz" which have multiple periods."""
+  extensions such as ".tar.gz" which have multiple periods.
+  """
   fl = filename.rpartition(".")
   fl = [fl[0], "", "."+fl[2]]
   if fl[0] == "":

@@ -33,7 +33,10 @@ class Schedule(gtk.ListStore):
   def __init__(self, title="", filename = None, builtin = True, filter_func = None):
     gtk.ListStore.__init__(self, *exposong.preslist.PresList.get_model_args())
     self.title = title
-    self.filename = filename
+    if filename == None:
+      self.filename = os.path.join(DATA_PATH, "sched")
+    else:
+      self.filename = filename
     self.builtin = builtin
     self.filter_func = filter_func
   
