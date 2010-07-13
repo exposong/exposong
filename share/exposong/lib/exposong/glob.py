@@ -19,6 +19,7 @@ import os
 import os.path
 import random
 import string
+import unicodedata
 
 """
 Some basic functions that are useful.
@@ -38,9 +39,12 @@ def get_node_text(node):
   return re.sub('\s+',' ',"".join(rc).strip())
   
 def title_to_filename(title):
-  'Returns a filename with letters and underscores only.'
-  #TODO May need to translate foreign characters to english, or allow
-  # foreign characters in the filename.
+  """
+  Returns a filename with letters and underscores only.
+  Non-ascii-characters are translated to its ascii-equivalent
+  """
+  title = unicodedata.normalize('NFD', unicode(title)).encode('ascii', 'ignore')
+  
   new = ""
   for char in title:
     if char.isalnum():
@@ -57,21 +61,21 @@ def check_filename(title, filepath):
   If filepath is a directory, it will return the complete filepath
   '''
   title_filename = title_to_filename(title)
-  
+
   if title_filename == os.path.basename(filepath):
     return filepath
   elif os.path.isdir(filepath):
     new_path = os.path.join(filepath, find_freefile(title_filename))
   elif os.path.isfile(filepath): #title does not match
     os.remove(filepath)
-    new_path = os.path.join(os.path.basename(filepath),
+    new_path = os.path.join(os.path.dirname(filepath),
                             find_freefile(title_filename))
   else:
     raise ValueError('Could not find file "%s"' % filepath)
-  
+
   if not new_path.endswith(".xml"):
     new_path += ".xml"
-  
+
   return new_path 
 
 def find_freefile(filename):
