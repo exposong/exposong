@@ -113,8 +113,8 @@ class Main (gtk.Window):
     #### Preview and Presentation Buttons
     win_rt_btm = gtk.HBox()
     
-    bgsel = exposong.bgselect.BGSelect()
-    win_rt_btm.pack_start(bgsel, False, True, 10)
+    exposong.bgselect.bgselect = exposong.bgselect.BGSelect()
+    win_rt_btm.pack_start(exposong.bgselect.bgselect, False, True, 10)
     #wrap it so that the aspect ratio is kept
     prev_box = gtk.VBox()
     prev_aspect = gtk.AspectFrame(None, 0.5, 0.5,
@@ -175,7 +175,8 @@ class Main (gtk.Window):
     self.add_accel_group(uimanager.get_accel_group())
     
     self.main_actions = gtk.ActionGroup('main')
-    self.main_actions.add_actions([('File', None, _('_File') ),
+    self.main_actions.add_actions([
+        ('File', None, _('_File') ),
         ('Edit', None, _('_Edit') ),
         ('Schedule', None, _("_Schedule") ),
         ('Presentation', None, _('P_resentation')),
@@ -183,6 +184,7 @@ class Main (gtk.Window):
         ('Quit', gtk.STOCK_QUIT, None, None, None, self._quit),
         ('Preferences', gtk.STOCK_PREFERENCES,
             None, None, None, self._on_prefs),
+        ('file-export', None, _("Export"), "", _("Export a .expo package")),
         ('sched-new', gtk.STOCK_NEW, None, None, _("Create a new schedule"),
             schedlist.schedlist._on_new),
         ('sched-rename', None, _("_Rename"), None,
@@ -232,6 +234,8 @@ class Main (gtk.Window):
     uimanager.add_ui_from_string('''
         <menubar name="MenuBar">
           <menu action="File">
+            <menu action="file-export"/>
+            <separator/>
             <menuitem action="Quit" position="bot" />
           </menu>
           <menu action="Edit">
@@ -297,6 +301,7 @@ class Main (gtk.Window):
   
   def load_pres(self,filenm):
     'Load a single presentation.'
+    filenm = os.path.join(DATA_PATH, "pres", filenm)
     pres = None
     plugins = exposong.plugins.get_plugins_by_capability(
         exposong.plugins._abstract.Presentation)
@@ -308,7 +313,7 @@ class Main (gtk.Window):
       except exposong.plugins._abstract.WrongPresentationType, details:
         continue
       except Exception:
-        print 'Error in filename "%s".' % filenm
+        print 'Error in file "%s".' % filenm
         raise
     else:
       print '"%s" is not a presentation file.' % filenm
@@ -329,20 +334,21 @@ class Main (gtk.Window):
     dir_list = os.listdir(directory)
     for filenm in dir_list:
       if filenm.endswith(".xml"):
-        self.load_pres(os.path.join(directory, filenm))
+        self.load_pres(filenm)
         yield True
     statusbar.statusbar.output(_("Ready"))
     yield False
   
   def load_sched(self, filenm):
     'Load a single schedule.'
+    filenm = os.path.join(DATA_PATH, "sched", filenm)
     dom = None
     sched = None
     try:
       dom = minidom.parse(filenm)
     except Exception, details:
       print "Error reading schedule file (%s): %s" % (
-        os.path.join(directory,filenm), details)
+        os.path.join(filenm), details)
     if dom:
       if dom.documentElement.tagName == "schedule":
         sched = Schedule(filename=filenm)
@@ -386,7 +392,7 @@ class Main (gtk.Window):
     dir_list = os.listdir(directory)
     for filenm in dir_list:
       if filenm.endswith(".xml"):
-        self.load_sched(os.path.join(directory,filenm))
+        self.load_sched(filenm)
         yield True
     schedlist.schedlist.expand_all()
     yield False

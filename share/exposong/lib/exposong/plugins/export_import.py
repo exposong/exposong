@@ -20,6 +20,7 @@ import os.path
 import shutil
 import tempfile
 import tarfile
+import mimetypes
 
 from exposong.plugins import _abstract, Plugin
 from exposong import DATA_PATH, schedlist
@@ -55,38 +56,122 @@ class ExportImport(Plugin, _abstract.Menu):
     pass
   
   def export_sched(self, *args):
-    'Export a single schedule list to file.'
+    'Export a single schedule with belonging presentations to file.'
     sched = schedlist.schedlist.get_active_item()
     if not sched:
       return False
-    if not sched.filename:
-      sched.save()
-    dlg = gtk.FileChooserDialog(_("Export Schedule"), exposong.application.main,
+    dlg = gtk.FileChooserDialog(_("Export Current Schedule"), exposong.application.main,
         gtk.FILE_CHOOSER_ACTION_SAVE, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
     dlg.add_filter(_FILTER)
     dlg.set_do_overwrite_confirmation(True)
     dlg.set_current_folder(os.path.expanduser("~"))
-    dlg.set_current_name(sched.filename.partition(".")[0]+".expo")
+    dlg.set_current_name(os.path.basename(title_to_filename(sched.title))+".expo")
     if dlg.run() == gtk.RESPONSE_ACCEPT:
-      exposong.application.main._save_schedules() #Make sure schedules are up to date.
       oldpath = os.getcwd()
       os.chdir(DATA_PATH)
       fname = dlg.get_filename()
       if not fname.endswith(".expo"):
         fname += ".expo"
       tar = tarfile.open(fname, "w:gz")
-      tar.add("sched/"+sched.filename)
-      itr = sched.get_iter_first()
-      while itr:
-        tar.add("pres/"+sched.get_value(itr, 0).filename)
-        if sched.get_value(itr, 0).get_type() == 'image':
-          for slide in sched.get_value(itr, 0).slides:
-            tar.add("image/"+slide.image.rpartition('/')[2])
-        itr = sched.iter_next(itr)
-      os.chdir(oldpath)
+      for item in self._get_sched_list():
+        tar.add(item[0], item[1])
       tar.close()
     dlg.destroy()
+    
+  def _get_sched_list(self, *args):
+    'Returns a list with a single schedule and belonging presentations'
+    exposong.application.main._save_schedules()
+    sched = schedlist.schedlist.get_active_item()
+    sched_list = []
+    sched_list.append((os.path.join(DATA_PATH, "sched", sched.filename),
+                       os.path.join("sched", os.path.basename(sched.filename))))
+    itr = sched.get_iter_first()
+    while itr:
+      fn = os.path.basename(sched.get_value(itr, 0).filename)
+      sched_list.append((os.path.join(DATA_PATH, "pres", fn),
+                         os.path.join("pres", fn)))
+      if sched.get_value(itr, 0).get_type() == 'image':
+        for slide in sched.get_value(itr, 0).slides:
+          fn = os.path.basename(slide.image)
+          sched_list.append((os.path.join(DATA_PATH, "image", fn),
+                             os.path.join("image", fn)))
+      itr = sched.iter_next(itr)
+    return sched_list
+  
+  def export_lib(self, *args):
+    'Export the full library to tar-compressed file.'
+    dlg = gtk.FileChooserDialog(_("Export Library"), exposong.application.main,
+        gtk.FILE_CHOOSER_ACTION_SAVE, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+        gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+    dlg.add_filter(_FILTER)
+    dlg.set_do_overwrite_confirmation(True)
+    dlg.set_current_name(_("exposong_library.expo"))
+    dlg.set_current_folder(os.path.expanduser("~"))
+    if dlg.run() == gtk.RESPONSE_ACCEPT:
+      fname = dlg.get_filename()
+      if not fname.endswith(".expo"):
+        fname += ".expo"
+      tar = tarfile.open(fname, "w:gz")
+      for item in self._get_library_list():
+        tar.add(item[0], item[1])
+      tar.close()
+    dlg.destroy()
+    
+  def _get_library_list(self, *args):
+    'Returns a list with all items in pres, image and sched folder'
+    #Make sure schedules are up to date.
+    exposong.application.main._save_schedules() 
+    library = exposong.application.main.library
+    itr = library.get_iter_first()
+    lib_list = []
+    while itr:
+      fn = library.get_value(itr, 0).filename
+      lib_list.append((fn, os.path.join("pres", os.path.split(fn)[1])))
+      if library.get_value(itr, 0).get_type() == 'image':
+        for slide in library.get_value(itr, 0).slides:
+          lib_list.append((slide.image,
+                  os.path.join("image", os.path.split(slide.image)[1])))
+      itr = library.iter_next(itr)
+    model = schedlist.schedlist.get_model()
+    itr = model.iter_children(schedlist.schedlist.custom_schedules)
+    while itr:
+      fn = model.get_value(itr, 0).filename
+      lib_list.append((fn, os.path.join("sched", os.path.split(fn)[1])))
+      itr = model.iter_next(itr)
+    return lib_list
+  
+  def export_backgrounds(self, *args):
+    'Export the backgrounds to tar-compressed file'
+    dlg = gtk.FileChooserDialog(_("Export Backgrounds"), exposong.application.main,
+        gtk.FILE_CHOOSER_ACTION_SAVE, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+        gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+    dlg.add_filter(_FILTER)
+    dlg.set_do_overwrite_confirmation(True)
+    dlg.set_current_folder(os.path.expanduser("~"))
+    dlg.set_current_name(_("exposong_backgrounds.expo"))
+    if dlg.run() == gtk.RESPONSE_ACCEPT:
+      fname = dlg.get_filename()
+      if not fname.endswith(".expo"):
+        fname += ".expo"
+      tar = tarfile.open(fname, "w:gz")
+      for pic in self._get_background_list():
+        tar.add(pic[0], pic[1])
+      tar.close()
+    dlg.destroy()
+    
+  def _get_background_list(self, *args):
+    'Returns a list with all images in bg folder'
+    dir = os.path.join(DATA_PATH, "bg")
+    dir_list = os.listdir(dir)
+    image_list = []
+    for filenm in dir_list:
+      if os.path.isfile(os.path.join(dir, filenm)):
+        mime = mimetypes.guess_type(filenm)
+        if mime[0] and mime[0].startswith("image"):
+          image_list.append((os.path.join(dir, filenm),
+                             os.path.join("bg", filenm)))
+    return image_list
   
   def export_song_list(self, *args):
     'Export an alphabetical song list'
@@ -100,50 +185,18 @@ class ExportImport(Plugin, _abstract.Menu):
     if dlg.run() == gtk.RESPONSE_ACCEPT:
       fname = dlg.get_filename()
       file = open(fname, "w")
+      library = exposong.application.main.library
       songs = ""
-      for i in exposong.preslist.preslist.get_model():
-        songs += "%s\n"%i[1]
+      for i in library:
+        if i[0].get_type() == "lyric":
+          songs += "%s\n"%i[0].title
+          #TODO: non-latin chars to be recognized
       file.write(songs)
       file.close()
     dlg.destroy()
   
-  def export_lib(self, *args):
-    'Export the full library to tar-compressed file.'
-    dlg = gtk.FileChooserDialog(_("Export Library"), exposong.application.main,
-        gtk.FILE_CHOOSER_ACTION_SAVE, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-        gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
-    dlg.add_filter(_FILTER)
-    dlg.set_do_overwrite_confirmation(True)
-    dlg.set_current_name(_("exposong_library.expo"))
-    dlg.set_current_folder(os.path.expanduser("~"))
-    if dlg.run() == gtk.RESPONSE_ACCEPT:
-      #Make sure schedules are up to date.
-      exposong.application.main._save_schedules() 
-      fname = dlg.get_filename()
-      if not fname.endswith(".expo"):
-        fname += ".expo"
-      tar = tarfile.open(fname, "w:gz")
-      library = exposong.application.main.library
-      itr = library.get_iter_first()
-      while itr:
-        fn = library.get_value(itr, 0).filename
-        tar.add(fn, os.path.join("pres", os.path.split(fn)[1]))
-        if library.get_value(itr, 0).get_type() == 'image':
-          for slide in library.get_value(itr, 0).slides:
-            tar.add(slide.image,
-                    os.path.join("image", os.path.split(slide.image)[1]))
-        itr = library.iter_next(itr)
-      model = schedlist.schedlist.get_model()
-      itr = model.iter_children(schedlist.schedlist.custom_schedules)
-      while itr:
-        fn = model.get_value(itr, 0).filename
-        tar.add(fn, os.path.join("sched", os.path.split(fn)[1]))
-        itr = model.iter_next(itr)
-      tar.close()
-    dlg.destroy()
-  
   def import_file(self, *args):
-    'Import a schedule or library.'
+    'Import a schedule, backgrounds or library.'
     dlg = gtk.FileChooserDialog(_("Import"), exposong.application.main,
         gtk.FILE_CHOOSER_ACTION_OPEN, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
@@ -160,7 +213,6 @@ class ExportImport(Plugin, _abstract.Menu):
       if os.path.isdir(os.path.join(tmpdir, "image")):
         for nm in os.listdir(os.path.join(tmpdir,"image")):
           if not os.path.exists(os.path.join(DATA_PATH, "image", nm)):
-            print os.path.join(DATA_PATH, "image", nm)
             shutil.move(os.path.join(tmpdir, "image", nm),
                 os.path.join(DATA_PATH, "image", nm))
           else:
@@ -216,30 +268,18 @@ class ExportImport(Plugin, _abstract.Menu):
                 os.path.join(DATA_PATH, "sched", nm))
             exposong.application.main.load_sched(nm)
           else:
-            nm2 = find_freefile(os.path.join(DATA_PATH, "sched", nm)) \
+            nm2 = find_freefile(os.path.join(DATA_PATH, "sched", nm))\
                 .rpartition(os.sep)[2]
             shutil.move(os.path.join(tmpdir, "sched", nm),
                 os.path.join(DATA_PATH, "sched", nm2))
             exposong.application.main.load_sched(nm2)
 
       if os.path.isdir(os.path.join(tmpdir, "bg")):
-        for nm in os.listdir(tmpdir):
-          if not os.path.exists(os.path.join(DATA_PATH, "bg", nm)):
-            shutil.move(os.path.join(tmpdir, "bg", nm),
-                os.path.join(DATA_PATH, "bg", nm))
-          else:
-            nm2 = find_freefile(os.path.join(DATA_PATH, "bg", nm))
-            shutil.move(os.path.join(tmpdir, "bg", nm),
-                os.path.join(DATA_PATH, "bg", nm2))
-      #for p1 in os.listdir(tmpdir):
-      #  p1abs = os.path.join(tmpdir, p1)
-      #  if os.path.isdir(p1abs):
-      #    for p2 in os.listdir(p1abs):
-      #      flname = find_freefile(os.path.join(DATA_PATH,p1,p2))
-      #      shutil.move(os.path.join(tmpdir,p1,p2), flname)
-      #  else:
-      #    print "Error: Not a directory ("+p1abs+")"
-      #shutil.rmtree(tmpdir)
+        images = os.listdir(os.path.join(tmpdir, "bg"))
+        for i in range(len(images)):
+          images[i] = os.path.join(tmpdir, "bg", images[i])
+        exposong.bgselect.bgselect.add_images(images)
+    
     dlg.destroy()
 
   @classmethod
@@ -249,12 +289,15 @@ class ExportImport(Plugin, _abstract.Menu):
     actiongroup = gtk.ActionGroup('export-import')
     actiongroup.add_actions([('import', None, _("_Import"), None,
             _("Import a schedule or full library."), self.import_file),
-        ('export-sched', None, _("_Export Schedule"), None,
-            None, self.export_sched),
-        ('export-lib', None, _("Export _Library"), None,
+        ('export-sched', None,
+         _("_Current Schedule (and belonging presentations)"),
+         None, None, self.export_sched),
+        ('export-lib', None, _("Whole _Library"), None,
             None, self.export_lib),
-        ('export-song-list', None, _("Export _Alphabetical Song List"), None,
-            None, self.export_song_list)
+        ('export-song-list', None, _("List of all Songs (for printing)"), None,
+            None, self.export_song_list),
+        ('export-bg', None, _("_Backgrounds"), None,
+            None, self.export_backgrounds)
         ])
     uimanager.insert_action_group(actiongroup, -1)
     
@@ -262,11 +305,13 @@ class ExportImport(Plugin, _abstract.Menu):
     cls.menu_merge_id = uimanager.add_ui_from_string("""
       <menubar name="MenuBar">
         <menu action="File">
-          <separator position="top" />
-          <menuitem action="export-song-list" position="top" />
-          <menuitem action="export-sched" position="top" />
-          <menuitem action="export-lib" position="top" />
           <menuitem action="import" position="top" />
+          <menu action="file-export">
+            <menuitem action="export-lib" />
+            <menuitem action="export-sched" />
+            <menuitem action="export-bg" />
+            <menuitem action="export-song-list" />
+          </menu>
         </menu>
       </menubar>
       """)

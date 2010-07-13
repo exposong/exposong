@@ -154,17 +154,23 @@ class BGSelect (gtk.VBox):
         buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK,
         gtk.RESPONSE_ACCEPT))
     dlg.add_filter(fltr)
+    dlg.set_current_folder(os.path.expanduser("~"))
     dlg.set_select_multiple(True)
     if dlg.run() == gtk.RESPONSE_ACCEPT:
       images = dlg.get_filenames()
-      dlg.hide()
-      itr = None
-      for img in images:
-        newimg = find_freefile(os.path.join(DATA_PATH, 'bg', os.path.split(img)[1]))
-        shutil.copyfile(img, newimg)
-        itr = self.imgmodel.append([newimg,
-            gtk.gdk.pixbuf_new_from_file_at_size(newimg, thsz[0], thsz[1])])
-      if itr:
-        self.imgcombo.set_active_iter(itr)
+      dlg.destroy()
+      self.add_images(images)
     else:
-      dlg.hide()
+      dlg.destroy()
+
+  def add_images(self, images):
+    'Adds new images to the background selector'
+    itr = None
+    for img in images:
+      newimg = find_freefile(os.path.join(DATA_PATH, 'bg', os.path.basename(img)))
+      shutil.copyfile(img, newimg)
+      itr = self.imgmodel.append([newimg,
+          gtk.gdk.pixbuf_new_from_file_at_size(newimg, thsz[0], thsz[1])])
+    if itr:
+      self.imgcombo.set_active_iter(itr)
+    

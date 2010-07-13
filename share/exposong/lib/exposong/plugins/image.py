@@ -248,6 +248,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     fchooser = gtk.FileChooserDialog( _("Add Images"), button.get_toplevel(),\
         gtk.FILE_CHOOSER_ACTION_OPEN, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,\
         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT) )
+    fchooser.set_current_folder(os.path.expanduser("~"))
     fchooser.set_select_multiple(True)
     progress = gtk.ProgressBar()
     fchooser.set_extra_widget(progress)
