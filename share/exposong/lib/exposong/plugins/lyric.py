@@ -128,7 +128,8 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
       if editor.changed:
         self.title = editor.get_slide_title()
         self.text = editor.get_slide_text()
-      return True
+        return True
+      return False
     
     @staticmethod
     def get_version():

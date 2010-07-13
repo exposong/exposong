@@ -54,7 +54,8 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       if editor.changed:
         self.title = editor.get_slide_title()
         self.text = editor.get_slide_text()
-      return True
+        return True
+      return False
     
     @staticmethod
     def get_version():
@@ -377,6 +378,7 @@ class SlideEdit(gtk.Dialog):
       dlg.destroy()
       if resp == gtk.RESPONSE_NO:
         return False
+    self.changed = False
     return True
   
   def _on_text_changed(self, event):
