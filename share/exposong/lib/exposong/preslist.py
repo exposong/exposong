@@ -54,6 +54,9 @@ class PresList(gtk.TreeView):
     self.enable_model_drag_source(gtk.gdk.BUTTON1_MASK,
         exposong.schedlist.DRAGDROP_SCHEDULE,
         gtk.gdk.ACTION_DEFAULT | gtk.gdk.ACTION_MOVE)
+    
+  def _on_pres_added(self, model, path, iter):
+    self.set_cursor(path)
   
   def get_active_item(self):
     'Return the presentation of the currently selected item.'

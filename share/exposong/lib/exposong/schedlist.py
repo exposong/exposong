@@ -37,7 +37,8 @@ class ScheduleList(gtk.TreeView):
     gtk.TreeView.__init__(self)
     self.set_size_request(200, 190)
     #Columns: Schedule, Name
-    self.model = gtk.TreeStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING, gobject.TYPE_STRING)
+    self.model = gtk.TreeStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING,
+                               gobject.TYPE_STRING)
     self.model.set_sort_column_id(2, gtk.SORT_ASCENDING)
     self.set_model(self.model)
     self.set_enable_search(False)
@@ -114,6 +115,9 @@ class ScheduleList(gtk.TreeView):
         .set_sensitive(enable)
     exposong.application.main.main_actions.get_action("sched-delete")\
         .set_sensitive(enable)
+    
+    exposong.preslist.preslist.get_model()\
+        .connect("row-changed", exposong.preslist.preslist._on_pres_added)
   
   def _on_sched_delete(self, action):
     'Delete the selected schedule.'
@@ -186,7 +190,7 @@ class ScheduleList(gtk.TreeView):
     self.set_cursor(pathnew, self.get_column(0), True)
   
   def _on_rename(self, *args):
-    'Create a new schedule.'
+    'Rename an existing schedule.'
     (path, focus) = self.get_cursor()
     self.set_cursor(path, focus, True)
   

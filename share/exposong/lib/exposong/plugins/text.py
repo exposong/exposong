@@ -101,25 +101,26 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     # Add the slides
     for sl in self.get_slide_list():
       self._fields['slides'].append(sl)
+    self._fields['slides'].connect("row-changed", self._on_slide_added)
     
-    slide_list = gtk.TreeView(self._fields['slides'])
-    slide_list.set_enable_search(False)
-    slide_list.set_reorderable(True)
+    self._slide_list = gtk.TreeView(self._fields['slides'])
+    self._slide_list.set_enable_search(False)
+    self._slide_list.set_reorderable(True)
     # Double click to edit
-    slide_list.connect("row-activated", self._slide_dlg, True)
+    self._slide_list.connect("row-activated", self._slide_dlg, True)
     col = gtk.TreeViewColumn( _("Slide") )
     col.set_resizable(False)
     cell = gtk.CellRendererText()
     col.pack_start(cell, False)
     col.add_attribute(cell, 'markup', 1)
-    slide_list.append_column(col)
+    self._slide_list.append_column(col)
     
     toolbar = gtk.Toolbar()
     btn = gtk.ToolButton(gtk.STOCK_ADD)
-    btn.connect("clicked", self._slide_dlg_btn, slide_list)
+    btn.connect("clicked", self._slide_dlg_btn, self._slide_list)
     toolbar.insert(btn, -1)
     btn = gtk.ToolButton(gtk.STOCK_EDIT)
-    btn.connect("clicked", self._slide_dlg_btn, slide_list, True)
+    btn.connect("clicked", self._slide_dlg_btn, self._slide_list, True)
     toolbar.insert(btn, -1)
     btn = gtk.ToolButton(gtk.STOCK_DELETE)
     btn.connect("clicked", self._slide_delete_dialog, parent)
@@ -129,7 +130,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     vbox.pack_start(toolbar, False, True)
     
     text_scroll = gtk.ScrolledWindow()
-    text_scroll.add(slide_list)
+    text_scroll.add(self._slide_list)
     text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
     text_scroll.set_size_request(400, 250)
     vbox.pack_start(text_scroll, True, True)
@@ -194,6 +195,9 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       else:
         sl._set_id()
         model.append( (sl, sl.get_markup()) )
+  
+  def _on_slide_added(self, model, path, iter):
+    self._slide_list.set_cursor(path)
     
   def _slide_delete_dialog(self, btn, parent):
     'Remove the selected slide.'

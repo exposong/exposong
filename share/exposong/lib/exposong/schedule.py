@@ -162,4 +162,3 @@ class ScheduleItem:
   def get_row(self):
     'Get a row to put into the presentation list.'
     return (self,)
-
