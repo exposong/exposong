@@ -20,6 +20,7 @@ import gtk.gdk
 import gobject
 import pango
 import re
+import string
 import os.path
 import xml.dom
 import xml.dom.minidom
@@ -61,8 +62,8 @@ def key_shortcuts(accel_group, acceleratable, keyval, modifier):
   pres = exposong.slidelist.slidelist.pres
   if pres != None:
     slnum = None
-    if chr(keyval) == 'c':
-      slnum = pres.get_slide_from_order('c')
+    if chr(keyval) in string.ascii_letters:
+      slnum = pres.get_slide_from_order(chr(keyval))
     elif chr(keyval) >= '0' and chr(keyval) <= '9':
       slnum = pres.get_slide_from_order("v%s" % chr(keyval))
     if(slnum != None):
@@ -70,6 +71,9 @@ def key_shortcuts(accel_group, acceleratable, keyval, modifier):
 
 _lyrics_accel = gtk.AccelGroup()
 _lyrics_accel.connect_group(ord("c"), 0,0, key_shortcuts)
+_lyrics_accel.connect_group(ord("r"), 0,0, key_shortcuts)
+_lyrics_accel.connect_group(ord("b"), 0,0, key_shortcuts)
+_lyrics_accel.connect_group(ord("e"), 0,0, key_shortcuts)
 for i in range(1,10):
   _lyrics_accel.connect_group(ord("%d"%i), 0,0, key_shortcuts)
 
