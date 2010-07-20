@@ -216,7 +216,8 @@ class Presentation:
     'Run the edit edit_dialog for the presentation.'
     edit_dialog = gtk.Dialog(_("New Presentation"), exposong.application.main,\
         gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,\
-        (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+        #(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
     edit_dialog.set_default_size(340, 400)
     if(self.get_title()):
       edit_dialog.set_title(_('Editing "%s"') % self.get_title())
@@ -233,16 +234,13 @@ class Presentation:
     notebook.show_all()
     
     while True:
-      if edit_dialog.run() == gtk.RESPONSE_ACCEPT:
+      if edit_dialog.run():
         if self._is_editing_complete(edit_dialog):
           self._edit_save()
           del(self._fields)
           self.to_xml()
           edit_dialog.destroy()
           return True
-      else:
-        edit_dialog.destroy()
-        return False
   
   def _edit_tabs(self, notebook, parent):
     'Tabs for the dialog.'
