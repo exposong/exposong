@@ -173,28 +173,6 @@ class ExportImport(Plugin, _abstract.Menu):
                              os.path.join("bg", filenm)))
     return image_list
   
-  def export_song_list(self, *args):
-    'Export an alphabetical song list'
-    dlg = gtk.FileChooserDialog(_("Export Alphabetical Song List"),
-        exposong.application.main, gtk.FILE_CHOOSER_ACTION_SAVE,
-        (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-         gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
-    dlg.set_do_overwrite_confirmation(True)
-    dlg.set_current_name(_("alphabetical_songs.txt"))
-    dlg.set_current_folder(os.path.expanduser("~"))
-    if dlg.run() == gtk.RESPONSE_ACCEPT:
-      fname = dlg.get_filename()
-      file = open(fname, "w")
-      library = exposong.application.main.library
-      songs = ""
-      for i in library:
-        if i[0].get_type() == "lyric":
-          songs += "%s\n"%i[0].title
-          #TODO: non-latin chars to be recognized
-      file.write(songs)
-      file.close()
-    dlg.destroy()
-  
   def import_file(self, *args):
     'Import a schedule, backgrounds or library.'
     dlg = gtk.FileChooserDialog(_("Import"), exposong.application.main,
@@ -294,8 +272,6 @@ class ExportImport(Plugin, _abstract.Menu):
          None, None, self.export_sched),
         ('export-lib', None, _("Whole _Library"), None,
             None, self.export_lib),
-        ('export-song-list', None, _("List of all Songs (for printing)"), None,
-            None, self.export_song_list),
         ('export-bg', None, _("_Backgrounds"), None,
             None, self.export_backgrounds)
         ])
@@ -310,7 +286,6 @@ class ExportImport(Plugin, _abstract.Menu):
             <menuitem action="export-lib" />
             <menuitem action="export-sched" />
             <menuitem action="export-bg" />
-            <menuitem action="export-song-list" />
           </menu>
         </menu>
       </menubar>

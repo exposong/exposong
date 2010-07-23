@@ -39,6 +39,7 @@ class BGSelect (gtk.VBox):
     bgcolor1 = config.getcolor("screen","bg_color_1")
     bgcolor2 = config.getcolor("screen","bg_color_2")
     
+    
     # Image Background
     hbox = gtk.HBox()
     vbox = gtk.VBox()
@@ -46,7 +47,7 @@ class BGSelect (gtk.VBox):
     hbox.pack_start(self.imgradio, False, True, 2)
     self.imgmodel = gtk.ListStore(str, gtk.gdk.Pixbuf)
     self.imgcombo = gtk.ComboBox(self.imgmodel)
-    vbox.pack_start(self.imgcombo, True, True, 2)
+    vbox.pack_start(self.imgcombo, False, True, 2)
     self.imgcombo.set_wrap_width(2)
     cell = gtk.CellRendererPixbuf()
     self.imgcombo.pack_start(cell, True)
@@ -65,13 +66,13 @@ class BGSelect (gtk.VBox):
           path = os.path.join(directory, filenm)
           pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(path, thsz[0], thsz[1])
           itr = self.imgmodel.append([path, pixbuf])
-          if bgtype == 'image' and path == bgimage:
+          if path == bgimage:
             self.imgcombo.set_active_iter(itr)
     
     self.new_image = gtk.Button( _("Add"), gtk.STOCK_ADD, False)
     self.new_image.connect("clicked", self._on_new_image)
-    vbox.pack_start(self.new_image, False, True, 2)
-    hbox.pack_start(vbox, True, True, 2)
+    vbox.pack_start(self.new_image, False, False, 2)
+    hbox.pack_start(vbox, True, False, 2)
     self.pack_start(hbox, True, True, 2)
     
     # Gradient Background

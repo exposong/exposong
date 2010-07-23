@@ -185,6 +185,7 @@ class Main (gtk.Window):
         ('Preferences', gtk.STOCK_PREFERENCES,
             None, None, None, self._on_prefs),
         ('file-export', None, _("Export"), "", _("Export a .expo package")),
+        ('file-print', None, _("Print"), "", None),
         ('sched-new', gtk.STOCK_NEW, None, None, _("Create a new schedule"),
             schedlist.schedlist._on_new),
         ('sched-rename', None, _("_Rename"), None,
@@ -235,6 +236,7 @@ class Main (gtk.Window):
         <menubar name="MenuBar">
           <menu action="File">
             <menu action="file-export"/>
+            <menu action="file-print"/>
             <separator/>
             <menuitem action="Quit" position="bot" />
           </menu>

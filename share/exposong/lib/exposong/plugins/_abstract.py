@@ -63,8 +63,12 @@ class Presentation:
         self.title = None
       self._set_id(value)
     
+    def get_title(self):
+      'Get the title for the slide'
+      return self.title
+    
     def get_text(self):
-      'Get the text for the presentation.'
+      'Get the text for the slide.'
       return self.text
   
     def get_markup(self):

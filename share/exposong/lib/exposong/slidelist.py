@@ -121,7 +121,7 @@ class SlideList(gtk.TreeView):
     exposong.screen.screen.draw()
     self.slide_order_index = -1
     
-    #Reset the time
+    #Reset the timer
     self.__timer += 1
     if self.pres and self.pres.timer:
       gobject.timeout_add(self.pres.timer*1000, self._set_timer, self.__timer)
