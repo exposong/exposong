@@ -307,17 +307,17 @@ class SlideEdit(gtk.Dialog):
     self.vbox.set_spacing(7)
     
     # Title
-    self.vbox.pack_start(self._add_title_box(), False, True)
+    self.vbox.pack_start(self._get_title_box(), False, True)
     
     # Toolbar
     self._toolbar = gtk.Toolbar()
-    self.undo_btn = self._add_toolbar_item(gtk.ToolButton(gtk.STOCK_UNDO),
+    self.undo_btn = self._get_toolbar_item(gtk.ToolButton(gtk.STOCK_UNDO),
                                            self._undo, False)
-    self.redo_btn = self._add_toolbar_item(gtk.ToolButton(gtk.STOCK_REDO),
+    self.redo_btn = self._get_toolbar_item(gtk.ToolButton(gtk.STOCK_REDO),
                                            self._redo, False)
     self.vbox.pack_start(self._toolbar, False, True)
     
-    self._buffer = self._add_buffer()
+    self._buffer = self._get_buffer()
     self._buffer.connect("changed", self._on_text_changed)
     
     text = gtk.TextView()
@@ -332,7 +332,7 @@ class SlideEdit(gtk.Dialog):
     self.vbox.show_all()
     
   
-  def _add_title_box(self):
+  def _get_title_box(self):
     hbox = gtk.HBox()
     self._title_label = gtk.Label(_("Title:"))
     self._title_label.set_alignment(0.5,0.5)
@@ -343,14 +343,14 @@ class SlideEdit(gtk.Dialog):
     hbox.pack_start(self._title_entry, True, True)
     return hbox
     
-  def _add_toolbar_item(self, toolbutton, proxy, sensitive=True):
+  def _get_toolbar_item(self, toolbutton, proxy, sensitive=True):
     btn = toolbutton
-    btn.set_sensitive(False)
+    btn.set_sensitive(sensitive)
     btn.connect("clicked", proxy)
     self._toolbar.insert(btn, -1)
     return btn
   
-  def _add_buffer(self):
+  def _get_buffer(self):
     buffer = undobuffer.UndoableBuffer()
     buffer.begin_not_undoable_action()
     buffer.set_text(self.slide_text)

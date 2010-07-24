@@ -92,6 +92,8 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     def __init__(self, pres, verse):
       lines = []
       self.pres = pres
+      # TODO Deep copy
+      self.verse = verse
       
       if verse:
         self.title = verse.name
@@ -677,7 +679,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
         if not songbook.get_text():
           info_dialog = gtk.MessageDialog(treeview.get_toplevel(),
               gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
-              _("Please enter an Songbook."))
+              _("Please enter a Songbook."))
           info_dialog.run()
           info_dialog.destroy()
         else:
@@ -813,16 +815,88 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     exposong.application.main.remove_accel_group(_lyrics_accel)
 
 
-class SlideEdit(text.SlideEdit):
-  'text.SlideEdit with custom title box'
+# TODO Maybe inherit from text.SlideEdit? Need to move run() to a separate
+# function if so.
+class SlideEdit(gtk.Dialog):
+  'Create a new window for editing a single slide.'
   def __init__(self, parent, slide):
-    text.SlideEdit.__init__(self, parent, slide)
+    gtk.Dialog.__init__(self, _("Editing Slide"), parent,\
+        gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
     
-  def _add_title_box(self):
+    cancelbutton = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
+    cancelbutton.connect("clicked", self._quit_without_save)
+    okbutton = self.add_button(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
+    okbutton.connect("clicked", self._quit_with_save)
+    
+    self.connect("delete-event", self._quit_without_save)
+    
+    self.slide_title = slide.title
+    self.slide_text = slide.text
+    self.changed = False
+    
+    self.set_border_width(4)
+    self.vbox.set_spacing(7)
+    
+    self.vbox.pack_start(self._get_title_box(), False, True)
+    
+    self.parts_list = gtk.ListStore(gobject.TYPE_STRING)
+    parts = [l.part for l in slide.verse.lines]
+    cnt = parts.count('')
+    if cnt == 1:
+      parts[parts.index('')] = "[unnamed]"
+    elif cnt > 1:
+      i = -1
+      n = 1
+      for iPos in range(cnt):
+        i = parts('', i+1)
+        parts[i] = "[unnamed %d]" % n
+    for p in parts:
+      self.parts_list.append( (p,) )
+    parts = gtk.TreeView(self.parts_list)
+    #parts.connect('row-activated', self._theme_dlg, True)
+    parts.set_reorderable(True)
+    cell = gtk.CellRendererText()
+    col = gtk.TreeViewColumn( _('Part'))
+    col.pack_start(cell)
+    col.set_resizable(True)
+    col.add_attribute(cell, 'text', 0)
+    parts.append_column(col)
+    
+    partsToolbar = gtk.Toolbar()
+    button = gtk.ToolButton(gtk.STOCK_ADD)
+    partsToolbar.insert(button, -1)
+    button.connect('clicked', self._add_part)
+    button = gtk.ToolButton(gtk.STOCK_EDIT)
+    parts.get_selection().connect('changed', gui.treesel_disable_widget,
+        button)
+    partsToolbar.insert(button, -1)
+    button = gtk.ToolButton(gtk.STOCK_DELETE)
+    parts.get_selection().connect('changed', gui.treesel_disable_widget,
+        button)
+    partsToolbar.insert(button, -1)
+    self.vbox.pack_start(partsToolbar, False, True)
+    
+    scroll = gtk.ScrolledWindow()
+    scroll.add(parts)
+    scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+    scroll.set_size_request(0, 120)
+    self.vbox.pack_start(scroll)
+    
+    self._edit_toolbar = gtk.Toolbar()
+    self.undo_btn = self._add_toolbar_item(gtk.ToolButton(gtk.STOCK_UNDO),
+                                           self._undo, False)
+    self.redo_btn = self._add_toolbar_item(gtk.ToolButton(gtk.STOCK_REDO),
+                                           self._redo, False)
+    self.vbox.pack_start(self._get_buffer(), True, True)
+    
+    self.vbox.show_all()
+  
+  def _get_title_box(self):
     hbox = gtk.HBox()
     label = gtk.Label(_("Title:"))
     label.set_alignment(0.5,0.5)
     hbox.pack_start(label, False, True)
+    
     title_list = gtk.ListStore(str, str)
     for i in range(1,5):
       title_list.append( ("v%d"%i, "Verse %d"%i) )
@@ -836,11 +910,157 @@ class SlideEdit(text.SlideEdit):
     cell = gtk.CellRendererText()
     self._title_entry.pack_start(cell, True)
     self._title_entry.add_attribute(cell, 'text', 1)
-    hbox.pack_start(self._title_entry, True, True)
-    self.vbox.pack_start(hbox, False, True)
-
+    self._title_entry.connect('changed', self._title_insert_event)
     hbox.pack_start(self._title_entry, True, True)
     return hbox
+  
+  def _add_toolbar_item(self, toolbutton, proxy, sensitive=True):
+    btn = toolbutton
+    btn.set_sensitive(sensitive)
+    btn.connect("clicked", proxy)
+    self._edit_toolbar.insert(btn, -1)
+    return btn
+  
+  def _get_buffer(self):
+    self.buffer = undobuffer.UndoableBuffer()
+    self.buffer.begin_not_undoable_action()
+    self.buffer.set_text(self.slide_text)
+    self.buffer.end_not_undoable_action()
+    self.buffer.set_modified(False)
+    self.buffer.connect("changed", self._on_text_changed)
+    
+    self.text_view = gtk.TextView()
+    self.text_view.set_wrap_mode(gtk.WRAP_WORD)
+    self.text_view.set_buffer(self.buffer)
+    self.text_view.set_border_window_size(gtk.TEXT_WINDOW_LEFT, 45)
+    self.text_view.connect("expose_event", self._line_numbers_expose)
+    scroll = gtk.ScrolledWindow()
+    scroll.add(self.text_view)
+    scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+    scroll.set_size_request(400, 250)
+    return scroll
+  
+  def get_slide_name(self):
+    'Returns the name of the edited slide'
+    return self.slide_title
+  
+  def get_slide_text(self):
+    'Returns the text of the edited slide'
+    return self.slide_text
+  
+  def _save(self):
+    self.slide_title = self._title_entry.child.get_text()
+    bounds = self.buffer.get_bounds()
+    self.slide_text = self.buffer.get_text(bounds[0], bounds[1])
+    self.changed = True
+      
+  def _ok_to_continue(self):
+    if self.buffer.can_undo or\
+        self._title_entry.child.get_text() != self.slide_title:
+      dlg = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
+          gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO,
+          _('Unsaved Changes exist. Do you really want to continue without saving?'))
+      resp = dlg.run()
+      dlg.destroy()
+      if resp == gtk.RESPONSE_NO:
+        return False
+      elif resp == gtk.RESPONSE_YES:
+        self._save()
+    return True
+  
+  def _title_insert_event(self, combobox):
+    s = combobox.get_active_text()
+    scnt = s.count(' ')
+    combobox.child.set_text(s.replace(' ','').lower())
+    # TODO This does not seem to do the trick. When you put a space, it moves
+    #    the cursor, and removes the space. Is this too aggressive anyways?
+    #combobox.child.emit('move-cursor', gtk.MOVEMENT_VISUAL_POSITIONS, 0-scnt,
+    #    False)
+  
+  def _on_text_changed(self, event):
+    self.undo_btn.set_sensitive(self.buffer.can_undo)
+    self.redo_btn.set_sensitive(self.buffer.can_redo)
+    if self.buffer.can_undo:
+      if not self.get_title().startswith("*"):
+        self.set_title("*%s"%self.get_title())
+    else:
+      self.set_title(self.get_title().lstrip("*"))
+  
+  def _get_buffer_lines(self, first_y, last_y, buffer_coords, numbers):
+    # Get iter at first y
+    iter, top = self.text_view.get_line_at_y(first_y)
+    
+    # For each iter, get its location and add it to the arrays.
+    # Stop when we pass last_y
+    count = 0
+    size = 0
+    
+    while not iter.is_end():
+      y, height = self.text_view.get_line_yrange(iter)
+      buffer_coords.append(y)
+      line_num = iter.get_line()
+      numbers.append(line_num)
+      count += 1
+      if (y + height) >= last_y:
+        break
+      iter.forward_line()
+    
+    return count
+  
+  def _line_numbers_expose(self, widget, event, user_data=None):
+    # See if this expose is on the line numbers window
+    left_win = self.text_view.get_window(gtk.TEXT_WINDOW_LEFT)
+    if event.window == left_win:
+      type = gtk.TEXT_WINDOW_LEFT
+      target = left_win
+    else:
+      return False
+    
+    first_y = event.area.y
+    last_y = first_y + event.area.height
 
-  def _get_title_value(self):
-    return self._title_entry.child.get_text()
+    x, first_y = self.text_view.window_to_buffer_coords(type, 0, first_y)
+    x, last_y = self.text_view.window_to_buffer_coords(type, 0, last_y)
+
+    numbers = []
+    pixels = []
+    parts = [row[0] for row in self.parts_list]
+    count = self._get_buffer_lines(first_y, last_y, pixels, numbers)
+
+    layout = widget.create_pango_layout("")
+    
+    for i in range(count):
+      x, pos = self.text_view.buffer_to_window_coords(type, 0, pixels[i])
+      s = "%s" % parts[numbers[i] % len(parts)]
+      layout.set_text(s)
+      widget.style.paint_layout(target, widget.state, False, None, widget, None,
+          0, pos + 2, layout)
+    
+    return False
+  
+  def _undo(self, event):
+    self.buffer.undo()
+  
+  def _redo(self, event):
+    self.buffer.redo()
+  
+  def _add_part(self, *args):
+    #TODO Implement. Also event needs to have it's "window" attribute set.
+    self.parts_list.append( ('Temp',) )
+    event = gtk.gdk.Event(gtk.gdk.EXPOSE)
+    self.text_view.emit("expose_event", event)
+  
+  def _quit_with_save(self, event, *args):
+    if self._title_entry.child.get_text() == "":
+      info_dialog = gtk.MessageDialog(self, gtk.DIALOG_DESTROY_WITH_PARENT,
+          gtk.MESSAGE_INFO, gtk.BUTTONS_OK, _("Please enter a Title."))
+      info_dialog.run()
+      info_dialog.destroy()
+      self._title_entry.grab_focus()
+      return False
+    self._save()
+    self.destroy()
+  
+  def _quit_without_save(self, event, *args):
+    if self._ok_to_continue():
+      self.destroy()

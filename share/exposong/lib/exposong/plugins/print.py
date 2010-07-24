@@ -108,7 +108,7 @@ class Print(Plugin, _abstract.Menu):
   def merge_menu(cls, uimanager):
     'Merge new values with the uimanager.'
     self = cls()
-    actiongroup = gtk.ActionGroup('export-import')
+    actiongroup = gtk.ActionGroup('print')
     actiongroup.add_actions([
         ('print-presentation', None,
          _("_Current Presentation"),
