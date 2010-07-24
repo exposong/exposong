@@ -111,7 +111,6 @@ class Song(object):
         if u'}' in root.tag:
             self.__ns = root.tag.split(u'}')[0].lstrip(u'{')
         else:
-            print root.tag
             self.__ns = ''
         self.createdIn = root.get(u'createdIn', u'')
         self.modifiedIn = root.get(u'modifiedIn', u'')
