@@ -189,11 +189,11 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     
     #Title field
     vbox = gtk.VBox()
-    self._fields['title'] = gtk.ListStore(gobject.TYPE_STRING,
+    self._fields['title_list'] = gtk.ListStore(gobject.TYPE_STRING,
         gobject.TYPE_STRING)
     for title in self.song.props.titles:
-      self._fields['title'].append( (title, title.lang) )
-    title_list = gtk.TreeView(self._fields['title'])
+      self._fields['title_list'].append( (title, title.lang) )
+    title_list = gtk.TreeView(self._fields['title_list'])
     title_list.connect('row-activated', self._title_dlg, True)
     title_list.set_reorderable(True)
     # TODO Add row-activated signal for editing.
@@ -448,7 +448,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     self.song.props.key = self._fields['key'].get_active_text()
     
     self.song.props.titles = []
-    for row in self._fields['title']:
+    for row in self._fields['title_list']:
       self.song.props.titles.append(openlyrics.Title(*row))
     
     self.song.props.authors = []
@@ -523,7 +523,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
             model.set_value(itr, 0, title.get_text())
             model.set_value(itr, 1, lang.get_active_text())
           else:
-            self._fields['title'].append( (title.get_text(),
+            self._fields['title_list'].append( (title.get_text(),
                 lang.get_active_text()) )
           dialog.hide()
           return True
@@ -703,7 +703,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
   
   def _is_editing_complete(self, parent):
     "Test to see if all fields have been filled which are required."
-    if len(self._fields['title']) == 0:
+    if len(self._fields['title_list']) == 0:
       info_dialog = gtk.MessageDialog(parent, gtk.DIALOG_DESTROY_WITH_PARENT,
           gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
           _("You must enter at least one title."))
@@ -723,7 +723,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     self.song.write(self.filename)
   
   def get_title(self):
-    if len(self.song.props.titles) == 0: return False
+    if len(self.song.props.titles) == 0: return os.path.basename(self.filename)
     return str(self.song.props.titles[0])
   
   title = property(get_title)
