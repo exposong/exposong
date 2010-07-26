@@ -64,7 +64,7 @@ class Print(Plugin, _abstract.Menu):
     for slide in pres.get_slide_list():
       markup += "<span weight='bold' face='sans' size='medium'>%s</span>\n"\
                 %slide[0].get_title()
-      markup += "%s\n\n"%slide[0].get_text()
+      markup += "<span face='sans'>%s</span>\n\n"%slide[0].get_text()
     
     #TODO: Handle too long lines
     
@@ -91,7 +91,7 @@ class Print(Plugin, _abstract.Menu):
     
     markup = """<span face='sans' size='large' weight='bold'>%(title)s</span>
 <span face='sans' size='x-small'>%(date)s</span>\n\n
-<span size='small'>%(text)s</span>
+<span face='sans 'size='small'>%(text)s</span>
     """ %{'title' : _("Alphabetical list of Songs"),
           'date'  : datetime.datetime.now().strftime(locale.nl_langinfo(locale.D_FMT)),
           'text'  : songs}

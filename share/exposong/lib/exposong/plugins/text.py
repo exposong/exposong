@@ -292,6 +292,8 @@ class SlideEdit(gtk.Dialog):
     gtk.Dialog.__init__(self, _("Editing Slide"), parent,\
         gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
     
+    self._build_menu()
+    
     cancelbutton = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
     cancelbutton.connect("clicked", self._quit_without_save)
     okbutton = self.add_button(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
@@ -331,6 +333,23 @@ class SlideEdit(gtk.Dialog):
     
     self.vbox.show_all()
     
+  def _build_menu(self):
+    self.uimanager = gtk.UIManager()
+    self.add_accel_group(self.uimanager.get_accel_group())
+    self.main_actions = gtk.ActionGroup('main')
+    self.main_actions.add_actions([
+        ('Edit', None, '_Edit' ),
+        ("edit-undo", gtk.STOCK_UNDO, "Undo", "<Ctrl>z", "Undo the last operation", self._undo),
+        ("edit-redo", gtk.STOCK_REDO, "Redo", "<Ctrl>y", "Redo the last operation", self._redo)
+        ])
+    self.uimanager.insert_action_group(self.main_actions, 0)
+    self.uimanager.add_ui_from_string('''
+        <menubar name="MenuBar">
+          <menu action="Edit">
+            <menuitem action="edit-undo"/>
+            <menuitem action="edit-redo"/>
+          </menu>
+        </menubar>''')
   
   def _get_title_box(self):
     hbox = gtk.HBox()

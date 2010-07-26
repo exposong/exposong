@@ -239,12 +239,14 @@ class Presentation:
     
     while True:
       if edit_dialog.run():
-        if self._is_editing_complete(edit_dialog):
-          self._edit_save()
-          del(self._fields)
-          self.to_xml()
-          edit_dialog.destroy()
-          return True
+        #When there are no slides, don't save anything
+        if not self.slides == []:
+          if self._is_editing_complete(edit_dialog):
+            self._edit_save()
+            self.to_xml()
+        del(self._fields)
+        edit_dialog.destroy()
+      return True
   
   def _edit_tabs(self, notebook, parent):
     'Tabs for the dialog.'
