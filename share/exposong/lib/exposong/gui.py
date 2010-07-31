@@ -176,7 +176,6 @@ def append_language_combo(table, value, top):
 
 def append_section_title(table, title, top):
   'Adds a title for the current section.'
-  hbox = gtk.HBox()
   label = gtk.Label()
   label.set_markup("<b>"+title+"</b>")
   label.set_alignment(0.0, 1.0)
