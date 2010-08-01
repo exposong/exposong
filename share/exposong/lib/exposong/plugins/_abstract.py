@@ -218,10 +218,11 @@ class Presentation:
   
   def edit(self):
     'Run the edit edit_dialog for the presentation.'
+    # TODO Slides need to be deep copied so that "Cancel" actually works.
     edit_dialog = gtk.Dialog(_("New Presentation"), exposong.application.main,\
         gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,\
-        (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
-        #(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        #(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+        (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
     edit_dialog.set_default_size(340, 400)
     if(self.get_title()):
       edit_dialog.set_title(_('Editing "%s"') % self.get_title())
@@ -238,15 +239,17 @@ class Presentation:
     notebook.show_all()
     
     while True:
-      if edit_dialog.run():
-        #When there are no slides, don't save anything
-        if not self.slides == []:
-          if self._is_editing_complete(edit_dialog):
-            self._edit_save()
-            self.to_xml()
+      if edit_dialog.run() == gtk.RESPONSE_ACCEPT:
+        if self._is_editing_complete(edit_dialog):
+          self._edit_save()
+          self.to_xml()
+          del(self._fields)
+          edit_dialog.destroy()
+          return True
+      else:
         del(self._fields)
-        edit_dialog.destroy()
-      return True
+        edit_dialog.destroy()  
+        return False
   
   def _edit_tabs(self, notebook, parent):
     'Tabs for the dialog.'
@@ -303,6 +306,8 @@ class Presentation:
   
   def _is_editing_complete(self, parent):
     "Test to see if all fields have been filled which are required."
+    if len(self.slides) == 0:
+      return False
     return True
   
   def to_xml(self):

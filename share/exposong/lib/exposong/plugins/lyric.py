@@ -134,6 +134,10 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
       if editor.changed:
         self.title = editor.get_slide_title()
         self.text = editor.get_slide_text()
+        lines = openlyrics.Lines()
+        for line in self.text.split('\n'):
+          lines.lines.append(openlyrics.Line(line))
+        self.verse.lines = [lines]
         return True
       return False
     
@@ -422,10 +426,12 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
         '\n'.join(self.song.props.comments), 0)
     notebook.append_page(table, gtk.Label(_("Other")))
     
-    _abstract.Presentation._edit_tabs(self, notebook, parent)
-    
     # Add verses and slide order.
     text.Presentation._edit_tabs(self, notebook, parent)
+    self._fields['title'].connect("changed", self._title_entry_changed)
+    for event in ("row-changed","row-deleted","row-inserted","rows-reordered")
+      self._fields['title_list'].connect(event, self._title_list_changed)
+    
     table = gui.Table(1)
     self._fields['verse_order'] = gui.append_entry(table, _("Verse Order:"),
         " ".join(self.song.props.verse_order), 0)
@@ -727,6 +733,18 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     return str(self.song.props.titles[0])
   
   title = property(get_title)
+  
+  def _title_entry_changed(self, entry):
+    'The title entry has changed.'
+    lst = self._fields['title_list']
+    lst.set_value(lst.get_iter_first(),
+                  0, entry.get_text())
+  
+  def _title_list_changed(self, model, path, iter=None, new_order=None):
+    'The title list has been changed.'
+    val = model.get_value(model.get_iter_first(), 0)
+    if val:
+      self._fields['title'].set_text(val)
   
   @classmethod
   def is_type(cls, fl):
