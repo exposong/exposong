@@ -307,6 +307,11 @@ class Presentation:
   def _is_editing_complete(self, parent):
     "Test to see if all fields have been filled which are required."
     if len(self.slides) == 0:
+      info_dialog = gtk.MessageDialog(parent, gtk.DIALOG_DESTROY_WITH_PARENT,
+          gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
+          _("The presentation must have at least one slide."))
+      info_dialog.run()
+      info_dialog.destroy()
       return False
     return True
   

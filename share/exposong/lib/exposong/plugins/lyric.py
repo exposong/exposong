@@ -429,7 +429,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     # Add verses and slide order.
     text.Presentation._edit_tabs(self, notebook, parent)
     self._fields['title'].connect("changed", self._title_entry_changed)
-    for event in ("row-changed","row-deleted","row-inserted","rows-reordered")
+    for event in ("row-changed","row-deleted","row-inserted","rows-reordered"):
       self._fields['title_list'].connect(event, self._title_list_changed)
     
     table = gui.Table(1)
@@ -736,15 +736,27 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
   
   def _title_entry_changed(self, entry):
     'The title entry has changed.'
+    if getattr(self,'_title_lock', False):
+      return
+    self._title_lock = True
     lst = self._fields['title_list']
+    if not lst.get_iter_first():
+      lst.append()
     lst.set_value(lst.get_iter_first(),
                   0, entry.get_text())
+    self._title_lock = False
   
   def _title_list_changed(self, model, path, iter=None, new_order=None):
     'The title list has been changed.'
+    if getattr(self,'_title_lock', False):
+      return
+    self._title_lock = True
     val = model.get_value(model.get_iter_first(), 0)
     if val:
       self._fields['title'].set_text(val)
+    else:
+      self._fields['title'].set_text('')
+    self._title_lock = False
   
   @classmethod
   def is_type(cls, fl):
