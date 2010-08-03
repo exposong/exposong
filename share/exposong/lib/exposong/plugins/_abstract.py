@@ -299,6 +299,15 @@ class Presentation:
   
   def _edit_save(self):
     'Save the fields if the user clicks ok.'
+    ## TODO: When renaming, preslist does not resort. The following doesn't work for me.
+    #for schedlistrow in exposong.schedlist.schedlist.get_model():
+    #  if schedlistrow[0] != None and schedlistrow[0].builtin:
+    #    schedrow = schedlistrow[0].get_iter_first()
+    #    while schedrow:
+    #      if self.filename == schedlistrow[0].get_value(schedrow,0).filename:
+    #        schedlistrow[0].row_changed(schedlistrow[0].get_path(schedrow),
+    #                                    schedrow)
+    #      schedrow = schedlistrow[0].iter_next(schedrow)
     if self._has_timer():
       if self._fields['timer_on'].get_active():
         self.timer = self._fields['timer'].get_value_as_int()
@@ -306,13 +315,6 @@ class Presentation:
   
   def _is_editing_complete(self, parent):
     "Test to see if all fields have been filled which are required."
-    if len(self.slides) == 0:
-      info_dialog = gtk.MessageDialog(parent, gtk.DIALOG_DESTROY_WITH_PARENT,
-          gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
-          _("The presentation must have at least one slide."))
-      info_dialog.run()
-      info_dialog.destroy()
-      return False
     return True
   
   def to_xml(self):

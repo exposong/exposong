@@ -22,8 +22,8 @@ from xml.dom import minidom
 
 from glob import *
 from exposong import DATA_PATH
+from exposong import preslist
 import exposong.plugins._abstract
-import exposong.preslist
 
 
 class Schedule(gtk.ListStore):
@@ -31,13 +31,16 @@ class Schedule(gtk.ListStore):
   Schedule of presentations.'
   '''
   def __init__(self, title="", filename = None, builtin = True, filter_func = None):
-    gtk.ListStore.__init__(self, *exposong.preslist.PresList.get_model_args())
+    gtk.ListStore.__init__(self, *preslist.PresList.get_model_args())
     self.title = title
     if filename == None:
       self.filename = os.path.join(DATA_PATH, "sched")
     else:
       self.filename = filename
     self.builtin = builtin
+    if builtin:
+      self.get_model().set_default_sort_func(self._column_sort)
+      self.get_model().set_sort_column_id(-1,gtk.SORT_ASCENDING)
     self.filter_func = filter_func
   
   def load(self, dom, library):
@@ -143,6 +146,14 @@ class Schedule(gtk.ListStore):
       if os.path.split(item.filename)[1] == filename:
         return item.presentation
       itr = self.iter_next(itr)
+  
+  @staticmethod
+  def _column_sort(treemodel, iter1, iter2):
+    c1 = treemodel.get_value(iter1,0).get_title()
+    c2 = treemodel.get_value(iter2,0).get_title()
+    if c1 < c2: return -1
+    if c1 > c2: return 1
+    return 0
 
 class ScheduleItem:
   '''

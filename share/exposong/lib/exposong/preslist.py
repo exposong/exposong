@@ -85,8 +85,6 @@ class PresList(gtk.TreeView):
   def set_model(self, model=None):
     'Override to sort.'
     gtk.TreeView.set_model(self, model)
-    #TODO Sorting is not working.
-    self.get_model().set_default_sort_func(self._column_sort)
     
   def get_model(self):
     model = gtk.TreeView.get_model(self)
@@ -241,11 +239,8 @@ class PresList(gtk.TreeView):
     pres = model.get_value(titer, 0)
     cell.set_property('text', pres.get_title())
   
-  def _column_sort(self, treemodel, iter1, iter2):
-    return treemodel.get_value(iter1,0).get_title().__cmp__(
-        treemodel.get_value(iter2,0).get_title())
-  
   @staticmethod
   def get_model_args():
     'Get the arguments to pass to `gtk.ListStore`.'
     return (gobject.TYPE_PYOBJECT,)
+

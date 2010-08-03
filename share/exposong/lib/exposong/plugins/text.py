@@ -164,7 +164,14 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       info_dialog.run()
       info_dialog.destroy()
       return False
-    return _abstract.Presentation._is_editing_complete(self, self)
+    if len(self._fields['slides']) == 0:
+      info_dialog = gtk.MessageDialog(parent, gtk.DIALOG_DESTROY_WITH_PARENT,
+          gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
+          _("The presentation must have at least one slide."))
+      info_dialog.run()
+      info_dialog.destroy()
+      return False
+    return _abstract.Presentation._is_editing_complete(self, parent)
   
   def _slide_dlg_btn(self, btn, treeview, edit=False):
     "Add or edit a title."
