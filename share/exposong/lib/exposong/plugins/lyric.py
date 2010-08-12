@@ -117,7 +117,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
       'Draw text on the footer.'
       jn = ['"%s"' % self.pres.title]
       # TODO List only translators for the current translation.
-      author = ';  '.join( '%s: %s' % (auth_types.get(a.type,_("Written By")),
+      author = ';  '.join(u'%s: %s' % (auth_types.get(a.type,_("Written By")),
           str(a)) for a in self.pres.song.props.authors )
       if len(author) > 0:
         jn.append(author)
@@ -126,6 +126,10 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
       if config.get("general", "ccli"):
         jn.append("Song CCLI ID# %s; CCLI# %s" % (self.pres.song.props.ccli_no,
             config.get("general", "ccli")))
+      songbooks = "; ".join(u'%s\xA0#%s' % (s.name, s.entry) for s in
+          self.pres.song.props.songbooks)
+      if len(songbooks):
+        jn.append(songbooks)
       return '\n'.join(jn)
     
     def _edit_window(self, parent):
