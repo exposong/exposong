@@ -56,11 +56,11 @@ class Presentation:
     def __init__(self, pres, value):
       self.pres = pres
       if isinstance(value, xml.dom.Node):
-        self.text = get_node_text(value)
+        self.text = get_node_text(value, True)
         self.title = value.getAttribute("title")
       elif isinstance(value, str):
         self.text = value
-        self.title = None
+        self.title = ''
       self._set_id(value)
     
     def get_title(self):
@@ -105,12 +105,20 @@ class Presentation:
     def draw(self, widget):
       'Overrides all text rendering to render custom slides.'
       return NotImplemented
+    
+    def copy(self):
+      'Create a duplicate of the slide.'
+      slide = self.__class__(self.pres, self.text)
+      slide.text = self.text
+      slide.title = self.title
+      slide._set_id()
+      return slide
       
     def _set_id(self, value = None):
       if isinstance(value, xml.dom.Node):
         self.id = value.getAttribute("id")
       if not self.id:
-        if(len(self.title) > 0):
+        if self.title:
           self.id = str(self.title).replace(" ","").lower()  + '_' + random_string(8)
         else:
           self.id = random_string(8)

@@ -87,15 +87,12 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     '''
     A lyric slide for the presentation.
     '''
-    lang = ''
-    
     def __init__(self, pres, verse):
       lines = []
       self.pres = pres
-      # TODO Deep copy
-      self.verse = verse
       
       if verse:
+        self.verse = verse
         self.title = verse.name
         self.lang = verse.lang
         lineList = []
@@ -107,6 +104,8 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
           self.text = '\n'.join(lineList)
         elif len(verse.lines) == 1:
           self.text = '\n'.join(str(l) for l in verse.lines[0].lines)
+      else:
+        self.verse = openlyrics.Verse()
     
     def set_attributes(self, layout):
       'Set attributes on a pango.Layout object.'
@@ -138,15 +137,29 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
       if editor.changed:
         old_title = self.title
         self.title = editor.get_slide_title()
-        self.text = editor.get_slide_text()
-        lines = openlyrics.Lines()
-        for line in self.text.split('\n'):
-          lines.lines.append(openlyrics.Line(line))
-        self.verse.lines = [lines]
         self.verse.name = self.title
+        self._set_lines(editor.get_slide_text())
         self.pres._rename_order(old_title, self.title)
         return True
       return False
+    
+    def copy(self):
+      'Create a duplicate of the slide.'
+      slide = Presentation.Slide(self.pres, None)
+      slide.verse = openlyrics.Verse()
+      slide.title = self.title
+      slide.verse.name = self.title
+      slide._set_lines(self.text)
+      slide.lang = self.verse.lang
+      return slide
+    
+    def _set_lines(self, text):
+      'Set the text from a string.'
+      self.text = text
+      lines = openlyrics.Lines()
+      for line in self.text.split('\n'):
+        lines.lines.append(openlyrics.Line(line))
+      self.verse.lines = [lines]
     
     @staticmethod
     def get_version():
@@ -482,12 +495,12 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     ## TODO: Slides
     itr = self._fields['slides'].get_iter_first()
     self.slides = []
-    while itr:
-      self.slides.append(self._fields['slides'].get_value(itr,0))
-      itr = self._fields['slides'].iter_next(itr)
     self.song.verses = []
-    for slide in self.slides:
+    while itr:
+      slide = self._fields['slides'].get_value(itr,0)
+      self.slides.append(slide)
       self.song.verses.append(slide.verse)
+      itr = self._fields['slides'].iter_next(itr)
   
   def _del_treeview_row(self, button, treeview):
     (model, itr) = treeview.get_selection().get_selected()

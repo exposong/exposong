@@ -189,7 +189,8 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       itr = model.get_iter(path)
       if not itr:
         return False
-      sl = model.get_value(itr, 0)
+      # Edit on a copy, so Cancel will work.
+      sl = model.get_value(itr, 0).copy()
       old_title = sl.title
     else:
       sl = self.Slide(self, None)

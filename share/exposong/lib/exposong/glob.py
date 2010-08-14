@@ -28,7 +28,7 @@ This file contains some miscellaneous functions that are useful to all parts of
 the program. May contain certain variables as well.
 """
 
-def get_node_text(node):
+def get_node_text(node, respect_whitespace=False):
   'Returns the text of a node (XML DOM Object)'
   if(isinstance(node, str)):
     return node
@@ -36,7 +36,10 @@ def get_node_text(node):
   for child in node.childNodes:
     if child.nodeType == node.TEXT_NODE:
       rc.append(child.data)
-  return re.sub('\s+',' ',"".join(rc).strip())
+  if respect_whitespace:
+    return "".join(rc).strip()
+  else:
+    return re.sub('\s+',' ',"".join(rc).strip())
   
 def title_to_filename(title):
   """
