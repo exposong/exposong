@@ -136,12 +136,14 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
       editor = SlideEdit(parent, self)
       editor.run()
       if editor.changed:
+        old_title = self.title
         self.title = editor.get_slide_title()
         self.text = editor.get_slide_text()
         lines = openlyrics.Lines()
         for line in self.text.split('\n'):
           lines.lines.append(openlyrics.Line(line))
         self.verse.lines = [lines]
+        self.pres._rename_order(old_title, self.title)
         return True
       return False
     
@@ -761,6 +763,15 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     else:
       self._fields['title'].set_text('')
     self._title_lock = False
+  
+  def _rename_order(self, old_title, new_title):
+    'If a slide title was changed, update the order with the new title.'
+    if old_title == new_title: return
+    order = self._fields['verse_order'].get_text().split()
+    for i in range(len(order)):
+      if order[i] == old_title:
+        order[i] = new_title
+    self._fields['verse_order'].set_text(" ".join(order))
   
   @classmethod
   def is_type(cls, fl):
