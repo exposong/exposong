@@ -123,7 +123,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     btn.connect("clicked", self._slide_dlg_btn, self._slide_list, True)
     toolbar.insert(btn, -1)
     btn = gtk.ToolButton(gtk.STOCK_DELETE)
-    btn.connect("clicked", self._slide_delete_dialog, parent)
+    btn.connect("clicked", self._on_slide_delete, self._slide_list, parent)
     toolbar.insert(btn, -1)
     toolbar.insert(gtk.SeparatorToolItem(), -1)
     
@@ -206,13 +206,20 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
   def _on_slide_added(self, model, path, iter):
     self._slide_list.set_cursor(path)
     
-  def _slide_delete_dialog(self, btn, parent):
+  def _on_slide_delete(self, btn, treeview, parent):
     'Remove the selected slide.'
     # TODO
-    #(model, itr) = self._fields['slides'].get_selection().get_selected()
+    (model, itr) = treeview.get_selection().get_selected()
     if not itr:
       return False
-    model.remove(itr)
+    dialog = gtk.MessageDialog(exposong.application.main, gtk.DIALOG_MODAL,
+        gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
+        _('Are you sure you want to this slide? This cannot be undone.'))
+    dialog.set_title( _("Delete Slide?") )
+    resp = dialog.run()
+    dialog.hide()
+    if resp == gtk.RESPONSE_YES:
+      model.remove(itr)
 
   def get_order(self):
     'Returns the order in which the slides should be presented.'

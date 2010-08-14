@@ -143,6 +143,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
         for line in self.text.split('\n'):
           lines.lines.append(openlyrics.Line(line))
         self.verse.lines = [lines]
+        self.verse.name = self.title
         self.pres._rename_order(old_title, self.title)
         return True
       return False
@@ -479,11 +480,14 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
         *self._fields['comments'].get_buffer().get_bounds()).split('\n')
     
     ## TODO: Slides
-    #itr = self._fields['slides'].get_iter_first()
-    #self.slides = []
-    #while itr:
-    #  self.slides.append(self._fields['slides'].get_value(itr,0))
-    #  itr = self._fields['slides'].iter_next(itr)
+    itr = self._fields['slides'].get_iter_first()
+    self.slides = []
+    while itr:
+      self.slides.append(self._fields['slides'].get_value(itr,0))
+      itr = self._fields['slides'].iter_next(itr)
+    self.song.verses = []
+    for slide in self.slides:
+      self.song.verses.append(slide.verse)
   
   def _del_treeview_row(self, button, treeview):
     (model, itr) = treeview.get_selection().get_selected()
