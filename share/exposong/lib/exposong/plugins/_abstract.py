@@ -308,14 +308,9 @@ class Presentation:
   def _edit_save(self):
     'Save the fields if the user clicks ok.'
     ## TODO: When renaming, preslist does not resort. The following doesn't work for me.
-    #for schedlistrow in exposong.schedlist.schedlist.get_model():
-    #  if schedlistrow[0] != None and schedlistrow[0].builtin:
-    #    schedrow = schedlistrow[0].get_iter_first()
-    #    while schedrow:
-    #      if self.filename == schedlistrow[0].get_value(schedrow,0).filename:
-    #        schedlistrow[0].row_changed(schedlistrow[0].get_path(schedrow),
-    #                                    schedrow)
-    #      schedrow = schedlistrow[0].iter_next(schedrow)
+    for schedlistrow in exposong.schedlist.schedlist.get_model():
+      if schedlistrow[0] and schedlistrow[0].builtin:
+        schedlistrow[0].resort()
     if self._has_timer():
       if self._fields['timer_on'].get_active():
         self.timer = self._fields['timer'].get_value_as_int()

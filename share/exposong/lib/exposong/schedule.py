@@ -39,8 +39,8 @@ class Schedule(gtk.ListStore):
       self.filename = filename
     self.builtin = builtin
     if builtin:
-      self.get_model().set_default_sort_func(self._column_sort)
-      self.get_model().set_sort_column_id(-1,gtk.SORT_ASCENDING)
+      self.get_model().set_sort_func(0, self._column_sort)
+      self.get_model().set_sort_column_id(0, gtk.SORT_ASCENDING)
     self.filter_func = filter_func
   
   def load(self, dom, library):
@@ -146,6 +146,11 @@ class Schedule(gtk.ListStore):
       if os.path.split(item.filename)[1] == filename:
         return item.presentation
       itr = self.iter_next(itr)
+  
+  def resort(self):
+    'Force the model to resort'
+    if self.builtin:
+      self.get_model().set_sort_func(0, self._column_sort)
   
   @staticmethod
   def _column_sort(treemodel, iter1, iter2):

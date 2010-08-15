@@ -82,10 +82,6 @@ class PresList(gtk.TreeView):
     'Return true if an item is selected.'
     return bool(self.get_selection().count_selected_rows())
   
-  def set_model(self, model=None):
-    'Override to sort.'
-    gtk.TreeView.set_model(self, model)
-    
   def get_model(self):
     model = gtk.TreeView.get_model(self)
     if isinstance(model, (gtk.TreeModelFilter, gtk.TreeModelSort)):
