@@ -56,6 +56,14 @@ auth_types = {
   "music": _("Music"),
   "translation": _("Translation"),
   }
+verse_names = {
+  "v": _("Verse"),
+  "p": _("Pre-Chorus"),
+  "c": _("Chorus"),
+  "r": _("Refrain"),
+  "b": _("Bridge"),
+  "e": _("Ending"),
+}
 
 def key_shortcuts(accel_group, acceleratable, keyval, modifier):
   'Adds the shortcuts to skip to a given slide.'
@@ -111,6 +119,17 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
       'Set attributes on a pango.Layout object.'
       #TODO
       pass
+    
+    def get_title(self, editing=False):
+      'Return a formatted title.'
+      if self.title[0] in verse_names:
+        if editing:
+          return "%s %s (%s)" % (verse_names[self.title[0]], self.title[1:],
+                            self.title)
+        else:
+          return "%s %s" % (verse_names[self.title[0]], self.title[1:])
+      else:
+        return self.title
     
     def footer_text(self):
       'Draw text on the footer.'
@@ -884,26 +903,33 @@ class SlideEdit(text.SlideEdit):
     
   def _get_title_box(self):
     hbox = gtk.HBox()
-    label = gtk.Label(_("Title:"))
+    label = gtk.Label(_("Name:"))
     label.set_alignment(0.5,0.5)
     hbox.pack_start(label, False, True, 1)
     
     title_list = gtk.ListStore(str, str)
-    for i in range(1,5):
-      title_list.append( ("v%d"%i, "Verse %d"%i) )
-    title_list.append( ("c", "Chorus") )
-    title_list.append( ("p", "Pre-Chorus") )
-    title_list.append( ("b", "Bridge") )
-    title_list.append( ("p", "Pre-Chorus") )
-    title_list.append( ("e", "Ending") )
-    self._title_entry = gtk.ComboBoxEntry(title_list, 0)
-    self._title_entry.child.set_text(self.slide_title)
+    self._title_entry = gtk.ComboBox(title_list)
+    for (abbr, name) in verse_names.iteritems():
+      itr = title_list.append( (abbr, name) )
+      if self.slide_title[0] == abbr:
+        self._title_entry.set_active_iter(itr)
     cell = gtk.CellRendererText()
     self._title_entry.pack_start(cell, True)
     self._title_entry.add_attribute(cell, 'text', 1)
     hbox.pack_start(self._title_entry, True, True, 1)
     
+    label = gtk.Label(" "+_("Index:"))
+    label.set_alignment(0.5,0.5)
+    hbox.pack_start(label, False, True, 1)
+    
+    self._title_num = gtk.Entry(4)
+    self._title_num.set_text(self.slide_title[1:])
+    self._title_num.set_width_chars(4)
+    hbox.pack_start(self._title_num, False, True, 1)
+    
     return hbox
 
   def _get_title_value(self):
-    return self._title_entry.child.get_text()
+    itr = self._title_entry.get_active_iter()
+    return self._title_entry.get_model().get_value(itr, 0) \
+        + self._title_num.get_text()

@@ -99,7 +99,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     
     self._fields['slides'] = gtk.ListStore(gobject.TYPE_PYOBJECT, str)
     # Add the slides
-    for sl in self.get_slide_list():
+    for sl in self.get_slide_list(True):
       self._fields['slides'].append(sl)
     self._fields['slides'].connect("row-changed", self._on_slide_added)
     
@@ -199,10 +199,10 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       if edit:
         if len(old_title) == 0 or old_title <> sl.title:
           sl._set_id()
-        model.set(itr, 0, sl, 1, sl.get_markup())
+        model.set(itr, 0, sl, 1, sl.get_markup(True))
       else:
         sl._set_id()
-        model.append( (sl, sl.get_markup()) )
+        model.append( (sl, sl.get_markup(True)) )
   
   def _on_slide_added(self, model, path, iter):
     self._slide_list.set_cursor(path)

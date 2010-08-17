@@ -63,7 +63,7 @@ class Presentation:
         self.title = ''
       self._set_id(value)
     
-    def get_title(self):
+    def get_title(self, editing=False):
       'Get the title for the slide'
       return self.title
     
@@ -71,10 +71,10 @@ class Presentation:
       'Get the text for the slide.'
       return self.text
   
-    def get_markup(self):
+    def get_markup(self, editing=False):
       'Get the text for the slide selection.'
       if self.title:
-        return "<b>" + self.title + "</b>\n" + self.text
+        return "<b>" + self.get_title(editing) + "</b>\n" + self.text
       else:
         return self.text
     
@@ -361,9 +361,9 @@ class Presentation:
     #TODO Should we be setting the model here?
     list_.set_model(gtk.ListStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING))
   
-  def get_slide_list(self):
+  def get_slide_list(self, editing=False):
     'Get the slide list.'
-    return tuple( (sl, sl.get_markup()) for sl in self.slides)
+    return tuple( (sl, sl.get_markup(editing)) for sl in self.slides)
   
   @classmethod
   def _on_pres_new(cls, action):
