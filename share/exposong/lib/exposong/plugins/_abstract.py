@@ -171,7 +171,7 @@ class Presentation:
     match = r'<presentation\b[^>]*\btype=[\'"]%s[\'"]' % cls.get_type()
     lncnt = 0
     for ln in fl:
-        if lncnt > 4: break
+        if lncnt > 2: break
         if re.search(match, ln):
             return True
         lncnt += 1
@@ -397,6 +397,25 @@ class Presentation:
   def on_deselect(self):
     'Called when the presentation is blurred.'
     pass
+
+class ConvertPresentation:
+  """
+  A plugin that converts from a legacy format to a new format
+  """
+  def __init__(self):
+    # This class should not be instantiated.
+    return NotImplemented
+  
+  @staticmethod
+  def is_type(filename):
+    'Should return True if this file should be converted.'
+    # Should be defined in subclass
+    raise NotImplementedError
+  
+  @staticmethod
+  def convert(filename):
+    "Converts the file."
+    return NotImplemented
 
 class Menu:
   '''

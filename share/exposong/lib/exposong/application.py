@@ -305,6 +305,16 @@ class Main (gtk.Window):
     'Load a single presentation.'
     filenm = os.path.join(DATA_PATH, "pres", filenm)
     pres = None
+    
+    # TODO Is this slowing us down? Might need to attempt to read the file
+    # first, then convert if reading it fails.
+    plugins = exposong.plugins.get_plugins_by_capability(
+        exposong.plugins._abstract.ConvertPresentation)
+    for plugin in plugins:
+      if plugin.is_type(filenm):
+        print 'Converting "%s" to openlyrics.' % filenm
+        plugin.convert(filenm)
+    
     plugins = exposong.plugins.get_plugins_by_capability(
         exposong.plugins._abstract.Presentation)
     for plugin in plugins:

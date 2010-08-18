@@ -814,7 +814,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     match = r'<song\b'
     lncnt = 0
     for ln in fl:
-        if lncnt > 3: break
+        if lncnt > 2: break
         if re.search(match, ln):
             return True
         lncnt += 1
