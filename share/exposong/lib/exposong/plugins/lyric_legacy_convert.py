@@ -103,7 +103,7 @@ class LyricConvert(_abstract.ConvertPresentation, _abstract.Menu, Plugin):
       outfile = check_filename(title_to_filename(title[0].text),
           os.path.join(DATA_PATH, "pres"))
     else:
-      outfile = infile
+      outfile = filename
     song.write(outfile)
     return outfile
   
