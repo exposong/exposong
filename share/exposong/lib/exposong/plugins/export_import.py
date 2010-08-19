@@ -55,14 +55,16 @@ class ExportImport(Plugin, _abstract.Menu):
   def __init__(self):
     pass
   
-  def export_sched(self, *args):
+  @classmethod
+  def export_sched(cls, *args):
     'Export a single schedule with belonging presentations to file.'
     sched = schedlist.schedlist.get_active_item()
     if not sched:
       return False
-    dlg = gtk.FileChooserDialog(_("Export Current Schedule"), exposong.application.main,
-        gtk.FILE_CHOOSER_ACTION_SAVE, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-        gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+    dlg = gtk.FileChooserDialog(_("Export Current Schedule"),
+        exposong.application.main, gtk.FILE_CHOOSER_ACTION_SAVE,
+        (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK,
+        gtk.RESPONSE_ACCEPT))
     dlg.add_filter(_FILTER)
     dlg.set_do_overwrite_confirmation(True)
     dlg.set_current_folder(os.path.expanduser("~"))
@@ -74,12 +76,13 @@ class ExportImport(Plugin, _abstract.Menu):
       if not fname.endswith(".expo"):
         fname += ".expo"
       tar = tarfile.open(fname, "w:gz")
-      for item in self._get_sched_list():
+      for item in cls._get_sched_list():
         tar.add(item[0], item[1])
       tar.close()
     dlg.destroy()
     
-  def _get_sched_list(self, *args):
+  @classmethod
+  def _get_sched_list(cls, *args):
     'Returns a list with a single schedule and belonging presentations'
     exposong.application.main._save_schedules()
     sched = schedlist.schedlist.get_active_item()
@@ -99,7 +102,8 @@ class ExportImport(Plugin, _abstract.Menu):
       itr = sched.iter_next(itr)
     return sched_list
   
-  def export_lib(self, *args):
+  @classmethod
+  def export_lib(cls, *args):
     'Export the full library to tar-compressed file.'
     dlg = gtk.FileChooserDialog(_("Export Library"), exposong.application.main,
         gtk.FILE_CHOOSER_ACTION_SAVE, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
@@ -113,12 +117,13 @@ class ExportImport(Plugin, _abstract.Menu):
       if not fname.endswith(".expo"):
         fname += ".expo"
       tar = tarfile.open(fname, "w:gz")
-      for item in self._get_library_list():
+      for item in cls._get_library_list():
         tar.add(item[0], item[1])
       tar.close()
     dlg.destroy()
     
-  def _get_library_list(self, *args):
+  @classmethod
+  def _get_library_list(cls, *args):
     'Returns a list with all items in pres, image and sched folder'
     #Make sure schedules are up to date.
     exposong.application.main._save_schedules() 
@@ -141,7 +146,8 @@ class ExportImport(Plugin, _abstract.Menu):
       itr = model.iter_next(itr)
     return lib_list
   
-  def export_backgrounds(self, *args):
+  @classmethod
+  def export_backgrounds(cls, *args):
     'Export the backgrounds to tar-compressed file'
     dlg = gtk.FileChooserDialog(_("Export Backgrounds"), exposong.application.main,
         gtk.FILE_CHOOSER_ACTION_SAVE, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
@@ -155,12 +161,13 @@ class ExportImport(Plugin, _abstract.Menu):
       if not fname.endswith(".expo"):
         fname += ".expo"
       tar = tarfile.open(fname, "w:gz")
-      for pic in self._get_background_list():
+      for pic in cls._get_background_list():
         tar.add(pic[0], pic[1])
       tar.close()
     dlg.destroy()
-    
-  def _get_background_list(self, *args):
+  
+  @classmethod
+  def _get_background_list(cls, *args):
     'Returns a list with all images in bg folder'
     dir = os.path.join(DATA_PATH, "bg")
     dir_list = os.listdir(dir)
@@ -173,7 +180,8 @@ class ExportImport(Plugin, _abstract.Menu):
                              os.path.join("bg", filenm)))
     return image_list
   
-  def import_file(self, *args):
+  @classmethod
+  def import_file(cls, *args):
     'Import a schedule, backgrounds or library.'
     dlg = gtk.FileChooserDialog(_("Import"), exposong.application.main,
         gtk.FILE_CHOOSER_ACTION_OPEN, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
@@ -263,17 +271,17 @@ class ExportImport(Plugin, _abstract.Menu):
   @classmethod
   def merge_menu(cls, uimanager):
     'Merge new values with the uimanager.'
-    self = cls()
     actiongroup = gtk.ActionGroup('export-import')
-    actiongroup.add_actions([('import', None, _("_Import"), None,
-            _("Import a schedule or full library."), self.import_file),
+    actiongroup.add_actions([('import-schedule', None,
+            _("_Import Schedule or Library"), None,
+            _("Import a schedule or full library."), cls.import_file),
         ('export-sched', None,
          _("_Current Schedule (and belonging presentations)"),
-         None, None, self.export_sched),
+         None, None, cls.export_sched),
         ('export-lib', None, _("Whole _Library"), None,
-            None, self.export_lib),
+            None, cls.export_lib),
         ('export-bg', None, _("_Backgrounds"), None,
-            None, self.export_backgrounds)
+            None, cls.export_backgrounds)
         ])
     uimanager.insert_action_group(actiongroup, -1)
     
@@ -281,7 +289,9 @@ class ExportImport(Plugin, _abstract.Menu):
     cls.menu_merge_id = uimanager.add_ui_from_string("""
       <menubar name="MenuBar">
         <menu action="File">
-          <menuitem action="import" position="top" />
+          <menu action='file-import'>
+            <menuitem action="import-schedule" position="top" />
+          </menu>
           <menu action="file-export">
             <menuitem action="export-lib" />
             <menuitem action="export-sched" />

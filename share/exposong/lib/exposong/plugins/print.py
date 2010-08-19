@@ -122,7 +122,6 @@ class Print(Plugin, _abstract.Menu):
     cls.menu_merge_id = uimanager.add_ui_from_string("""
       <menubar name="MenuBar">
         <menu action="File">
-          <menuitem action="import" position="top" />
           <menu action="file-print">
             <menuitem action="print-presentation" />
             <menuitem action="print-songlist" />

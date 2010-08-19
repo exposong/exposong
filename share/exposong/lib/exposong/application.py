@@ -184,6 +184,8 @@ class Main (gtk.Window):
         ('Quit', gtk.STOCK_QUIT, None, None, None, self._quit),
         ('Preferences', gtk.STOCK_PREFERENCES,
             None, None, None, self._on_prefs),
+        ('file-import', None, _("Import"), "",
+            _("Import a .expo package or other format")),
         ('file-export', None, _("Export"), "", _("Export a .expo package")),
         ('file-print', None, _("Print"), "", None),
         ('sched-new', gtk.STOCK_NEW, None, None, _("Create a new schedule"),
@@ -235,6 +237,7 @@ class Main (gtk.Window):
     uimanager.add_ui_from_string('''
         <menubar name="MenuBar">
           <menu action="File">
+            <menu action="file-import"/>
             <menu action="file-export"/>
             <menu action="file-print"/>
             <separator/>
