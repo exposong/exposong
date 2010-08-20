@@ -112,7 +112,7 @@ class Screen:
   
   def draw(self):
     'Redraw the presentation and preview screens.'
-    if self.pres.window and self.pres.window.is_viewable():
+    if self.is_viewable():
       self.pres.queue_draw()
     else:
       self.preview.queue_draw()
@@ -164,6 +164,7 @@ class Screen:
     self.draw()
     self._set_menu_items_disabled()
     exposong.slidelist.slidelist.grab_focus()
+    exposong.slidelist.slidelist.reset_timer()
   
   def expose(self, widget, event):
     'Redraw `widget`.'
@@ -177,6 +178,9 @@ class Screen:
     'Put up notification text on the screen.'
     self._notification = text
     self.draw()
+  
+  def is_viewable(self):
+    return self.pres.window and self.pres.window.is_viewable()
   
   def _set_background(self, widget, ccontext = None, bounds = None):
     'Set the background of `widget` to a color or image.'
@@ -275,8 +279,7 @@ class Screen:
     
     ccontext = widget.window.cairo_create()
     screenW, screenH = widget.window.get_size()
-    if widget is self.preview and self.pres.window and\
-        self.pres.window.is_viewable():
+    if widget is self.preview and self.is_viewable():
       #Scale if the presentation window size is available
       win_sz = self.pres.window.get_size()
       width = int(float(preview_height)*win_sz[0]/win_sz[1])
@@ -396,7 +399,7 @@ class Screen:
   
   def _set_menu_items_disabled(self):
     'Disable buttons if the presentation is not shown.'
-    enabled = self.pres.window and self.pres.window.is_viewable()
+    enabled = self.is_viewable()
     actions = exposong.application.main.main_actions
     actions.get_action("Background").set_sensitive(enabled)
     actions.get_action("Logo").set_sensitive(enabled)

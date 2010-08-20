@@ -32,19 +32,19 @@ class SlideList(gtk.TreeView):
     self.pres = None
     self.slide_order = ()
     self.slide_order_index = -1
-    self.__timer = 0 #Used to stop or reset the timer if the presentation or slide changes.
+    # Used to stop or reset the timer if the presentation or slide changes.
+    self.__timer = 0
 
     gtk.TreeView.__init__(self)
     self.set_size_request(280, 200)
     self.set_enable_search(False)
+    #self.set_headers_visible(False)
     
     self.column1 = gtk.TreeViewColumn( _("Slide"))
     self.column1.set_resizable(False)
     self.append_column(self.column1)
-    #self.set_column()
     
     self.set_model(gtk.ListStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING))
-    #self.set_headers_visible(False)
     self.get_selection().connect("changed", self._on_slide_activate)
   
   def set_presentation(self, pres):
@@ -78,7 +78,7 @@ class SlideList(gtk.TreeView):
     else:
       return False
   
-  def _move_to_slide(self, widget, mv):
+  def _move_to_slide(self, mv):
     'Move to the slide at mv. This ignores slide_order_index.'
     order_index = self.slide_order_index
     if self.slide_order_index == -1 and self.get_selection().count_selected_rows() > 0:
@@ -99,15 +99,24 @@ class SlideList(gtk.TreeView):
       self.to_slide(self.slide_order[order_index + mv])
       self.slide_order_index = order_index + mv
       return True
+    return False
   
   def prev_slide(self, widget):
     'Move to the previous slide.'
-    self._move_to_slide(widget, -1)
+    return self._move_to_slide(-1)
   
   def next_slide(self, widget):
     'Move to the next slide.'
-    self._move_to_slide(widget,  1)
-
+    return self._move_to_slide(1)
+  
+  def to_start(self):
+    'Reset to the first slide.'
+    self.slide_order_index = 0
+    if len(self.slide_order):
+      self.to_slide(self.slide_order[0])
+      return True
+    return False
+  
   def to_slide(self, slide_num):
     model = self.get_model()
     itr = model.iter_nth_child(None, slide_num)
@@ -121,7 +130,10 @@ class SlideList(gtk.TreeView):
     exposong.screen.screen.draw()
     self.slide_order_index = -1
     
-    #Reset the timer
+    self.reset_timer()
+  
+  def reset_timer(self):
+    'Restart the timer.'
     self.__timer += 1
     if self.pres and self.pres.timer:
       gobject.timeout_add(self.pres.timer*1000, self._set_timer, self.__timer)
@@ -130,6 +142,10 @@ class SlideList(gtk.TreeView):
     'Starts the timer, or continues a current timer.'
     if t <> self.__timer:
       return False
-    self.next_slide(None)
-    return True
+    if not exposong.screen.screen.is_viewable():
+      return False
+    if not self.next_slide(None) and self.pres.timer_loop:
+      self.to_start()
+    # Return False, because the slide is activated, adding another timeout
+    return False
 
