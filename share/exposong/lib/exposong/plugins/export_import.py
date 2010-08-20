@@ -40,7 +40,7 @@ information = {
 
 FILE_EXT = ".expo"
 _FILTER = gtk.FileFilter()
-_FILTER.set_name("Exposong Archive")
+_FILTER.set_name("ExpoSong Archive")
 _FILTER.add_pattern("*.expo")
 
 class ExportImport(Plugin, _abstract.Menu):

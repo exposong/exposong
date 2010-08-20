@@ -29,17 +29,17 @@ from exposong.plugins import Plugin, _abstract
 from exposong.prefs import config
 
 """
-A converter from Exposong (<= 0.6.2) Lyrics type.
+A converter from ExpoSong (<= 0.6.2) Lyrics type.
 """
 information = {
-    'name': _("Exposong Lyrics Converter"),
+    'name': _("ExpoSong Lyrics Converter"),
     'description': __doc__,
     'required': False,
     }
 
 class LyricConvert(_abstract.ConvertPresentation, _abstract.Menu, Plugin):
   """
-  Convert from Exposong (<= 0.6.2) Lyrics type to OpenLyrics.
+  Convert from ExpoSong (<= 0.6.2) Lyrics type to OpenLyrics.
   """
   
   @staticmethod
@@ -109,12 +109,12 @@ class LyricConvert(_abstract.ConvertPresentation, _abstract.Menu, Plugin):
   
   @classmethod
   def import_dialog(cls, action):
-    dlg = gtk.FileChooserDialog(_("Import Exposong Legacy File"),
+    dlg = gtk.FileChooserDialog(_("Import ExpoSong Legacy File"),
         exposong.application.main, gtk.FILE_CHOOSER_ACTION_OPEN,
         (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK,
         gtk.RESPONSE_ACCEPT))
     filter = gtk.FileFilter()
-    filter.set_name("Exposong Legacy File")
+    filter.set_name("ExpoSong Legacy File")
     filter.add_pattern("*.xml")
     dlg.add_filter(filter)
     dlg.set_current_folder(os.path.expanduser("~"))
@@ -129,7 +129,7 @@ class LyricConvert(_abstract.ConvertPresentation, _abstract.Menu, Plugin):
     pass
     actiongroup = gtk.ActionGroup('lyric-legacy-grp')
     actiongroup.add_actions([('import-lyric-legacy', None,
-        _('Import Exposong Legacy File'), None,
+        _('Import ExpoSong Legacy File'), None,
         _('Import a Lyric Presentation from ExpoSong before 0.7'),
         cls.import_dialog)])
     uimanager.insert_action_group(actiongroup, -1)

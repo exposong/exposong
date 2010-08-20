@@ -215,7 +215,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
       return False
     dialog = gtk.MessageDialog(exposong.application.main, gtk.DIALOG_MODAL,
         gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
-        _('Are you sure you want to this slide? This cannot be undone.'))
+        _('Are you sure you want to delete this slide? This cannot be undone.'))
     dialog.set_title( _("Delete Slide?") )
     resp = dialog.run()
     dialog.hide()

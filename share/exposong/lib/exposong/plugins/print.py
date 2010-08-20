@@ -45,8 +45,8 @@ class Print(Plugin, _abstract.Menu):
     if not exposong.preslist.preslist.get_active_item():
       dialog = gtk.MessageDialog(exposong.application.main, gtk.DIALOG_MODAL,
         gtk.MESSAGE_WARNING, gtk.BUTTONS_OK,
-        _('Please select the presentation you want to print first.'))
-      dialog.set_title( _("Select Presentation?") )
+        _('Please select the presentation you want to print.'))
+      dialog.set_title( _("Select Presentation") )
       resp = dialog.run()
       dialog.destroy()
       return

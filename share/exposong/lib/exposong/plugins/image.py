@@ -222,6 +222,8 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     img_del.connect("clicked", self._on_img_del, imgtree)
     
     _abstract.Presentation._edit_tabs(self, notebook, parent)
+    
+    self._fields['title'].grab_focus()
   
   def _edit_save(self):
     'Save the fields if the user clicks ok.'
@@ -269,7 +271,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
         while gtk.events_pending():
           gtk.main_iteration()
       
-    fchooser.hide()
+    fchooser.destroy()
   
   def _on_img_del(self, button, treeview):
     'Remove an image from the presentation.'
