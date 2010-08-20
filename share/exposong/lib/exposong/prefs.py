@@ -135,7 +135,7 @@ will be used."))
       exposong.screen.screen.reposition(parent)
       
       exposong.screen.screen.set_dirty()
-      if hasattr(self,"_logo_pbuf"):
+      if hasattr(exposong.screen.screen,"_logo_pbuf"):
         del exposong.screen.screen._logo_pbuf
       exposong.screen.screen.draw()
     
