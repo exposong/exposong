@@ -474,6 +474,8 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     table = gui.Table(1)
     self._fields['verse_order'] = gui.append_entry(table, _("Verse Order:"),
         " ".join(self.song.props.verse_order), 0)
+    self._fields['verse_order'].set_tooltip_text(_("Use the Slide names in \
+brackets to modify the order"))
     notebook.get_nth_page(0).pack_start(table, False, True)
     table.show_all()
   
@@ -909,6 +911,8 @@ class SlideEdit(text.SlideEdit):
     
     title_list = gtk.ListStore(str, str)
     self._title_entry = gtk.ComboBox(title_list)
+    if not self.slide_title:
+      self.slide_title = "v"
     for (abbr, name) in verse_names.iteritems():
       itr = title_list.append( (abbr, name) )
       if self.slide_title[0] == abbr:
