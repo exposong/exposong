@@ -8,7 +8,11 @@
 
 == 0.7 ==
  * Using OpenLyrics to store Lyrics (http://openlyrics.info)
+ * User can change the output monitor in dual screen mode
+ * Display songbook number on presentation (more improvements in next release)
  * Save and restore the main window's state
+ * Undo/Redo in some edit dialogs
+ * Shortcuts have been changed
  * New config format
  * setup.py script
 

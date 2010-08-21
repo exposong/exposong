@@ -16,13 +16,24 @@ ExpoSong is a worship presentation software. Features include:
  * Printing Support
  * OpenLyrics Integration
 
-Find out more at http://exposong.org, and http://exposong.googlecode.com .
-
-
 = Installation =
 
-Please see [http://code.google.com/p/exposong/wiki/Installation] for instructions
-on how to install and run this program.
+Please see [http://code.google.com/p/exposong/wiki/Installation] for full
+instructions on how to install and run this program.
+
+== Windows ==
+
+You will need to install all of these applications to run from source:
+* Python
+* GTK
+* PyGTK, PyGObject, and PyCairo
+
+You can find links at http://code.google.com/p/exposong/wiki/Installation.
+
+Once you get everything installed, double click "exposong" or "exposong.vbs" in
+this directory.
+
+== Linux, OSX ==
 
 Start the program with bin/exposong by either double clicking if possible, or
 using the following command in the terminal/command line in the folder for the
