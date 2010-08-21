@@ -64,12 +64,7 @@ import locale
 import os.path
 import sys
 
-try:
-    from lxml import etree
-except ImportError:
-    print 'lxml python module required, please install it.'
-    print 'http://pypi.python.org/pypi/lxml/'
-    exit(1)
+from xml.etree import cElementTree as etree
 
 
 NAMESPACE = 'http://openlyrics.info/namespace/2009/song'
@@ -338,7 +333,7 @@ class OpenLyricsConverter(object):
 
     def __init__(self, opensong_file):
         #print('Parsing...')
-        parser = etree.XMLParser(remove_blank_text=True)
+        parser = etree.XMLParser()
         self.osong = etree.parse(opensong_file)
         self.olyrics = etree.ElementTree(etree.Element('song'))
 
@@ -376,8 +371,7 @@ class OpenLyricsConverter(object):
     def save(self, openlyrics_file):
         #print('Saving...')
         # write openlyrics
-        self.olyrics.write(openlyrics_file, encoding='utf-8', pretty_print=True,
-                xml_declaration=True)
+        self.olyrics.write(openlyrics_file, encoding='utf-8')
 
     def validate(self, ol_file, relaxng_schema):
         #print('Validating...')
@@ -544,8 +538,8 @@ def main():
         converter = OpenLyricsConverter(opensong_file)
         converter.convert()
         converter.save(openlyrics_file)
-        schema = etree.parse(SCHEMAFILE)
-        converter.validate(openlyrics_file, schema.getroot())
+        #schema = etree.parse(SCHEMAFILE)
+        #converter.validate(openlyrics_file, schema.getroot())
 
 
 
