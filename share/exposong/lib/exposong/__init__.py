@@ -59,13 +59,14 @@ if not SHARED_FILES:
 
 LOCALE_PATH = join(SHARED_FILES, 'i18n')
 RESOURCE_PATH = join(SHARED_FILES, 'res')
-HELP_URL = join(HELP_PATH, _('en') , 'index.html')
 
 #Set up translations for the program
 locale.setlocale(locale.LC_ALL, '')
 gettext.bindtextdomain('exposong', LOCALE_PATH)
 gettext.textdomain('exposong')
 __builtin__._ = gettext.gettext
+
+HELP_URL = join(HELP_PATH, _('en') , 'index.html')
 
 # This needs to be after we locate SHARED_FILES, but before DATA_PATH is
 # defined.

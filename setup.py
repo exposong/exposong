@@ -19,7 +19,6 @@ import glob
 import os
 from os.path import normpath
 from distutils.core import setup
-import pprint
 
 data_files = []
 
