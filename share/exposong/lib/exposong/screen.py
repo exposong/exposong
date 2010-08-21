@@ -182,6 +182,12 @@ class Screen:
   def is_viewable(self):
     return self.pres.window and self.pres.window.is_viewable()
   
+  def is_running(self):
+    'If the presentation is visible and running (not black or background).'
+    return self.is_viewable() and \
+        not (self._black or self._logo or self._background)
+        
+  
   def _set_background(self, widget, ccontext = None, bounds = None):
     'Set the background of `widget` to a color or image.'
     if not widget.window:

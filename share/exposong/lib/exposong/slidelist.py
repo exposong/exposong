@@ -142,7 +142,7 @@ class SlideList(gtk.TreeView):
     'Starts the timer, or continues a current timer.'
     if t <> self.__timer:
       return False
-    if not exposong.screen.screen.is_viewable():
+    if not exposong.screen.screen.is_running():
       return False
     if not self.next_slide(None) and self.pres.timer_loop:
       self.to_start()
