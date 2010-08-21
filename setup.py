@@ -50,15 +50,17 @@ setup(name       = 'ExpoSong',
     - Schedule creation
     - On-screen notification
     - Gradient or image backgrounds
-    - Uses OpenLyrics to store Lyrics
-    - and more""",
+    - OpenLyrics Integration
+    - Print Support
+    - Export/Import Functions""",
     author       = 'Samuel Mehrbrodt',
     author_email = 's.mehrbrodt@gmail.com',
     url          = 'http://www.exposong.org/',
     license      = 'GPLv3',
     scripts      = ['bin/exposong'],
     package_dir  = {'': 'share/exposong/lib'},
-    packages     = ['exposong', 'exposong.plugins'],
-    py_modules   = ['openlyrics','undobuffer'],
+    packages     = ['exposong', 'exposong.plugins',
+                    'openlyrics', 'openlyrics.tools'],
+    py_modules   = ['undobuffer'],
     data_files   = data_files,
     )

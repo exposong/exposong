@@ -760,7 +760,7 @@ msgstr "_Text"
 
 #: share/exposong/lib/exposong/plugins/text.py:284
 msgid "Text Presentations"
-msgstr "Text-Präsentationenn"
+msgstr "Text-Präsentationen"
 
 #: share/exposong/lib/exposong/plugins/text.py:307
 msgid "Editing Slide"

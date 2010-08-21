@@ -26,10 +26,10 @@ from exposong import DATA_PATH
 from exposong.plugins import Plugin, _abstract
 
 """
-A converter from ExpoSong (<= 0.6.2) Lyrics type.
+A converter from OpenSong Lyrics type.
 """
 information = {
-    'name': _("ExpoSong Lyrics Converter"),
+    'name': _("OpenSong Lyrics Converter"),
     'description': __doc__,
     'required': False,
     }
@@ -52,7 +52,7 @@ class LyricConvert(_abstract.ConvertPresentation, _abstract.Menu, Plugin):
     Converts the file.
     
     filename   The name of the file for input.
-    outfile    The name of the file for output. If none, `filename` will used
+    outfile    The name of the file for output. If None, `filename` will used
                and placed into DATA_PATH
     """
     
@@ -90,7 +90,7 @@ class LyricConvert(_abstract.ConvertPresentation, _abstract.Menu, Plugin):
     pass
     actiongroup = gtk.ActionGroup('opensong-import-grp')
     actiongroup.add_actions([('import-opensong', None,
-        _('Import OpenSong File(s)...'), None,
+        _('Import OpenSong File(s) ...'), None,
         _('Import a Lyric Presentation from OpenSong'),
         cls.import_dialog)])
     uimanager.insert_action_group(actiongroup, -1)

@@ -273,14 +273,14 @@ class ExportImport(Plugin, _abstract.Menu):
     'Merge new values with the uimanager.'
     actiongroup = gtk.ActionGroup('export-import')
     actiongroup.add_actions([('import-schedule', None,
-            _("_Import Schedule or Library"), None,
+            _("_Import Schedule or Library ..."), None,
             _("Import a schedule or full library."), cls.import_file),
         ('export-sched', None,
-         _("_Current Schedule (and belonging presentations)"),
+         _("_Current Schedule (and belonging presentations) ..."),
          None, None, cls.export_sched),
-        ('export-lib', None, _("Whole _Library"), None,
+        ('export-lib', None, _("Whole _Library ..."), None,
             None, cls.export_lib),
-        ('export-bg', None, _("_Backgrounds"), None,
+        ('export-bg', None, _("_Backgrounds ..."), None,
             None, cls.export_backgrounds)
         ])
     uimanager.insert_action_group(actiongroup, -1)
