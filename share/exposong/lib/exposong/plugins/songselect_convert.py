@@ -20,6 +20,6 @@ _("SongSelect Lyrics Converter")
 # Dialog title
 _("Import SongSelect Lyrics")
 # Menu entry
-_("Import SongSelect Lyrics ...")
+_("_SongSelect Lyrics ...")
 # Menu help string
 _("Converts a SongSelect file to OpenLyrics")

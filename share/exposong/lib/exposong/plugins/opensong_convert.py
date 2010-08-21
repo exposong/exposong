@@ -90,7 +90,7 @@ class LyricConvert(_abstract.ConvertPresentation, _abstract.Menu, Plugin):
     pass
     actiongroup = gtk.ActionGroup('opensong-import-grp')
     actiongroup.add_actions([('import-opensong', None,
-        _('Import OpenSong File(s) ...'), None,
+        _('_OpenSong File(s) ...'), None,
         _('Import a Lyric Presentation from OpenSong'),
         cls.import_dialog)])
     uimanager.insert_action_group(actiongroup, -1)

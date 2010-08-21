@@ -113,7 +113,7 @@ class Print(Plugin, _abstract.Menu):
         ('print-presentation', None,
          _("_Current Presentation"),
          None, None, self.print_presentation),
-        ('print-songlist', None, _("List of all Songs"), None,
+        ('print-songlist', None, _("_List of all Songs"), None,
             None, self.print_songlist)
         ])
     uimanager.insert_action_group(actiongroup, -1)

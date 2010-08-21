@@ -138,7 +138,7 @@ class LyricConvert(_abstract.ConvertPresentation, _abstract.Menu, Plugin):
     pass
     actiongroup = gtk.ActionGroup('lyric-legacy-grp')
     actiongroup.add_actions([('import-lyric-legacy', None,
-        _('Import ExpoSong Legacy File(s) ...'), None,
+        _('_ExpoSong Legacy File(s) ...'), None,
         _('Import a Lyric Presentation from ExpoSong before 0.7'),
         cls.import_dialog)])
     uimanager.insert_action_group(actiongroup, -1)

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-20 14:46+0300\n"
-"PO-Revision-Date: 2010-08-20 14:51+0300\n"
+"POT-Creation-Date: 2010-08-22 01:27+0300\n"
+"PO-Revision-Date: 2010-08-22 01:33+0300\n"
 "Last-Translator: Samuel Mehrbrodt <s.mehrbrodt@gmail.com>\n"
 "Language-Team: German>\n"
 "MIME-Version: 1.0\n"
@@ -71,26 +71,24 @@ msgid "_Help"
 msgstr "H_ilfe"
 
 #: share/exposong/lib/exposong/application.py:187
-#: share/exposong/lib/exposong/plugins/export_import.py:186
-msgid "Import"
-msgstr "Importieren"
+msgid "_Import"
+msgstr "_Importieren"
 
 #: share/exposong/lib/exposong/application.py:188
 msgid "Import a .expo package or other format"
 msgstr "Ein .expo Paket oder ein anderes Format importieren"
 
 #: share/exposong/lib/exposong/application.py:189
-msgid "Export"
-msgstr "Exportieren"
+msgid "_Export"
+msgstr "_Exportieren"
 
 #: share/exposong/lib/exposong/application.py:189
 msgid "Export a .expo package"
 msgstr "Ein .expo Paket exportieren"
 
 #: share/exposong/lib/exposong/application.py:190
-#: share/exposong/lib/exposong/plugins/print.py:30
-msgid "Print"
-msgstr "Drucken"
+msgid "_Print"
+msgstr "_Drucken"
 
 #: share/exposong/lib/exposong/application.py:191
 msgid "Create a new schedule"
@@ -209,7 +207,7 @@ msgstr "Ordner auswählen"
 msgid "Language Code"
 msgstr "Ländercode"
 
-#: share/exposong/lib/exposong/__init__.py:88
+#: share/exposong/lib/exposong/__init__.py:69
 msgid "en"
 msgstr "de"
 
@@ -399,25 +397,29 @@ msgstr "Hintergründe exportieren"
 msgid "exposong_backgrounds.expo"
 msgstr "exposong_backgrounds.expo"
 
+#: share/exposong/lib/exposong/plugins/export_import.py:186
+msgid "Import"
+msgstr "Importieren"
+
 #: share/exposong/lib/exposong/plugins/export_import.py:276
-msgid "_Import Schedule or Library"
-msgstr "_Ablaufplan oder Bibliothek importieren"
+msgid "_Schedule or Library ..."
+msgstr "_Ablaufplan oder Bibliothek ..."
 
 #: share/exposong/lib/exposong/plugins/export_import.py:277
 msgid "Import a schedule or full library."
 msgstr "Ablaufplan oder Bibliothek importieren"
 
 #: share/exposong/lib/exposong/plugins/export_import.py:279
-msgid "_Current Schedule (and belonging presentations)"
-msgstr "_Aktuellen Ablaufplan (und zugehörige Präsentationen)"
+msgid "_Current Schedule (and belonging presentations) ..."
+msgstr "_Aktuellen Ablaufplan (und zugehörige Präsentationen) ..."
 
 #: share/exposong/lib/exposong/plugins/export_import.py:281
-msgid "Whole _Library"
-msgstr "_Ganze Bibliothek"
+msgid "Whole _Library ..."
+msgstr "_Ganze Bibliothek ..."
 
 #: share/exposong/lib/exposong/plugins/export_import.py:283
-msgid "_Backgrounds"
-msgstr "Hinter_gründe"
+msgid "_Backgrounds ..."
+msgstr "Hinter_gründe ..."
 
 #: share/exposong/lib/exposong/plugins/image.py:35
 msgid "Image Presentation"
@@ -455,12 +457,23 @@ msgstr "Bilder-Präsentationen"
 msgid "ExpoSong Lyrics Converter"
 msgstr "ExpoSong Lieder-Converter"
 
-#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:112
-#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:132
-msgid "Import ExpoSong Legacy File"
-msgstr "Altes ExpoSong-Lied importieren"
+#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:97
+msgid "Undefined Title"
+msgstr "Undefinierter Titel"
 
-#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:133
+#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:116
+msgid "Import ExpoSong Legacy File(s)"
+msgstr "Frühere(s) ExpoSong-Lied(er) importieren ..."
+
+#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:122
+msgid "ExpoSong Legacy File"
+msgstr "Frühere ExpoSong-Datei"
+
+#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:141
+msgid "_ExpoSong Legacy File(s) ..."
+msgstr "frühere _ExpoSong Datei ..."
+
+#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:142
 msgid "Import a Lyric Presentation from ExpoSong before 0.7"
 msgstr "Eine Lieder-Präsentation von ExpoSong vor 0.7 importieren"
 
@@ -718,25 +731,61 @@ msgstr "Name:"
 msgid "Index:"
 msgstr "Index:"
 
-#: share/exposong/lib/exposong/plugins/print.py:48
+#: share/exposong/lib/exposong/plugins/opensong_convert.py:32
+msgid "OpenSong Lyrics Converter"
+msgstr "OpenSong Lieder-Converter"
+
+#: share/exposong/lib/exposong/plugins/opensong_convert.py:73
+msgid "Import OpenSong File(s)"
+msgstr "OpenSong-Datei(en) importieren"
+
+#: share/exposong/lib/exposong/plugins/opensong_convert.py:93
+msgid "_OpenSong File(s) ..."
+msgstr "_OpenSong Datei(en)"
+
+#: share/exposong/lib/exposong/plugins/opensong_convert.py:94
+msgid "Import a Lyric Presentation from OpenSong"
+msgstr "Eine Lieder-Präsentation von OpenSong importieren"
+
+#: share/exposong/lib/exposong/plugins/print_support.py:30
+msgid "Print"
+msgstr "Drucken"
+
+#: share/exposong/lib/exposong/plugins/print_support.py:48
 msgid "Please select the presentation you want to print."
 msgstr "Bitte wählen Sie eine Präsentation aus, die Sie drucken wollen."
 
-#: share/exposong/lib/exposong/plugins/print.py:49
+#: share/exposong/lib/exposong/plugins/print_support.py:49
 msgid "Select Presentation"
 msgstr "Präsentation auswählen"
 
-#: share/exposong/lib/exposong/plugins/print.py:95
+#: share/exposong/lib/exposong/plugins/print_support.py:95
 msgid "Alphabetical list of Songs"
 msgstr "Alphabetische Liederliste"
 
-#: share/exposong/lib/exposong/plugins/print.py:114
+#: share/exposong/lib/exposong/plugins/print_support.py:114
 msgid "_Current Presentation"
 msgstr "_Aktuelle Präsentation"
 
-#: share/exposong/lib/exposong/plugins/print.py:116
-msgid "List of all Songs"
-msgstr "Liste aller Lieder"
+#: share/exposong/lib/exposong/plugins/print_support.py:116
+msgid "_List of all Songs"
+msgstr "_Liste aller Lieder"
+
+#: share/exposong/lib/exposong/plugins/songselect_convert.py:19
+msgid "SongSelect Lyrics Converter"
+msgstr "SongSelect Lieder-Converter"
+
+#: share/exposong/lib/exposong/plugins/songselect_convert.py:21
+msgid "Import SongSelect Lyrics"
+msgstr "SongSelect Lied importieren"
+
+#: share/exposong/lib/exposong/plugins/songselect_convert.py:23
+msgid "_SongSelect Lyrics ..."
+msgstr "_SongSelect Lyrics ..."
+
+#: share/exposong/lib/exposong/plugins/songselect_convert.py:25
+msgid "Converts a SongSelect file to OpenLyrics"
+msgstr "Konvertiert eine SongSelect-Datei zu OpenLyrics"
 
 #: share/exposong/lib/exposong/plugins/text.py:31
 msgid "Text Presentation"
@@ -770,8 +819,6 @@ msgstr "Folie bearbeiten"
 msgid "Unsaved Changes exist. Do you really want to continue without saving?"
 msgstr "Es gibt ungespeicherte Änderungen. Möchten Sie fortfahren, ohne zu speichern?"
 
-#~ msgid "_Import"
-#~ msgstr "_Importieren"
 #~ msgid "Part"
 #~ msgstr "Part"
 #~ msgid "Export Alphabetical Song List"
