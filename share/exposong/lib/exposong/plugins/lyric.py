@@ -26,7 +26,7 @@ import xml.dom
 import xml.dom.minidom
 from datetime import datetime
 
-import openlyrics
+from openlyrics import openlyrics
 import undobuffer
 
 import exposong.application

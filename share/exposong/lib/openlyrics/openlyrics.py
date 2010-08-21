@@ -601,7 +601,10 @@ class Lines(object):
             lines_elem.set('part', self.part)
         for line in self.lines:
             line = u'<line>%s</line>' % line.markup
-            line_elem = etree.fromstring(line.encode('UTF-8'))
+            try:
+                line_elem = etree.fromstring(line.encode('UTF-8'))
+            except SyntaxError:
+                continue
             lines_elem.append(line_elem)
         return lines_elem
     

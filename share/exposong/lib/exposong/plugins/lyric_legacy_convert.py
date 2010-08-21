@@ -18,7 +18,7 @@
 import gtk
 import gtk.gdk
 
-import openlyrics
+from openlyrics import openlyrics
 from xml.etree import cElementTree as etree
 
 import exposong.application
@@ -93,12 +93,16 @@ class LyricConvert(_abstract.ConvertPresentation, _abstract.Menu, Plugin):
     slides = root.findall('slide')
     for slide in slides:
       verse = openlyrics.Verse()
-      vname = slide.get("title").lower()[0]+slide.get('title').partition(' ')[2]
+      if not slide.get("title"):
+        vname = _("Undefined Title")
+      else:
+        vname = slide.get("title").lower()[0]+slide.get('title').partition(' ')[2]
       verse.name = vname
       lines = openlyrics.Lines()
-      lines.lines = [openlyrics.Line(l) for l in slide.text.split('\n')]
-      verse.lines = [lines]
-      song.verses.append(verse)
+      if slide.text: # To skip empty slides
+        lines.lines = [openlyrics.Line(l) for l in slide.text.split('\n')]
+        verse.lines = [lines]
+        song.verses.append(verse)
     if newfile:
       outfile = check_filename(title_to_filename(title[0].text),
           os.path.join(DATA_PATH, "pres"))
@@ -109,18 +113,23 @@ class LyricConvert(_abstract.ConvertPresentation, _abstract.Menu, Plugin):
   
   @classmethod
   def import_dialog(cls, action):
-    dlg = gtk.FileChooserDialog(_("Import ExpoSong Legacy File"),
+    dlg = gtk.FileChooserDialog(_("Import ExpoSong Legacy File(s)"),
         exposong.application.main, gtk.FILE_CHOOSER_ACTION_OPEN,
         (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK,
         gtk.RESPONSE_ACCEPT))
+    dlg.set_select_multiple(True)
     filter = gtk.FileFilter()
-    filter.set_name("ExpoSong Legacy File")
+    filter.set_name(_("ExpoSong Legacy File"))
     filter.add_pattern("*.xml")
     dlg.add_filter(filter)
     dlg.set_current_folder(os.path.expanduser("~"))
     if dlg.run() == gtk.RESPONSE_ACCEPT:
-      filename = cls.convert(dlg.get_filename(), True)
-      exposong.application.main.load_pres(filename)
+      dlg.hide()
+      files = dlg.get_filenames()
+      for file in files:
+        print file
+        filename = cls.convert(file, True)
+        exposong.application.main.load_pres(filename)
     dlg.destroy()
   
   @classmethod
@@ -129,7 +138,7 @@ class LyricConvert(_abstract.ConvertPresentation, _abstract.Menu, Plugin):
     pass
     actiongroup = gtk.ActionGroup('lyric-legacy-grp')
     actiongroup.add_actions([('import-lyric-legacy', None,
-        _('Import ExpoSong Legacy File'), None,
+        _('Import ExpoSong Legacy File(s)...'), None,
         _('Import a Lyric Presentation from ExpoSong before 0.7'),
         cls.import_dialog)])
     uimanager.insert_action_group(actiongroup, -1)
