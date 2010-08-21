@@ -31,12 +31,6 @@ HELP_URL = None
 
 pygtk.require("2.0")
 
-#Set up translations for the program
-locale.setlocale(locale.LC_ALL, '')
-gettext.bindtextdomain('exposong', LOCALE_PATH)
-gettext.textdomain('exposong')
-__builtin__._ = gettext.gettext
-
 # TODO We need a better method of searching for defs.py.
 _defs_files = None
 p = os.path.join(dirname(__file__), pardir, pardir, pardir, pardir)
@@ -66,6 +60,12 @@ if not SHARED_FILES:
 LOCALE_PATH = join(SHARED_FILES, 'i18n')
 RESOURCE_PATH = join(SHARED_FILES, 'res')
 HELP_URL = join(HELP_PATH, _('en') , 'index.html')
+
+#Set up translations for the program
+locale.setlocale(locale.LC_ALL, '')
+gettext.bindtextdomain('exposong', LOCALE_PATH)
+gettext.textdomain('exposong')
+__builtin__._ = gettext.gettext
 
 # This needs to be after we locate SHARED_FILES, but before DATA_PATH is
 # defined.
