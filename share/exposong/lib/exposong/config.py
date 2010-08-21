@@ -31,7 +31,14 @@ class Config(ConfigParser.SafeConfigParser):
   
   def __init__(self):
     ConfigParser.SafeConfigParser.__init__(self)
-    cfile = os.path.join(os.path.expanduser("~"), ".exposong.conf")
+    if os.name == 'nt':
+      d = os.path.join(os.environ["LOCALAPPDATA"], "exposong")
+    else:
+      d = os.path.join(os.path.expanduser("~"), ".config", "exposong")
+    if not os.path.exists(d):
+      os.makedirs(d)
+    cfile = os.path.join(d,"exposong.conf")
+    del d
     
     self.add_section("main_window")
     self.add_section("general")
