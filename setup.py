@@ -17,29 +17,31 @@
 
 import glob
 import os
+from os.path import normpath
 from distutils.core import setup
+import pprint
 
 data_files = []
 
 # Add images
-data_files.append(('share/exposong/images/',
-                   glob.glob('share/exposong/res/*.png')))
+data_files.append((normpath('share/exposong/images'),
+                   glob.glob(normpath('share/exposong/res/*.png'))))
 
 # Add translations
-for filepath in glob.glob('share/exposong/i18n/*/LC_MESSAGES/exposong.mo'):
-    data_files.append((filepath.replace('LC_MESSAGES/exposong.mo', ''),
+for filepath in glob.glob(normpath('share/exposong/i18n/*/LC_MESSAGES/exposong.mo')):
+    data_files.append((filepath.replace(normpath('LC_MESSAGES/exposong.mo'), ''),
                        [filepath]))
 
 # Add help files
-data_files.append(('share/exposong/help/', ['help/es.png', 'help/style.css']))
-for filepath in glob.glob('help/*/index.html'):
-    data_files.append((os.path.join(
-        'share/exposong',filepath.rstrip('index.html')), [filepath]))
+data_files.append((normpath('share/exposong/help'),
+                   [normpath('help/es.png'), normpath('help/s  tyle.css')]))
+for filepath in glob.glob(normpath('help/*/index.html')):
+    data_files.append((normpath(os.path.join('share/exposong',
+                                filepath.rstrip('/index.html'))), [filepath]))
 
-
-setup(name='ExpoSong',
-    version='0.7',
-    description='Worship presentation software',
+setup(name       = 'ExpoSong',
+    version      = '0.7',
+    description  = 'Worship presentation software',
     long_description="""
     ExpoSong is a presentation software with a focus on displaying lyrics, 
     text and image slides in a Christian setting.
@@ -51,12 +53,13 @@ setup(name='ExpoSong',
     - Gradient or image backgrounds
     - Uses OpenLyrics to store Lyrics
     - and more""",
-    author='Samuel Mehrbrodt',
-    author_email='s.mehrbrodt@gmail.com',
-    url='http://www.exposong.org/',
-    license='GPLv3',
-    scripts = ['bin/exposong'],
-    package_dir = {'': 'share/exposong/lib'},
-    packages=['exposong', 'exposong.plugins'],
-    data_files = data_files,
+    author       = 'Samuel Mehrbrodt',
+    author_email = 's.mehrbrodt@gmail.com',
+    url          = 'http://www.exposong.org/',
+    license      = 'GPLv3',
+    scripts      = ['bin/exposong'],
+    package_dir  = {'': 'share/exposong/lib'},
+    packages     = ['exposong', 'exposong.plugins'],
+    py_modules   = ['openlyrics','undobuffer'],
+    data_files   = data_files,
     )

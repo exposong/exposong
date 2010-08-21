@@ -1,6 +1,6 @@
 include *.txt
-include defs_dist.py
+include defs.py
 include setup.py
-recursive-include help/ *
+recursive-include help *
 recursive-include share/exposong/res *.png
 recursive-include share/exposong/i18n *
