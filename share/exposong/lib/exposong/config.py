@@ -19,8 +19,8 @@ import os
 import shutil
 
 from exposong import SHARED_FILES
-# NOTE: Do NOT import anything that uses DATA_PATH here. This is almost
-# all of exposong.* .
+# NOTE: If you import something that uses DATA_PATH, the results could be bad.
+# This includes almost all of exposong.*.
 
 class Config(ConfigParser.SafeConfigParser):
   """

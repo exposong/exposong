@@ -19,17 +19,24 @@
 # Usage:
 # To use this file, move to defs.py in the root folder of exposong.
 
-import os.path
+from os.path import abspath, join, dirname
 
-# The variable DATA_PATH can be used to customize where the data will be
-# stored. If no value is specified, it defaults to ~/exposong/data
+# DATA_PATH can be used to customize where the data will be stored. If no value
+# is specified, it defaults to ~/exposong/data
 #
 # The following example uses "data" directly under the program directory:
 #
-#DATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),'data')
+DATA_PATH = abspath(join(dirname(__file__),'data'))
 #
 # Or you can use "~/Documents/exposong"
 # directory.
 #
 #DATA_PATH = os.path.join(os.path.expanduser('~'),'Documents','exposong')
 
+# SHARED_FILES defines where program images, translations, and other
+# miscellaneous files.
+# 
+SHARED_FILES = abspath(join(dirname(__file__), 'share', 'exposong'))
+
+# HELP_PATH defines where help is located.
+HELP_PATH = abspath(join(dirname(__file__), 'help'))

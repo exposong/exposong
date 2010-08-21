@@ -14,52 +14,72 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import imp
 import os.path, os
+import pygtk
+import gettext
+import locale
+import __builtin__
 from os.path import abspath, dirname, join, pardir, expanduser
 
+DATA_PATH = None
+SHARED_FILES = None
+LOCALE_PATH = None
+RESOURCE_PATH = None
+HELP_PATH = None
+HELP_URL = None
 
-# Find shared files
+pygtk.require("2.0")
 
-usr_dir = abspath(join('/', 'usr', 'share', 'exposong'))
-#running from bin/exposong
-bin_path = abspath(join(dirname(__file__), pardir, pardir, pardir, pardir,
-                        'bin', 'exposong'))
-if os.path.exists(bin_path):
-  SHARED_FILES = abspath(join(dirname(__file__), pardir, pardir))
-  LOCALE_PATH = join(SHARED_FILES, 'i18n')
-  RESOURCE_PATH = join(SHARED_FILES, 'res')
-  HELP_PATH = abspath(join(SHARED_FILES, pardir, pardir, 'help'))
-# running from /usr/share/exposong
-elif os.path.exists(usr_dir):
-  SHARED_FILES = usr_dir
-  LOCALE_PATH = join(SHARED_FILES, 'i18n')
-  RESOURCE_PATH = join(SHARED_FILES, 'images')
-  HELP_PATH = join(SHARED_FILES, 'help')
+#Set up translations for the program
+locale.setlocale(locale.LC_ALL, '')
+gettext.bindtextdomain('exposong', LOCALE_PATH)
+gettext.textdomain('exposong')
+__builtin__._ = gettext.gettext
+
+# TODO We need a better method of searching for defs.py.
+_defs_files = None
+p = os.path.join(dirname(__file__), pardir, pardir, pardir, pardir)
+if not os.path.exists(p):
+  p = os.path.join('/', 'usr', 'share', 'exposong')
+  if not os.path.exists(p):
+    p = None
+
+if p:
+  _defs_files = abspath(join(p,"defs.py"))
 else:
   print "Program files not found. Will now exit"
   exit(0)
 
-# Find DATA_PATH
-DATA_PATH = None
+_defs = imp.load_source('defs', _defs_files)
 
+del _defs_files
+
+if _defs:
+  SHARED_FILES = _defs.SHARED_FILES
+  HELP_PATH = _defs.HELP_PATH
+
+if not SHARED_FILES:
+  print "Program files not found. Will now exit"
+  exit(0)
+
+LOCALE_PATH = join(SHARED_FILES, 'i18n')
+RESOURCE_PATH = join(SHARED_FILES, 'res')
+HELP_URL = join(HELP_PATH, _('en') , 'index.html')
+
+# This needs to be after we locate SHARED_FILES, but before DATA_PATH is
+# defined.
 from exposong import config
 
 if config.config.has_option("general", "data-path"):
   DATA_PATH = config.config.get("general", "data-path")
 else:
-  _defs = None
-  try:
-    _defs_files = abspath(join(SHARED_FILES, pardir, pardir, "defs.py"))
-    import imp
-    _defs = imp.load_source('defs', _defs_files)
-  except IOError:
-    pass
-  
-  if hasattr(_defs, "DATA_PATH") and isinstance(_defs.DATA_PATH, str):
+  if _defs and hasattr(_defs, "DATA_PATH"):
     DATA_PATH = _defs.DATA_PATH
   else:
     DATA_PATH = join(expanduser("~"),"exposong","data")
-  del _defs
+
+del _defs
 
 # Initialize the data directories. This assumes that if they exist, they are
 # either directories or symlinks. We might need to handle the case where they
@@ -70,22 +90,5 @@ for folder in ('bg','pres','sched','image'):
   if not os.path.exists(join(DATA_PATH, folder)):
     os.mkdir(join(DATA_PATH,folder))
 
-
-import pygtk
-pygtk.require("2.0")
-
-#Set up translations for the program
-import gettext
-import locale
-
-locale.setlocale(locale.LC_ALL, '')
-gettext.bindtextdomain('exposong', LOCALE_PATH)
-gettext.textdomain('exposong')
-
-import __builtin__
-__builtin__._ = gettext.gettext
-
-HELP_URL = join(HELP_PATH, _('en') , 'index.html')
-
-#import the main application
+# Import this last.
 from exposong.application import run

@@ -57,7 +57,6 @@ setup(name='ExpoSong',
     license='GPLv3',
     scripts = ['bin/exposong'],
     package_dir = {'': 'share/exposong/lib'},
-    packages=['exposong',
-            'exposong.plugins'],
+    packages=['exposong', 'exposong.plugins'],
     data_files = data_files,
     )

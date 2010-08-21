@@ -23,13 +23,13 @@ import threading
 
 from xml.dom import minidom
 
+import exposong.plugins, exposong.plugins._abstract
+import exposong.bgselect, exposong.notify
 from exposong import RESOURCE_PATH, DATA_PATH, SHARED_FILES, HELP_URL
 from exposong import config, prefs, screen, schedlist
 from exposong import preslist, presfilter, slidelist, statusbar
 from exposong.about import About
 from exposong.schedule import Schedule # ? where to put library
-import exposong.plugins, exposong.plugins._abstract
-import exposong.bgselect, exposong.notify
 
 main = None
 keys_to_disable = ("Background","Black Screen")
