@@ -52,8 +52,7 @@ class LyricConvert(_abstract.ConvertPresentation, _abstract.Menu, Plugin):
     Converts the file.
     
     filename   The name of the file for input.
-    outfile    The name of the file for output. If None, `filename` will used
-               and placed into DATA_PATH
+    newfile    Set to True if the file is not to be overwritten.
     """
     
     if not newfile:
@@ -87,7 +86,6 @@ class LyricConvert(_abstract.ConvertPresentation, _abstract.Menu, Plugin):
   @classmethod
   def merge_menu(cls, uimanager):
     'Merge new values with the uimanager.'
-    pass
     actiongroup = gtk.ActionGroup('opensong-import-grp')
     actiongroup.add_actions([('import-opensong', None,
         _('_OpenSong File(s) ...'), None,

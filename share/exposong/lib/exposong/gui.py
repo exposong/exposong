@@ -136,7 +136,6 @@ def append_combo2(table, label, options, value, top):
   combo.pack_start(cell, True)
   combo.add_attribute(cell, 'text', 1)
   for i in range(len(options)):
-    print i, options[i]
     list.append(options[i])
     if options[i][0] == value:
       combo.set_active(i)

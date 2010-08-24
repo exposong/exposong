@@ -66,8 +66,7 @@ class LyricConvert(_abstract.ConvertPresentation, _abstract.Menu, Plugin):
     Converts the file.
     
     filename   The name of the file for input.
-    outfile    The name of the file for output. If none, `filename` will be
-               overwritten.
+    newfile    Set to True if the file is not to be overwritten.
     """
     tree = etree.parse(filename)
     if isinstance(tree, etree.ElementTree):
@@ -127,7 +126,6 @@ class LyricConvert(_abstract.ConvertPresentation, _abstract.Menu, Plugin):
       dlg.hide()
       files = dlg.get_filenames()
       for file in files:
-        print file
         filename = cls.convert(file, True)
         exposong.application.main.load_pres(filename)
     dlg.destroy()
@@ -135,7 +133,6 @@ class LyricConvert(_abstract.ConvertPresentation, _abstract.Menu, Plugin):
   @classmethod
   def merge_menu(cls, uimanager):
     'Merge new values with the uimanager.'
-    pass
     actiongroup = gtk.ActionGroup('lyric-legacy-grp')
     actiongroup.add_actions([('import-lyric-legacy', None,
         _('_ExpoSong Legacy File(s) ...'), None,
