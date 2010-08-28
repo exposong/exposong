@@ -22,6 +22,7 @@ import webbrowser
 import threading
 
 from xml.dom import minidom
+from urllib import pathname2url
 
 import exposong.plugins, exposong.plugins._abstract
 import exposong.bgselect, exposong.notify
@@ -439,7 +440,7 @@ class Main (gtk.Window):
   
   def _show_help(self, *args):
     'Show the help pages.'
-    webbrowser.open(HELP_URL)
+    webbrowser.open("file:"+pathname2url(HELP_URL))
   
   def _save_schedules(self):
     'Save all schedules to disk.'
