@@ -17,13 +17,17 @@
 
 import glob
 import os
+import sys
+from cx_Freeze import setup, Executable
 from os.path import normpath
-from distutils.core import setup
+
+sys.path.insert(0,'share/exposong/lib')
+sys.path.insert(0,'./')
 
 data_files = []
 
 # Add images
-data_files.append((normpath('share/exposong/images'),
+data_files.append((normpath('share/exposong/res'),
                    glob.glob(normpath('share/exposong/res/*.png'))))
 
 # Add translations
@@ -33,13 +37,20 @@ for filepath in glob.glob(normpath('share/exposong/i18n/*/LC_MESSAGES/exposong.m
 
 # Add help files
 data_files.append((normpath('share/exposong/help'),
-                   [normpath('share/help/es.png'), normpath('share/help/style.css')]))
-for filepath in glob.glob(normpath('share/help/*/index.html')):
-    data_files.append((normpath(os.path.join('share/exposong',
-                                filepath.rstrip('/index.html'))), [filepath]))
+                   [normpath('share/exposong/help/es.png'),
+                    normpath('share/exposong/help/style.css')]))
+for filepath in glob.glob(normpath('share/exposong/help/*/index.html')):
+    data_files.append((normpath(os.path.join(filepath.rstrip('/index.html'))),
+                                             [filepath]))
+
+#plugins = ['exposong.plugins.%s' % p[:-3]
+#           for p in os.listdir(normpath('share/exposong/lib/exposong/plugins'))
+#           if p.endswith(".py") and not p.startswith("_")]
+
+# TODO defs.py needs to get included somehow.
 
 setup(name       = 'ExpoSong',
-    version      = '0.7',
+    version      = '0.7.0b1',
     description  = 'Worship presentation software',
     long_description="""
     ExpoSong is a presentation software with a focus on displaying lyrics, 
@@ -61,6 +72,11 @@ setup(name       = 'ExpoSong',
     package_dir  = {'': 'share/exposong/lib'},
     packages     = ['exposong', 'exposong.plugins',
                     'openlyrics', 'openlyrics.tools'],
-    py_modules   = ['undobuffer'],
+    py_modules   = ['undobuffer'],#+plugins,
+    executables=[Executable(
+        script   ='bin/exposong',
+    #    includes =['defs'],
+    #    packages =['exposong','exposong.plugins'],
+        )],
     data_files   = data_files,
     )

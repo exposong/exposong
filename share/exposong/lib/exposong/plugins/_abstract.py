@@ -23,7 +23,6 @@ from xml.parsers.expat import ExpatError
 
 from exposong.glob import *
 from exposong import DATA_PATH
-from exposong.plugins import Plugin
 import exposong.application
 import exposong.schedlist
 

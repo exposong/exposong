@@ -22,8 +22,8 @@ Thanks to Armin Ronacher for writing most of this code
 """
 
 import os
+import sys
 
-__all__ = [fnm[:-3] for fnm in os.listdir(__path__[0]) if fnm.endswith(".py") and not fnm.startswith("_")]
 
 class Plugin(object):
   '''
@@ -48,8 +48,9 @@ def init_plugin_system(plugins):
 
 def load_plugins():
   'Import plugins.'
-  for plugin in __all__:
-    __import__("exposong.plugins."+plugin, None, None, [''])
+  if not hasattr(sys, "frozen"):
+    for plugin in __all__:
+      __import__("exposong.plugins."+plugin, None, None, [''])
 
 
 def find_plugins():
@@ -65,3 +66,21 @@ def get_plugins_by_capability(klass):
       result.append(plugin)
   return result
 
+
+# Have to put this below so that Plugin is defined.
+
+# TODO This is not as automated as it was before, so it needs to be fixed, and
+# work with cx_Freeze.
+if hasattr(sys, "frozen"):
+  import exposong.plugins.export_import
+  import exposong.plugins.image
+  import exposong.plugins.lyric
+  import exposong.plugins.lyric_legacy_convert
+  import exposong.plugins.opensong_convert
+  import exposong.plugins.print_support
+  import exposong.plugins.songselect_convert
+  import exposong.plugins.text
+  __all__ = ["export_import","image","lyric","text","print_support",
+             "lyric_legacy_convert","opensong_convert","songselect_convert"]
+else:
+  __all__ = [fnm[:-3] for fnm in os.listdir(__path__[0]) if fnm.endswith(".py") and not fnm.startswith("_")]

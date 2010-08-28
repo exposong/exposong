@@ -31,32 +31,17 @@ HELP_URL = None
 
 pygtk.require("2.0")
 
-# TODO We need a better method of searching for defs.py.
-_defs_files = None
-p = os.path.join(dirname(__file__), pardir, pardir, pardir, pardir)
-if not os.path.exists(p):
-  p = os.path.join('/', 'usr', 'share', 'exposong')
-  if not os.path.exists(p):
-    p = None
-
-if p:
-  _defs_files = abspath(join(p,"defs.py"))
+# Find the 'share' folder
+for i in range(6):
+  _p = abspath(join(*([__file__]+[pardir]*i+['share','exposong'])))
+  if os.path.exists(_p):
+    SHARED_FILES = _p
+    break
 else:
-  print "Program files not found. Will now exit"
+  print "Program files not found. Will now exit."
   exit(0)
 
-_defs = imp.load_source('defs', _defs_files)
-
-del _defs_files
-
-if _defs:
-  SHARED_FILES = _defs.SHARED_FILES
-  HELP_PATH = _defs.HELP_PATH
-
-if not SHARED_FILES:
-  print "Program files not found. Will now exit"
-  exit(0)
-
+HELP_PATH = join(SHARED_FILES, 'help')
 LOCALE_PATH = join(SHARED_FILES, 'i18n')
 RESOURCE_PATH = join(SHARED_FILES, 'res')
 
@@ -75,12 +60,7 @@ from exposong import config
 if config.config.has_option("general", "data-path"):
   DATA_PATH = config.config.get("general", "data-path")
 else:
-  if _defs and hasattr(_defs, "DATA_PATH"):
-    DATA_PATH = _defs.DATA_PATH
-  else:
-    DATA_PATH = join(expanduser("~"),"exposong","data")
-
-del _defs
+  DATA_PATH = join(expanduser("~"),"exposong","data")
 
 # Initialize the data directories. This assumes that if they exist, they are
 # either directories or symlinks. We might need to handle the case where they
