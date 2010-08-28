@@ -161,6 +161,7 @@ class Screen:
     'Show the presentation screen.'
     self._background = self._black = self._logo = False
     self.window.show_all()
+    #self.set_dirty()
     self.draw()
     self._set_menu_items_disabled()
     exposong.slidelist.slidelist.grab_focus()
@@ -285,7 +286,7 @@ class Screen:
     
     ccontext = widget.window.cairo_create()
     screenW, screenH = widget.window.get_size()
-    if widget is self.preview and self.is_viewable():
+    if widget is self.preview and self.pres.window:
       #Scale if the presentation window size is available
       win_sz = self.pres.window.get_size()
       width = int(float(preview_height)*win_sz[0]/win_sz[1])
