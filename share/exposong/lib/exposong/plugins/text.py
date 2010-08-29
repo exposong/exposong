@@ -129,11 +129,12 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     
     vbox.pack_start(toolbar, False, True)
     
-    text_scroll = gtk.ScrolledWindow()
-    text_scroll.add(self._slide_list)
-    text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-    text_scroll.set_size_request(400, 250)
-    vbox.pack_start(text_scroll, True, True)
+    scroll = gtk.ScrolledWindow()
+    scroll.add(self._slide_list)
+    scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+    scroll.set_size_request(400, 250)
+    scroll.set_shadow_type(gtk.SHADOW_IN)
+    vbox.pack_start(scroll, True, True)
     
     vbox.show_all()
     notebook.insert_page(vbox, gtk.Label(_("Edit")), 0)
@@ -340,11 +341,12 @@ class SlideEdit(gtk.Dialog):
     text = gtk.TextView()
     text.set_wrap_mode(gtk.WRAP_NONE)
     text.set_buffer(self._buffer)
-    text_scroll = gtk.ScrolledWindow()
-    text_scroll.add(text)
-    text_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-    text_scroll.set_size_request(400, 250)
-    self.vbox.pack_start(text_scroll, True, True)
+    scroll = gtk.ScrolledWindow()
+    scroll.add(text)
+    scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+    scroll.set_size_request(400, 250)
+    scroll.set_shadow_type(gtk.SHADOW_IN)
+    self.vbox.pack_start(scroll, True, True)
     
     self.vbox.show_all()
     

@@ -49,7 +49,8 @@ def append_textview(table, label, value, top):
     textview.get_buffer().set_text(value)
   scroll = gtk.ScrolledWindow()
   scroll.add(textview)
-  scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+  scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+  scroll.set_shadow_type(gtk.SHADOW_IN)
   table.attach(scroll, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL,
       gtk.EXPAND|gtk.FILL, _WIDGET_SPACING)
   return textview

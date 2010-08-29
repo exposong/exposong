@@ -191,7 +191,6 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     vbox.pack_start(hbox, False, True)
     
     toolbar = gtk.Toolbar()
-    toolbar.set_style(gtk.TOOLBAR_ICONS)
     img_add = gtk.ToolButton(gtk.STOCK_ADD)
     toolbar.insert(img_add, 0)
     img_del = gtk.ToolButton(gtk.STOCK_DELETE)
@@ -208,6 +207,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     imgtree.append_column(col)
     imgtree.set_headers_visible(False)
     imgscroll = gtk.ScrolledWindow()
+    imgscroll.set_shadow_type(gtk.SHADOW_IN)
     imgscroll.add(imgtree)
     imgscroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
     imgscroll.set_size_request(300, 290)

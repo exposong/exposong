@@ -273,6 +273,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     scroll = gtk.ScrolledWindow()
     scroll.add(title_list)
     scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+    scroll.set_shadow_type(gtk.SHADOW_IN)
     vbox.pack_start(scroll, True, True)
     table = gui.Table(3)
     self._fields['variant'] = gui.append_entry(table, _("Variant:"),
@@ -330,6 +331,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     scroll = gtk.ScrolledWindow()
     scroll.add(author_list)
     scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+    scroll.set_shadow_type(gtk.SHADOW_IN)
     vbox.pack_start(scroll, True, True)
     table = gui.Table(3)
     self._fields['copyright'] = gui.append_entry(table, _('Copyright:'),
@@ -391,6 +393,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     scroll = gtk.ScrolledWindow()
     scroll.add(theme_list)
     scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+    scroll.set_shadow_type(gtk.SHADOW_IN)
     vbox.pack_start(scroll, True, True)
     
     table = gui.Table(1)
@@ -441,6 +444,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     scroll = gtk.ScrolledWindow()
     scroll.add(songbook_list)
     scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
+    scroll.set_shadow_type(gtk.SHADOW_IN)
     vbox.pack_start(scroll, True, True)
     
     table = gui.Table(4)
