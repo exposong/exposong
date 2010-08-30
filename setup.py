@@ -53,8 +53,10 @@ setup(name       = 'ExpoSong',
     - OpenLyrics Integration
     - Print Support
     - Export/Import Functions""",
-    author       = 'Samuel Mehrbrodt',
-    author_email = 's.mehrbrodt@gmail.com',
+    author       = 'Exposong Team',
+    author_email = 'exposong@googlegroups.com',
+    maintainer   = 'Samuel Mehrbrodt',
+    maintainer_email = 's.mehrbrodt@gmail.com',
     url          = 'http://www.exposong.org/',
     license      = 'GPLv3',
     scripts      = ['bin/exposong'],

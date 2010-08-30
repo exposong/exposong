@@ -15,14 +15,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#Running:
+# python setup_cx.py bdist_msi
+
 import glob
 import os
 import sys
+import re
 from cx_Freeze import setup, Executable
-from os.path import normpath
+from os.path import normpath, isfile
 
 sys.path.insert(0,'share/exposong/lib')
 sys.path.insert(0,'./')
+GTK_DIR = normpath("C:/GTK")
 
 data_files = []
 
@@ -32,7 +37,7 @@ data_files.append((normpath('share/exposong/res'),
 
 # Add translations
 for filepath in glob.glob(normpath('share/exposong/i18n/*/LC_MESSAGES/exposong.mo')):
-    data_files.append((filepath.replace(normpath('LC_MESSAGES/exposong.mo'), ''),
+    data_files.append((filepath.rstrip(normpath('/LC_MESSAGES/exposong.mo')),
                        [filepath]))
 
 # Add help files
@@ -40,14 +45,29 @@ data_files.append((normpath('share/exposong/help'),
                    [normpath('share/exposong/help/es.png'),
                     normpath('share/exposong/help/style.css')]))
 for filepath in glob.glob(normpath('share/exposong/help/*/index.html')):
-    data_files.append((normpath(os.path.join(filepath.rstrip('/index.html'))),
-                                             [filepath]))
+    data_files.append((normpath(filepath.rstrip('/index.html')), [filepath]))
 
 #plugins = ['exposong.plugins.%s' % p[:-3]
 #           for p in os.listdir(normpath('share/exposong/lib/exposong/plugins'))
 #           if p.endswith(".py") and not p.startswith("_")]
 
-# TODO defs.py needs to get included somehow.
+# Some GTK Data files
+data_files.append((normpath('etc/gtk-2.0'),
+                  [GTK_DIR + normpath('/etc/gtk-2.0/gtkrc')]))
+data_files.append((normpath('lib/gtk-2.0/2.10.0/engines'),
+                   [GTK_DIR + normpath('/lib/gtk-2.0/2.10.0/engines/libpixmap.dll')]))
+
+def recursive_add(dir, pre):
+    global data_files
+    for p1 in glob.glob(dir):
+        if isfile(p1):
+            if re.match("^[A-Za-z_][A-Za-z0-9_.-]*$", p1.rpartition(os.sep)[2]):
+                data_files.append((p1.lstrip(pre).rpartition(os.sep)[0], [p1]))
+            continue
+        recursive_add(p1+normpath("/*"), pre)
+
+recursive_add(GTK_DIR+normpath('/share/themes/VistaBut/*'), GTK_DIR)
+
 
 setup(name       = 'ExpoSong',
     version      = '0.7.0b1',
@@ -64,8 +84,8 @@ setup(name       = 'ExpoSong',
     - OpenLyrics Integration
     - Print Support
     - Export/Import Functions""",
-    author       = 'Samuel Mehrbrodt',
-    author_email = 's.mehrbrodt@gmail.com',
+    author       = 'Exposong Team',
+    author_email = 'exposong@googlegroups.com',
     url          = 'http://www.exposong.org/',
     license      = 'GPLv3',
     scripts      = ['bin/exposong'],
@@ -74,9 +94,14 @@ setup(name       = 'ExpoSong',
                     'openlyrics', 'openlyrics.tools'],
     py_modules   = ['undobuffer'],#+plugins,
     executables=[Executable(
-        script   ='bin/exposong',
+        script       = 'bin/exposong',
+        icon         = 'share/exposong/res/es.ico',
+        shortcutName = 'ExpoSong',
+        shortcutDir  = 'ProgramMenuFolder',
     #    includes =['defs'],
     #    packages =['exposong','exposong.plugins'],
+        # Hide the command line.
+        base         = "Win32GUI",
         )],
     data_files   = data_files,
     )
