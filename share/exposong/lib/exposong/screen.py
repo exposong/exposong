@@ -19,6 +19,7 @@ import pango
 import cairo
 import time
 import gobject
+import os
 
 import exposong.prefs
 import exposong.slidelist
@@ -128,7 +129,7 @@ class Screen:
   
   def to_logo(self, button):
     'Set the screen to a the ExpoSong logo or a user-defined one.'
-    if config.has_option("screen", "logo"):
+    if config.has_option("screen", "logo") and os.path.isfile(config.get("screen", "logo")):
       self._logo = True
       self._black = self._background = False
       self.draw()
@@ -138,12 +139,13 @@ class Screen:
         _('No Logo set. Do you want to choose a Logo now?'))
       dialog.set_title( _("Set Logo?") )
       resp = dialog.run()
-      dialog.hide()
+      dialog.destroy ()
       if resp == gtk.RESPONSE_YES:
-        exposong.prefs.prefs.dialog(exposong.application.main)
-        self.to_logo(None)
+        exposong.prefs.PrefsDialog(exposong.application.main)
+        if os.path.isfile(config.get("screen", "logo")):
+          self.to_logo(None)
       else:
-        self.to_background(None)
+        self.to_background(None) 
   
   def to_background(self, button):
     'Hide text from the screen.'
