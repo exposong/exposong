@@ -229,6 +229,8 @@ class Screen:
       bgcolor2 = config.getcolor("screen", "bg_color_2")
     
     if bgtype == 'image':
+      if bgimage == "":
+        pass
       bgkey = str(bounds[0])+'x'+str(bounds[1])
       try:
         if self.bg_dirty or bgkey not in self.bg_img:
@@ -236,13 +238,12 @@ class Screen:
           self.bg_img[bgkey] = pixbuf.scale_simple(bounds[0], bounds[1],
               gtk.gdk.INTERP_BILINEAR)
       except gobject.GError:
-        print "Error: Could not open background file."
+        print "Error: Could not open background file: %s."%bgimage
         if hasattr(self, 'bg_img') and bgkey in self.bg_img:
           del self.bg_img[bgkey]
-        bg = (0,0,0)
-        #Set back to the default
-        config.setcolor("screen", "bg_color_1", (0, 13107, 19660))
-        config.setcolor("screen", "bg_color_2", (0, 26214, 39321))
+        config.set("screen", "bg_image", "")
+        config.set("screen", "bg_type", "color")
+        exposong.bgselect.bgselect.set_background_to_color()
       else:
         ccontext.set_source_pixbuf(self.bg_img[bgkey], 0, 0)
         ccontext.paint()

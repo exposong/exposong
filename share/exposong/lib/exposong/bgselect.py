@@ -47,13 +47,13 @@ class BGSelect (gtk.VBox):
     hbox.pack_start(self.imgradio, False, True, 2)
     self.imgmodel = gtk.ListStore(str, gtk.gdk.Pixbuf)
     self.imgcombo = gtk.ComboBox(self.imgmodel)
-    vbox.pack_start(self.imgcombo, False, True, 2)
+    vbox.pack_start(self.imgcombo, True, True, 2)
     self.imgcombo.set_wrap_width(2)
     cell = gtk.CellRendererPixbuf()
     self.imgcombo.pack_start(cell, True)
     self.imgcombo.add_attribute(cell, 'pixbuf', 1)
     if bgtype == 'image':
-      self.imgradio.set_active(True)
+      self.set_background_to_image()
     else:
       self.imgcombo.set_sensitive(False)
     
@@ -71,8 +71,8 @@ class BGSelect (gtk.VBox):
     
     self.new_image = gtk.Button( _("Add"), gtk.STOCK_ADD, False)
     self.new_image.connect("clicked", self._on_new_image)
-    vbox.pack_start(self.new_image, False, False, 2)
-    hbox.pack_start(vbox, True, False, 2)
+    vbox.pack_start(self.new_image, False, True, 2)
+    hbox.pack_start(vbox, True, True, 2)
     self.pack_start(hbox, True, True, 2)
     
     # Gradient Background
@@ -93,11 +93,11 @@ class BGSelect (gtk.VBox):
     hbox.pack_start(self.grad1, True, True)
     hbox.pack_start(self.grad2, True, True)
     
+    self.grad1.set_color(gtk.gdk.Color(bgcolor1[0], bgcolor1[1], bgcolor1[2]))
+    self.grad2.set_color(gtk.gdk.Color(bgcolor2[0], bgcolor2[1], bgcolor2[2]))
     if bgtype == 'color':
-      self.gradradio.set_active(True)
-      self.grad1.set_color(gtk.gdk.Color(bgcolor1[0], bgcolor1[1], bgcolor1[2]))
-      self.grad2.set_color(gtk.gdk.Color(bgcolor2[0], bgcolor2[1], bgcolor2[2]))
-    
+      self.set_background_to_color()
+      
     self._on_image_radio(self.imgradio)
     self._on_grad_radio(self.gradradio)
     self.pack_start(hbox, True, True, 2)
@@ -163,6 +163,12 @@ class BGSelect (gtk.VBox):
       self.add_images(images)
     else:
       dlg.destroy()
+
+  def set_background_to_color(self):
+    self.gradradio.set_active(True) 
+
+  def set_background_to_image(self):
+    self.imgradio.set_active(True)
 
   def add_images(self, images):
     'Adds new images to the background selector'
