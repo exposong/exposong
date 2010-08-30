@@ -32,7 +32,10 @@ class Config(ConfigParser.SafeConfigParser):
   def __init__(self):
     ConfigParser.SafeConfigParser.__init__(self)
     if os.name == 'nt':
-      d = os.path.join(os.environ["LOCALAPPDATA"], "exposong")
+      try:
+        d = os.path.join(os.environ["LOCALAPPDATA"], "exposong")
+      except KeyError:
+        d = os.path.expanduser("~", "exposong")
     else:
       d = os.path.join(os.path.expanduser("~"), ".config", "exposong")
     if not os.path.exists(d):
