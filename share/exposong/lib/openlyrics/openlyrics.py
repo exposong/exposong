@@ -35,8 +35,8 @@ from StringIO import StringIO
 
 OLYR_NS = u'http://openlyrics.info/namespace/2009/song'
 OLYR_VERSION = u'0.7'
-OLYR_CREATED_IN = u'OpenLyrics Python Library %s' % __version__
-OLYR_MODIFIED_IN = u'OpenLyrics Python Library %s' % __version__
+OLYR_CREATED_IN = u'ExpoSong 0.7'
+OLYR_MODIFIED_IN = u'ExpoSong 0.7'
 
 
 # TODO revise creating openlyrics Objects - add more arguments to contructor
