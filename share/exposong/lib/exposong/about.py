@@ -31,8 +31,8 @@ class About:
     self.dialog.set_copyright(_("Copyright %s") % "2008-2010 Exposong.org")
     self.dialog.set_authors(("Brad Landis", "Samuel Mehrbrodt", "Siegwart Bogatscher",))
     self.dialog.set_artists(("Tango (http://tango.freedesktop.org)",))
-    if _("Translators Name") is not "Translators Name":
-      self.dialog.set_translator_credits(_("Translators Name"))
+    if _("translator-credits") is not "translator-credits":
+      self.dialog.set_translator_credits(_("translator-credits"))
     self.dialog.set_logo(gtk.gdk.pixbuf_new_from_file(
         os.path.join(RESOURCE_PATH, "exposong.png")))
     self.dialog.set_website("http://exposong.org")
