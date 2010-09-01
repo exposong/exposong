@@ -34,7 +34,8 @@ class timedStatusbar(gtk.Statusbar):
   
   def _del_timer(self):
     if self.last_tag:
-      gtk.source_remove(self.last_tag)
+      gobject.source_remove(self.last_tag)
+    #self.last_tag = None
   
   def _set_timer(self, timeout):
     if timeout > 0:
