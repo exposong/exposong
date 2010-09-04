@@ -52,9 +52,10 @@ type_icon = gtk.gdk.pixbuf_new_from_file_at_size(
 # TODO These do not remain in order, so when creating the pull-down, the items
 # are in arbitrary order.
 auth_types = {
-  "words": _("Words"),
-  "music": _("Music"),
-  "translation": _("Translation"),
+  'words': _('Words'),
+  'music': _('Music'),
+  'translation': _('Translation'),
+  None: '',
   }
 verse_names = {
   "v": _("Verse"),
@@ -291,7 +292,8 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     self._fields['author'] = gtk.ListStore(gobject.TYPE_STRING,
         gobject.TYPE_STRING, gobject.TYPE_STRING)
     for author in self.song.props.authors:
-      self._fields['author'].append( (author, author.type, author.lang) )
+      self._fields['author'].append( (author, auth_types[author.type],
+                                      author.lang) )
     author_list = gtk.TreeView(self._fields['author'])
     author_list.connect('row-activated', self._author_dlg, True)
     author_list.set_reorderable(True)
@@ -371,7 +373,6 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     vbox.pack_start(toolbar, False, True)
     theme_list.get_selection().emit('changed')
     #Table
-    #Columns
     cell = gtk.CellRendererText()
     col = gtk.TreeViewColumn( _('Theme'))
     col.pack_start(cell)
@@ -428,7 +429,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
     toolbar.insert(button, -1)
     vbox.pack_start(toolbar, False, True)
     songbook_list.get_selection().emit('changed')
-    #Columns
+    #Table
     cell = gtk.CellRendererText()
     col = gtk.TreeViewColumn( _('Songbook Name'))
     col.pack_start(cell)
@@ -504,7 +505,13 @@ brackets to modify the order"))
     
     self.song.props.authors = []
     for row in self._fields['author']:
-      self.song.props.authors.append(openlyrics.Author(*row))
+      for (k,v) in auth_types.iteritems():
+        if v == row[1]:
+          atype = k
+          break
+      else:
+        atype = None
+      self.song.props.authors.append(openlyrics.Author(row[0], atype, row[2]))
     
     self.song.props.songbooks = []
     for row in self._fields['songbook']:
@@ -610,11 +617,16 @@ brackets to modify the order"))
       if model.get_value(itr,0):
         dialog.set_title( _('Editing Author "%s"') % model.get_value(itr,0) )
       author_value = model.get_value(itr,0)
-      type_value = model.get_value(itr,1)
+      for (k,v) in auth_types.iteritems():
+        if v == model.get_value(itr,1):
+          type_value = k
+          break
+      else:
+        type_value = None
       lang_value = model.get_value(itr,2)
     author = gui.append_entry(table, _('Author Name:'), author_value, 0)
     type = gui.append_combo2(table, _('Author Type:'),
-        (('', _("None")),) + tuple(auth_types.iteritems()), type_value, 1)
+                             tuple(auth_types.iteritems()), type_value, 1)
     tmodel = type.get_model()
     lang = gui.append_language_combo(table, lang_value, 2)
     type.connect('changed', lambda combo: lang.set_sensitive(
@@ -634,12 +646,12 @@ brackets to modify the order"))
           if edit:
             model.set_value(itr, 0, author.get_text())
             model.set_value(itr, 1,
-                tmodel.get_value(type.get_active_iter(),0))
+                tmodel.get_value(type.get_active_iter(),1))
             if tmodel.get_value(type.get_active_iter(),0) == 'translation':
               model.set_value(itr, 2, lang.get_active_text())
           else:
             self._fields['author'].append( (author.get_text(),
-                tmodel.get_value(type.get_active_iter(),0),
+                tmodel.get_value(type.get_active_iter(),1),
                 lang.get_active_text()))
           dialog.hide()
           return True
