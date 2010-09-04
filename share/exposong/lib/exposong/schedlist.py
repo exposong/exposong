@@ -167,7 +167,7 @@ class ScheduleList(gtk.TreeView):
       context.finish(True, False)
       statusbar.statusbar.output(
           _('Added Presentation >%(presentation)s< to Schedule >%(schedule)s<')%
-          {"presentation":pres.title, "schedule": sched.title})
+          {"presentation":pres.get_title(), "schedule": sched.title})
   
   def _on_new(self, *args):
     'Create a new schedule.'
