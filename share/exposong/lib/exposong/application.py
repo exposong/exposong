@@ -227,6 +227,7 @@ class Main (gtk.Window):
         ('Hide', gtk.STOCK_CLOSE, _('Hi_de'), "Escape", None,
             screen.screen.hide),
         ('HelpContents', gtk.STOCK_HELP, None, None, None, self._show_help),
+        ("Contribute", None, "Contribute", None, None, self._help_contribute),
         ('About', gtk.STOCK_ABOUT, None, None, None, self._on_about)])
     self.main_actions.get_action("Background").set_sensitive(False)
     self.main_actions.get_action("Logo").set_sensitive(False)
@@ -273,6 +274,7 @@ class Main (gtk.Window):
           </menu>
           <menu action="Help">
             <menuitem action="HelpContents" />
+            <menuitem action="Contribute" />
             <menuitem action="About" />
           </menu>
         </menubar>''')
@@ -441,6 +443,10 @@ class Main (gtk.Window):
   def _show_help(self, *args):
     'Show the help pages.'
     webbrowser.open("file:"+pathname2url(HELP_URL))
+    
+  def _help_contribute(self, *args):
+    'Show the how-to-contribute page.'
+    webbrowser.open("http://exposong.org/contribute")
   
   def _save_schedules(self):
     'Save all schedules to disk.'
