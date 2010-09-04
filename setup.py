@@ -33,10 +33,10 @@ for filepath in glob.glob(normpath('share/exposong/i18n/*/LC_MESSAGES/exposong.m
 
 # Add help files
 data_files.append((normpath('share/exposong/help'),
-                   [normpath('share/help/es.png'), normpath('share/help/style.css')]))
-for filepath in glob.glob(normpath('share/help/*/index.html')):
-    data_files.append((normpath(os.path.join('share/exposong',
-                                filepath.rstrip('/index.html'))), [filepath]))
+                   [normpath('share/exposong/help/es.png'),
+                    normpath('share/exposong/help/style.css')]))
+for filepath in glob.glob(normpath('share/exposong/help/*/index.html')):
+    data_files.append((normpath(filepath.rstrip('/index.html')), [filepath]))
 
 setup(name       = 'ExpoSong',
     version      = '0.7',
@@ -46,13 +46,15 @@ setup(name       = 'ExpoSong',
     text and image slides in a Christian setting.
 
     Features:
-    - Lyric, text and image presentations
-    - Schedule creation
-    - On-screen notification
-    - Gradient or image backgrounds
-    - OpenLyrics Integration
-    - Print Support
-    - Export/Import Functions""",
+    * Image, lyric, and text presentations
+    * Images and gradient backgrounds
+    * Schedules
+    * On-screen notifications
+    * Logo and black screen
+    * Importing and Exporting possibilities
+    * Printing Support
+    * OpenLyrics Data Format
+    * Full-text search""",
     author       = 'Exposong Team',
     author_email = 'exposong@googlegroups.com',
     maintainer   = 'Samuel Mehrbrodt',

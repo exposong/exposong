@@ -70,20 +70,22 @@ recursive_add(GTK_DIR+normpath('/share/themes/VistaBut/*'), GTK_DIR)
 
 
 setup(name       = 'ExpoSong',
-    version      = '0.7.0b1',
+    version      = '0.7',
     description  = 'Worship presentation software',
     long_description="""
     ExpoSong is a presentation software with a focus on displaying lyrics, 
     text and image slides in a Christian setting.
 
     Features:
-    - Lyric, text and image presentations
-    - Schedule creation
-    - On-screen notification
-    - Gradient or image backgrounds
-    - OpenLyrics Integration
-    - Print Support
-    - Export/Import Functions""",
+    * Image, lyric, and text presentations
+    * Images and gradient backgrounds
+    * Schedules
+    * On-screen notifications
+    * Logo and black screen
+    * Importing and Exporting possibilities
+    * Printing Support
+    * OpenLyrics Data Format
+    * Full-text search""",
     author       = 'Exposong Team',
     author_email = 'exposong@googlegroups.com',
     url          = 'http://www.exposong.org/',

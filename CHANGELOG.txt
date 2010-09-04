@@ -8,6 +8,7 @@
 
 == 0.7 ==
  * Using OpenLyrics to store Lyrics (http://openlyrics.info)
+ * Enhanced Lyrics Edit Dialog
  * User can change the output monitor in dual screen mode
  * Display songbook number on presentation (more improvements in next release)
  * Save and restore the main window's state
@@ -15,6 +16,8 @@
  * Shortcuts have been changed
  * New config format
  * setup.py script
+ * Printing Support
+ * Import from ExpoSong Legacy, OpenSong and SongSelect
 
 == 0.6.2 ==
 
