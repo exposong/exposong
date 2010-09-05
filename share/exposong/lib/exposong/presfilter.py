@@ -46,7 +46,7 @@ class PresFilter(gtk.Entry):
     
     self._handler_changed = self.connect_after("changed",
                            self._on_changed)
-    self.connect("icon-press", self._on_icon_pressed)
+    
     self.connect("key-press-event", self._on_key_pressed)
     self.connect("focus-in-event", exposong.application.main.disable_shortcuts)
     self.connect("focus-out-event", exposong.application.main.enable_shortcuts)
@@ -56,6 +56,7 @@ class PresFilter(gtk.Entry):
     self.use_icons = gtk.gtk_version[0] >= 2 and gtk.gtk_version[1] > 16
     if self.use_icons:
       self.set_icon_from_stock(gtk.ENTRY_ICON_PRIMARY, gtk.STOCK_FIND)
+      self.connect("icon-press", self._on_icon_pressed)
     
     # Do not draw a yellow bg if an a11y theme is used
     settings = gtk.settings_get_default()

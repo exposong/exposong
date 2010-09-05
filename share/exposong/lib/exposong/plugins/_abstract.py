@@ -146,9 +146,9 @@ class Presentation:
       try:
         dom = xml.dom.minidom.parse(filename)
         root = dom.documentElement
-      except IOError as details:
+      except IOError, details:
         print "Error reading presentation file (%s): %s" % (filename, details)
-      except ExpatError as details:
+      except ExpatError, details:
         print "Error reading presentation file (%s): %s" % (filename, details)
       else:
         self._title = get_node_text(root.getElementsByTagName("title")[0])
