@@ -7,13 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-22 01:27+0300\n"
-"PO-Revision-Date: 2010-08-22 01:33+0300\n"
+"POT-Creation-Date: 2010-08-28 17:25+0300\n"
+"PO-Revision-Date: 2010-09-05 23:28+0100\n"
 "Last-Translator: Samuel Mehrbrodt <s.mehrbrodt@gmail.com>\n"
 "Language-Team: German>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2010-08-29 04:05+0000\n"
+"X-Generator: Launchpad (build Unknown)\n"
 
 #: share/exposong/lib/exposong/about.py:31
 #, python-format
@@ -22,10 +24,11 @@ msgstr "Copyright %s"
 
 #: share/exposong/lib/exposong/about.py:34
 #: share/exposong/lib/exposong/about.py:35
-msgid "Translators Name"
+msgid "translator-credits"
 msgstr ""
 "Siegwart Bogatscher\n"
-"Samuel Mehrbrodt"
+"Launchpad Contributions:\n"
+"  Samuel Mehrbrodt https://launchpad.net/~sam92"
 
 #: share/exposong/lib/exposong/application.py:131
 msgid "Present"
@@ -203,7 +206,7 @@ msgstr "Datei auswählen"
 msgid "Choose Folder"
 msgstr "Ordner auswählen"
 
-#: share/exposong/lib/exposong/gui.py:158
+#: share/exposong/lib/exposong/gui.py:157
 msgid "Language Code"
 msgstr "Ländercode"
 
@@ -457,23 +460,24 @@ msgstr "Bilder-Präsentationen"
 msgid "ExpoSong Lyrics Converter"
 msgstr "ExpoSong Lieder-Converter"
 
-#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:97
+#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:96
+#: share/exposong/lib/exposong/plugins/songselect_convert.py:123
 msgid "Undefined Title"
 msgstr "Undefinierter Titel"
 
-#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:116
+#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:115
 msgid "Import ExpoSong Legacy File(s)"
 msgstr "Frühere(s) ExpoSong-Lied(er) importieren ..."
 
-#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:122
+#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:121
 msgid "ExpoSong Legacy File"
 msgstr "Frühere ExpoSong-Datei"
 
-#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:141
+#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:138
 msgid "_ExpoSong Legacy File(s) ..."
 msgstr "frühere _ExpoSong Datei ..."
 
-#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:142
+#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:139
 msgid "Import a Lyric Presentation from ExpoSong before 0.7"
 msgstr "Eine Lieder-Präsentation von ExpoSong vor 0.7 importieren"
 
@@ -735,15 +739,15 @@ msgstr "Index:"
 msgid "OpenSong Lyrics Converter"
 msgstr "OpenSong Lieder-Converter"
 
-#: share/exposong/lib/exposong/plugins/opensong_convert.py:73
+#: share/exposong/lib/exposong/plugins/opensong_convert.py:72
 msgid "Import OpenSong File(s)"
 msgstr "OpenSong-Datei(en) importieren"
 
-#: share/exposong/lib/exposong/plugins/opensong_convert.py:93
+#: share/exposong/lib/exposong/plugins/opensong_convert.py:91
 msgid "_OpenSong File(s) ..."
 msgstr "_OpenSong Datei(en)"
 
-#: share/exposong/lib/exposong/plugins/opensong_convert.py:94
+#: share/exposong/lib/exposong/plugins/opensong_convert.py:92
 msgid "Import a Lyric Presentation from OpenSong"
 msgstr "Eine Lieder-Präsentation von OpenSong importieren"
 
@@ -771,19 +775,24 @@ msgstr "_Aktuelle Präsentation"
 msgid "_List of all Songs"
 msgstr "_Liste aller Lieder"
 
-#: share/exposong/lib/exposong/plugins/songselect_convert.py:19
+#: share/exposong/lib/exposong/plugins/songselect_convert.py:37
 msgid "SongSelect Lyrics Converter"
 msgstr "SongSelect Lieder-Converter"
 
-#: share/exposong/lib/exposong/plugins/songselect_convert.py:21
+#: share/exposong/lib/exposong/plugins/songselect_convert.py:142
 msgid "Import SongSelect Lyrics"
 msgstr "SongSelect Lied importieren"
 
-#: share/exposong/lib/exposong/plugins/songselect_convert.py:23
+#: share/exposong/lib/exposong/plugins/songselect_convert.py:148
+#, python-format
+msgid "SongSelect File (%s)"
+msgstr "SongSelect Datei (%s)"
+
+#: share/exposong/lib/exposong/plugins/songselect_convert.py:165
 msgid "_SongSelect Lyrics ..."
 msgstr "_SongSelect Lyrics ..."
 
-#: share/exposong/lib/exposong/plugins/songselect_convert.py:25
+#: share/exposong/lib/exposong/plugins/songselect_convert.py:166
 msgid "Converts a SongSelect file to OpenLyrics"
 msgstr "Konvertiert eine SongSelect-Datei zu OpenLyrics"
 
@@ -819,8 +828,10 @@ msgstr "Folie bearbeiten"
 msgid "Unsaved Changes exist. Do you really want to continue without saving?"
 msgstr "Es gibt ungespeicherte Änderungen. Möchten Sie fortfahren, ohne zu speichern?"
 
-#~ msgid "Part"
-#~ msgstr "Part"
+#~ msgid "Translators Name"
+#~ msgstr ""
+#~ "Siegwart Bogatscher\n"
+#~ "Samuel Mehrbrodt"
 #~ msgid "Export Alphabetical Song List"
 #~ msgstr "Alphabetische Liederliste exportieren"
 #~ msgid "_Export Schedule"
@@ -845,4 +856,6 @@ msgstr "Es gibt ungespeicherte Änderungen. Möchten Sie fortfahren, ohne zu spe
 #~ msgstr "<b>Timer</b>"
 #~ msgid "Settings"
 #~ msgstr "Einstellungen"
+#~ msgid "Part"
+#~ msgstr "Part"
 
