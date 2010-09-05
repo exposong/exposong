@@ -227,7 +227,7 @@ class Main (gtk.Window):
         ('Hide', gtk.STOCK_CLOSE, _('Hi_de'), "Escape", None,
             screen.screen.hide),
         ('HelpContents', gtk.STOCK_HELP, None, None, None, self._show_help),
-        ("Contribute", None, "Contribute", None, None, self._help_contribute),
+        ("Contribute", None, _("Contribute"), None, None, self._help_contribute),
         ('About', gtk.STOCK_ABOUT, None, None, None, self._on_about)])
     self.main_actions.get_action("Background").set_sensitive(False)
     self.main_actions.get_action("Logo").set_sensitive(False)
