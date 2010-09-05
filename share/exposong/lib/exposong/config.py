@@ -35,7 +35,7 @@ class Config(ConfigParser.SafeConfigParser):
       try:
         d = os.path.join(os.environ["LOCALAPPDATA"], "exposong")
       except KeyError:
-        d = os.path.expanduser("~", "exposong")
+        d = os.path.join(os.path.expanduser("~"), "exposong")
     else:
       d = os.path.join(os.path.expanduser("~"), ".config", "exposong")
     if not os.path.exists(d):
