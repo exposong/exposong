@@ -451,7 +451,7 @@ class Author(object):
         elem = etree.Element(u'author')
         if self.type:
             elem.set(u'type',self.type)
-            if self.type == u'translator' and self.lang:
+            if self.type == u'translation' and self.lang:
                 elem.set(u'lang',self.lang)
         elem.text = self.name
         return elem

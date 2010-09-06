@@ -703,7 +703,7 @@ brackets to modify the order"))
             model.set_value(itr, 1, lang.get_active_text())
           else:
             self._fields['theme'].append( (theme.get_text(),
-                lang.get_active_text(), -1) )
+                lang.get_active_text(), "") )
           dialog.hide()
           return True
       else:
