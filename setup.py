@@ -23,22 +23,27 @@ from distutils.core import setup
 data_files = []
 
 # Add images
-data_files.append((normpath('share/exposong/images'),
+data_files.append((normpath('share/exposong/res'),
                    glob.glob(normpath('share/exposong/res/*.png'))))
 
 # Add translations
 for filepath in glob.glob(normpath('share/exposong/i18n/*/LC_MESSAGES/exposong.mo')):
-    data_files.append((filepath.replace(normpath('LC_MESSAGES/exposong.mo'), ''),
-                       [filepath]))
+    data_files.append((os.path.dirname(filepath), [filepath]))
 
 # Add help files
 data_files.append((normpath('share/exposong/help'),
                    [normpath('share/exposong/help/es.png'),
                     normpath('share/exposong/help/style.css')]))
 for filepath in glob.glob(normpath('share/exposong/help/*/index.html')):
-    data_files.append((normpath(filepath.rstrip('/index.html')), [filepath]))
+    data_files.append((os.path.dirname(filepath), [filepath]))
 
-setup(name       = 'ExpoSong',
+# Add menu entry for Linux
+data_files.append(('share/applications',
+                   [normpath("debian/exposong.desktop")]))
+data_files.append(('share/pixmaps',
+                   [normpath('share/exposong/res/es64.png')]))
+
+setup(name       = 'exposong',
     version      = '0.7',
     description  = 'Worship presentation software',
     long_description="""

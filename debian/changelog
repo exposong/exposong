@@ -1,5 +1,6 @@
 exposong (0.7-1) unstable; urgency=low
 
-  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+  * Initial release
 
- -- Samuel Mehrbrodt <s.mehrbrodt@gmail.com>  Thu, 13 May 2010 16:27:01 +0200
+ -- Samuel Mehrbrodt <s.mehrbrodt@gmail.com>  Mon, 06 Sep 2010 18:36:01 +0200
+ 
