@@ -519,7 +519,7 @@ brackets to modify the order"))
     
     self.song.props.themes = []
     for row in self._fields['theme']:
-      self.song.props.themes.append(openlyrics.Theme(*row))
+      self.song.props.themes.append(openlyrics.Theme(row[0], row[2], row[1]))
     
     self.song.props.comments = self._fields['comments'].get_buffer().get_text(
         *self._fields['comments'].get_buffer().get_bounds()).split('\n')
