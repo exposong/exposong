@@ -20,7 +20,7 @@ text and image slides in a Christian setting. Features include:
 
 = Installation =
 
-Please see [http://code.google.com/p/exposong/wiki/Installation] for full
+Please see [http://exposong.org/download] for full
 instructions on how to install and run this program.
 
 == Windows ==
@@ -30,7 +30,7 @@ You will need to install all of these applications to run from source:
 * GTK
 * PyGTK, PyGObject, and PyCairo
 
-You can find links at http://code.google.com/p/exposong/wiki/Installation.
+You can find links at http://exposong.org/download .
 
 Once you get everything installed, double click "exposong" or "exposong.vbs" in
 this directory.
@@ -41,4 +41,3 @@ Start the program with bin/exposong by either double clicking if possible, or
 using the following command in the terminal/command line in the folder for the
 program:
   ./bin/exposong
-
