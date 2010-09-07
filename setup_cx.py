@@ -37,15 +37,14 @@ data_files.append((normpath('share/exposong/res'),
 
 # Add translations
 for filepath in glob.glob(normpath('share/exposong/i18n/*/LC_MESSAGES/exposong.mo')):
-    data_files.append((filepath.rstrip(normpath('/LC_MESSAGES/exposong.mo')),
-                       [filepath]))
+    data_files.append((os.path.dirname(filepath), [filepath]))
 
 # Add help files
 data_files.append((normpath('share/exposong/help'),
                    [normpath('share/exposong/help/es.png'),
                     normpath('share/exposong/help/style.css')]))
 for filepath in glob.glob(normpath('share/exposong/help/*/index.html')):
-    data_files.append((normpath(filepath.rstrip('/index.html')), [filepath]))
+    data_files.append((os.path.dirname(filepath), [filepath]))
 
 #plugins = ['exposong.plugins.%s' % p[:-3]
 #           for p in os.listdir(normpath('share/exposong/lib/exposong/plugins'))
@@ -56,6 +55,7 @@ data_files.append((normpath('etc/gtk-2.0'),
                   [GTK_DIR + normpath('/etc/gtk-2.0/gtkrc')]))
 data_files.append((normpath('lib/gtk-2.0/2.10.0/engines'),
                    [GTK_DIR + normpath('/lib/gtk-2.0/2.10.0/engines/libpixmap.dll')]))
+
 
 def recursive_add(dir, pre):
     global data_files
@@ -69,7 +69,7 @@ def recursive_add(dir, pre):
 recursive_add(GTK_DIR+normpath('/share/themes/VistaBut/*'), GTK_DIR)
 
 
-setup(name       = 'ExpoSong',
+setup(name       = 'exposong',
     version      = '0.7',
     description  = 'Worship presentation software',
     long_description="""
@@ -88,6 +88,8 @@ setup(name       = 'ExpoSong',
     * Full-text search""",
     author       = 'Exposong Team',
     author_email = 'exposong@googlegroups.com',
+    maintainer   = 'Brad Landis',
+    maintainer_email = 'bradleelandis@gmail.com',
     url          = 'http://www.exposong.org/',
     license      = 'GPLv3',
     scripts      = ['bin/exposong'],
