@@ -33,13 +33,13 @@ pygtk.require("2.0")
 
 # Find the 'share' folder
 for i in range(6):
-  _p = abspath(join(*([__file__]+[pardir]*i+['share','exposong'])))
-  if os.path.exists(_p):
-    SHARED_FILES = _p
-    break
+    _p = abspath(join(*([__file__]+[pardir]*i+['share','exposong'])))
+    if os.path.exists(_p):
+        SHARED_FILES = _p
+        break
 else:
-  print "Program files not found. Will now exit."
-  exit(0)
+    print "Program files not found. Will now exit."
+    exit(0)
 
 HELP_PATH = join(SHARED_FILES, 'help')
 LOCALE_PATH = join(SHARED_FILES, 'i18n')
@@ -58,18 +58,18 @@ HELP_URL = join(HELP_PATH, _('en') , 'index.html')
 from exposong import config
 
 if config.config.has_option("general", "data-path"):
-  DATA_PATH = config.config.get("general", "data-path")
+    DATA_PATH = config.config.get("general", "data-path")
 else:
-  DATA_PATH = join(expanduser("~"),"exposong","data")
+    DATA_PATH = join(expanduser("~"),"exposong","data")
 
 # Initialize the data directories. This assumes that if they exist, they are
 # either directories or symlinks. We might need to handle the case where they
 # could be files at a later point (TODO).
 if not os.path.exists(DATA_PATH):
-  os.makedirs(DATA_PATH)
+    os.makedirs(DATA_PATH)
 for folder in ('bg','pres','sched','image'):
-  if not os.path.exists(join(DATA_PATH, folder)):
-    os.mkdir(join(DATA_PATH,folder))
+    if not os.path.exists(join(DATA_PATH, folder)):
+        os.mkdir(join(DATA_PATH,folder))
 
 # Import this last.
 from exposong.application import run

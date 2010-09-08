@@ -25,7 +25,7 @@ import re
 from cx_Freeze import setup, Executable
 from os.path import normpath, isfile
 
-sys.path.insert(0,'share/exposong/lib')
+sys.path.insert(0,'lib')
 sys.path.insert(0,'./')
 GTK_DIR = normpath("C:/GTK")
 
@@ -47,7 +47,7 @@ for filepath in glob.glob(normpath('share/exposong/help/*/index.html')):
     data_files.append((os.path.dirname(filepath), [filepath]))
 
 #plugins = ['exposong.plugins.%s' % p[:-3]
-#           for p in os.listdir(normpath('share/exposong/lib/exposong/plugins'))
+#           for p in os.listdir(normpath('lib/exposong/plugins'))
 #           if p.endswith(".py") and not p.startswith("_")]
 
 # Some GTK Data files
@@ -93,7 +93,7 @@ setup(name       = 'exposong',
     url          = 'http://www.exposong.org/',
     license      = 'GPLv3',
     scripts      = ['bin/exposong'],
-    package_dir  = {'': 'share/exposong/lib'},
+    package_dir  = {'': 'lib'},
     packages     = ['exposong', 'exposong.plugins',
                     'openlyrics', 'openlyrics.tools'],
     py_modules   = ['undobuffer'],#+plugins,

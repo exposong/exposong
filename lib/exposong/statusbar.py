@@ -20,28 +20,28 @@ import gobject
 statusbar = None
 
 class timedStatusbar(gtk.Statusbar):
-  "A gtk.Statusbar supporting timeout for messages"
-  def __init__(self):
-    gtk.Statusbar.__init__(self)
-    self.last_tag = None
-  
-  def output(self, msg, timeout=5):
-    "Puts the message 'msg' for 'timeout' seconds on the statusbar"
-    self._del_timer()
-    self.pop(1)
-    self.push(1,msg)
-    self._set_timer(timeout)
-  
-  def _del_timer(self):
-    if self.last_tag:
-      gobject.source_remove(self.last_tag)
-    #self.last_tag = None
-  
-  def _set_timer(self, timeout):
-    if timeout > 0:
-      self.last_tag = gobject.timeout_add(timeout*1000, self._clear)
-  
-  def _clear(self):
-    self.pop(1)
-    self.push(1,"")
-    return False
+    "A gtk.Statusbar supporting timeout for messages"
+    def __init__(self):
+        gtk.Statusbar.__init__(self)
+        self.last_tag = None
+    
+    def output(self, msg, timeout=5):
+        "Puts the message 'msg' for 'timeout' seconds on the statusbar"
+        self._del_timer()
+        self.pop(1)
+        self.push(1,msg)
+        self._set_timer(timeout)
+    
+    def _del_timer(self):
+        if self.last_tag:
+            gobject.source_remove(self.last_tag)
+        #self.last_tag = None
+    
+    def _set_timer(self, timeout):
+        if timeout > 0:
+            self.last_tag = gobject.timeout_add(timeout*1000, self._clear)
+    
+    def _clear(self):
+        self.pop(1)
+        self.push(1,"")
+        return False

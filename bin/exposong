@@ -19,13 +19,13 @@ import sys
 from os.path import dirname, join, pardir, abspath, exists
 
 try:
-  __file__
+    __file__
 except NameError:
-  pass
+    pass
 else:
-  # running from bin/exposong
-  if exists(join(dirname(__file__), pardir, 'share', 'exposong', 'lib')): 
-    sys.path.insert(0, join(dirname(__file__), pardir, 'share', 'exposong', 'lib'))
+    # running from bin/exposong
+    if exists(join(dirname(__file__), pardir, 'lib')): 
+        sys.path.insert(0, join(dirname(__file__), pardir, 'lib'))
 
 import exposong
 exposong.run()
