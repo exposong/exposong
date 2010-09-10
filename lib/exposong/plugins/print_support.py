@@ -18,9 +18,10 @@ import gtk
 import datetime
 import locale
 
-from exposong.plugins import _abstract, Plugin
 import exposong.preslist
 import exposong.application
+from exposong import gui
+from exposong.plugins import _abstract, Plugin
 
 """
 Adds functionality print a song or a list of Songs
@@ -42,18 +43,6 @@ class Print(Plugin, _abstract.Menu):
     
     def print_presentation(self, *args):
         "Print a single presentation."
-        # TODO This button should be enabled or disabled based on preslist
-        # selection
-        if not exposong.preslist.preslist.get_active_item():
-            msg = _('Please select the presentation you want to print.')
-            dialog = gtk.MessageDialog(exposong.application.main,
-                                       gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING,
-                                       gtk.BUTTONS_OK, msg)
-            dialog.set_title( _("Select Presentation") )
-            resp = dialog.run()
-            dialog.destroy()
-            return
-        
         print_op = gtk.PrintOperation()
         print_op.set_n_pages(1)
         print_op.connect("draw_page", self._presentation_markup)
@@ -120,6 +109,11 @@ class Print(Plugin, _abstract.Menu):
                 ('print-songlist', None, _("_List of all Songs"), None,
                         None, self.print_songlist)
                 ])
+        
+        action = actiongroup.get_action('print-presentation')
+        exposong.preslist.preslist.get_selection().connect('changed',
+                                                           gui.treesel_disable_widget,
+                                                           action)
         uimanager.insert_action_group(actiongroup, -1)
         
         #Had to use position='top' to put them above "Quit"
