@@ -20,7 +20,30 @@ import pygtk
 import gettext
 import locale
 import __builtin__
+import logging
 from os.path import abspath, dirname, join, pardir, expanduser
+
+log = logging.getLogger("exposong")
+log.setLevel(logging.DEBUG)
+_handler = logging.StreamHandler()
+_handler.setLevel(logging.INFO)
+_fmt = logging.Formatter("%(asctime)s:%(levelname)s: %(message)s")
+_handler.setFormatter(_fmt)
+log.addHandler(_handler)
+
+## TODO Allow the user to pass a variable to the command line for logging to a file.
+#if False:
+#    _handler = logging.FileHandler('exposong.log')
+#    _handler.setLevel(logging.INFO)
+#    _fmt = logging.Formatter("%(asctime)s:%(filename)s@%(lineno)d:%(levelname)s: %(message)s")
+#    _handler.setFormatter(_fmt)
+#    log.addHandler(_handler)
+
+log.debug("Initializing.")
+
+log.info('Locale set to "%s".', locale.LC_ALL)
+log.info('Shared files found at "%s".', SHARED_FILES)
+
 
 DATA_PATH = None
 SHARED_FILES = None
@@ -38,7 +61,7 @@ for i in range(6):
         SHARED_FILES = _p
         break
 else:
-    print "Program files not found. Will now exit."
+    log.exception("Program files not found. Will now exit.")
     exit(0)
 
 HELP_PATH = join(SHARED_FILES, 'help')
@@ -61,6 +84,8 @@ if config.config.has_option("general", "data-path"):
     DATA_PATH = config.config.get("general", "data-path")
 else:
     DATA_PATH = join(expanduser("~"),"exposong","data")
+
+log.info('Data is located at "%s".', DATA_PATH)
 
 # Initialize the data directories. This assumes that if they exist, they are
 # either directories or symlinks. We might need to handle the case where they

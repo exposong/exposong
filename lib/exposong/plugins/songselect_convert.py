@@ -89,7 +89,7 @@ class LyricConvert(_abstract.ConvertPresentation, _abstract.Menu, Plugin):
                 val.rstrip("\n")
                 if key == "Version":
                     if float(val) > MAX_VERSION:
-                        print "Warning: SongSelect version may have unsupported features."
+                        exposong.log.warning("SongSelect version may have unsupported features.")
                 elif key == "Title":
                     song.props.titles.append(openlyrics.Title(val))
                 elif key == "Author":
@@ -113,7 +113,7 @@ class LyricConvert(_abstract.ConvertPresentation, _abstract.Menu, Plugin):
                 elif key == "Type":
                     pass
                 else:
-                    print "Unknown variable: %s" % key
+                    exposong.log.error("Unknown variable: %s", key)
         
         # TODO Might need extra error checking.
         for i in range(len(verses)):

@@ -69,7 +69,8 @@ class Schedule(gtk.ListStore):
                 if pres:
                     gtk.ListStore.append(self, ScheduleItem(pres, comment).get_row())
                 else:
-                    print 'Presentation file "%s" not found.' % filenm
+                    exposong.log.warning('Presentation file "%s" not found.',
+                                     filenm)
             
     def save(self):
         'Write schedule to disk.'

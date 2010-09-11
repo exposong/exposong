@@ -148,9 +148,11 @@ class Presentation:
                 dom = xml.dom.minidom.parse(filename)
                 root = dom.documentElement
             except IOError, details:
-                print "Error reading presentation file (%s): %s" % (filename, details)
+                exposong.log.error('Could not open presentation "%s": %s',
+                                   filename, details)
             except ExpatError, details:
-                print "Error reading presentation file (%s): %s" % (filename, details)
+                exposong.log.error('Error reading presentation file "%s": %s',
+                                   filename, details)
             else:
                 self._title = get_node_text(root.getElementsByTagName("title")[0])
                 copyright = root.getElementsByTagName("copyright")

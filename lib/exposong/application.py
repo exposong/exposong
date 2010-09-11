@@ -115,7 +115,8 @@ class Main (gtk.Window):
         
         exposong.bgselect.bgselect = exposong.bgselect.BGSelect()
         win_rt_btm.pack_start(exposong.bgselect.bgselect, False, True, 10)
-        #wrap it so that the aspect ratio is kept
+        
+        # Wrap the pres_preview it so that the aspect ratio is kept
         prev_box = gtk.VBox()
         prev_aspect = gtk.AspectFrame(None, 0.5, 0.5,
                                       exposong.screen.screen.aspect, False)
@@ -153,7 +154,7 @@ class Main (gtk.Window):
         statusbar.statusbar = statusbar.timedStatusbar()
         win_v.pack_end(statusbar.statusbar, False)
         
-        gtk.settings_get_default().set_long_property('gtk-button-images',True,\
+        gtk.settings_get_default().set_long_property('gtk-button-images',True,
                                                      'application:__init__')    
         self.build_all()
         
@@ -225,7 +226,7 @@ class Main (gtk.Window):
                 ('Hide', gtk.STOCK_CLOSE, _('Hi_de'), "Escape", None,
                         screen.screen.hide),
                 ('HelpContents', gtk.STOCK_HELP, None, None, None, self._show_help),
-                ("Contribute", None, _("Contribute"), None, None, self._help_contribute),
+                ('Contribute', None, _("Contribute"), None, None, self._help_contribute),
                 ('About', gtk.STOCK_ABOUT, None, None, None, self._on_about)])
         self.main_actions.get_action("Background").set_sensitive(False)
         self.main_actions.get_action("Logo").set_sensitive(False)
@@ -318,7 +319,7 @@ class Main (gtk.Window):
                 exposong.plugins._abstract.ConvertPresentation)
         for plugin in plugins:
             if plugin.is_type(filenm):
-                print 'Converting "%s" to openlyrics.' % filenm
+                exposong.log.info('Converting "%s" to openlyrics.', filenm)
                 plugin.convert(filenm)
         
         plugins = exposong.plugins.get_plugins_by_capability(
@@ -330,21 +331,11 @@ class Main (gtk.Window):
                 break
             except exposong.plugins._abstract.WrongPresentationType, details:
                 continue
-            except Exception:
-                print 'Error in file "%s".' % filenm
+            except Exception, details:
+                exposong.log.error('Error in file "%s":\n  %s', filenm,details)
                 raise
         else:
-            print '"%s" is not a presentation file.' % filenm
-        
-        #try:
-        #  dom = minidom.parse(os.path.join(directory,filenm))
-        #except Exception, details:
-        #  print "Error reading presentation file (%s): %s" % (filenm, details)
-        #else:
-        #  root_elem = dom.documentElement
-        #  
-        #  dom.unlink()
-        #  del dom
+            exposong.log.warning('"%s" is not a presentation file.', filenm)
         
     def build_pres_list(self):
         'Load presentations and add them to self.library.'
@@ -365,15 +356,16 @@ class Main (gtk.Window):
         try:
             dom = minidom.parse(filenm)
         except Exception, details:
-            print "Error reading schedule file (%s): %s" %\
-                (os.path.join(filenm), details)
+            exposong.log.error('Error reading schedule file "%s":\n  %s',
+                os.path.join(filenm), details)
         if dom:
             if dom.documentElement.tagName == "schedule":
                 sched = Schedule(filename=filenm)
                 sched.load(dom.documentElement, self.library)
                 schedlist.schedlist.append(schedlist.schedlist.custom_schedules, sched)
             else:
-                print "%s is not a schedule file." % os.path.join(directory,filenm)
+                exposong.log.error("%s is not a schedule file.",
+                                   os.path.join(directory,filenm))
             dom.unlink()
             del dom
         return sched

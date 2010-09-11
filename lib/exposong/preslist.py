@@ -133,8 +133,8 @@ class PresList(gtk.TreeView):
         else:
             exposong.slidelist.slidelist.set_presentation(None)
             self.prev_selection = None
-        exposong.slidelist.slide_scroll.get_vadjustment().set_value(0)
         #TODO This is not working, may need to change the signal
+        exposong.slidelist.slide_scroll.get_vadjustment().set_value(0)
         
         actions = exposong.application.main.main_actions
         actions.get_action("pres-edit")\

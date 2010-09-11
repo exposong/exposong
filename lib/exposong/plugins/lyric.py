@@ -230,7 +230,7 @@ class Presentation (text.Presentation, Plugin, _abstract.Menu,
             if re.match(order_value,sl.title.lower()):
                 return i
             i += 1
-        print "Slide in order does not exist: %s" % order_value
+        exposong.log.warning("Slide in order does not exist: %s", order_value)
         return -1
     
     def _edit_tabs(self, notebook, parent):

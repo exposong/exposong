@@ -111,7 +111,8 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
                         self.thumb.rotate_simple(self.rotate)
                         return self.thumb
                     except gobject.GError:
-                        print "Error: Could not open file."
+                        exposong.log.error('Could not open "%s" image.',
+                                     self.image)
             if hasattr(self, "thumb"):
                 return self.thumb
             else:
@@ -156,7 +157,8 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
                     self.pixbuf = pixbuf_new_sz(self.image, bounds[0],
                                                 bounds[1]).rotate_simple(self.rotate)
                 except gobject.GError:
-                    print "Error: Could not open background file."
+                    exposong.log.error('Could not open "%s" background file.',
+                                 self.image)
                     return
             ccontext.set_source_pixbuf(self.pixbuf, (bounds[0]-self.pixbuf.get_width())/2,\
             (bounds[1]-self.pixbuf.get_height())/2)
@@ -173,8 +175,8 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
             try:
                 self.slides.append(self.Slide(self, sl))
             except ImageNotFoundError, err:
-                print "Image not found (%s), slide was not added to the \"%s.\"" % \
-                        (err.image, self._title)
+                exposong.log.error('Image "%s" not found in presentation "%s".',
+                        err.image, self._title)
     
     def _edit_tabs(self, notebook, parent):
         'Tabs for the dialog.'

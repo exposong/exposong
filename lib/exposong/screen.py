@@ -215,7 +215,8 @@ class Screen:
                             config.get("screen", "logo"), int(bounds[0]/1.5),
                             int(bounds[1]/1.5))
                 except gobject.GError:
-                    print "Error: Could not open logo file."
+                    exposong.log.error('Could not open logo "%s".',
+                                       config.get('screen', 'logo'))
                     self._logo_pbuf = None
             bg = c2dec(config.getcolor("screen", "logo_bg"))
             ccontext.set_source_rgb(bg[0], bg[1], bg[2])
@@ -243,7 +244,7 @@ class Screen:
                                                              bounds[1],
                                                              gtk.gdk.INTERP_BILINEAR)
             except gobject.GError:
-                print "Error: Could not open background file: %s."%bgimage
+                exposong.log.error('Could not open background file "%s".', bgimage)
                 if hasattr(self, 'bg_img') and bgkey in self.bg_img:
                     del self.bg_img[bgkey]
                 config.set("screen", "bg_image", "")
@@ -285,7 +286,8 @@ class Screen:
                 ccontext.set_source(gradient)
                 ccontext.fill()
             else:
-                print "_set_background: Incorrect color"
+                exposong.log.error('_set_background: Incorrect color `%s`.',
+                    repr(color))
     
     def _draw(self, widget):
         'Render `widget`.'
