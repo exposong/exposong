@@ -26,10 +26,15 @@ from os.path import abspath, dirname, join, pardir, expanduser
 log = logging.getLogger("exposong")
 log.setLevel(logging.DEBUG)
 _handler = logging.StreamHandler()
-_handler.setLevel(logging.INFO)
+_handler.setLevel(logging.WARNING)
 _fmt = logging.Formatter("%(asctime)s:%(levelname)s: %(message)s")
 _handler.setFormatter(_fmt)
 log.addHandler(_handler)
+
+import exposong.gtklogger
+
+exposong.gtklogger.handler = exposong.gtklogger.GTKHandler(logging.DEBUG)
+log.addHandler(exposong.gtklogger.handler)
 
 ## TODO Allow the user to pass a variable to the command line for logging to a file.
 #if False:
@@ -39,7 +44,7 @@ log.addHandler(_handler)
 #    _handler.setFormatter(_fmt)
 #    log.addHandler(_handler)
 
-log.debug("Initializing.")
+log.debug("Starting ExpoSong.")
 
 
 DATA_PATH = None
@@ -61,7 +66,7 @@ else:
     log.exception("Program files not found. Will now exit.")
     exit(0)
 
-log.info('Shared files found at "%s".', SHARED_FILES)
+log.debug('Shared files found at "%s".', SHARED_FILES)
 
 HELP_PATH = join(SHARED_FILES, 'help')
 LOCALE_PATH = join(SHARED_FILES, 'i18n')
@@ -69,7 +74,7 @@ RESOURCE_PATH = join(SHARED_FILES, 'res')
 
 #Set up translations for the program
 locale.setlocale(locale.LC_ALL, '')
-log.info('Locale set to "%s".', locale.LC_ALL)
+log.debug('Locale set to "%s".', locale.LC_ALL)
 gettext.bindtextdomain('exposong', LOCALE_PATH)
 gettext.textdomain('exposong')
 __builtin__._ = gettext.gettext
@@ -85,7 +90,7 @@ if config.config.has_option("general", "data-path"):
 else:
     DATA_PATH = join(expanduser("~"),"exposong","data")
 
-log.info('Data is located at "%s".', DATA_PATH)
+log.debug('Data is located at "%s".', DATA_PATH)
 
 # Initialize the data directories. This assumes that if they exist, they are
 # either directories or symlinks. We might need to handle the case where they

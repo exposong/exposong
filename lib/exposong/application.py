@@ -223,6 +223,9 @@ class Main (gtk.Window):
                 ('Quit', gtk.STOCK_QUIT, None, None, None, self._quit),
                 ('Preferences', gtk.STOCK_PREFERENCES,
                         None, None, None, self._on_prefs),
+                
+                ('view-log', gtk.STOCK_PROPERTIES, _('View _Log'), None,
+                        _("Show the event log"), exposong.gtklogger.handler.show_window),
                 ('file-import', None, _("_Import"), "",
                         _("Import a .expo package or other format")),
                 ('file-export', None, _("_Export"), "", _("Export a .expo package")),
@@ -286,6 +289,7 @@ class Main (gtk.Window):
                     <menu action="Edit">
                         <menuitem action="Search" position="bot" />
                         <separator />
+                        <menuitem action="view-log" position="bot" />
                         <menuitem action="Preferences" position="bot" />
                     </menu>
                     <menu action="Schedule">
@@ -368,7 +372,7 @@ class Main (gtk.Window):
                 pres = plugin(filenm)
                 self.library.append(pres)
                 exposong.log.info('Adding %s presentation "%s" to Library.',
-                                  pres.get_type(), pres.get_title())
+                                  pres.get_type(), os.path.basename(filenm))
                 break
             except exposong.plugins._abstract.WrongPresentationType, details:
                 continue
