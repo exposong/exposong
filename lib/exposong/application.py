@@ -328,6 +328,8 @@ class Main (gtk.Window):
             try:
                 pres = plugin(filenm)
                 self.library.append(pres)
+                exposong.log.info('Adding %s presentation "%s" to Library.',
+                                  pres.get_type(), pres.get_title())
                 break
             except exposong.plugins._abstract.WrongPresentationType, details:
                 continue
@@ -360,7 +362,7 @@ class Main (gtk.Window):
                 os.path.join(filenm), details)
         if dom:
             if dom.documentElement.tagName == "schedule":
-                sched = Schedule(filename=filenm)
+                sched = Schedule(filename=filenm, builtin=False)
                 sched.load(dom.documentElement, self.library)
                 schedlist.schedlist.append(schedlist.schedlist.custom_schedules, sched)
             else:

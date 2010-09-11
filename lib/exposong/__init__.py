@@ -41,9 +41,6 @@ log.addHandler(_handler)
 
 log.debug("Initializing.")
 
-log.info('Locale set to "%s".', locale.LC_ALL)
-log.info('Shared files found at "%s".', SHARED_FILES)
-
 
 DATA_PATH = None
 SHARED_FILES = None
@@ -64,12 +61,15 @@ else:
     log.exception("Program files not found. Will now exit.")
     exit(0)
 
+log.info('Shared files found at "%s".', SHARED_FILES)
+
 HELP_PATH = join(SHARED_FILES, 'help')
 LOCALE_PATH = join(SHARED_FILES, 'i18n')
 RESOURCE_PATH = join(SHARED_FILES, 'res')
 
 #Set up translations for the program
 locale.setlocale(locale.LC_ALL, '')
+log.info('Locale set to "%s".', locale.LC_ALL)
 gettext.bindtextdomain('exposong', LOCALE_PATH)
 gettext.textdomain('exposong')
 __builtin__._ = gettext.gettext

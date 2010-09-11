@@ -160,8 +160,8 @@ class ScheduleList(gtk.TreeView):
             model = treeview.get_model()
             path, position = drop_info
             
-            model = exposong.preslist.preslist.get_filter_model()
-            pres = model.get_value(model.get_iter_from_string(selection.data),
+            pmodel = exposong.preslist.preslist.get_filter_model()
+            pres = pmodel.get_value(pmodel.get_iter_from_string(selection.data),
                                    0).presentation
             sched = model.get_value(model.get_iter(path), 0)
             
@@ -170,6 +170,9 @@ class ScheduleList(gtk.TreeView):
             msg = _('Added Presentation "%(presentation)s" to Schedule "%(schedule)s"')
             statusbar.statusbar.output(msg % {"presentation":pres.get_title(),
                                               "schedule": sched.title})
+            exposong.log.info('Added Presentation "%s" to Schedule "%s"',
+                              pres.get_title(),
+                              sched.title)
     
     def _on_new(self, *args):
         'Create a new schedule.'
