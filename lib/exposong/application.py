@@ -44,7 +44,30 @@ class Main (gtk.Window):
         #define this instance in the global scope
         global main
         main = self
+        exposong.log.debug("Loading Main:")
         
+        exposong.log.debug("Initializing the splash screen.")
+        self._splash = gtk.Window()
+        vbox = gtk.VBox()
+        self._splash.set_title(_("Loading ExpoSong"))
+        self._splash.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_SPLASHSCREEN)
+        self._splash.set_position(gtk.WIN_POS_CENTER)
+        self._splash.set_transient_for(self)
+        self._splash.set_modal(True)
+        # TODO This takes a while to show... not sure why.
+        img = gtk.image_new_from_file(os.path.join(RESOURCE_PATH, 'exposong.png'))
+        img.show_all()
+        vbox.pack_start(img)
+        vbox.pack_start(gtk.Label(_('Loading ExpoSong. Please Wait.')), False,
+                        True, 5)
+        self._splash.add(vbox)
+        self._splash.show_all()
+        
+        #dynamically load plugins
+        exposong.log.debug("Loading plugins.")
+        exposong.plugins.load_plugins()
+        
+        exposong.log.debug("Initializing the main window.")
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         gtk.window_set_default_icon_list(
                 gtk.gdk.pixbuf_new_from_file(os.path.join(RESOURCE_PATH, 'es128.png')),
@@ -52,30 +75,31 @@ class Main (gtk.Window):
                 gtk.gdk.pixbuf_new_from_file(os.path.join(RESOURCE_PATH, 'es48.png')),
                 gtk.gdk.pixbuf_new_from_file(os.path.join(RESOURCE_PATH, 'es32.png')),
                 gtk.gdk.pixbuf_new_from_file(os.path.join(RESOURCE_PATH, 'es16.png')))
-        self.set_title( "ExpoSong" )
+        self.set_title("ExpoSong")
         self.connect("configure_event", self._on_configure_event)
         self.connect("window_state_event", self._on_window_state_event)
         self.connect("destroy", self._quit)
-        
-        #dynamically load plugins
-        exposong.plugins.load_plugins()
         
         ##  GUI
         win_v = gtk.VBox()
         
         #These have to be initialized for the menus to render properly
+        exposong.log.debug("Loading the presentation screen.")
         pres_prev = gtk.DrawingArea()
         screen.screen = screen.Screen(pres_prev)
         screen.screen.reposition(self)
         
+        exposong.log.debug("Initializing custom widgets.")
         schedlist.schedlist = schedlist.ScheduleList()
         preslist.presfilter = presfilter.PresFilter()
         preslist.preslist = preslist.PresList()
         slidelist.slidelist = slidelist.SlideList()
         
+        exposong.log.debug("Creating the menus.")
         menu = self._create_menu()
         win_v.pack_start(menu, False)
         
+        exposong.log.debug("Laying out the schedlist and preslist.")
         ## Main Window Area
         self.win_h = gtk.HPaned()
         ### Main left area
@@ -101,6 +125,7 @@ class Main (gtk.Window):
         left_vbox.show_all()
         self.win_h.pack1(left_vbox, False, False)
         
+        exposong.log.debug("Laying out the slidelist.")
         ### Main right area
         win_rt = gtk.VBox()
         #### Slide List
@@ -110,12 +135,15 @@ class Main (gtk.Window):
                                           gtk.POLICY_AUTOMATIC)
         win_rt.pack_start(slidelist.slide_scroll)
         
+        exposong.log.debug("Laying out the preview area.")
         #### Preview and Presentation Buttons
         win_rt_btm = gtk.HBox()
         
+        exposong.log.debug(" * BGSelect")
         exposong.bgselect.bgselect = exposong.bgselect.BGSelect()
         win_rt_btm.pack_start(exposong.bgselect.bgselect, False, True, 10)
         
+        exposong.log.debug(" * Preview")
         # Wrap the pres_preview it so that the aspect ratio is kept
         prev_box = gtk.VBox()
         prev_aspect = gtk.AspectFrame(None, 0.5, 0.5,
@@ -124,10 +152,12 @@ class Main (gtk.Window):
         prev_aspect.add(pres_prev)
         prev_box.pack_start(prev_aspect, True, False, 0)
         
+        exposong.log.debug(" * Notification")
         exposong.notify.notify = exposong.notify.Notify()
         prev_box.pack_start(exposong.notify.notify, True, False, 0)
         win_rt_btm.pack_start(prev_box, True, False, 10)
         
+        exposong.log.debug(" * Buttons")
         pres_buttons = gtk.VButtonBox()
         self.pbut_present = gtk.Button( _("Present") )
         self.main_actions.get_action('Present').connect_proxy(self.pbut_present)
@@ -151,24 +181,33 @@ class Main (gtk.Window):
         win_v.pack_start(self.win_h, True)
         
         ## Status bar
+        exposong.log.debug("Status bar.")
         statusbar.statusbar = statusbar.timedStatusbar()
         win_v.pack_end(statusbar.statusbar, False)
         
         gtk.settings_get_default().set_long_property('gtk-button-images',True,
                                                      'application:__init__')    
-        self.build_all()
+        task = self.build_schedule()
+        gobject.idle_add(task.next)
         
         win_v.show_all()
         self.add(win_v)
         
         self.restore_window()
-        self.show_all()
-        gobject.idle_add(self.restore_panes)
+        gobject.idle_add(self.restore_panes,
+                         priority=gobject.PRIORITY_HIGH_IDLE+2)
+        # All custom schedules should load after the presentations.
+        gobject.idle_add(self._ready, priority=gobject.PRIORITY_LOW)
+        exposong.log.debug("Loading Main completed.")
     
-    def build_all(self):
-        task = self.build_schedule()
-        gobject.idle_add(task.next)
-        
+    def _ready(self):
+        "Called when ExpoSong is fully loaded."
+        gobject.timeout_add(200, self._splash.destroy)
+        self.show_all()
+        statusbar.statusbar.output(_("Ready"))
+        exposong.log.info('Ready.')
+        return False
+    
     def _create_menu(self):
         'Set up the menus and popup menus.'
         uimanager = gtk.UIManager()
@@ -347,7 +386,6 @@ class Main (gtk.Window):
             if filenm.endswith(".xml"):
                 self.load_pres(filenm)
                 yield True
-        statusbar.statusbar.output(_("Ready"))
         yield False
     
     def load_sched(self, filenm):
@@ -378,7 +416,7 @@ class Main (gtk.Window):
         directory = os.path.join(DATA_PATH, "sched")
         self.library = Schedule( _("Library"))
         task = self.build_pres_list()
-        gobject.idle_add(task.next, priority=gobject.PRIORITY_DEFAULT_IDLE-1)
+        gobject.idle_add(task.next, priority=gobject.PRIORITY_HIGH_IDLE)
         yield True
         libitr = schedlist.schedlist.append(None, self.library, 1)
         schedlist.schedlist.get_selection().select_iter(libitr)
@@ -497,6 +535,7 @@ class Main (gtk.Window):
         if config.config.has_option("main_window", "main-paned"):
             self.win_h.set_position(int(config.config.get(
                     "main_window", "main-paned")))
+        return False
 
     def save_state(self):
         'Saves the state of the panes in the window'

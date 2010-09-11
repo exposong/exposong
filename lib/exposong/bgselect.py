@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import gtk
+import gobject
 import os
 import mimetypes
 import shutil
@@ -35,7 +36,6 @@ class BGSelect (gtk.VBox):
         gtk.VBox.__init__(self)
         
         bgtype = config.get("screen","bg_type")
-        bgimage = config.get("screen","bg_image")    
         bgcolor1 = config.getcolor("screen","bg_color_1")
         bgcolor2 = config.getcolor("screen","bg_color_2")
         
@@ -57,17 +57,11 @@ class BGSelect (gtk.VBox):
         else:
             self.imgcombo.set_sensitive(False)
         
-        directory = os.path.join(DATA_PATH, "bg")
-        dir_list = os.listdir(directory)
-        for filenm in dir_list:
-            if os.path.isfile(os.path.join(directory, filenm)):
-                mime = mimetypes.guess_type(filenm)
-                if mime[0] and mime[0].startswith("image"):
-                    path = os.path.join(directory, filenm)
-                    pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(path, thsz[0], thsz[1])
-                    itr = self.imgmodel.append([path, pixbuf])
-                    if path == bgimage:
-                        self.imgcombo.set_active_iter(itr)
+        # TODO Loading these images is a major drag on starting the program.
+        # We could pass "priority=gobject.PRIORITY_LOW" to idle_add if we'd like
+        # for them to load after the program window is shown.
+        task = self._load_images()
+        gobject.idle_add(task.next)
         
         self.new_image = gtk.Button( _("Add"), gtk.STOCK_ADD, False)
         self.new_image.connect("clicked", self._on_new_image)
@@ -165,10 +159,31 @@ class BGSelect (gtk.VBox):
             self.add_images(images)
         else:
             dlg.destroy()
-
+    
+    def _load_images(self):
+        "Load the images from the data folder."
+        bgimage = config.get("screen","bg_image")
+        directory = os.path.join(DATA_PATH, "bg")
+        dir_list = os.listdir(directory)
+        yield True
+        for filenm in dir_list:
+            if os.path.isfile(os.path.join(directory, filenm)):
+                mime = mimetypes.guess_type(filenm)
+                if mime[0] and mime[0].startswith("image"):
+                    path = os.path.join(directory, filenm)
+                    exposong.log.info('Loading background image "%s".',
+                                      filenm)
+                    pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(path, thsz[0],
+                                                                  thsz[1])
+                    itr = self.imgmodel.append([path, pixbuf])
+                    if path == bgimage:
+                        self.imgcombo.set_active_iter(itr)
+                yield True
+        yield False
+    
     def set_background_to_color(self):
         self.gradradio.set_active(True) 
-
+    
     def set_background_to_image(self):
         self.imgradio.set_active(True)
 
