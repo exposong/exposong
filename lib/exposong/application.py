@@ -223,9 +223,6 @@ class Main (gtk.Window):
                 ('Quit', gtk.STOCK_QUIT, None, None, None, self._quit),
                 ('Preferences', gtk.STOCK_PREFERENCES,
                         None, None, None, self._on_prefs),
-                
-                ('view-log', gtk.STOCK_PROPERTIES, _('View _Log'), None,
-                        _("Show the event log"), exposong.gtklogger.handler.show_window),
                 ('file-import', None, _("_Import"), "",
                         _("Import a .expo package or other format")),
                 ('file-export', None, _("_Export"), "", _("Export a .expo package")),
@@ -270,6 +267,10 @@ class Main (gtk.Window):
                 ('HelpContents', gtk.STOCK_HELP, None, None, None, self._show_help),
                 ('Contribute', None, _("Contribute"), None, None, self._help_contribute),
                 ('About', gtk.STOCK_ABOUT, None, None, None, self._on_about)])
+        self.main_actions.add_actions([
+                ('view-log', gtk.STOCK_PROPERTIES, _('View _Log'), None,
+                        _("Show the event log"),
+                        exposong.gtklogger.handler.show_window),], self)
         self.main_actions.get_action("Background").set_sensitive(False)
         self.main_actions.get_action("Logo").set_sensitive(False)
         self.main_actions.get_action("Black Screen").set_sensitive(False)
