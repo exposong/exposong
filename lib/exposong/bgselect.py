@@ -163,18 +163,30 @@ class BGSelect (gtk.VBox):
     def _load_images(self):
         "Load the images from the data folder."
         bgimage = config.get("screen","bg_image")
-        directory = os.path.join(DATA_PATH, "bg")
-        dir_list = os.listdir(directory)
+        bg_dir = os.path.join(DATA_PATH, "bg")
+        cache_dir = os.path.join(DATA_PATH, ".cache", "bg")
+        if not os.path.exists(cache_dir):
+            os.makedirs(cache_dir)
+        dir_list = os.listdir(bg_dir)
         yield True
         for filenm in dir_list:
-            if os.path.isfile(os.path.join(directory, filenm)):
+            if os.path.isfile(os.path.join(bg_dir, filenm)):
                 mime = mimetypes.guess_type(filenm)
                 if mime[0] and mime[0].startswith("image"):
-                    path = os.path.join(directory, filenm)
-                    exposong.log.info('Loading background image "%s".',
-                                      filenm)
-                    pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(path, thsz[0],
-                                                                  thsz[1])
+                    cpath = os.path.join(cache_dir, filenm)
+                    path = os.path.join(bg_dir, filenm)
+                    if os.path.exists(cpath):
+                        exposong.log.info('Loading background image "%s" from cache.',
+                                          filenm)
+                        pixbuf = gtk.gdk.pixbuf_new_from_file(cpath)
+                    else:
+                        exposong.log.info('Loading background image "%s".',
+                                          filenm)
+                        pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(path,
+                                                                      thsz[0],
+                                                                      thsz[1])
+                        if pixbuf:
+                            pixbuf.save(os.path.join(cache_dir, filenm), "png")
                     itr = self.imgmodel.append([path, pixbuf])
                     if path == bgimage:
                         self.imgcombo.set_active_iter(itr)
