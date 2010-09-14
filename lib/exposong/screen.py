@@ -315,7 +315,7 @@ class Screen:
             self._set_background(widget, ccontext, (screenW, screenH))
         else:
             
-            if slide.draw(widget) is not NotImplemented:
+            if slide.draw(ccontext, (screenW, screenH)) is not NotImplemented:
                 return True
             
             self._set_background(widget, ccontext, (screenW, screenH))

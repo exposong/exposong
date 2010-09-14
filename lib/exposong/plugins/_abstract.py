@@ -101,7 +101,7 @@ class Presentation:
             'Draw text in the center of the screen.'
             return self.get_text()
         
-        def draw(self, widget):
+        def draw(self, widget, bounds):
             'Overrides all text rendering to render custom slides.'
             return NotImplemented
         
@@ -318,6 +318,8 @@ class Presentation:
             if self._fields['timer_on'].get_active():
                 self.timer = self._fields['timer'].get_value_as_int()
                 self.timer_loop = self._fields['timer_loop'].get_active()
+            else:
+                self.timer = None
     
     def _is_editing_complete(self, parent):
         "Test to see if all fields have been filled which are required."

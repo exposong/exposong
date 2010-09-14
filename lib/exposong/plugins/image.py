@@ -26,10 +26,10 @@ import shutil
 from gtk.gdk import pixbuf_new_from_file_at_size as pixbuf_new_sz
 from gtk.gdk import pixbuf_new_from_file as pixbuf_new
 
+import exposong.application
 from exposong.glob import *
 from exposong import RESOURCE_PATH, DATA_PATH
 from exposong.plugins import Plugin, _abstract
-import exposong.application
 
 """
 Image presentations.
@@ -104,15 +104,26 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
             self._set_id(value)
         
         def get_thumb(self):
+            "Return the thumbnail"
+            cache_dir = os.path.join(DATA_PATH, ".cache", "image")
+            if not os.path.exists(cache_dir):
+                os.makedirs(cache_dir)
             if hasattr(self, "image"):
                 if not hasattr(self, "thumb"):
-                    try:
-                        self.thumb = pixbuf_new_sz(self.image, thsz[0], thsz[1])
-                        self.thumb.rotate_simple(self.rotate)
-                        return self.thumb
-                    except gobject.GError:
-                        exposong.log.error('Could not open "%s" image.',
-                                     self.image)
+                    cpath = os.path.join(cache_dir,
+                                         os.path.basename(self.image))
+                    if os.path.isfile(cpath):
+                        self.thumb = gtk.gdk.pixbuf_new_from_file(cpath)
+                    else:
+                        try:
+                            self.thumb = pixbuf_new_sz(self.image, thsz[0],
+                                                       thsz[1])
+                            self.thumb.rotate_simple(self.rotate)
+                            self.thumb.save(cpath, "png")
+                            return self.thumb
+                        except gobject.GError:
+                            exposong.log.error('Could not open "%s" image.',
+                                         self.image)
             if hasattr(self, "thumb"):
                 return self.thumb
             else:
@@ -142,20 +153,22 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
             'Return the description of the plugin.'
             return "An image presentation type."
         
-        def draw(self, widget):
+        def draw(self, ccontext, bounds):
             'Override screen to draw an image instead of text.'
-            ccontext = widget.window.cairo_create()
-            bounds = widget.window.get_size()
             
             #draw a black background
             ccontext.set_source_rgb(0, 0, 0)
             ccontext.paint()
             
-            if not hasattr(self,'pixbuf') or bounds[0] <> self.pixbuf.get_width()\
+            if not hasattr(self,'pixbuf') or bounds[0] <> self.pixbuf.get_width()
                     or bounds[1] <> self.pixbuf.get_height():
                 try:
-                    self.pixbuf = pixbuf_new_sz(self.image, bounds[0],
-                                                bounds[1]).rotate_simple(self.rotate)
+                    exposong.log.debug('Opening file "%s" for presentation "%s".',
+                                       os.path.basename(self.image),
+                                       self.pres.get_title())
+                    self.pixbuf = pixbuf_new_sz(self.image, bounds[0], bounds[1])
+                    if self.rotate <> 'n':
+                        self.pixbuf = self.pixbuf.rotate_simple(self.rotate)
                 except gobject.GError:
                     exposong.log.error('Could not open "%s" background file.',
                                  self.image)

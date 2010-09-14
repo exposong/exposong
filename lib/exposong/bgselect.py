@@ -175,7 +175,7 @@ class BGSelect (gtk.VBox):
                 if mime[0] and mime[0].startswith("image"):
                     cpath = os.path.join(cache_dir, filenm)
                     path = os.path.join(bg_dir, filenm)
-                    if os.path.exists(cpath):
+                    if os.path.isfile(cpath):
                         exposong.log.info('Loading background image "%s" from cache.',
                                           filenm)
                         pixbuf = gtk.gdk.pixbuf_new_from_file(cpath)
@@ -186,7 +186,7 @@ class BGSelect (gtk.VBox):
                                                                       thsz[0],
                                                                       thsz[1])
                         if pixbuf:
-                            pixbuf.save(os.path.join(cache_dir, filenm), "png")
+                            pixbuf.save(cpath, "png")
                     itr = self.imgmodel.append([path, pixbuf])
                     if path == bgimage:
                         self.imgcombo.set_active_iter(itr)
