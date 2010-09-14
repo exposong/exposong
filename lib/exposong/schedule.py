@@ -61,8 +61,8 @@ class Schedule(gtk.ListStore):
                         presNode.getElementsByTagName("file")[0]))[1]
                 hasFile = True
             except IndexError:
-                exposong.log.warning('Presentation in Schedule "%s" did not ' +
-                                     'have a filename', self.title)
+                exposong.log.warning('Presentation in Schedule "%s" did not '%self.title +
+                                     'have a filename')
                 continue
             
             try:
@@ -77,8 +77,8 @@ class Schedule(gtk.ListStore):
                     exposong.log.info('Adding %s presentation "%s" to schedule "%s".',
                                       pres.get_type(), pres.get_title(), self.title)
                 else:
-                    exposong.log.warning('Presentation file "%s" not found for'
-                                         + ' schedule "%s".', filenm)
+                    exposong.log.warning('Presentation file "%s" not found for'%filenm
+                                         + ' schedule "%s".'%self.title)
             
     def save(self):
         'Write schedule to disk.'

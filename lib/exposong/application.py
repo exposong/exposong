@@ -19,7 +19,6 @@ import gtk.gdk
 import gobject
 import os
 import webbrowser
-import threading
 
 from xml.dom import minidom
 from urllib import pathname2url
@@ -58,7 +57,7 @@ class Main (gtk.Window):
         img = gtk.image_new_from_file(os.path.join(RESOURCE_PATH, 'exposong.png'))
         img.show_all()
         vbox.pack_start(img)
-        vbox.pack_start(gtk.Label(_('Loading ExpoSong. Please Wait.')), False,
+        vbox.pack_start(gtk.Label(_('Loading, Please Wait.')), False,
                         True, 5)
         self._splash.add(vbox)
         self._splash.show_all()
