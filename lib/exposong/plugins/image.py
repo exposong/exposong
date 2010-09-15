@@ -79,6 +79,8 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
         An image slide.
         '''
         def __init__(self, pres, value):
+            # TODO Make sure the thumb and image don't exist before creating the
+            # new image.
             self.pres = pres
             
             if(isinstance(value, xml.dom.Node)):
@@ -95,7 +97,9 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
             if not os.path.isabs(self.image):
                 self.image = os.path.join(DATA_PATH, 'image', self.image)
             elif not self.image.startswith(os.path.join(DATA_PATH, 'image')):
-                newimg = os.path.join(DATA_PATH, 'image', os.path.split(self.image)[1])
+                imgname = ("_"+random_string(6)).join(
+                        os.path.splitext(os.path.basename(self.image)))
+                newimg = os.path.join(DATA_PATH, 'image', imgname)
                 shutil.copyfile(self.image, newimg)
                 self.image = newimg
             if not os.path.isfile(self.image):
@@ -193,6 +197,7 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     
     def _edit_tabs(self, notebook, parent):
         'Tabs for the dialog.'
+        self._delete_on_remove = []
         vbox = gtk.VBox()
         vbox.set_border_width(4)
         vbox.set_spacing(7)
@@ -250,6 +255,8 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
         while itr:
             self.slides.append(self.Slide(self, self._fields['images'].get_value(itr, 0)))
             itr = self._fields['images'].iter_next(itr)
+        for fl in self._delete_on_remove:
+            os.remove(fl)
         _abstract.Presentation._edit_save(self)
     
     def _is_editing_complete(self, parent):
@@ -294,14 +301,20 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
         'Remove an image from the presentation.'
         (model, s_iter) = treeview.get_selection().get_selected()
         if s_iter:
+            thmb = os.path.join(DATA_PATH, '.cache', 'image',
+                                os.path.basename(model.get_value(s_iter, 0)))
             if model.get_value(s_iter, 0).startswith(DATA_PATH):
-                os.remove(model.get_value(s_iter, 0))
+                self._delete_on_remove += [model.get_value(s_iter, 0)]
+            if os.path.isfile(thmb):
+                self._delete_on_remove += [thmb]
             model.remove(s_iter)
     
     def on_delete(self):
         'Called when the presentation is deleted.'
         for sl in self.slides:
             os.remove(sl.image)
+            if sl.thumb and os.path.isfile(sl.thumb):
+                os.remove(sl.thumb)
     
     @staticmethod
     def get_type():
