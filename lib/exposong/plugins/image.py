@@ -159,11 +159,9 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
             #draw a black background
             ccontext.set_source_rgb(0, 0, 0)
             ccontext.paint()
-            print "ImageDraw: ",bounds
             
             if not hasattr(self,'pixbuf') or (bounds[0] <> self.pixbuf.get_width()
                     and bounds[1] <> self.pixbuf.get_height()):
-                print "  Reloading."
                 try:
                     exposong.log.debug('Opening file "%s" for presentation "%s".',
                                        os.path.basename(self.image),

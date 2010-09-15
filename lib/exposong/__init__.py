@@ -17,7 +17,7 @@
 import imp
 import os.path, os
 import pygtk
-import gettext
+import gettext, gettext_windows
 import locale
 import __builtin__
 import logging
@@ -73,6 +73,7 @@ LOCALE_PATH = join(SHARED_FILES, 'i18n')
 RESOURCE_PATH = join(SHARED_FILES, 'res')
 
 #Set up translations for the program
+gettext_windows.setup_env()
 locale.setlocale(locale.LC_ALL, '')
 log.debug('Locale set to "%s".', locale.LC_ALL)
 gettext.bindtextdomain('exposong', LOCALE_PATH)
