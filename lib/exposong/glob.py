@@ -89,18 +89,15 @@ def find_freefile(filename):
     until the file won't overwrite an existing file. Needs changes to work with
     extensions such as ".tar.gz" which have multiple periods.
     """
-    fl = filename.rpartition(".")
-    fl = [fl[0], "", "."+fl[2]]
-    if fl[0] == "":
-        #If there's not a dot, just add a number to the end.
-        fl = [fl[2][1:], "", ""]
-    while os.path.exists("".join(fl)):
+    root,ext = os.path.splitext(filename)
+    n = ''
+    while os.path.exists("".join([root,n,ext])):
         try:
-            fl[1] = str(int(fl[1])-1)
+            n = str(int(n)-1)
         except ValueError:
             #The first time, it will be an empty string, so set it manually.
-            fl[1] = "-1"
-    return "".join(fl)
+            n = "-1"
+    return "".join([root,n,ext])
 
 def random_string(len):
     chars = string.ascii_letters + string.digits

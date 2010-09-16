@@ -97,9 +97,9 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
             if not os.path.isabs(self.image):
                 self.image = os.path.join(DATA_PATH, 'image', self.image)
             elif not self.image.startswith(os.path.join(DATA_PATH, 'image')):
-                imgname = ("_"+random_string(6)).join(
-                        os.path.splitext(os.path.basename(self.image)))
-                newimg = os.path.join(DATA_PATH, 'image', imgname)
+                newimg = os.path.join(DATA_PATH, 'image',
+                                      os.path.basename(self.image))
+                newimg = find_freefile(newimg)
                 shutil.copyfile(self.image, newimg)
                 self.image = newimg
             if not os.path.isfile(self.image):
@@ -256,6 +256,9 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
             self.slides.append(self.Slide(self, self._fields['images'].get_value(itr, 0)))
             itr = self._fields['images'].iter_next(itr)
         for fl in self._delete_on_remove:
+            exposong.log.info('Removing image "%s" for presentation "%s".',
+                              os.path.basename(fl),
+                              self.get_title())
             os.remove(fl)
         _abstract.Presentation._edit_save(self)
     
@@ -312,8 +315,14 @@ class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
     def on_delete(self):
         'Called when the presentation is deleted.'
         for sl in self.slides:
+            exposong.log.info('Removing image "%s" for presentation "%s".',
+                              os.path.basename(sl.image),
+                              self.get_title())
             os.remove(sl.image)
             if sl.thumb and os.path.isfile(sl.thumb):
+                exposong.log.debug('Removing thumb "%s" for presentation "%s".',
+                                   os.path.basename(self.image),
+                                   self.pres.get_title())
                 os.remove(sl.thumb)
     
     @staticmethod
