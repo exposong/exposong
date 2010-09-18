@@ -26,7 +26,7 @@ from urllib import pathname2url
 import exposong.plugins, exposong.plugins._abstract
 import exposong.bgselect, exposong.notify
 from exposong import RESOURCE_PATH, DATA_PATH, SHARED_FILES, HELP_URL
-from exposong import config, prefs, screen, schedlist
+from exposong import config, prefs, screen, schedlist, splash
 from exposong import preslist, presfilter, slidelist, statusbar
 from exposong.about import About
 from exposong.schedule import Schedule # ? where to put library
@@ -45,22 +45,7 @@ class Main (gtk.Window):
         main = self
         exposong.log.debug("Loading Main:")
         
-        exposong.log.debug("Initializing the splash screen.")
-        self._splash = gtk.Window()
-        vbox = gtk.VBox()
-        self._splash.set_title(_("Loading ExpoSong"))
-        self._splash.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_SPLASHSCREEN)
-        self._splash.set_position(gtk.WIN_POS_CENTER)
-        self._splash.set_transient_for(self)
-        self._splash.set_modal(True)
-        # TODO This takes a while to show... not sure why.
-        img = gtk.image_new_from_file(os.path.join(RESOURCE_PATH, 'exposong.png'))
-        img.show_all()
-        vbox.pack_start(img)
-        vbox.pack_start(gtk.Label(_('Loading, Please Wait.')), False,
-                        True, 5)
-        self._splash.add(vbox)
-        self._splash.show_all()
+        splash.splash = splash.SplashScreen(self)
         
         #dynamically load plugins
         exposong.log.debug("Loading plugins.")
@@ -201,7 +186,7 @@ class Main (gtk.Window):
     
     def _ready(self):
         "Called when ExpoSong is fully loaded."
-        gobject.timeout_add(200, self._splash.destroy)
+        gobject.timeout_add(200, splash.splash.destroy)
         self.show_all()
         statusbar.statusbar.output(_("Ready"))
         exposong.log.info('Ready.')
@@ -386,10 +371,12 @@ class Main (gtk.Window):
         'Load presentations and add them to self.library.'
         directory = os.path.join(DATA_PATH, "pres")
         dir_list = os.listdir(directory)
+        splash.splash.incr_total(len(dir_list))
         for filenm in dir_list:
             if filenm.endswith(".xml"):
                 self.load_pres(filenm)
                 yield True
+            splash.splash.incr(1)
         yield False
     
     def load_sched(self, filenm):
@@ -430,6 +417,7 @@ class Main (gtk.Window):
         #Add schedules from plugins
         plugins = exposong.plugins.get_plugins_by_capability(
                 exposong.plugins._abstract.Schedule)
+        splash.splash.incr_total(len(plugins))
         for plugin in plugins:
             schedule = Schedule(plugin.schedule_name(),
                                 filter_func=plugin.schedule_filter)
@@ -439,6 +427,7 @@ class Main (gtk.Window):
                 schedule.append(item)
                 itr = self.library.iter_next(itr)
             schedlist.schedlist.append(None, schedule, 2)
+            splash.splash.incr(1)
             yield True
         
         #Add custom schedules from the data directory

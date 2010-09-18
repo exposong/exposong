@@ -20,11 +20,11 @@ import os
 import mimetypes
 import shutil
 
-from exposong import DATA_PATH
-from exposong.glob import *
-from exposong.config import config
 import exposong.screen
 import exposong.application
+from exposong import DATA_PATH, splash
+from exposong.glob import *
+from exposong.config import config
 
 thsz = (80, 50)
 
@@ -168,6 +168,7 @@ class BGSelect (gtk.VBox):
         if not os.path.exists(cache_dir):
             os.makedirs(cache_dir)
         dir_list = os.listdir(bg_dir)
+        splash.splash.incr_total(len(dir_list))
         yield True
         for filenm in dir_list:
             if os.path.isfile(os.path.join(bg_dir, filenm)):
@@ -190,6 +191,7 @@ class BGSelect (gtk.VBox):
                     itr = self.imgmodel.append([path, pixbuf])
                     if path == bgimage:
                         self.imgcombo.set_active_iter(itr)
+                splash.splash.incr(1)
                 yield True
         yield False
     
