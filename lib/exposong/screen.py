@@ -52,7 +52,6 @@ class Screen:
         self.pres = gtk.DrawingArea()
         self.pres.connect("expose-event", self.expose)
         #self.pres.set_redraw_on_allocate(False) #This may fix the compiz redraw problem.
-        self.pres.show()
         self.window.add(self.pres)
         
         self.preview = gtk.DrawingArea()
@@ -98,17 +97,7 @@ class Screen:
         self.aspect = float(geometry[2])/geometry[3]
         self.preview.set_size_request(int(preview_height*self.aspect),
                                       preview_height)
-    
-    #def set_background(self, **keys):
-    # 'Set the background color.'
-    # self._set_background(self.preview, **keys)
-    # if hasattr(self, "pres") and self.pres.window:
-    #   self._set_background(self.pres, **keys)
-    
-    #def set_text(self, text):
-    #  'Set the text of the window.'
-    #  self.text = str(text)
-    #  self.draw()
+        self._size = geometry[2:4]
     
     def draw(self):
         'Redraw the presentation and preview screens.'
@@ -293,14 +282,24 @@ class Screen:
         
         ccontext = widget.window.cairo_create()
         screenW, screenH = widget.window.get_size()
-        if widget is self.preview and self.pres.window:
-            #Scale if the presentation window size is available
-            win_sz = self.pres.window.get_size()
-            width = int(float(preview_height)*win_sz[0]/win_sz[1])
-            screenW = screenW*win_sz[0]/width
-            screenH = screenH*win_sz[1]/preview_height
-            ccontext.scale(float(width)/win_sz[0],
-                           float(preview_height)/win_sz[1])
+        if self.pres.window and self.pres.window.get_size() <> self._size:
+            exposong.log.error('The screen sizes are inconsistent. '
+                               + 'Screen: "%s"; Stored: "%s".',
+                               self.pres.window.get_size(), self._size)
+            self._size = self.pres.window.get_size()
+        if widget is self.preview:
+            win_sz = None
+            if self.pres.window:
+                #Scale if the presentation window size is available
+                win_sz = self.pres.window.get_size()
+            elif self._size:
+                win_sz = self._size
+            if win_sz:
+                width = int(float(preview_height)*win_sz[0]/win_sz[1])
+                screenW = screenW*win_sz[0]/width
+                screenH = screenH*win_sz[1]/preview_height
+                ccontext.scale(float(width)/win_sz[0],
+                               float(preview_height)/win_sz[1])
         elif widget is self.pres:
             self.preview.queue_draw()
         

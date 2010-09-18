@@ -255,6 +255,8 @@ class Presentation:
                     self.to_xml()
                     del(self._fields)
                     edit_dialog.destroy()
+                    exposong.log.info('Adding new %s presentation "%s".',
+                                      self.get_type(), self.get_title())
                     return True
             else:
                 del(self._fields)

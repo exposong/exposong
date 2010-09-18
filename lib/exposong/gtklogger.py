@@ -23,6 +23,7 @@ _SEV_LEVELS = ['CRITICAL','ERROR','WARNING','INFO','DEBUG']
 class GTKHandler (logging.Handler, object):
     def __init__(self, level=logging.NOTSET):
         self.liststore = gtk.ListStore(*(str,)*6)
+        self.scroll = None
         logging.Handler.__init__(self, level)
         # \x1e is an ASCII character for "Field divider", which prevents getting
         # collisions in the message that might be a part of the data.
@@ -36,6 +37,7 @@ class GTKHandler (logging.Handler, object):
         r2 = self.format(record).split("\x1e")
         color = self._get_color(r2[1])
         self.liststore.append(r2+color)
+        self.scroll_to_end()
     
     def _get_color(self, levelname):
         if levelname == "CRITICAL":
@@ -97,17 +99,23 @@ class GTKHandler (logging.Handler, object):
         
         treeview.set_model(list)
         
-        scroll = gtk.ScrolledWindow()
-        scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scroll.add(treeview)
-        scroll.show_all()
+        self.scroll = gtk.ScrolledWindow()
+        self.scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        self.scroll.add(treeview)
+        self.scroll.show_all()
         # TODO Allow saving to file
         
-        win.vbox.pack_start(scroll, True, True, 4)
+        win.vbox.pack_start(self.scroll, True, True, 4)
         win.show_all()
+        self.scroll_to_end()
+    
+    def scroll_to_end(self):
+        if self.scroll:
+            self.scroll.emit('scroll-child', gtk.SCROLL_END, False)
     
     def _destroy(self, win, response_id=None):
         "Close the window."
+        self.scroll = None
         win.destroy()
     
     def _row_filter(self, model, itr, combo):

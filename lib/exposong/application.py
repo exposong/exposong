@@ -246,8 +246,8 @@ class Main (gtk.Window):
                         screen.screen.to_black),
                 ('Hide', gtk.STOCK_CLOSE, _('Hi_de'), "Escape", None,
                         screen.screen.hide),
-                ('HelpContents', gtk.STOCK_HELP, None, None, None, self._show_help),
-                ('Contribute', None, _("Contribute"), None, None, self._help_contribute),
+                ('HelpContents', gtk.STOCK_HELP, None, None, None, self._goto_help),
+                ('Contribute', None, _("Contribute"), None, None, self._goto_contribute),
                 ('About', gtk.STOCK_ABOUT, None, None, None, self._on_about)])
         self.main_actions.add_actions([
                 ('view-log', gtk.STOCK_PROPERTIES, _('View _Log'), None,
@@ -441,11 +441,11 @@ class Main (gtk.Window):
         'Shows the preferences dialog.'
         prefs.PrefsDialog(self)
     
-    def _show_help(self, *args):
+    def _goto_help(self, *args):
         'Show the help pages.'
         webbrowser.open("file:"+pathname2url(HELP_URL))
         
-    def _help_contribute(self, *args):
+    def _goto_contribute(self, *args):
         'Show the how-to-contribute page.'
         webbrowser.open("http://exposong.org/contribute")
     
