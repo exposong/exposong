@@ -40,7 +40,7 @@ class Main (gtk.Window):
     Primary user interface.
     '''
     def __init__(self):
-        #define this instance in the global scope
+        # Define this instance in the global scope. This has to be done
         global main
         main = self
         exposong.log.debug("Loading Main:")
@@ -69,8 +69,7 @@ class Main (gtk.Window):
         
         #These have to be initialized for the menus to render properly
         exposong.log.debug("Loading the presentation screen.")
-        pres_prev = gtk.DrawingArea()
-        screen.screen = screen.Screen(pres_prev)
+        screen.screen = screen.Screen()
         screen.screen.reposition(self)
         
         exposong.log.debug("Initializing custom widgets.")
@@ -98,7 +97,6 @@ class Main (gtk.Window):
         self.win_lft.pack1(schedule_scroll, True, True)
         
         #### Presentation List
-        preslist.preslist.connect("button-release-event", self._on_pres_rt_click)
         preslist_scroll = gtk.ScrolledWindow()
         preslist_scroll.add(preslist.preslist)
         preslist_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -133,7 +131,7 @@ class Main (gtk.Window):
         prev_aspect = gtk.AspectFrame(None, 0.5, 0.5,
                                       exposong.screen.screen.aspect, False)
         prev_aspect.set_shadow_type(gtk.SHADOW_NONE)
-        prev_aspect.add(pres_prev)
+        prev_aspect.add(screen.screen.preview)
         prev_box.pack_start(prev_aspect, True, False, 0)
         
         exposong.log.debug(" * Notification")
@@ -312,20 +310,6 @@ class Main (gtk.Window):
             mod.merge_menu(uimanager)
         
         menu = uimanager.get_widget('/MenuBar')
-        self.pres_list_menu = gtk.Menu()
-        self.pres_list_menu.append(self.main_actions.get_action('pres-edit').\
-                                   create_menu_item())
-        self.pres_list_menu.append(self.main_actions.get_action('pres-delete').\
-                                   create_menu_item())
-        self.pres_list_menu.show_all()
-        
-        self.pres_list_sched_menu = gtk.Menu() #Custom schedule menu
-        self.pres_list_sched_menu.append(self.main_actions.get_action('pres-edit').\
-                                         create_menu_item())
-        self.pres_list_sched_menu.append(self.main_actions.\
-                                         get_action('pres-remove-from-schedule').\
-                                         create_menu_item())
-        self.pres_list_sched_menu.show_all()
         
         self.sched_list_menu = gtk.Menu()
         self.sched_list_menu.append(self.main_actions.get_action('sched-rename').\
@@ -341,8 +325,8 @@ class Main (gtk.Window):
         filenm = os.path.join(DATA_PATH, "pres", filenm)
         pres = None
         
-        # TODO Is this slowing us down? Might need to attempt to read the file
-        # first, then convert if reading it fails.
+        # TODO Might need to attempt to read the file first, then convert if
+        # reading it fails.
         plugins = exposong.plugins.get_plugins_by_capability(
                 exposong.plugins._abstract.ConvertPresentation)
         for plugin in plugins:
@@ -442,17 +426,6 @@ class Main (gtk.Window):
         schedlist.schedlist.expand_all()
         yield False
         
-    def _on_pres_rt_click(self, widget, event):
-        'The user right clicked in the presentation list area.'
-        if event.button == 3:
-            path = preslist.preslist.get_path_at_pos(int(event.x), int(event.y))
-            if path is not None:
-                if preslist.preslist.get_model().builtin:
-                    menu = self.pres_list_menu
-                else:
-                    menu = self.pres_list_sched_menu
-                menu.popup(None, None, None, event.button, event.get_time())
-    
     def _on_schedule_rt_click(self, widget, event):
         'The user right clicked in the schedule area.'
         if event.button == 3:

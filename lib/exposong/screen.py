@@ -41,7 +41,7 @@ class Screen:
     Manage the window for presentation.
     '''
     
-    def __init__(self, preview):
+    def __init__(self):
         self._black = self._background = self._logo = False
         self.bg_dirty = False
         self._notification = None
@@ -55,11 +55,8 @@ class Screen:
         self.pres.show()
         self.window.add(self.pres)
         
-        if isinstance(preview, gtk.DrawingArea):
-            self.preview = preview
-            self.preview.connect("expose-event", self.expose)
-        else:
-            raise Exception("'preview' must be gtk.DrawingArea")
+        self.preview = gtk.DrawingArea()
+        self.preview.connect("expose-event", self.expose)
         
         #self.draw()
     

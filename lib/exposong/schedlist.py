@@ -135,8 +135,9 @@ class ScheduleList(gtk.TreeView):
         resp = dialog.run()
         dialog.hide()
         if resp == gtk.RESPONSE_YES:
-            if item.filename:
-                # directory for search
+            exposong.log.info('Deleting custom schedule "%s".',
+                              item.title)
+            if item.filename and os.path.isfile(item.filename):
                 os.remove(os.path.join(DATA_PATH, "sched",item.filename))
             self.remove(item)
             self.set_cursor((0,))
@@ -210,6 +211,8 @@ class ScheduleList(gtk.TreeView):
         if len(new_text.strip()) == 0:
             return
         iter1 = self.model.get_iter(path)
+        exposong.log.info('Renaming custom schedule "%s" to "%s".',
+                          self.model.get_value(iter1, 0).title, new_text)
         self.model.get_value(iter1, 0).title = new_text
         self.model.set_value(iter1, 1, new_text)
         self.model.set_value(iter1, 2, new_text)

@@ -20,8 +20,8 @@ import gtk.gdk
 import gobject
 
 import exposong.slidelist
-import exposong.application
 import exposong.schedlist
+import exposong.application
 from exposong import DATA_PATH
 
 preslist = None #will hold the PresList instance
@@ -49,6 +49,7 @@ class PresList(gtk.TreeView):
         self.set_headers_clickable(False)
         self.get_selection().connect("changed", self._on_pres_activate)
         
+        self.connect("button-release-event", self._on_pres_rt_click)
         self.connect("drag-data-get", self._on_drag_get)
         self.connect("drag-data-received", self._on_pres_drag_received)
         self.enable_model_drag_source(gtk.gdk.BUTTON1_MASK,
@@ -137,8 +138,7 @@ class PresList(gtk.TreeView):
         exposong.slidelist.slide_scroll.get_vadjustment().set_value(0)
         
         actions = exposong.application.main.main_actions
-        actions.get_action("pres-edit")\
-                .set_sensitive(self.has_selection())
+        actions.get_action("pres-edit").set_sensitive(self.has_selection())
         pres_delete = actions.get_action("pres-delete")
         pres_remove_from_sched = actions.get_action("pres-remove-from-schedule")
         pres_delete.set_sensitive(self.has_selection())
@@ -236,6 +236,23 @@ class PresList(gtk.TreeView):
         'Returns the title of the current presentation.'
         pres = model.get_value(titer, 0)
         cell.set_property('text', pres.get_title())
+    
+    def _on_pres_rt_click(self, widget, event):
+        'The user right clicked in the presentation list area.'
+        actions = exposong.application.main.main_actions
+        
+        # TODO This might be better if it was staticly created.
+        menu = gtk.Menu()
+        menu.append(actions.get_action('pres-edit').create_menu_item())
+        menu.append(actions.get_action('pres-delete').create_menu_item())
+        menu.append(actions.get_action('pres-remove-from-schedule').\
+                                         create_menu_item())
+        menu.show_all()
+        
+        if event.button == 3:
+            path = self.get_path_at_pos(int(event.x), int(event.y))
+            if path is not None:
+                menu.popup(None, None, None, event.button, event.get_time())
     
     @staticmethod
     def get_model_args():

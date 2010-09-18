@@ -57,9 +57,6 @@ class BGSelect (gtk.VBox):
         else:
             self.imgcombo.set_sensitive(False)
         
-        # TODO Loading these images is a major drag on starting the program.
-        # We could pass "priority=gobject.PRIORITY_LOW" to idle_add if we'd like
-        # for them to load after the program window is shown.
         task = self._load_images()
         gobject.idle_add(task.next)
         
@@ -76,7 +73,7 @@ class BGSelect (gtk.VBox):
         self.graddir = gtk.combo_box_new_text()
         graddirlist = [ u'\u2192', u'\u2198', u'\u2193', u'\u2199' ]
         for st in graddirlist:
-            self.graddir.append_text( st)
+            self.graddir.append_text(st)
         if config.get("screen","bg_angle") in graddirlist:
             self.graddir.set_active(graddirlist.index(config.get("screen","bg_angle")))
         else:
@@ -91,7 +88,7 @@ class BGSelect (gtk.VBox):
         self.grad2.set_color(gtk.gdk.Color(bgcolor2[0], bgcolor2[1], bgcolor2[2]))
         if bgtype == 'color':
             self.set_background_to_color()
-            
+        
         self._on_image_radio(self.imgradio)
         self._on_grad_radio(self.gradradio)
         self.pack_start(hbox, True, True, 2)
@@ -196,11 +193,13 @@ class BGSelect (gtk.VBox):
         yield False
     
     def set_background_to_color(self):
+        "Change the background selector to color."
         self.gradradio.set_active(True) 
     
     def set_background_to_image(self):
+        "Change the background selector to image."
         self.imgradio.set_active(True)
-
+    
     def add_images(self, images):
         'Adds new images to the background selector'
         itr = None
@@ -213,4 +212,3 @@ class BGSelect (gtk.VBox):
                                                          thsz[1])])
         if itr:
             self.imgcombo.set_active_iter(itr)
-        

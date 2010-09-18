@@ -43,8 +43,12 @@ class Schedule(gtk.ListStore):
             self.get_model().set_sort_func(0, self._column_sort)
             self.get_model().set_sort_column_id(0, gtk.SORT_ASCENDING)
         else:
-            exposong.log.info('Adding custom schedule "%s".',
-                              os.path.basename(filename))
+            if filename:
+                exposong.log.info('Adding custom schedule "%s".',
+                                  os.path.basename(filename))
+            else:
+                exposong.log.info('Adding custom schedule "%s".',
+                                  title)
         self.filter_func = filter_func
     
     def load(self, dom, library):
@@ -123,7 +127,7 @@ class Schedule(gtk.ListStore):
         gtk.ListStore.remove(self, itr)
     
     def remove_if(self, presentation):
-        'Searches and removes a schedule if it is presentation.'
+        'Searches and removes a presentation if it matches.'
         itr = self.get_iter_first()
         ret = False
         while itr:
