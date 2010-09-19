@@ -27,6 +27,7 @@ from gtk.gdk import pixbuf_new_from_file_at_size as pixbuf_new_sz
 from gtk.gdk import pixbuf_new_from_file as pixbuf_new
 
 import exposong.application
+import exposong._hook
 from exposong.glob import *
 from exposong import RESOURCE_PATH, DATA_PATH
 from exposong.plugins import Plugin, _abstract
@@ -68,7 +69,7 @@ class ImageNotFoundError( Exception ):
         self.image = image
 
 
-class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
+class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         _abstract.Schedule, _abstract.Screen):
     '''
     Image presentation type.

@@ -21,6 +21,7 @@ import os
 from openlyrics.tools.opensong2openlyrics import OpenLyricsConverter
 
 import exposong.application
+import exposong._hook
 from exposong.glob import *
 from exposong import DATA_PATH
 from exposong.plugins import Plugin, _abstract
@@ -34,7 +35,7 @@ information = {
         'required': False,
         }
 
-class LyricConvert(_abstract.ConvertPresentation, _abstract.Menu, Plugin):
+class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
     """
     Convert from OpenSong Lyrics type to OpenLyrics.
     """

@@ -424,20 +424,6 @@ class ConvertPresentation:
         "Converts the file."
         return NotImplemented
 
-class Menu:
-    '''
-    Subclasses can modify the menu using uimanager.
-    '''
-    @classmethod
-    def merge_menu(cls, uimanager):
-        'Merge new values with the uimanager.'
-        raise NotImplementedError
-    
-    @classmethod
-    def unmerge_menu(cls, uimanager):
-        'Remove merged items from the menu.'
-        raise NotImplementedError
-
 
 class Schedule:
     '''

@@ -19,6 +19,7 @@ import xml.dom
 import xml.dom.minidom
 
 import exposong.application
+import exposong._hook
 import undobuffer
 from exposong.glob import *
 from exposong import RESOURCE_PATH
@@ -35,7 +36,7 @@ information = {
 type_icon = gtk.gdk.pixbuf_new_from_file_at_size(
         os.path.join(RESOURCE_PATH,'pres_text.png'), 20, 14)
 
-class Presentation (Plugin, _abstract.Presentation, _abstract.Menu,
+class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                     _abstract.Schedule):
     """
     Text presentation type.

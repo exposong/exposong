@@ -22,10 +22,10 @@ import tempfile
 import tarfile
 import mimetypes
 
-from exposong.plugins import _abstract, Plugin
+import exposong.application
+import exposong.plugins
 from exposong import DATA_PATH, schedlist
 from exposong.glob import *
-import exposong.application
 
 """
 Adds functionality to move schedules, or a full library to another exposong
@@ -43,7 +43,7 @@ _FILTER = gtk.FileFilter()
 _FILTER.set_name("ExpoSong Archive")
 _FILTER.add_pattern("*.expo")
 
-class ExportImport(Plugin, _abstract.Menu):
+class ExportImport(exposong.plugins.Plugin, exposong._hook.Menu):
     '''
     Export or Import from file.
     
@@ -272,20 +272,21 @@ class ExportImport(Plugin, _abstract.Menu):
                 exposong.bgselect.bgselect.add_images(images)
         
         dlg.destroy()
-
+    
     @classmethod
     def merge_menu(cls, uimanager):
         'Merge new values with the uimanager.'
         actiongroup = gtk.ActionGroup('export-import')
         actiongroup.add_actions([('import-schedule', None,
-                        _("_ExpoSong Data (.expo) ..."), None,
-                        _("Import a schedule, presentations or backgrounds"), cls.import_file),
+                        _("_ExpoSong Data (.expo)..."), None,
+                        _("Import a schedule, presentations or backgrounds"),
+                        cls.import_file),
                 ('export-sched', None,
-                 _("_Current Schedule (and belonging presentations) ..."),
-                 None, None, cls.export_sched),
-                ('export-lib', None, _("Whole _Library ..."), None,
+                        _("_Current Schedule with Presentations..."),
+                        None, None, cls.export_sched),
+                ('export-lib', None, _("Whole _Library..."), None,
                         None, cls.export_lib),
-                ('export-bg', None, _("_Backgrounds ..."), None,
+                ('export-bg', None, _("_Backgrounds..."), None,
                         None, cls.export_backgrounds)
                 ])
         uimanager.insert_action_group(actiongroup, -1)
@@ -306,8 +307,7 @@ class ExportImport(Plugin, _abstract.Menu):
             </menubar>
             """)
     
-    @classmethod
+    @staticmethod
     def unmerge_menu(cls, uimanager):
         'Remove merged items from the menu.'
         uimanager.remove_ui(cls.menu_merge_id)
-

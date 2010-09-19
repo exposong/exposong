@@ -23,6 +23,7 @@ from xml.etree import cElementTree as etree
 
 import exposong.application
 import exposong.slidelist
+import exposong._hook
 from exposong.glob import *
 from exposong import RESOURCE_PATH, DATA_PATH
 from exposong.plugins import Plugin, _abstract
@@ -42,7 +43,7 @@ information = {
 # Defines the version of SongSelect file to limit to.
 MAX_VERSION = 3.0
 
-class LyricConvert(_abstract.ConvertPresentation, _abstract.Menu, Plugin):
+class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
     """
     Convert from ExpoSong (<= 0.6.2) Lyrics type to OpenLyrics.
     """

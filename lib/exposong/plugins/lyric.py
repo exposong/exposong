@@ -26,16 +26,16 @@ import xml.dom
 import xml.dom.minidom
 from datetime import datetime
 
-from openlyrics import openlyrics
-import undobuffer
-
 import exposong.application
 import exposong.slidelist
+import exposong._hook
+import undobuffer
 from exposong.glob import *
 from exposong import RESOURCE_PATH, DATA_PATH
 from exposong import gui
 from exposong.plugins import Plugin, _abstract, text
 from exposong.prefs import config
+from openlyrics import openlyrics
 
 
 """
@@ -87,7 +87,7 @@ for i in range(1,10):
     _lyrics_accel.connect_group(ord("%d"%i), 0,0, key_shortcuts)
 
 
-class Presentation (text.Presentation, Plugin, _abstract.Menu,
+class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
         _abstract.Schedule, _abstract.Screen):
     '''
     Lyric presentation type.

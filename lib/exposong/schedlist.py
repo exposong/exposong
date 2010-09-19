@@ -19,9 +19,10 @@ import gtk.gdk
 import gobject
 import xml.dom
 
-import exposong.schedule
 import exposong.application
+import exposong._hook
 import exposong.preslist
+import exposong.schedule
 from glob import *
 from exposong import DATA_PATH
 from exposong import statusbar
@@ -29,7 +30,7 @@ from exposong import statusbar
 schedlist = None
 DRAGDROP_SCHEDULE = [("text/treeview-path", gtk.TARGET_SAME_APP, 4121)]
 
-class ScheduleList(gtk.TreeView):
+class ScheduleList(gtk.TreeView, exposong._hook.Menu):
     '''
     A TreeView of presentation schedules.
     '''
@@ -58,6 +59,7 @@ class ScheduleList(gtk.TreeView):
         self.get_selection().connect("changed", self._on_schedule_activate)
         
         self.enable_model_drag_dest(DRAGDROP_SCHEDULE, gtk.gdk.ACTION_DEFAULT)
+        self.connect("button-release-event", self._on_rt_click)
         self.connect("drag-drop", self._on_pres_drop)
         self.connect("drag-data-received", self._on_sched_drag_received)
         #self.set_drag_dest_row((1,), gtk.TREE_VIEW_DROP_INTO_OR_BEFORE)
@@ -112,10 +114,8 @@ class ScheduleList(gtk.TreeView):
         except UnboundLocalError:
             enable = False
 
-        exposong.application.main.main_actions.get_action("sched-rename")\
-                .set_sensitive(enable)
-        exposong.application.main.main_actions.get_action("sched-delete")\
-                .set_sensitive(enable)
+        self._actions.get_action("sched-rename").set_sensitive(enable)
+        self._actions.get_action("sched-delete").set_sensitive(enable)
         
         exposong.preslist.preslist.get_model().connect("row-changed",
                             exposong.preslist.preslist._on_pres_added)
@@ -216,4 +216,42 @@ class ScheduleList(gtk.TreeView):
         self.model.get_value(iter1, 0).title = new_text
         self.model.set_value(iter1, 1, new_text)
         self.model.set_value(iter1, 2, new_text)
-
+    
+    def _on_rt_click(self, widget, event):
+        'The user right clicked in the schedule area.'
+        if event.button == 3:
+            if widget.get_active_item() and not widget.get_active_item().builtin:
+                menu = gtk.Menu()
+                menu.append(self._actions.get_action('sched-rename').create_menu_item())
+                menu.append(self._actions.get_action('sched-delete').create_menu_item())
+                menu.show_all()
+                self.sched_list_menu.popup(None, None, None,
+                                           event.button, event.get_time())
+    
+    @classmethod
+    def merge_menu(cls, uimanager):
+        'Merge new values with the uimanager.'
+        global schedlist
+        cls._actions = gtk.ActionGroup('schedlist')
+        cls._actions.add_actions([
+                ('sched-new', gtk.STOCK_NEW, None, None,
+                        _("Create a new schedule"), schedlist._on_new),
+                ('sched-rename', None, _("_Rename"), None,
+                        _("Rename the selected schedule"), schedlist._on_rename),
+                ('sched-delete', gtk.STOCK_DELETE, None, None,
+                        _("Delete the currently selected schedule"),
+                        schedlist._on_sched_delete ),
+                ])
+        
+        uimanager.insert_action_group(cls._actions, -1)
+        uimanager.add_ui_from_string("""
+                <menubar name="MenuBar">
+                    <menu action="Schedule">
+                        <menuitem action='sched-new' />
+                        <menuitem action='sched-rename' />
+                        <menuitem action='sched-delete' />
+                    </menu>                
+                </menubar>
+                """)
+        # unmerge_menu not implemented, because we will never uninstall this as
+        # a module.

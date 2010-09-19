@@ -19,6 +19,7 @@ import gtk
 import gtk.gdk
 import gobject
 
+import exposong._hook
 import exposong.slidelist
 import exposong.schedlist
 import exposong.application
@@ -27,7 +28,7 @@ from exposong import DATA_PATH
 preslist = None #will hold the PresList instance
 presfilter = None #will hold PresFilter instance
 
-class PresList(gtk.TreeView):
+class PresList(gtk.TreeView, exposong._hook.Menu):
     '''
     Manage the presentation list.
     '''
@@ -137,14 +138,13 @@ class PresList(gtk.TreeView):
         #TODO This is not working, may need to change the signal
         exposong.slidelist.slide_scroll.get_vadjustment().set_value(0)
         
-        actions = exposong.application.main.main_actions
-        actions.get_action("pres-edit").set_sensitive(self.has_selection())
-        pres_delete = actions.get_action("pres-delete")
-        pres_remove_from_sched = actions.get_action("pres-remove-from-schedule")
+        self._actions.get_action("pres-edit").set_sensitive(self.has_selection())
+        pres_delete = self._actions.get_action("pres-delete")
+        pres_remove = self._actions.get_action("pres-remove-from-schedule")
         pres_delete.set_sensitive(self.has_selection())
-        pres_remove_from_sched.set_sensitive(self.has_selection()
+        pres_remove.set_sensitive(self.has_selection()
                 and not self.get_model().builtin)
-        pres_remove_from_sched.set_visible(not self.get_model().builtin)
+        pres_remove.set_visible(not self.get_model().builtin)
     
     def _on_pres_edit(self, *args):
         'Edit the presentation.'
@@ -239,13 +239,12 @@ class PresList(gtk.TreeView):
     
     def _on_pres_rt_click(self, widget, event):
         'The user right clicked in the presentation list area.'
-        actions = exposong.application.main.main_actions
         
         # TODO This might be better if it was staticly created.
         menu = gtk.Menu()
-        menu.append(actions.get_action('pres-edit').create_menu_item())
-        menu.append(actions.get_action('pres-delete').create_menu_item())
-        menu.append(actions.get_action('pres-remove-from-schedule').\
+        menu.append(self._actions.get_action('pres-edit').create_menu_item())
+        menu.append(self._actions.get_action('pres-delete').create_menu_item())
+        menu.append(self._actions.get_action('pres-remove-from-schedule').\
                                          create_menu_item())
         menu.show_all()
         
@@ -258,4 +257,39 @@ class PresList(gtk.TreeView):
     def get_model_args():
         'Get the arguments to pass to `gtk.ListStore`.'
         return (gobject.TYPE_PYOBJECT,)
-
+    
+    @classmethod
+    def merge_menu(cls, uimanager):
+        'Merge new values with the uimanager.'
+        global preslist
+        cls._actions = gtk.ActionGroup('preslist')
+        cls._actions.add_actions([
+                ('pres-edit', gtk.STOCK_EDIT, None, None,
+                        _("Edit the currently selected presentation"),
+                        preslist._on_pres_edit),
+                ('pres-remove-from-schedule', gtk.STOCK_REMOVE,
+                        _("_Remove from Schedule"), "Delete",
+                        _("Remove the presentation from schedule"),
+                        preslist._on_pres_remove_from_schedule),
+                ('pres-delete', gtk.STOCK_DELETE, None, "Delete",
+                        _("Delete the presentation"), preslist._on_pres_delete),
+                ('pres-prev', None, _("Previous Presentation"), "<Ctrl>Page_Up",
+                        None, preslist.prev_pres),
+                ('pres-next', None, _("Next Presentation"), "<Ctrl>Page_Down",
+                        None, preslist.next_pres),
+                ])
+        
+        uimanager.insert_action_group(cls._actions, -1)
+        uimanager.add_ui_from_string("""
+            <menubar name="MenuBar">
+                <menu action="Presentation">
+                    <menuitem action="pres-edit" />
+                    <menuitem action="pres-remove-from-schedule" />
+                    <menuitem action="pres-delete" />
+                    <menuitem action="pres-prev" position="bot" />
+                    <menuitem action="pres-next" position="bot" />
+                </menu>
+            </menubar>
+            """)
+        # unmerge_menu not implemented, because we will never uninstall this as
+        # a module.

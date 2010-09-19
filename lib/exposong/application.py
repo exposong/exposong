@@ -25,6 +25,7 @@ from urllib import pathname2url
 
 import exposong.plugins, exposong.plugins._abstract
 import exposong.bgselect, exposong.notify
+import exposong._hook
 from exposong import RESOURCE_PATH, DATA_PATH, SHARED_FILES, HELP_URL
 from exposong import config, prefs, screen, schedlist, splash
 from exposong import preslist, presfilter, slidelist, statusbar
@@ -89,8 +90,6 @@ class Main (gtk.Window):
         left_vbox = gtk.VBox()
         self.win_lft = gtk.VPaned()
         #### Schedule
-        schedlist.schedlist.connect("button-release-event",
-                                    self._on_schedule_rt_click)
         schedule_scroll = gtk.ScrolledWindow()
         schedule_scroll.add(schedlist.schedlist)
         schedule_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -209,31 +208,11 @@ class Main (gtk.Window):
                         _("Import a .expo package or other format")),
                 ('file-export', None, _("_Export"), "", _("Export a .expo package")),
                 ('file-print', None, _("_Print"), "", None),
-                ('sched-new', gtk.STOCK_NEW, None, None, _("Create a new schedule"),
-                        schedlist.schedlist._on_new),
-                ('sched-rename', None, _("_Rename"), None,
-                        _("Rename the selected schedule"), schedlist.schedlist._on_rename),
-                ('sched-delete', gtk.STOCK_DELETE, None, None,
-                        _("Delete the currently selected schedule"),
-                        schedlist.schedlist._on_sched_delete ),
                 ('pres-new', gtk.STOCK_NEW, None, "", _("Create a new presentation")),
-                ('pres-edit', gtk.STOCK_EDIT, None, None,
-                        _("Edit the currently selected presentation"),
-                        preslist.preslist._on_pres_edit),
-                ('pres-remove-from-schedule', gtk.STOCK_REMOVE,
-                        _("_Remove from Schedule"), "Delete",
-                        _("Remove the presentation from schedule"),
-                        preslist.preslist._on_pres_remove_from_schedule),
-                ('pres-delete', gtk.STOCK_DELETE, None, "Delete",
-                        _("Delete the presentation"), preslist.preslist._on_pres_delete),
-                ('pres-prev', None, _("Previous Presentation"), "<Ctrl>Page_Up",
-                        None, preslist.preslist.prev_pres),
                 ('pres-slide-prev', None, _("Previous Slide"), "Page_Up", None,
                         slidelist.slidelist.prev_slide),
                 ('pres-slide-next', None, _("Next Slide"), "Page_Down", None,
                         slidelist.slidelist.next_slide),
-                ('pres-next', None, _("Next Presentation"), "<Ctrl>Page_Down",
-                        None, preslist.preslist.next_pres),
                 ('Search', gtk.STOCK_FIND, _('_Find Presentation'), "slash",
                         _('Search for a presentation'), preslist.presfilter.focus),
                 ('Present', gtk.STOCK_FULLSCREEN, _('_Present'), "F5", None,
@@ -260,6 +239,8 @@ class Main (gtk.Window):
         self.main_actions.get_action("pres-slide-next").set_sensitive(False)
         self.main_actions.get_action("pres-slide-prev").set_sensitive(False)
         uimanager.insert_action_group(self.main_actions, 0)
+        # UIManager is not as flexible as hoped for, so I have to define actions
+        # that are created elsewhere to keep the desired order.
         uimanager.add_ui_from_string('''
                 <menubar name="MenuBar">
                     <menu action="File">
@@ -275,13 +256,9 @@ class Main (gtk.Window):
                         <menuitem action="view-log" position="bot" />
                         <menuitem action="Preferences" position="bot" />
                     </menu>
-                    <menu action="Schedule">
-                        <menuitem action='sched-new' />
-                        <menuitem action='sched-rename' />
-                        <menuitem action='sched-delete' />
-                    </menu>
+                    <menu action="Schedule"></menu>
                     <menu action="Presentation">
-                        <menu action="pres-new"></menu>
+                        <menu action="pres-new" position="top"></menu>
                         <menuitem action="pres-edit" />
                         <menuitem action="pres-remove-from-schedule" />
                         <menuitem action="pres-delete" />
@@ -293,9 +270,9 @@ class Main (gtk.Window):
                         <menuitem action="Hide" position="bot" />
                         <separator />
                         <menuitem action="pres-prev" position="bot" />
+                        <menuitem action="pres-next" position="bot" />
                         <menuitem action="pres-slide-prev" position="bot" />
                         <menuitem action="pres-slide-next" position="bot" />
-                        <menuitem action="pres-next" position="bot" />
                     </menu>
                     <menu action="Help">
                         <menuitem action="HelpContents" />
@@ -304,19 +281,10 @@ class Main (gtk.Window):
                     </menu>
                 </menubar>''')
         
-        plugins = exposong.plugins.get_plugins_by_capability(
-                exposong.plugins._abstract.Menu)
-        for mod in plugins:
+        for mod in exposong._hook.get_hooks(exposong._hook.Menu):
             mod.merge_menu(uimanager)
         
         menu = uimanager.get_widget('/MenuBar')
-        
-        self.sched_list_menu = gtk.Menu()
-        self.sched_list_menu.append(self.main_actions.get_action('sched-rename').\
-                                    create_menu_item())
-        self.sched_list_menu.append(self.main_actions.get_action('sched-delete').\
-                                    create_menu_item())
-        self.sched_list_menu.show_all()
         
         return menu
     
@@ -425,13 +393,6 @@ class Main (gtk.Window):
                 yield True
         schedlist.schedlist.expand_all()
         yield False
-        
-    def _on_schedule_rt_click(self, widget, event):
-        'The user right clicked in the schedule area.'
-        if event.button == 3:
-            if widget.get_active_item() and not widget.get_active_item().builtin:
-                self.sched_list_menu.popup(None, None, None,
-                                           event.button, event.get_time())
     
     def _on_about(self, *args):
         'Shows the about dialog.'

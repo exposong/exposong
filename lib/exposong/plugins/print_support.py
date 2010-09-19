@@ -20,6 +20,7 @@ import locale
 
 import exposong.preslist
 import exposong.application
+import exposong._hook
 from exposong import gui
 from exposong.plugins import _abstract, Plugin
 
@@ -34,7 +35,7 @@ information = {
 }
 
 
-class Print(Plugin, _abstract.Menu):
+class Print(Plugin, exposong._hook.Menu):
     '''
     Print a song or a list of songs
     '''
@@ -107,7 +108,7 @@ class Print(Plugin, _abstract.Menu):
                  _("_Current Presentation"),
                  None, None, self.print_presentation),
                 ('print-songlist', None, _("_List of all Songs"), None,
-                        None, self.print_songlist)
+                        None, self.print_songlist),
                 ])
         
         action = actiongroup.get_action('print-presentation')
@@ -116,7 +117,6 @@ class Print(Plugin, _abstract.Menu):
                                                            action)
         uimanager.insert_action_group(actiongroup, -1)
         
-        #Had to use position='top' to put them above "Quit"
         cls.menu_merge_id = uimanager.add_ui_from_string("""
             <menubar name="MenuBar">
                 <menu action="File">
