@@ -24,7 +24,7 @@ import exposong.screen
 slidelist = None #will hold instance of SlideList
 slide_scroll = None
 
-class SlideList(gtk.TreeView):
+class SlideList(gtk.TreeView, exposong._hook.Menu):
     '''
     Class to manipulate the text_area in the presentation program.
     '''
@@ -65,10 +65,8 @@ class SlideList(gtk.TreeView):
             self.slide_order_index = -1
         self.__timer += 1
         men = slist.get_iter_first() is not None
-        exposong.application.main.main_actions.get_action("pres-slide-next")\
-                .set_sensitive(men)
-        exposong.application.main.main_actions.get_action("pres-slide-prev")\
-                .set_sensitive(men)
+        self._actions.get_action("pres-slide-next").set_sensitive(men)
+        self._actions.get_action("pres-slide-prev").set_sensitive(men)
     
     def get_active_item(self):
         'Return the selected `Slide` object.'
@@ -150,4 +148,29 @@ class SlideList(gtk.TreeView):
             self.to_start()
         # Return False, because the slide is activated, adding another timeout
         return False
-
+    
+    @classmethod
+    def merge_menu(cls, uimanager):
+        'Merge new values with the uimanager.'
+        global slidelist
+        cls._actions = gtk.ActionGroup('slidelist')
+        cls._actions.add_actions([
+                ('pres-slide-prev', None, _("Previous Slide"), "Page_Up", None,
+                        slidelist.prev_slide),
+                ('pres-slide-next', None, _("Next Slide"), "Page_Down", None,
+                        slidelist.next_slide),
+                ])
+        
+        uimanager.insert_action_group(cls._actions, -1)
+        uimanager.add_ui_from_string("""
+            <menubar name="MenuBar">
+                <menu action="Presentation">
+                    <menuitem action="pres-slide-prev" position="bot" />
+                    <menuitem action="pres-slide-next" position="bot" />
+                </menu>
+            </menubar>
+            """)
+        cls._actions.get_action("pres-slide-next").set_sensitive(False)
+        cls._actions.get_action("pres-slide-prev").set_sensitive(False)
+        # unmerge_menu not implemented, because we will never uninstall this as
+        # a module.

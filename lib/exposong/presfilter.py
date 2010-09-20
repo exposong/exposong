@@ -29,7 +29,9 @@ import gobject
 import exposong.application
 import exposong.preslist
 
-class PresFilter(gtk.Entry):
+presfilter = None #will hold PresFilter instance
+
+class PresFilter(gtk.Entry, exposong._hook.Menu):
 
     __gsignals__ = {'terms-changed':(gobject.SIGNAL_RUN_FIRST,
                                     gobject.TYPE_NONE,
@@ -156,3 +158,24 @@ class PresFilter(gtk.Entry):
     def focus(self, *args):
         'Sets the focus (for an menu action).'
         self.grab_focus()
+    
+    @classmethod
+    def merge_menu(cls, uimanager):
+        'Merge new values with the uimanager.'
+        global presfilter
+        cls._actions = gtk.ActionGroup('presfilter')
+        cls._actions.add_actions([
+                ('Search', gtk.STOCK_FIND, _('_Find Presentation'), "slash",
+                        _('Search for a presentation'), presfilter.focus),
+                ])
+        
+        uimanager.insert_action_group(cls._actions, -1)
+        uimanager.add_ui_from_string("""
+            <menubar name="MenuBar">
+                <menu action="Edit">
+                    <menuitem action="Search" position="bot" />
+                </menu>
+            </menubar>
+            """)
+        # unmerge_menu not implemented, because we will never uninstall this as
+        # a module.

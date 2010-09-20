@@ -359,15 +359,15 @@ class SlideEdit(gtk.Dialog):
     def _build_menu(self):
         self.uimanager = gtk.UIManager()
         self.add_accel_group(self.uimanager.get_accel_group())
-        self.main_actions = gtk.ActionGroup('main')
-        self.main_actions.add_actions([
+        self._actions = gtk.ActionGroup('main')
+        self._actions.add_actions([
                 ('Edit', None, '_Edit' ),
                 ("edit-undo", gtk.STOCK_UNDO, "Undo",
                     "<Ctrl>z", "Undo the last operation", self._undo),
                 ("edit-redo", gtk.STOCK_REDO, "Redo",
                     "<Ctrl>y", "Redo the last operation", self._redo)
                 ])
-        self.uimanager.insert_action_group(self.main_actions, 0)
+        self.uimanager.insert_action_group(self._actions, 0)
         self.uimanager.add_ui_from_string('''
                 <menubar name='MenuBar'>
                     <menu action='Edit'>

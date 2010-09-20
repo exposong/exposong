@@ -26,7 +26,6 @@ import exposong.application
 from exposong import DATA_PATH
 
 preslist = None #will hold the PresList instance
-presfilter = None #will hold PresFilter instance
 
 class PresList(gtk.TreeView, exposong._hook.Menu):
     '''
@@ -135,8 +134,8 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         else:
             exposong.slidelist.slidelist.set_presentation(None)
             self.prev_selection = None
-        #TODO This is not working, may need to change the signal
-        exposong.slidelist.slide_scroll.get_vadjustment().set_value(0)
+        
+        exposong.slidelist.slide_scroll.emit('scroll-child', gtk.SCROLL_START, False)
         
         self._actions.get_action("pres-edit").set_sensitive(self.has_selection())
         pres_delete = self._actions.get_action("pres-delete")

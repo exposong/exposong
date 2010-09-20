@@ -19,7 +19,6 @@ import gtk.gdk
 import gobject
 import os
 import webbrowser
-
 from xml.dom import minidom
 from urllib import pathname2url
 
@@ -75,7 +74,7 @@ class Main (gtk.Window):
         
         exposong.log.debug("Initializing custom widgets.")
         schedlist.schedlist = schedlist.ScheduleList()
-        preslist.presfilter = presfilter.PresFilter()
+        presfilter.presfilter = presfilter.PresFilter()
         preslist.preslist = preslist.PresList()
         slidelist.slidelist = slidelist.SlideList()
         
@@ -101,7 +100,7 @@ class Main (gtk.Window):
         preslist_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.win_lft.pack2(preslist_scroll, True, True)
         left_vbox.pack_start(self.win_lft, True, True)
-        left_vbox.pack_start(preslist.presfilter, False, True, 2)
+        left_vbox.pack_start(presfilter.presfilter, False, True, 2)
         
         left_vbox.show_all()
         self.win_h.pack1(left_vbox, False, False)
@@ -139,24 +138,8 @@ class Main (gtk.Window):
         win_rt_btm.pack_start(prev_box, True, False, 10)
         
         exposong.log.debug(" * Buttons")
-        pres_buttons = gtk.VButtonBox()
-        self.pbut_present = gtk.Button( _("Present") )
-        self.main_actions.get_action('Present').connect_proxy(self.pbut_present)
-        pres_buttons.add(self.pbut_present)
-        self.pbut_background = gtk.Button( _("Background") )
-        self.main_actions.get_action('Background').connect_proxy(self.pbut_background)
-        pres_buttons.add(self.pbut_background)
-        self.pbut_logo = gtk.Button( _("Logo") )
-        self.main_actions.get_action('Logo').connect_proxy(self.pbut_logo)
-        pres_buttons.add(self.pbut_logo)
-        self.pbut_black = gtk.Button( _("Black Screen") )
-        self.main_actions.get_action('Black Screen').connect_proxy(self.pbut_black)
-        pres_buttons.add(self.pbut_black)
-        self.pbut_hide = gtk.Button( _("Hide") )
-        self.main_actions.get_action('Hide').connect_proxy(self.pbut_hide)
-        pres_buttons.add(self.pbut_hide)
         
-        win_rt_btm.pack_end(pres_buttons, False, False, 10)
+        win_rt_btm.pack_end(screen.screen.get_button_bar(), False, False, 10)
         win_rt.pack_start(win_rt_btm, False, True)
         self.win_h.pack2(win_rt, True, False)
         win_v.pack_start(self.win_h, True)
@@ -209,35 +192,14 @@ class Main (gtk.Window):
                 ('file-export', None, _("_Export"), "", _("Export a .expo package")),
                 ('file-print', None, _("_Print"), "", None),
                 ('pres-new', gtk.STOCK_NEW, None, "", _("Create a new presentation")),
-                ('pres-slide-prev', None, _("Previous Slide"), "Page_Up", None,
-                        slidelist.slidelist.prev_slide),
-                ('pres-slide-next', None, _("Next Slide"), "Page_Down", None,
-                        slidelist.slidelist.next_slide),
-                ('Search', gtk.STOCK_FIND, _('_Find Presentation'), "slash",
-                        _('Search for a presentation'), preslist.presfilter.focus),
-                ('Present', gtk.STOCK_FULLSCREEN, _('_Present'), "F5", None,
-                        screen.screen.show),
-                ('Background', gtk.STOCK_CLEAR, _('Bac_kground'), "k", None,
-                        screen.screen.to_background),
-                ('Logo', None, _('Lo_go'), "<Ctrl>g", None,
-                        screen.screen.to_logo),
-                ('Black Screen', None, _('_Black Screen'), "b", None,
-                        screen.screen.to_black),
-                ('Hide', gtk.STOCK_CLOSE, _('Hi_de'), "Escape", None,
-                        screen.screen.hide),
                 ('HelpContents', gtk.STOCK_HELP, None, None, None, self._goto_help),
                 ('Contribute', None, _("Contribute"), None, None, self._goto_contribute),
-                ('About', gtk.STOCK_ABOUT, None, None, None, self._on_about)])
+                ('About', gtk.STOCK_ABOUT, None, None, None, self._on_about),
+                ])
         self.main_actions.add_actions([
                 ('view-log', gtk.STOCK_PROPERTIES, _('View _Log'), None,
                         _("Show the event log"),
                         exposong.gtklogger.handler.show_window),], self)
-        self.main_actions.get_action("Background").set_sensitive(False)
-        self.main_actions.get_action("Logo").set_sensitive(False)
-        self.main_actions.get_action("Black Screen").set_sensitive(False)
-        self.main_actions.get_action("Hide").set_sensitive(False)
-        self.main_actions.get_action("pres-slide-next").set_sensitive(False)
-        self.main_actions.get_action("pres-slide-prev").set_sensitive(False)
         uimanager.insert_action_group(self.main_actions, 0)
         # UIManager is not as flexible as hoped for, so I have to define actions
         # that are created elsewhere to keep the desired order.
@@ -421,12 +383,12 @@ class Main (gtk.Window):
     def disable_shortcuts(self, *args):
         'Disables keyboard shortcuts to allow typing.'
         for k in keys_to_disable:
-            self.main_actions.get_action(k).disconnect_accelerator()
+            screen.screen._actions.get_action(k).disconnect_accelerator()
 
     def enable_shortcuts(self, *args):
         'Enables keyboard shortcuts after disabling.'
         for k in keys_to_disable:
-            self.main_actions.get_action(k).connect_accelerator()
+            screen.screen._actions.get_action(k).connect_accelerator()
 
     def _on_configure_event(self, widget, *args):
         'Sets the size and position in the config (matters, if not maximized)'

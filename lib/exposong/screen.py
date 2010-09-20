@@ -36,7 +36,7 @@ def c2dec(color):
 screen = None # will be the instance variable for Screen once Main runs
 preview_height = 145
 
-class Screen:
+class Screen(exposong._hook.Menu):
     '''
     Manage the window for presentation.
     '''
@@ -419,9 +419,66 @@ class Screen:
     def _set_menu_items_disabled(self):
         'Disable buttons if the presentation is not shown.'
         enabled = self.is_viewable()
-        actions = exposong.application.main.main_actions
-        actions.get_action("Background").set_sensitive(enabled)
-        actions.get_action("Logo").set_sensitive(enabled)
-        actions.get_action("Black Screen").set_sensitive(enabled)
-        actions.get_action("Hide").set_sensitive(enabled)
-
+        self._actions.get_action("Background").set_sensitive(enabled)
+        self._actions.get_action("Logo").set_sensitive(enabled)
+        self._actions.get_action("Black Screen").set_sensitive(enabled)
+        self._actions.get_action("Hide").set_sensitive(enabled)
+    
+    @classmethod
+    def merge_menu(cls, uimanager):
+        'Merge new values with the uimanager.'
+        global screen
+        cls._actions = gtk.ActionGroup('screen')
+        cls._actions.add_actions([
+                ('Present', gtk.STOCK_FULLSCREEN, _('_Present'), "F5", None,
+                        screen.show),
+                ('Background', gtk.STOCK_CLEAR, _('Bac_kground'), None, None,
+                        screen.to_background),
+                ('Logo', None, _('Lo_go'), "<Ctrl>g", None,
+                        screen.to_logo),
+                ('Black Screen', None, _('_Black Screen'), "b", None,
+                        screen.to_black),
+                ('Hide', gtk.STOCK_CLOSE, _('Hi_de'), "Escape", None,
+                        screen.hide),
+                ])
+        
+        uimanager.insert_action_group(cls._actions, -1)
+        uimanager.add_ui_from_string("""
+            <menubar name="MenuBar">
+                <menu action="Presentation">
+                    <menuitem action="Present" position="bot" />
+                    <menuitem action="Background" position="bot" />
+                    <menuitem action="Logo" position="bot" />
+                    <menuitem action="Black Screen" position="bot" />
+                    <menuitem action="Hide" position="bot" />
+                </menu>
+            </menubar>
+            """)
+        # unmerge_menu not implemented, because we will never uninstall this as
+        # a module.
+        
+        cls._actions.get_action("Background").set_sensitive(False)
+        cls._actions.get_action("Logo").set_sensitive(False)
+        cls._actions.get_action("Black Screen").set_sensitive(False)
+        cls._actions.get_action("Hide").set_sensitive(False)
+    
+    @classmethod
+    def get_button_bar(cls):
+        "Return the presentation button widget."
+        buttons = gtk.VButtonBox()
+        button = gtk.Button( _("Present") )
+        cls._actions.get_action('Present').connect_proxy(button)
+        buttons.add(button)
+        button = gtk.Button( _("Background") )
+        cls._actions.get_action('Background').connect_proxy(button)
+        buttons.add(button)
+        button = gtk.Button( _("Logo") )
+        cls._actions.get_action('Logo').connect_proxy(button)
+        buttons.add(button)
+        button = gtk.Button( _("Black Screen") )
+        cls._actions.get_action('Black Screen').connect_proxy(button)
+        buttons.add(button)
+        button = gtk.Button( _("Hide") )
+        cls._actions.get_action('Hide').connect_proxy(button)
+        buttons.add(button)
+        return buttons
