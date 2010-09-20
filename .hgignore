@@ -1,2 +1,5 @@
 glob:*.pyc
 glob:.cache
+glob:.project
+glob:.pydevproject
+glob:*.kpf

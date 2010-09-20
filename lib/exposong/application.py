@@ -25,6 +25,7 @@ from urllib import pathname2url
 import exposong.plugins, exposong.plugins._abstract
 import exposong.bgselect, exposong.notify
 import exposong._hook
+import exposong.help
 from exposong import RESOURCE_PATH, DATA_PATH, SHARED_FILES, HELP_URL
 from exposong import config, prefs, screen, schedlist, splash
 from exposong import preslist, presfilter, slidelist, statusbar
@@ -366,7 +367,8 @@ class Main (gtk.Window):
     
     def _goto_help(self, *args):
         'Show the help pages.'
-        webbrowser.open("file:"+pathname2url(HELP_URL))
+        #webbrowser.open("file:"+pathname2url(HELP_URL))
+        exposong.help.open()
         
     def _goto_contribute(self, *args):
         'Show the how-to-contribute page.'
