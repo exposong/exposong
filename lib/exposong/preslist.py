@@ -18,12 +18,13 @@ import os
 import gtk
 import gtk.gdk
 import gobject
+import pango
 
 import exposong._hook
 import exposong.slidelist
 import exposong.schedlist
 import exposong.application
-from exposong import DATA_PATH
+from exposong import DATA_PATH, RESOURCE_PATH
 
 preslist = None #will hold the PresList instance
 
@@ -38,13 +39,17 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         
         pixbufrend = gtk.CellRendererPixbuf()
         textrend = gtk.CellRendererText()
+        textrend.set_property("ellipsize", pango.ELLIPSIZE_END)
         column = gtk.TreeViewColumn( _("Presentation") )
+        column.set_resizable(False)
         column.pack_start(pixbufrend, False)
         column.set_cell_data_func(pixbufrend, self._get_row_icon)
         column.pack_start(textrend, True)
         column.set_cell_data_func(textrend, self._get_row_text)
-        column.set_resizable(False)
         column.set_property('spacing', 4)
+        pixbufrend = gtk.CellRendererPixbuf()
+        column.pack_start(pixbufrend, False)
+        column.set_cell_data_func(pixbufrend, self._get_timer_icon)
         self.append_column(column)
         self.set_headers_clickable(False)
         self.get_selection().connect("changed", self._on_pres_activate)
@@ -230,6 +235,18 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         'Returns the icon of the current presentation.'
         pres = model.get_value(titer, 0)
         cell.set_property('pixbuf', pres.get_icon())
+    
+    def _get_timer_icon(self, column, cell, model, titer):
+        'Returns the icon of the current presentation.'
+        if not hasattr(self, "_timer_icon"):
+            fl = os.path.join(RESOURCE_PATH, 'timer.png')
+            self._timer_icon = gtk.gdk.pixbuf_new_from_file_at_size(fl, 20, 14)
+        pres = model.get_value(titer, 0)
+        # TODO Should be a function, not an attribute
+        if pres.timer:
+            cell.set_property('pixbuf', self._timer_icon)
+        else:
+            cell.set_property('pixbuf', None)
     
     def _get_row_text(self, column, cell, model, titer):
         'Returns the title of the current presentation.'
