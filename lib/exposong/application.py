@@ -327,7 +327,6 @@ class Main (gtk.Window):
         libitr = schedlist.schedlist.append(None, self.library, 1)
         schedlist.schedlist.get_selection().select_iter(libitr)
         schedlist.schedlist._on_schedule_activate()
-        del libitr
         
         #Add schedules from plugins
         plugins = exposong.plugins.get_plugins_by_capability(
@@ -341,7 +340,7 @@ class Main (gtk.Window):
                 item = self.library.get_value(itr, 0).presentation
                 schedule.append(item)
                 itr = self.library.iter_next(itr)
-            schedlist.schedlist.append(None, schedule, 2)
+            schedlist.schedlist.append(libitr, schedule, 2)
             splash.splash.incr(1)
             yield True
         
@@ -355,6 +354,9 @@ class Main (gtk.Window):
                 self.load_sched(filenm)
                 yield True
         schedlist.schedlist.expand_all()
+        
+        schedmodel = schedlist.schedlist.get_model()
+        schedlist.schedlist.collapse_row(schedmodel.get_path(libitr))
         yield False
     
     def _on_about(self, *args):

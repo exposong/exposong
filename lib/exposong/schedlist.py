@@ -97,17 +97,17 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu):
     
     def _on_schedule_activate(self, *args):
         'Change the presentation list to the current schedule.'
+        preslist = exposong.preslist.preslist
         if self.has_selection():
             sched = self.get_active_item()
             if isinstance(sched, exposong.schedule.Schedule):
-                exposong.preslist.preslist.set_model(sched)
-                exposong.preslist.preslist.columns_autosize()
+                preslist.set_model(sched)
+                preslist.columns_autosize()
                 if sched.is_reorderable():
-                    exposong.preslist.preslist.enable_model_drag_dest(
-                                DRAGDROP_SCHEDULE,
-                                gtk.gdk.ACTION_DEFAULT)
+                    preslist.enable_model_drag_dest(DRAGDROP_SCHEDULE,
+                                                    gtk.gdk.ACTION_DEFAULT)
                 else:
-                    exposong.preslist.preslist.unset_rows_drag_dest()
+                    preslist.unset_rows_drag_dest()
         try:
             enable = isinstance(sched, exposong.schedule.Schedule)\
                      and not sched.builtin
@@ -117,8 +117,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu):
         self._actions.get_action("sched-rename").set_sensitive(enable)
         self._actions.get_action("sched-delete").set_sensitive(enable)
         
-        exposong.preslist.preslist.get_model().connect("row-changed",
-                            exposong.preslist.preslist._on_pres_added)
+        preslist.get_model().connect("row-changed", preslist._on_pres_added)
     
     def _on_sched_delete(self, action):
         'Delete the selected schedule.'

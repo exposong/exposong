@@ -43,15 +43,15 @@ class Presentation:
     Requires at minimum a title and slides.
     '''
     class Slide:
-        pres = None
-        id = None
-        title = ''
-        text = ''
         '''
         A plain text slide.
     
         Reimplementing this class is optional.
         '''
+        pres = None
+        id = None
+        title = ''
+        text = ''
         def __init__(self, pres, value):
             self.pres = pres
             if isinstance(value, xml.dom.Node):
