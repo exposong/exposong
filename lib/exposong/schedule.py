@@ -119,8 +119,17 @@ class Schedule(gtk.ListStore):
         'Add a presentation to the schedule.'
         if callable(self.filter_func) and not self.filter_func(pres):
             return False
-        sched = ScheduleItem(pres, comment)
+        if isinstance(pres, ScheduleItem):
+            sched = ScheduleItem(pres.presentation, comment)
+        else:
+            sched = ScheduleItem(pres, comment)
         gtk.ListStore.append(self, sched.get_row())
+    
+    def append_action(self, action):
+        'Add the selected presentation to the schedule (from a Menu button).'
+        model, itr = preslist.preslist.get_selection().get_selected()
+        pres = model.get_value(itr, 0)
+        self.append(pres)
     
     def remove(self, itr):
         'Remove a presentation from a schedule.'

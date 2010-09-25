@@ -71,9 +71,14 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu):
                 sort = row.title
             else:
                 sort = "%03u" % sort
-            return self.model.append( parent, (row, row.title, sort) )
+            ret = self.model.append( parent, (row, row.title, sort) )
         elif isinstance(row, tuple):
-            return self.model.append( parent, row )
+            ret = self.model.append( parent, row )
+        else:
+            exposong.log.warning("Schedule cannot append this item: %r" % row)
+            return
+        self._add_to_schedule_menu()
+        return ret
     
     def remove(self, item):
         'Remove the item from the model.'
@@ -82,6 +87,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu):
         while model.get_value(itr, 0).filename != item.filename:
             itr = model.iter_next(itr)
         self.get_model().remove(itr)
+        self._add_to_schedule_menu()
     
     def get_active_item(self):
         'Get the currently selected Schedule.'
@@ -191,7 +197,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu):
         sched = exposong.schedule.Schedule(name, builtin=False)
         itrnew = self.append(self.custom_schedules, sched)
         pathnew = self.model.get_path(itrnew)
-        self.expand_all()
+        self.expand_to_path(pathnew)
         self.set_cursor(pathnew, self.get_column(0), True)
     
     def _on_rename(self, *args):
@@ -215,6 +221,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu):
         self.model.get_value(iter1, 0).title = new_text
         self.model.set_value(iter1, 1, new_text)
         self.model.set_value(iter1, 2, new_text)
+        self._add_to_schedule_menu()
     
     def _on_rt_click(self, widget, event):
         'The user right clicked in the schedule area.'
@@ -224,8 +231,47 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu):
                 menu.append(self._actions.get_action('sched-rename').create_menu_item())
                 menu.append(self._actions.get_action('sched-delete').create_menu_item())
                 menu.show_all()
-                self.sched_list_menu.popup(None, None, None,
-                                           event.button, event.get_time())
+                menu.popup(None, None, None, event.button, event.get_time())
+    
+    def get_add_sched_actions(self):
+        'Returns the "Add to Schedule" Actions.'
+        if hasattr(self, '_sched_actiongroup'):
+            return self._sched_actiongroup.list_actions()
+        return []
+    
+    def _add_to_schedule_menu(self):
+        if not hasattr(self, 'custom_schedules'):
+            return False
+        model = self.get_model()
+        scheds = []
+        itr = model.iter_children(self.custom_schedules)
+        while itr:
+            scheds.append((model.get_value(itr, 0), model.get_value(itr, 1)))
+            itr = model.iter_next(itr)
+        
+        uimanager = exposong.application.main.uimanager
+        
+        if hasattr(self,'_sched_actiongroup'):
+            uimanager.remove_action_group(self._sched_actiongroup)
+            uimanager.remove_ui(self._sched_mergeid)
+        
+        self._sched_actiongroup = gtk.ActionGroup('addtosched')
+        self._sched_actiongroup.add_actions(
+                [('pres-add-%s' % s[1], None, s[1], None,
+                 _("_Add to Schedule %s" % s[1]),
+                 s[0].append_action) for s in scheds])
+        
+        uimanager.insert_action_group(self._sched_actiongroup)
+        self._sched_mergeid = uimanager.add_ui_from_string("""
+            <menubar name="MenuBar">
+                <menu action="Presentation">
+                    <menu action="pres-add-to-schedule">
+                        %s
+                    </menu>
+                </menu>
+            </menubar>
+            """ % '\n'.join(["<menuitem action='pres-add-%s' />" % s[1] for s in scheds])
+            )
     
     @classmethod
     def merge_menu(cls, uimanager):

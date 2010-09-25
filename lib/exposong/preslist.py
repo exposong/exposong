@@ -145,10 +145,14 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         self._actions.get_action("pres-edit").set_sensitive(self.has_selection())
         pres_delete = self._actions.get_action("pres-delete")
         pres_remove = self._actions.get_action("pres-remove-from-schedule")
+        pres_add = self._actions.get_action("pres-add-to-schedule")
         pres_delete.set_sensitive(self.has_selection())
-        pres_remove.set_sensitive(self.has_selection()
-                and not self.get_model().builtin)
+        pres_remove.set_sensitive(self.has_selection() and
+                                  not self.get_model().builtin)
         pres_remove.set_visible(not self.get_model().builtin)
+        pres_add.set_sensitive(self.has_selection())
+        for action in exposong.schedlist.schedlist.get_add_sched_actions():
+            action.set_sensitive(self.has_selection())
     
     def _on_pres_edit(self, *args):
         'Edit the presentation.'
@@ -255,19 +259,24 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
     
     def _on_pres_rt_click(self, widget, event):
         'The user right clicked in the presentation list area.'
-        
-        # TODO This might be better if it was staticly created.
+        if event.button != 3:
+            return
+        actions = self._actions
         menu = gtk.Menu()
-        menu.append(self._actions.get_action('pres-edit').create_menu_item())
-        menu.append(self._actions.get_action('pres-delete').create_menu_item())
-        menu.append(self._actions.get_action('pres-remove-from-schedule').\
-                                         create_menu_item())
+        sch = actions.get_action('pres-add-to-schedule').create_menu_item()
+        menu2 = gtk.Menu()
+        sch.set_submenu(menu2)
+        menu.append(sch)
+        for action in exposong.schedlist.schedlist.get_add_sched_actions():
+            menu2.append(action.create_menu_item())
+        menu.append(actions.get_action('pres-edit').create_menu_item())
+        menu.append(actions.get_action('pres-delete').create_menu_item())
+        menu.append(actions.get_action('pres-remove-from-schedule').create_menu_item())
         menu.show_all()
         
-        if event.button == 3:
-            path = self.get_path_at_pos(int(event.x), int(event.y))
-            if path is not None:
-                menu.popup(None, None, None, event.button, event.get_time())
+        path = self.get_path_at_pos(int(event.x), int(event.y))
+        if path is not None:
+            menu.popup(None, None, None, event.button, event.get_time())
     
     @staticmethod
     def get_model_args():
@@ -280,6 +289,9 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         global preslist
         cls._actions = gtk.ActionGroup('preslist')
         cls._actions.add_actions([
+                ('pres-add-to-schedule', gtk.STOCK_ADD, _("_Add to Schedule"),
+                        None, _("Add the Selected Presentation to a Schedule"),
+                        None),
                 ('pres-edit', gtk.STOCK_EDIT, None, None,
                         _("Edit the currently selected presentation"),
                         preslist._on_pres_edit),
@@ -300,6 +312,7 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
             <menubar name="MenuBar">
                 <menu action="Presentation">
                     <menuitem action="pres-edit" />
+                    <menu action="pres-add-to-schedule"></menu>
                     <menuitem action="pres-remove-from-schedule" />
                     <menuitem action="pres-delete" />
                     <menuitem action="pres-prev" position="bot" />

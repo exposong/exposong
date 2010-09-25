@@ -175,8 +175,8 @@ class Main (gtk.Window):
     
     def _create_menu(self):
         'Set up the menus and popup menus.'
-        uimanager = gtk.UIManager()
-        self.add_accel_group(uimanager.get_accel_group())
+        self.uimanager = gtk.UIManager()
+        self.add_accel_group(self.uimanager.get_accel_group())
         
         self.main_actions = gtk.ActionGroup('main')
         self.main_actions.add_actions([
@@ -201,10 +201,10 @@ class Main (gtk.Window):
                 ('view-log', gtk.STOCK_PROPERTIES, _('View _Log'), None,
                         _("Show the event log"),
                         exposong.gtklogger.handler.show_window),], self)
-        uimanager.insert_action_group(self.main_actions, 0)
+        self.uimanager.insert_action_group(self.main_actions, 0)
         # UIManager is not as flexible as hoped for, so I have to define actions
         # that are created elsewhere to keep the desired order.
-        uimanager.add_ui_from_string('''
+        self.uimanager.add_ui_from_string('''
                 <menubar name="MenuBar">
                     <menu action="File">
                         <menu action="file-import"/>
@@ -223,8 +223,10 @@ class Main (gtk.Window):
                     <menu action="Presentation">
                         <menu action="pres-new" position="top"></menu>
                         <menuitem action="pres-edit" />
-                        <menuitem action="pres-remove-from-schedule" />
                         <menuitem action="pres-delete" />
+                        <separator />
+                        <menu action="pres-add-to-schedule"></menu>
+                        <menuitem action="pres-remove-from-schedule" />
                         <separator />
                         <menuitem action="Present" position="bot" />
                         <menuitem action="Background" position="bot" />
@@ -245,10 +247,9 @@ class Main (gtk.Window):
                 </menubar>''')
         
         for mod in exposong._hook.get_hooks(exposong._hook.Menu):
-            mod.merge_menu(uimanager)
+            mod.merge_menu(self.uimanager)
         
-        menu = uimanager.get_widget('/MenuBar')
-        
+        menu = self.uimanager.get_widget('/MenuBar')
         return menu
     
     def load_pres(self,filenm):
