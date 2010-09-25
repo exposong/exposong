@@ -40,7 +40,7 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
         self.set_enable_search(False)
         #self.set_headers_visible(False)
         
-        self.column1 = gtk.TreeViewColumn( _("Slide"))
+        self.column1 = gtk.TreeViewColumn( _("Slides"))
         self.column1.set_resizable(False)
         self.append_column(self.column1)
         

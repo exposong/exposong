@@ -40,7 +40,7 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         pixbufrend = gtk.CellRendererPixbuf()
         textrend = gtk.CellRendererText()
         textrend.set_property("ellipsize", pango.ELLIPSIZE_END)
-        column = gtk.TreeViewColumn( _("Presentation") )
+        column = gtk.TreeViewColumn( _("Presentations") )
         column.set_resizable(False)
         column.pack_start(pixbufrend, False)
         column.set_cell_data_func(pixbufrend, self._get_row_icon)
