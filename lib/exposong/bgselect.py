@@ -28,16 +28,18 @@ from exposong.config import config
 
 thsz = (80, 50)
 
+
 class BGSelect (gtk.VBox):
     '''
     Select the background.
     '''
+
     def __init__(self):
         gtk.VBox.__init__(self)
         
-        bgtype = config.get("screen","bg_type")
-        bgcolor1 = config.getcolor("screen","bg_color_1")
-        bgcolor2 = config.getcolor("screen","bg_color_2")
+        bgtype = config.get("screen", "bg_type")
+        bgcolor1 = config.getcolor("screen", "bg_color_1")
+        bgcolor2 = config.getcolor("screen", "bg_color_2")
         
         
         # Image Background
@@ -60,7 +62,7 @@ class BGSelect (gtk.VBox):
         task = self._load_images()
         gobject.idle_add(task.next)
         
-        self.new_image = gtk.Button( _("Add"), gtk.STOCK_ADD, False)
+        self.new_image = gtk.Button(_("Add"), gtk.STOCK_ADD, False)
         self.new_image.connect("clicked", self._on_new_image)
         vbox.pack_start(self.new_image, False, True, 2)
         hbox.pack_start(vbox, True, True, 2)
@@ -71,11 +73,12 @@ class BGSelect (gtk.VBox):
         self.gradradio = gtk.RadioButton(self.imgradio)
         hbox.pack_start(self.gradradio, False, True, 2)
         self.graddir = gtk.combo_box_new_text()
-        graddirlist = [ u'\u2192', u'\u2198', u'\u2193', u'\u2199' ]
+        graddirlist = [u'\u2192', u'\u2198', u'\u2193', u'\u2199']
         for st in graddirlist:
             self.graddir.append_text(st)
-        if config.get("screen","bg_angle") in graddirlist:
-            self.graddir.set_active(graddirlist.index(config.get("screen","bg_angle")))
+        if config.get("screen", "bg_angle") in graddirlist:
+            self.graddir.set_active(graddirlist.index(
+                                    config.get("screen", "bg_angle")))
         else:
             self.graddir.set_active(0)
         hbox.pack_start(self.graddir, True, True, 2)
@@ -140,11 +143,11 @@ class BGSelect (gtk.VBox):
     def _on_new_image(self, button):
         'The user added a new image as a background.'
         fltr = gtk.FileFilter()
-        fltr.set_name( _("Image Types"))
+        fltr.set_name(_("Image Types"))
         fltr.add_mime_type("image/jpeg")
         fltr.add_mime_type("image/png")
         fltr.add_mime_type("image/gif")
-        dlg = gtk.FileChooserDialog( _("Add Image"), exposong.application.main,
+        dlg = gtk.FileChooserDialog(_("Add Image"), exposong.application.main,
                 buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK,
                 gtk.RESPONSE_ACCEPT))
         dlg.add_filter(fltr)

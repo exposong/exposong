@@ -85,10 +85,10 @@ class Print(Plugin, exposong._hook.Menu):
         markup = """<span face='sans' size='large' weight='bold'>%(title)s</span>
 <span face='sans' size='x-small'>%(date)s</span>\n\n
 <span face='sans 'size='small'>%(text)s</span>
-        """ %{'title' : _("Alphabetical list of Songs"),
-                    'date'  : datetime.datetime.now().strftime(
+        """ %{'title':_("Alphabetical list of Songs"),
+                    'date':datetime.datetime.now().strftime(
                               locale.nl_langinfo(locale.D_FMT)),
-                    'text'  : songs}
+                    'text':songs}
         
         #TODO: Multiples Columns, pango cannot do it
         

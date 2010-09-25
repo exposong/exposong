@@ -15,9 +15,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import imp
-import os.path, os
+import os
+import os.path
 import pygtk
-import gettext, gettext_windows
+import gettext
+import gettext_windows
 import locale
 import __builtin__
 import logging
@@ -36,11 +38,13 @@ import exposong.gtklogger
 exposong.gtklogger.handler = exposong.gtklogger.GTKHandler(logging.DEBUG)
 log.addHandler(exposong.gtklogger.handler)
 
-## TODO Allow the user to pass a variable to the command line for logging to a file.
+## TODO Allow the user to pass a variable to the command line
+#for logging to a file.
 #if False:
 #    _handler = logging.FileHandler('exposong.log')
 #    _handler.setLevel(logging.INFO)
-#    _fmt = logging.Formatter("%(asctime)s:%(filename)s@%(lineno)d:%(levelname)s: %(message)s")
+#    _fmt = logging.Formatter("%(asctime)s:%(filename)\
+#            s@%(lineno)d:%(levelname)s: %(message)s")
 #    _handler.setFormatter(_fmt)
 #    log.addHandler(_handler)
 
@@ -58,7 +62,7 @@ pygtk.require("2.0")
 
 # Find the 'share' folder
 for i in range(6):
-    _p = abspath(join(*([__file__]+[pardir]*i+['share','exposong'])))
+    _p = abspath(join(*([__file__] + [pardir] * i + ['share', 'exposong'])))
     if os.path.exists(_p):
         SHARED_FILES = _p
         break
@@ -80,7 +84,7 @@ gettext.bindtextdomain('exposong', LOCALE_PATH)
 gettext.textdomain('exposong')
 __builtin__._ = gettext.gettext
 
-HELP_URL = join(HELP_PATH, _('en') , 'index.html')
+HELP_URL = join(HELP_PATH, _('en'), 'index.html')
 
 # This needs to be after we locate SHARED_FILES, but before DATA_PATH is
 # defined.
@@ -89,7 +93,7 @@ from exposong import config
 if config.config.has_option("general", "data-path"):
     DATA_PATH = config.config.get("general", "data-path")
 else:
-    DATA_PATH = join(expanduser("~"),"exposong","data")
+    DATA_PATH = join(expanduser("~"), "exposong", "data")
 
 log.debug('Data is located at "%s".', DATA_PATH)
 
@@ -98,9 +102,9 @@ log.debug('Data is located at "%s".', DATA_PATH)
 # could be files at a later point (TODO).
 if not os.path.exists(DATA_PATH):
     os.makedirs(DATA_PATH)
-for folder in ('bg','pres','sched','image'):
+for folder in ('bg', 'pres', 'sched', 'image'):
     if not os.path.exists(join(DATA_PATH, folder)):
-        os.mkdir(join(DATA_PATH,folder))
+        os.mkdir(join(DATA_PATH, folder))
 
 # Import this last.
 from exposong.application import run

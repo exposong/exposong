@@ -21,9 +21,8 @@ from urllib import pathname2url
 from exposong import RESOURCE_PATH, DATA_PATH
 from exposong import statusbar
 
-help = None
-
 class Help():
+    
     def __init__(self):
         self.helpfile = os.path.join(DATA_PATH, 'help.html')
     
@@ -54,9 +53,9 @@ class Help():
     <h2><img src='%(headerimg)s' alt='' /></h2>
     </div>
     <div id='content'>"""%\
-                {'title'       : _('ExpoSong Help'),
-                'stylepath'   : os.path.join(RESOURCE_PATH, 'style.css'),
-                'headerimg' : os.path.join(RESOURCE_PATH, 'exposong.png')}
+                {'title':_('ExpoSong Help'),
+                'stylepath':os.path.join(RESOURCE_PATH, 'style.css'),
+                'headerimg':os.path.join(RESOURCE_PATH, 'exposong.png')}
         return header
     
     def _about(self):
@@ -135,8 +134,7 @@ class Help():
                      [_("Go to Chorus"), "c"],
                      [_("Other"), None],
                      [_("New Schedule"), _("Ctrl-N")],
-                     [_("Find Presentation"), _("Ctrl-F")]
-                     ]
+                     [_("Find Presentation"), _("Ctrl-F")]]
         
         table = self._h(_('Shortcut Keys')) + '<table border="2" cellpadding="5"'
         
@@ -157,3 +155,5 @@ class Help():
         'Wrap text in HTML header element with the specified level'
         return "<h%(level)d>%(text)s</h%(level)d>\n"%{"level":level,
                                                       "text":text}
+
+help = Help()

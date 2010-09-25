@@ -16,7 +16,8 @@
 
 import gtk
 
-import exposong.screen, exposong.application
+import exposong.screen
+import exposong.application
 
 class Notify(gtk.HBox):
     def __init__(self):
@@ -61,4 +62,3 @@ class Notify(gtk.HBox):
 
 #notify = Notify()
 notify = None
-

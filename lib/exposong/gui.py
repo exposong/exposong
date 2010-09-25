@@ -29,7 +29,7 @@ def Table(rows):
     table.set_border_width(6)
     return table
 
-def append_entry(table, label, value, top, max_len = 0):
+def append_entry(table, label, value, top, max_len=0):
     'Adds a text entry widget to a table and returns it.'
     set_label(table, label, top)
     
@@ -146,7 +146,7 @@ def append_combo2(table, label, options, value, top):
     table.attach(combo, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, _WIDGET_SPACING)
     return combo
 
-def append_radio(table, label, active, top, group = None):
+def append_radio(table, label, active, top, group=None):
     'Adds a radio widget to a table and returns it.'
     radio = gtk.RadioButton(group, label)
     radio.set_alignment(0.0, 0.5)

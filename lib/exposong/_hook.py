@@ -27,15 +27,17 @@ Thanks to Armin Ronacher for plugin ideas
 
 ### Class Definitions ###
 
+
 class Menu(object):
     '''
     Subclasses of this class can modify the menu.
     '''
+
     @classmethod
     def merge_menu(cls, uimanager):
         'Merge new values with the uimanager.'
         raise NotImplementedError
-    
+
     @classmethod
     def unmerge_menu(cls, uimanager):
         'Remove merged items from the menu.'

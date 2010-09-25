@@ -397,4 +397,3 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
     def get_description():
         'Return the description of the plugin.'
         return "A image presentation type."
-

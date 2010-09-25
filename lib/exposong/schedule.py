@@ -180,8 +180,10 @@ class Schedule(gtk.ListStore):
     def _column_sort(treemodel, iter1, iter2):
         c1 = treemodel.get_value(iter1,0).get_title()
         c2 = treemodel.get_value(iter2,0).get_title()
-        if c1 < c2: return -1
-        if c1 > c2: return 1
+        if c1 < c2:
+            return -1
+        if c1 > c2:
+            return 1
         return 0
 
 class ScheduleItem:

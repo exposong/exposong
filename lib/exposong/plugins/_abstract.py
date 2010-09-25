@@ -173,7 +173,8 @@ class Presentation:
         match = r'<presentation\b[^>]*\btype=[\'"]%s[\'"]' % cls.get_type()
         lncnt = 0
         for ln in fl:
-                if lncnt > 2: break
+                if lncnt > 2:
+                    break
                 if re.search(match, ln):
                         return True
                 lncnt += 1

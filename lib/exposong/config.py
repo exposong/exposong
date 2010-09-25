@@ -22,7 +22,9 @@ from exposong import SHARED_FILES
 # NOTE: If you import something that uses DATA_PATH, the results could be bad.
 # This includes almost all of exposong.*.
 
+
 class Config(ConfigParser.SafeConfigParser):
+
     """
     Manages user preferences in the system.
     """
@@ -40,7 +42,7 @@ class Config(ConfigParser.SafeConfigParser):
             d = os.path.join(os.path.expanduser("~"), ".config", "exposong")
         if not os.path.exists(d):
             os.makedirs(d)
-        cfile = os.path.join(d,"exposong.conf")
+        cfile = os.path.join(d, "exposong.conf")
         del d
         
         self.add_section("main_window")
@@ -57,7 +59,7 @@ class Config(ConfigParser.SafeConfigParser):
         self.setcolor("screen", "text_color", (65535, 65535, 65535))
         self.setcolor("screen", "text_shadow", (0, 0, 0, 26214))
         self.set("screen", "logo",
-                 os.path.join(SHARED_FILES,"res","exposong.png"))
+                 os.path.join(SHARED_FILES, "res", "exposong.png"))
         self.setcolor("screen", "logo_bg", (65535, 43690, 4369))
         self.setcolor("screen", "notify_bg", (65535, 0, 0))
         
@@ -70,11 +72,11 @@ class Config(ConfigParser.SafeConfigParser):
     
     def setcolor(self, section, option, value):
         "Sets a value from a tuple of integers."
-        self.set(section, option, ','.join(map(str,value)))
+        self.set(section, option, ','.join(map(str, value)))
 
     def write(self):
         "Save the config to file."
-        tmpname = self.configfile+".new"
+        tmpname = self.configfile + ".new"
         f = open(tmpname, 'w')
         ConfigParser.SafeConfigParser.write(self, f)
         f.close()

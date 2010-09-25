@@ -18,12 +18,15 @@ import gtk
 import gtk.gdk
 import gobject
 import os
+import os.path
 import webbrowser
 from xml.dom import minidom
 from urllib import pathname2url
 
-import exposong.plugins, exposong.plugins._abstract
-import exposong.bgselect, exposong.notify
+import exposong.plugins
+import exposong.plugins._abstract
+import exposong.bgselect
+import exposong.notify
 import exposong._hook
 import exposong.help
 from exposong import RESOURCE_PATH, DATA_PATH, SHARED_FILES, HELP_URL
@@ -33,19 +36,19 @@ from exposong.about import About
 from exposong.schedule import Schedule # ? where to put library
 
 main = None
-keys_to_disable = ("Background","Black Screen")
+keys_to_disable = ("Background", "Black Screen")
 
 
 class Main (gtk.Window):
     '''
     Primary user interface.
     '''
+
     def __init__(self):
         # Define this instance in the global scope. This has to be done
         global main
         main = self
         exposong.log.debug("Loading Main:")
-        
         splash.splash = splash.SplashScreen(self)
         
         #dynamically load plugins
@@ -150,7 +153,7 @@ class Main (gtk.Window):
         statusbar.statusbar = statusbar.timedStatusbar()
         win_v.pack_end(statusbar.statusbar, False)
         
-        gtk.settings_get_default().set_long_property('gtk-button-images',True,
+        gtk.settings_get_default().set_long_property('gtk-button-images', True,
                                                      'application:__init__')    
         task = self.build_schedule()
         gobject.idle_add(task.next)
@@ -160,7 +163,7 @@ class Main (gtk.Window):
         
         self.restore_window()
         gobject.idle_add(self.restore_panes,
-                         priority=gobject.PRIORITY_HIGH_IDLE+2)
+                         priority=gobject.PRIORITY_HIGH_IDLE + 2)
         # All custom schedules should load after the presentations.
         gobject.idle_add(self._ready, priority=gobject.PRIORITY_LOW)
         exposong.log.debug("Loading Main completed.")
@@ -180,9 +183,9 @@ class Main (gtk.Window):
         
         self.main_actions = gtk.ActionGroup('main')
         self.main_actions.add_actions([
-                ('File', None, _('_File') ),
-                ('Edit', None, _('_Edit') ),
-                ('Schedule', None, _("_Schedule") ),
+                ('File', None, _('_File')),
+                ('Edit', None, _('_Edit')),
+                ('Schedule', None, _("_Schedule")),
                 ('Presentation', None, _('P_resentation')),
                 ('Help', None, _('_Help')),
                 ('Quit', gtk.STOCK_QUIT, None, None, None, self._quit),
@@ -200,7 +203,7 @@ class Main (gtk.Window):
         self.main_actions.add_actions([
                 ('view-log', gtk.STOCK_PROPERTIES, _('View _Log'), None,
                         _("Show the event log"),
-                        exposong.gtklogger.handler.show_window),], self)
+                        exposong.gtklogger.handler.show_window)], self)
         self.uimanager.insert_action_group(self.main_actions, 0)
         # UIManager is not as flexible as hoped for, so I have to define actions
         # that are created elsewhere to keep the desired order.
@@ -252,7 +255,7 @@ class Main (gtk.Window):
         menu = self.uimanager.get_widget('/MenuBar')
         return menu
     
-    def load_pres(self,filenm):
+    def load_pres(self, filenm):
         'Load a single presentation.'
         filenm = os.path.join(DATA_PATH, "pres", filenm)
         pres = None
@@ -278,7 +281,7 @@ class Main (gtk.Window):
             except exposong.plugins._abstract.WrongPresentationType, details:
                 continue
             except Exception, details:
-                exposong.log.error('Error in file "%s":\n  %s', filenm,details)
+                exposong.log.error('Error in file "%s":\n  %s', filenm, details)
                 raise
         else:
             exposong.log.warning('"%s" is not a presentation file.', filenm)
@@ -312,7 +315,7 @@ class Main (gtk.Window):
                 schedlist.schedlist.append(schedlist.schedlist.custom_schedules, sched)
             else:
                 exposong.log.error("%s is not a schedule file.",
-                                   os.path.join(directory,filenm))
+                                   os.path.join(directory, filenm))
             dom.unlink()
             del dom
         return sched
@@ -321,7 +324,7 @@ class Main (gtk.Window):
         'Add items to the schedule list.'
         #Initialize the Library
         directory = os.path.join(DATA_PATH, "sched")
-        self.library = Schedule( _("Library"))
+        self.library = Schedule(_("Library"))
         task = self.build_pres_list()
         gobject.idle_add(task.next, priority=gobject.PRIORITY_HIGH_IDLE)
         yield True
@@ -370,7 +373,6 @@ class Main (gtk.Window):
     
     def _goto_help(self, *args):
         'Show the help page in a webbrowser.'
-        exposong.help.help = exposong.help.Help()
         exposong.help.help.show()
         
     def _goto_contribute(self, *args):
@@ -399,10 +401,10 @@ class Main (gtk.Window):
         'Sets the size and position in the config (matters, if not maximized)'
         if not config.config.has_option("main_window", "maximized") or \
                 not config.config.getboolean("main_window", "maximized"):
-            config.config.set("main_window","size", ','.join(
-                    map(str,self.get_size())))
+            config.config.set("main_window", "size", ','.join(
+                    map(str, self.get_size())))
             config.config.set("main_window", "position", ",".join(
-                    map(str,self.get_position())))
+                    map(str, self.get_position())))
         
     def _on_window_state_event(self, widget, event, *args):
         'Sees if window is maximized or not and sets it in the config'
@@ -412,10 +414,10 @@ class Main (gtk.Window):
     def restore_window(self):
         'Restores window position and size.'
         if config.config.has_option("main_window", "size"):
-            (x,y) = config.config.get("main_window", "size").split(",")
+            (x, y) = config.config.get("main_window", "size").split(",")
             self.set_default_size(int(x), int(y))
         if config.config.has_option("main_window", "position"):
-            (x,y) = config.config.get("main_window", "position").split(",")
+            (x, y) = config.config.get("main_window", "position").split(",")
             self.move(int(x), int(y))
         if config.config.has_option("main_window", "maximized"):
             if config.config.getboolean("main_window", "maximized"):
@@ -445,6 +447,7 @@ class Main (gtk.Window):
         config.config.write()
         exposong.help.help.delete_help_file()
         gtk.main_quit()
+
 
 def run():
     Main()

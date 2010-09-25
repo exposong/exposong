@@ -21,13 +21,15 @@ import os.path
 
 from exposong import RESOURCE_PATH
 
+
 class About:
     '''Creates an About dialog to show details about the program.'''
-    def __init__(self, parent = None):
+
+    def __init__(self, parent=None):
         self.dialog = gtk.AboutDialog()
         self.dialog.set_transient_for(parent)
         self.dialog.set_name("ExpoSong")
-        self.dialog.set_version( "0.7" )
+        self.dialog.set_version("0.7")
         self.dialog.set_copyright(_("Copyright %s") % "2008-2010 Exposong.org")
         self.dialog.set_authors(("Brad Landis",
                                  "Samuel Mehrbrodt",
@@ -43,4 +45,3 @@ class About:
         self.dialog.hide()
 
 gtk.about_dialog_set_url_hook(lambda dlg, url: webbrowser.open(url))
-

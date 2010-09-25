@@ -28,6 +28,7 @@ This file contains some miscellaneous functions that are useful to all parts of
 the program. May contain certain variables as well.
 """
 
+
 def get_node_text(node, respect_whitespace=False):
     'Returns the text of a node (XML DOM Object)'
     if(isinstance(node, str)):
@@ -39,8 +40,9 @@ def get_node_text(node, respect_whitespace=False):
     if respect_whitespace:
         return "".join(rc).strip()
     else:
-        return re.sub('\s+',' ',"".join(rc).strip())
-    
+        return re.sub('\s+', ' ', "".join(rc).strip())
+
+
 def title_to_filename(title):
     """
     Returns a filename with letters and underscores only.
@@ -56,6 +58,7 @@ def title_to_filename(title):
             new += "_"
             
     return new
+
 
 def check_filename(title, filepath):
     '''
@@ -81,6 +84,7 @@ def check_filename(title, filepath):
 
     return new_path 
 
+
 def find_freefile(filename):
     """
     Find an open filename.
@@ -89,15 +93,16 @@ def find_freefile(filename):
     until the file won't overwrite an existing file. Needs changes to work with
     extensions such as ".tar.gz" which have multiple periods.
     """
-    root,ext = os.path.splitext(filename)
+    root, ext = os.path.splitext(filename)
     n = ''
-    while os.path.exists("".join([root,n,ext])):
+    while os.path.exists("".join([root, n, ext])):
         try:
             n = str(int(n)-1)
         except ValueError:
             #The first time, it will be an empty string, so set it manually.
             n = "-1"
-    return "".join([root,n,ext])
+    return "".join([root, n, ext])
+
 
 def random_string(len):
     chars = string.ascii_letters + string.digits

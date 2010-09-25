@@ -129,7 +129,7 @@ class Screen(exposong._hook.Menu):
                                        msg)
             dialog.set_title( _("Set Logo?") )
             resp = dialog.run()
-            dialog.destroy ()
+            dialog.destroy()
             if resp == gtk.RESPONSE_YES:
                 exposong.prefs.PrefsDialog(exposong.application.main)
                 if os.path.isfile(config.get("screen", "logo")):

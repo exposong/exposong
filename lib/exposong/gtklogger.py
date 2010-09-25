@@ -21,8 +21,9 @@ from exposong import gui
 _SEV_LEVELS = ['CRITICAL','ERROR','WARNING','INFO','DEBUG']
 
 class GTKHandler (logging.Handler, object):
+    
     def __init__(self, level=logging.NOTSET):
-        self.liststore = gtk.ListStore(*(str,)*6)
+        self.liststore = gtk.ListStore(*(str,) * 6)
         self.scroll = None
         logging.Handler.__init__(self, level)
         # \x1e is an ASCII character for "Field divider", which prevents getting
@@ -36,7 +37,7 @@ class GTKHandler (logging.Handler, object):
     def emit(self, record):
         r2 = self.format(record).split("\x1e")
         color = self._get_color(r2[1])
-        self.liststore.append(r2+color)
+        self.liststore.append(r2 + color)
         self.scroll_to_end()
     
     def _get_color(self, levelname):
@@ -72,7 +73,7 @@ class GTKHandler (logging.Handler, object):
         
         treeview = gtk.TreeView()
         cell = gtk.CellRendererText()
-        col = gtk.TreeViewColumn( _('Time'))
+        col = gtk.TreeViewColumn(_('Time'))
         col.pack_start(cell)
         col.set_resizable(True)
         col.add_attribute(cell, 'text', 0)
