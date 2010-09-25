@@ -43,9 +43,10 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu):
         self.model.set_sort_column_id(2, gtk.SORT_ASCENDING)
         self.set_model(self.model)
         self.set_enable_search(False)
+        self.set_headers_visible(False)
         
         sched_rend = gtk.CellRendererText()
-        column = gtk.TreeViewColumn( _("Schedule"), sched_rend, text=1)
+        column = gtk.TreeViewColumn( _("Schedules"), sched_rend, text=1)
         
         sched_rend.connect("editing-started",
                 exposong.application.main.disable_shortcuts)
