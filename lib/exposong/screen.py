@@ -42,7 +42,7 @@ class Screen(exposong._hook.Menu):
     '''
     
     def __init__(self):
-        self._black = self._background = self._logo = False
+        self._black = self._background = self._logo  = self._freeze = False
         self.bg_dirty = False
         self._notification = None
         self.bg_img = {}
@@ -100,11 +100,20 @@ class Screen(exposong._hook.Menu):
         self._size = geometry[2:4]
     
     def draw(self):
-        'Redraw the presentation and preview screens.'
-        if self.is_viewable():
-            self.pres.queue_draw()
-        else:
+        '''Redraw the presentation and preview screens.
+           Draw preview only when freeze is active'''
+        if self._freeze or not self.is_viewable():
             self.preview.queue_draw()
+        else:
+            self.pres.queue_draw()
+    
+    def freeze(self, action):
+        'Set the screen to be freezed or not'
+        self._freeze = True
+        self._actions.get_action("Background").set_sensitive(False)
+        self._actions.get_action("Logo").set_sensitive(False)
+        self._actions.get_action("Black Screen").set_sensitive(False)
+        self._actions.get_action("Freeze").set_sensitive(False)
     
     def to_black(self, button):
         'Set the screen to black / show the presentation if screen was black'
@@ -151,7 +160,7 @@ class Screen(exposong._hook.Menu):
     
     def show(self, *args):
         'Show the presentation screen.'
-        self._background = self._black = self._logo = False
+        self._background = self._black = self._logo = self._freeze = False
         self.window.show_all()
         #self.set_dirty()
         self.draw()
@@ -422,6 +431,7 @@ class Screen(exposong._hook.Menu):
         self._actions.get_action("Background").set_sensitive(enabled)
         self._actions.get_action("Logo").set_sensitive(enabled)
         self._actions.get_action("Black Screen").set_sensitive(enabled)
+        self._actions.get_action("Freeze").set_sensitive(enabled)
         self._actions.get_action("Hide").set_sensitive(enabled)
     
     @classmethod
@@ -438,6 +448,8 @@ class Screen(exposong._hook.Menu):
                         screen.to_logo),
                 ('Black Screen', None, _('_Black Screen'), "b", None,
                         screen.to_black),
+                ('Freeze', None, _('_Freeze'), None , None,
+                        screen.freeze),
                 ('Hide', gtk.STOCK_CLOSE, _('Hi_de'), "Escape", None,
                         screen.hide),
                 ])
@@ -450,6 +462,7 @@ class Screen(exposong._hook.Menu):
                     <menuitem action="Background" position="bot" />
                     <menuitem action="Logo" position="bot" />
                     <menuitem action="Black Screen" position="bot" />
+                    <menuitem action="Freeze" position="bot" />
                     <menuitem action="Hide" position="bot" />
                 </menu>
             </menubar>
@@ -460,25 +473,29 @@ class Screen(exposong._hook.Menu):
         cls._actions.get_action("Background").set_sensitive(False)
         cls._actions.get_action("Logo").set_sensitive(False)
         cls._actions.get_action("Black Screen").set_sensitive(False)
+        cls._actions.get_action("Freeze").set_sensitive(False)
         cls._actions.get_action("Hide").set_sensitive(False)
     
     @classmethod
     def get_button_bar(cls):
         "Return the presentation button widget."
         buttons = gtk.VButtonBox()
-        button = gtk.Button( _("Present") )
+        button = gtk.Button(_("Present"))
         cls._actions.get_action('Present').connect_proxy(button)
         buttons.add(button)
-        button = gtk.Button( _("Background") )
+        button = gtk.Button(_("Background"))
         cls._actions.get_action('Background').connect_proxy(button)
         buttons.add(button)
-        button = gtk.Button( _("Logo") )
+        button = gtk.Button(_("Logo"))
         cls._actions.get_action('Logo').connect_proxy(button)
         buttons.add(button)
-        button = gtk.Button( _("Black Screen") )
+        button = gtk.Button(_("Black Screen"))
         cls._actions.get_action('Black Screen').connect_proxy(button)
         buttons.add(button)
-        button = gtk.Button( _("Hide") )
+        button = gtk.Button(_("Freeze"))
+        cls._actions.get_action('Freeze').connect_proxy(button)
+        buttons.add(button)
+        button = gtk.Button(_("Hide"))
         cls._actions.get_action('Hide').connect_proxy(button)
         buttons.add(button)
         return buttons

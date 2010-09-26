@@ -165,7 +165,7 @@ class PresFilter(gtk.Entry, exposong._hook.Menu):
         global presfilter
         cls._actions = gtk.ActionGroup('presfilter')
         cls._actions.add_actions([
-                ('Search', gtk.STOCK_FIND, _('_Find Presentation'), "slash",
+                ('Search', gtk.STOCK_FIND, _('_Find Presentation'), "<Ctrl>f",
                         _('Search for a presentation'), presfilter.focus),
                 ])
         
