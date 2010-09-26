@@ -15,7 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+import gobject
 import gtk
+import os.path
 from exposong import gui
 
 _SEV_LEVELS = ['CRITICAL','ERROR','WARNING','INFO','DEBUG']
@@ -23,12 +25,12 @@ _SEV_LEVELS = ['CRITICAL','ERROR','WARNING','INFO','DEBUG']
 class GTKHandler (logging.Handler, object):
     
     def __init__(self, level=logging.NOTSET):
-        self.liststore = gtk.ListStore(*(str,) * 6)
+        self.liststore = gtk.ListStore(*([object] + [str] * 6))
         self.scroll = None
         logging.Handler.__init__(self, level)
         # \x1e is an ASCII character for "Field divider", which prevents getting
         # collisions in the message that might be a part of the data.
-        _fmt = logging.Formatter("\x1e".join(["%(asctime)s",
+        _fmt = logging.Formatter("\x1e".join(["%(relativeCreated)3f",
                                               "%(levelname)s",
                                               "%(filename)s:%(lineno)d",
                                               "%(message)s"]))
@@ -36,8 +38,7 @@ class GTKHandler (logging.Handler, object):
     
     def emit(self, record):
         r2 = self.format(record).split("\x1e")
-        color = self._get_color(r2[1])
-        self.liststore.append(r2 + color)
+        self.liststore.append([record] + r2 + self._get_color(r2[1]))
         self.scroll_to_end()
     
     def _get_color(self, levelname):
@@ -53,8 +54,10 @@ class GTKHandler (logging.Handler, object):
             return ["Cadet Blue","Black"]
     
     def show_window(self, action, topwindow):
+        "Display the log."
         win = gtk.Dialog("Event Log", None, 0,
-                         (gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+                         (gtk.STOCK_SAVE, gtk.RESPONSE_ACCEPT,
+                         gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
         win.set_transient_for(topwindow)
         win.set_default_size(600, 400)
         win.connect("destroy", self._destroy)
@@ -76,26 +79,26 @@ class GTKHandler (logging.Handler, object):
         col = gtk.TreeViewColumn(_('Time'))
         col.pack_start(cell)
         col.set_resizable(True)
-        col.add_attribute(cell, 'text', 0)
-        col.add_attribute(cell, 'background', 4)
-        col.add_attribute(cell, 'foreground', 5)
+        col.add_attribute(cell, 'text', 1)
+        col.add_attribute(cell, 'background', 5)
+        col.add_attribute(cell, 'foreground', 6)
         treeview.append_column(col)
         cell = gtk.CellRendererText()
         col = gtk.TreeViewColumn( _('Severity'))
         col.pack_start(cell)
         col.set_resizable(True)
-        col.add_attribute(cell, 'text', 1)
-        col.add_attribute(cell, 'background', 4)
-        col.add_attribute(cell, 'foreground', 5)
+        col.add_attribute(cell, 'text', 2)
+        col.add_attribute(cell, 'background', 5)
+        col.add_attribute(cell, 'foreground', 6)
         treeview.append_column(col)
         # Skipping "module:linenum". May want to have it added later.
         cell = gtk.CellRendererText()
         col = gtk.TreeViewColumn( _('Message'))
         col.pack_start(cell)
         col.set_resizable(True)
-        col.add_attribute(cell, 'text', 3)
-        col.add_attribute(cell, 'background', 4)
-        col.add_attribute(cell, 'foreground', 5)
+        col.add_attribute(cell, 'text', 4)
+        col.add_attribute(cell, 'background', 5)
+        col.add_attribute(cell, 'foreground', 6)
         treeview.append_column(col)
         
         treeview.set_model(list)
@@ -104,18 +107,21 @@ class GTKHandler (logging.Handler, object):
         self.scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.scroll.add(treeview)
         self.scroll.show_all()
-        # TODO Allow saving to file
-        
         win.vbox.pack_start(self.scroll, True, True, 4)
+        
         win.show_all()
         self.scroll_to_end()
     
     def scroll_to_end(self):
+        "Scroll the list to the most recent log entry."
         if self.scroll:
             self.scroll.emit('scroll-child', gtk.SCROLL_END, False)
     
     def _destroy(self, win, response_id=None):
         "Close the window."
+        if response_id == gtk.RESPONSE_ACCEPT:
+            if not self._save(win):
+                return
         self.scroll = None
         win.destroy()
     
@@ -123,7 +129,29 @@ class GTKHandler (logging.Handler, object):
         "Filter based on `combo` selection."
         try:
             filt = _SEV_LEVELS.index(combo.get_active_text())
-            cur = _SEV_LEVELS.index(model.get_value(itr, 1))
+            cur = _SEV_LEVELS.index(model.get_value(itr, 2))
             return cur <= filt
         except ValueError:
             return False
+    
+    def _save(self, toplevel):
+        "Save the log to file."
+        dlg = gtk.FileChooserDialog("Save Log File", toplevel,
+                                    gtk.FILE_CHOOSER_ACTION_SAVE,
+                                    (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+                                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        # Could be ".log" file, but ".txt" is Windows friendly.
+        dlg.set_current_name(u"exposong-log.txt")
+        dlg.set_current_folder(os.path.expanduser("~"))
+        dlg.set_do_overwrite_confirmation(True)
+        if dlg.run() == gtk.RESPONSE_ACCEPT:
+            dlg.hide()
+            outfile = dlg.get_filename()
+            out = open(outfile, "w")
+            for record in self.liststore:
+                out.write(" | ".join(self.format(record[0]).split("\x1e"))+"\n")
+            out.close()
+            dlg.destroy()
+            return True
+        dlg.destroy()
+        return False
