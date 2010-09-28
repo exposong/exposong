@@ -21,7 +21,6 @@ import os
 import os.path
 import webbrowser
 from xml.dom import minidom
-from urllib import pathname2url
 
 import exposong.plugins
 import exposong.plugins._abstract
@@ -196,8 +195,6 @@ class Main (gtk.Window):
                 ('file-export', None, _("_Export"), "", _("Export a .expo package")),
                 ('file-print', None, _("_Print"), "", None),
                 ('pres-new', gtk.STOCK_NEW, None, "", _("Create a new presentation")),
-                ('UsageGuide', None, _("Usage Guide"), None, None, self._goto_help),
-                ('Contribute', None, _("Contribute"), None, None, self._goto_contribute),
                 ('About', gtk.STOCK_ABOUT, None, None, None, self._on_about),
                 ])
         self.main_actions.add_actions([
@@ -371,14 +368,6 @@ class Main (gtk.Window):
     def _on_prefs(self, *args):
         'Shows the preferences dialog.'
         prefs.PrefsDialog(self)
-    
-    def _goto_help(self, *args):
-        'Show the help page in a webbrowser.'
-        exposong.help.help.show()
-        
-    def _goto_contribute(self, *args):
-        'Show the how-to-contribute page.'
-        webbrowser.open("http://exposong.org/contribute")
     
     def _save_schedules(self):
         'Save all schedules to disk.'

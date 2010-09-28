@@ -15,18 +15,21 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import gtk
 import webbrowser
 from urllib import pathname2url
 
+import exposong._hook
 from exposong import RESOURCE_PATH, DATA_PATH
 from exposong import statusbar
 
-class Help():
+class Help(exposong._hook.Menu, object):
     
     def __init__(self):
         self.helpfile = os.path.join(DATA_PATH, 'help.html')
     
-    def show(self):
+    def show(self, *args):
+        "Show the file in the web browser."
         all = self._header() + self._about() + self._schedules() +\
                 self._presentations() + self._notifications() +\
                 self._backgrounds() + self._shortcuts_table()
@@ -36,6 +39,10 @@ class Help():
         f.close()
         webbrowser.open("file:"+pathname2url(self.helpfile))
         statusbar.statusbar.output(_("Help page opened in Webbrowser"))
+    
+    def show_contrib(self, *args):
+        "Show the how to contribute page."
+        webbrowser.open("http://exposong.org/contribute")
     
     def delete_help_file(self):
         'Delete the generated help file'
@@ -155,5 +162,26 @@ class Help():
         'Wrap text in HTML header element with the specified level'
         return "<h%(level)d>%(text)s</h%(level)d>\n"%{"level":level,
                                                       "text":text}
+    
+    @classmethod
+    def merge_menu(cls, uimanager):
+        'Merge new values with the uimanager.'
+        self = exposong.help.help
+        cls._actions = gtk.ActionGroup('help')
+        cls._actions.add_actions([
+                ('UsageGuide', None, _("Usage Guide"), None, None, self.show),
+                ('Contribute', None, _("Contribute"), None, None,
+                        self.show_contrib),
+                ])
+        
+        uimanager.insert_action_group(cls._actions, -1)
+        uimanager.add_ui_from_string("""
+            <menubar name="MenuBar">
+                <menu action="Help">
+                    <menuitem action="UsageGuide" />
+                    <menuitem action="Contribute" />
+                </menu>
+            </menubar>
+            """)
 
 help = Help()
