@@ -55,7 +55,7 @@ auth_types = {
     'words': _('Words'),
     'music': _('Music'),
     'translation': _('Translation'),
-    None: '',
+    None: _('Written By'),
     }
 verse_names = {
     "v": _("Verse"),
@@ -138,7 +138,7 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
             'Draw text on the footer.'
             jn = ['"%s"' % self.pres.title]
             # TODO List only translators for the current translation.
-            author = '; '.join(u'%s: %s' % \
+            author = '; '.join(u'%s: %s' %
                                (auth_types.get(a.type, _("Written By")), str(a))
                                for a in self.pres.song.props.authors )
             if len(author) > 0:
@@ -146,9 +146,7 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
             if len(self.pres.song.props.copyright):
                 jn.append(u"Copyright \xA9 %s" % self.pres.song.props.copyright)
             if config.get("general", "ccli"):
-                jn.append("Song CCLI ID# %s; CCLI# %s" % \
-                          (self.pres.song.props.ccli_no,
-                          config.get("general", "ccli")))
+                jn.append("CCLI# %s" % config.get("general", "ccli"))
             songbooks = "; ".join(u'%s\xA0#%s' % (s.name, s.entry)
                     for s in self.pres.song.props.songbooks)
             if len(songbooks):
@@ -346,7 +344,8 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
         self._fields['copyright'] = gui.append_entry(table, _('Copyright:'),
                                                      self.song.props.copyright,
                                                      0)
-        self._fields['ccli_no'] = gui.append_entry(table, _("CCLI Number:"),
+        self._fields['ccli_no'] = gui.append_entry(table,
+                                                   _("CCLI Song ID:"),
                                                    self.song.props.ccli_no, 1)
         self._fields['publisher'] = gui.append_entry(table, _("Publisher:"),
                                                      self.song.props.publisher,

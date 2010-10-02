@@ -80,27 +80,29 @@ class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
         verses = None
         verse_names = None
         for ln in oldfile:
+            # Remove \n
+            ln = ln[:-1]
             if ln == "[File]":
                 continue
-            elif ln.startswith("[s a"):
-                # TODO "[S A1406918]"
-                song.props.ccli_no = int(ln[4:])
+            elif ln.lower().startswith("[s a"):
+                song.props.ccli_no = ln[4:-1]
             elif ln and "=" in ln:
                 (key, val) = ln.split("=", 1)
-                val.rstrip("\n")
                 if key == "Version":
                     if float(val) > MAX_VERSION:
                         exposong.log.warning("SongSelect version may have unsupported features.")
                 elif key == "Title":
                     song.props.titles.append(openlyrics.Title(val))
                 elif key == "Author":
-                    if "," in val:
-                        val = ' '.join(val.split(',',1)[::-1])
-                    song.props.authors.append(openlyrics.Author(val))
+                    for auth in val.split("|"):
+                        auth = auth.strip()
+                        if "," in auth:
+                            auth = ' '.join(auth.split(',',1)[::-1])
+                        song.props.authors.append(openlyrics.Author(auth))
                 elif key == "Copyright":
                     song.props.copyright = val
                 elif key == "Admin":
-                    pass
+                    song.props.publisher = val
                 elif key == "Themes":
                     #TODO Assign ThemeIDs
                     song.props.themes = [openlyrics.Theme(t) for t in
@@ -122,12 +124,28 @@ class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
             #if not verses[i]:
             #  continue
             if i >= len(verse_names):
-                verse.name = _("Undefined Title")
+                verse.name = "m"
+            elif verse_names[i].partition(' ')[0] in ('Chorus', 'Coro',
+                                                      'Chorus', 'Coro'):
+                verse.name = 'c'+verse_names[i].partition(' ')[2]
+            elif verse_names[i].partition(' ')[0] in ('Verse', 'Estribillo',
+                                                      'Vers', 'Verso'):
+                verse.name = 'v'+verse_names[i].partition(' ')[2]
             else:
-                verse.name = verse_names[i].lower()[0]+verse_names[i].partition(' ')[2]
+                miscnm = verses[i].split("/n")[0]
+                if miscnm.lower().startswith("(bridge"):
+                    verse.name = "b"
+                    verses[i] = "/n".join(verses[i].split("/n")[1:])
+                elif miscnm.lower().startswith("(end"):
+                    verse.name = "e"
+                    verses[i] = "\n".join(verses[i].split("\n")[1:])
+            if not verse.name:
+                # How should we handle this?
+                verse.name = 'm'
             lines = openlyrics.Lines()
             # Intentionally "/n", as it is in the format.
-            lines.lines = [openlyrics.Line(l) for l in verses[i].split("/n")]
+            lines.lines = [openlyrics.Line(l) for l
+                           in verses[i].strip("/n").split("/n")]
             verse.lines = [lines]
             song.verses.append(verse)
         
