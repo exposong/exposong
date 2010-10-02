@@ -92,6 +92,8 @@ class Screen(exposong._hook.Menu):
                 parent.move(0,0)
                 geometry = (scr_geom.width/2, scr_geom.height/2,
                             scr_geom.width/2, scr_geom.height/2)
+        exposong.log.info('Setting presentation screen position to %s.',
+                           "x=%d, y=%d, w=%d, h=%d" % geometry)
         self.window.move(geometry[0], geometry[1])
         self.window.resize(geometry[2], geometry[3])
         self.aspect = float(geometry[2])/geometry[3]
@@ -107,7 +109,7 @@ class Screen(exposong._hook.Menu):
         else:
             self.pres.queue_draw()
     
-    def freeze(self, action):
+    def freeze(self, action=None):
         'Set the screen to be freezed or not'
         self._freeze = True
         self._actions.get_action("Background").set_sensitive(False)
@@ -115,7 +117,7 @@ class Screen(exposong._hook.Menu):
         self._actions.get_action("Black Screen").set_sensitive(False)
         self._actions.get_action("Freeze").set_sensitive(False)
     
-    def to_black(self, button):
+    def to_black(self, action=None):
         'Set the screen to black / show the presentation if screen was black'
         if self._black:
             self.show()
@@ -124,7 +126,7 @@ class Screen(exposong._hook.Menu):
             self._background = self._logo = False
             self.draw()
     
-    def to_logo(self, button):
+    def to_logo(self, action=None):
         'Set the screen to a the ExpoSong logo or a user-defined one.'
         if config.has_option("screen", "logo") and \
                 os.path.isfile(config.get("screen", "logo")):
@@ -142,17 +144,17 @@ class Screen(exposong._hook.Menu):
             if resp == gtk.RESPONSE_YES:
                 exposong.prefs.PrefsDialog(exposong.application.main)
                 if os.path.isfile(config.get("screen", "logo")):
-                    self.to_logo(None)
+                    self.to_logo()
             else:
-                self.to_background(None) 
+                self.to_background() 
     
-    def to_background(self, button):
+    def to_background(self, action=None):
         'Hide text from the screen.'
         self._background = True
         self._black = self._logo = False
         self.draw()
     
-    def hide(self, button):
+    def hide(self, action=None):
         'Remove the presentation screen from view.'
         self._background = self._black = self._logo = False
         self.window.hide()
@@ -160,10 +162,9 @@ class Screen(exposong._hook.Menu):
     
     def show(self, *args):
         'Show the presentation screen.'
+        exposong.log.info('Showing the presentation screen.')
         self._background = self._black = self._logo = self._freeze = False
         self.window.show_all()
-        #self.set_dirty()
-        self.draw()
         self._set_menu_items_disabled()
         exposong.slidelist.slidelist.grab_focus()
         exposong.slidelist.slidelist.reset_timer()
@@ -479,23 +480,20 @@ class Screen(exposong._hook.Menu):
     @classmethod
     def get_button_bar(cls):
         "Return the presentation button widget."
-        buttons = gtk.VButtonBox()
-        button = gtk.Button(_("Present"))
-        cls._actions.get_action('Present').connect_proxy(button)
-        buttons.add(button)
-        button = gtk.Button(_("Background"))
-        cls._actions.get_action('Background').connect_proxy(button)
-        buttons.add(button)
-        button = gtk.Button(_("Logo"))
-        cls._actions.get_action('Logo').connect_proxy(button)
-        buttons.add(button)
-        button = gtk.Button(_("Black Screen"))
-        cls._actions.get_action('Black Screen').connect_proxy(button)
-        buttons.add(button)
-        button = gtk.Button(_("Freeze"))
-        cls._actions.get_action('Freeze').connect_proxy(button)
-        buttons.add(button)
-        button = gtk.Button(_("Hide"))
-        cls._actions.get_action('Hide').connect_proxy(button)
-        buttons.add(button)
-        return buttons
+        tb = gtk.Toolbar()
+        tb.set_orientation(gtk.ORIENTATION_VERTICAL)
+        tb.set_style(gtk.TOOLBAR_BOTH_HORIZ)
+        tb.set_icon_size(gtk.ICON_SIZE_SMALL_TOOLBAR)
+        button = cls._actions.get_action('Present').create_tool_item()
+        tb.add(button)
+        button = cls._actions.get_action('Background').create_tool_item()
+        tb.add(button)
+        button = cls._actions.get_action('Logo').create_tool_item()
+        tb.add(button)
+        button = cls._actions.get_action('Black Screen').create_tool_item()
+        tb.add(button)
+        button = cls._actions.get_action('Freeze').create_tool_item()
+        tb.add(button)
+        button = cls._actions.get_action('Hide').create_tool_item()
+        tb.add(button)
+        return tb

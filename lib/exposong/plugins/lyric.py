@@ -64,6 +64,8 @@ verse_names = {
     "r": _("Refrain"),
     "b": _("Bridge"),
     "e": _("Ending"),
+    # For Song-Select
+    "m": _("Miscellaneous"),
 }
 
 def key_shortcuts(accel_group, acceleratable, keyval, modifier):

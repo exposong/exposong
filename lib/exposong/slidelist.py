@@ -54,6 +54,8 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
         if pres is None:
             slist.clear()
         else:
+            exposong.log.debug('Activating "%s" %s presentation.',
+                               pres.get_title(), pres.get_type())
             slist.clear()
             if not hasattr(self, 'pres_type') or self.pres_type is not pres.get_type():
                 self.pres_type = pres.get_type()

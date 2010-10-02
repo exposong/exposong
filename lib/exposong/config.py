@@ -18,6 +18,7 @@ import ConfigParser
 import os
 import shutil
 
+import exposong
 from exposong import SHARED_FILES
 # NOTE: If you import something that uses DATA_PATH, the results could be bad.
 # This includes almost all of exposong.*.
@@ -43,6 +44,7 @@ class Config(ConfigParser.SafeConfigParser):
         if not os.path.exists(d):
             os.makedirs(d)
         cfile = os.path.join(d, "exposong.conf")
+        exposong.log.info('Loading config file from "%s".', cfile)
         del d
         
         self.add_section("main_window")
@@ -81,6 +83,7 @@ class Config(ConfigParser.SafeConfigParser):
         ConfigParser.SafeConfigParser.write(self, f)
         f.close()
         
+        exposong.log.info('Saving config file to "%s".', self.configfile)
         shutil.move(tmpname, self.configfile)
 
 config = Config()

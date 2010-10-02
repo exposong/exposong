@@ -49,10 +49,14 @@ class Notify(gtk.HBox):
     
     def _on_save(self, *args):
         'The user clicked save.'
+        exposong.log.info('Setting notification to "%s".',
+                          self.notify.get_text())
         exposong.screen.screen.notify(self.notify.get_text())
     
     def _on_clear(self, *args):
         'The user clicked clear.'
+        exposong.log.info('Clearing notification.',
+                          self.notify.get_text())
         self.notify.set_text("")
         exposong.screen.screen.notify()
     

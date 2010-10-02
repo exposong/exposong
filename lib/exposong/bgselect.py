@@ -20,6 +20,10 @@ import os
 import mimetypes
 import shutil
 
+from gtk.gdk import pixbuf_new_from_file_at_size as pb_new_at_sz
+from gtk.gdk import pixbuf_new_from_file as pb_new
+
+import exposong
 import exposong.screen
 import exposong.application
 from exposong import DATA_PATH, splash
@@ -110,6 +114,8 @@ class BGSelect (gtk.VBox):
             mod = imgcombo.get_model()
             config.set("screen", "bg_image", mod.get_value(itr, 0))
             exposong.screen.screen.set_dirty()
+            exposong.log.info('Background image changed to "%s".',
+                              mod.get_value(itr, 0))
             exposong.screen.screen.draw()
     
     def _on_grad_change(self, *args):
@@ -122,6 +128,7 @@ class BGSelect (gtk.VBox):
                         (grad2.red,grad2.green,grad2.blue))
         config.set("screen", "bg_angle", self.graddir.get_active_text())
         exposong.screen.screen.draw()
+        exposong.log.info('Background gradiant changed.')
     
     def _on_image_radio(self, radio):
         'The image radioButton was changed.'
@@ -179,13 +186,11 @@ class BGSelect (gtk.VBox):
                     if os.path.isfile(cpath):
                         exposong.log.info('Loading background image "%s" from cache.',
                                           filenm)
-                        pixbuf = gtk.gdk.pixbuf_new_from_file(cpath)
+                        pixbuf = pb_new(cpath)
                     else:
                         exposong.log.info('Loading background image "%s".',
                                           filenm)
-                        pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(path,
-                                                                      thsz[0],
-                                                                      thsz[1])
+                        pixbuf = pb_new_at_sz(path, thsz[0], thsz[1])
                         if pixbuf:
                             pixbuf.save(cpath, "png")
                     itr = self.imgmodel.append([path, pixbuf])
@@ -211,7 +216,8 @@ class BGSelect (gtk.VBox):
                                    os.path.basename(img)))
             shutil.copyfile(img, newimg)
             itr = self.imgmodel.append([newimg,
-                    gtk.gdk.pixbuf_new_from_file_at_size(newimg, thsz[0],
-                                                         thsz[1])])
+                                        pb_new_at_sz(newimg, thsz[0], thsz[1])])
+            exposong.log.info('Adding background image "%s".',
+                              os.path.basename(newimg))
         if itr:
             self.imgcombo.set_active_iter(itr)

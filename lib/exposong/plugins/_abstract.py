@@ -252,12 +252,16 @@ class Presentation:
         while True:
             if edit_dialog.run() == gtk.RESPONSE_ACCEPT:
                 if self._is_editing_complete(edit_dialog):
+                    is_new = not self.filename
                     self._edit_save()
                     self.to_xml()
                     del(self._fields)
                     edit_dialog.destroy()
-                    exposong.log.info('Adding new %s presentation "%s".',
-                                      self.get_type(), self.get_title())
+                    if is_new:
+                        msg = 'Adding new %s presentation "%s".'
+                    else:
+                        msg = 'Edited %s presentation "%s".'
+                    exposong.log.info(msg, self.get_type(), self.get_title())
                     return True
             else:
                 del(self._fields)

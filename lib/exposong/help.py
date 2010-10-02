@@ -36,13 +36,16 @@ class Help(exposong._hook.Menu, object):
         
         f = open(self.helpfile, "w")
         f.write(all)
+        exposong.log.info("Help page generated.")
         f.close()
         webbrowser.open("file:"+pathname2url(self.helpfile))
-        statusbar.statusbar.output(_("Help page opened in Webbrowser"))
+        statusbar.statusbar.output(_("Help page opened in Web Browser"))
+        exposong.log.info("Help page opened in Web Browser.")
     
     def show_contrib(self, *args):
         "Show the how to contribute page."
         webbrowser.open("http://exposong.org/contribute")
+        exposong.log.info("Contribute page opened in Web Browser.")
     
     def delete_help_file(self):
         'Delete the generated help file'

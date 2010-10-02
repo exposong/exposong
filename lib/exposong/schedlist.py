@@ -135,14 +135,14 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu):
         while not isinstance(win, gtk.Window):
             win = win.get_parent()
         dialog = gtk.MessageDialog(win, gtk.DIALOG_MODAL,
-                gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
-                _('Are you sure you want to delete "%s"?') % item.title)
+                                   gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
+                                   _('Are you sure you want to delete "%s"?') %
+                                   item.title)
         dialog.set_title( _("Delete Schedule?") )
         resp = dialog.run()
         dialog.hide()
         if resp == gtk.RESPONSE_YES:
-            exposong.log.info('Deleting custom schedule "%s".',
-                              item.title)
+            exposong.log.info('Deleting custom schedule "%s".', item.title)
             if item.filename and os.path.isfile(item.filename):
                 os.remove(os.path.join(DATA_PATH, "sched",item.filename))
             self.remove(item)
@@ -178,8 +178,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu):
             statusbar.statusbar.output(msg % {"presentation":pres.get_title(),
                                               "schedule": sched.title})
             exposong.log.info('Added Presentation "%s" to Schedule "%s"',
-                              pres.get_title(),
-                              sched.title)
+                              pres.get_title(), sched.title)
     
     def _on_new(self, *args):
         'Create a new schedule.'
@@ -197,6 +196,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu):
             name += " "+str(int(curnames[len(curnames)-1][-2:]) + 1)
         sched = exposong.schedule.Schedule(name, builtin=False)
         itrnew = self.append(self.custom_schedules, sched)
+        exposong.log.info('Creating New Schedule "%s".', name)
         pathnew = self.model.get_path(itrnew)
         self.expand_to_path(pathnew)
         self.set_cursor(pathnew, self.get_column(0), True)
@@ -209,7 +209,8 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu):
     def _cell_data_func(self, column, cell, model, iter1):
         'Set whether the cell is editable or not.'
         sched = model.get_value(iter1, 0)
-        cell.set_property('editable', isinstance(sched, exposong.schedule.Schedule)\
+        cell.set_property('editable',
+                          isinstance(sched, exposong.schedule.Schedule)
                           and sched.builtin is False)
     
     def _rename_schedule(self, text_rend, path, new_text):

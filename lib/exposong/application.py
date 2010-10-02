@@ -20,6 +20,7 @@ import gobject
 import os
 import os.path
 import webbrowser
+from gtk.gdk import pixbuf_new_from_file as pb_new
 from xml.dom import minidom
 
 import exposong.plugins
@@ -57,11 +58,11 @@ class Main (gtk.Window):
         exposong.log.debug("Initializing the main window.")
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         gtk.window_set_default_icon_list(
-                gtk.gdk.pixbuf_new_from_file(os.path.join(RESOURCE_PATH, 'es128.png')),
-                gtk.gdk.pixbuf_new_from_file(os.path.join(RESOURCE_PATH, 'es64.png')),
-                gtk.gdk.pixbuf_new_from_file(os.path.join(RESOURCE_PATH, 'es48.png')),
-                gtk.gdk.pixbuf_new_from_file(os.path.join(RESOURCE_PATH, 'es32.png')),
-                gtk.gdk.pixbuf_new_from_file(os.path.join(RESOURCE_PATH, 'es16.png')))
+                pb_new(os.path.join(RESOURCE_PATH, 'es128.png')),
+                pb_new(os.path.join(RESOURCE_PATH, 'es64.png')),
+                pb_new(os.path.join(RESOURCE_PATH, 'es48.png')),
+                pb_new(os.path.join(RESOURCE_PATH, 'es32.png')),
+                pb_new(os.path.join(RESOURCE_PATH, 'es16.png')))
         self.set_title("ExpoSong")
         self.connect("configure_event", self._on_configure_event)
         self.connect("window_state_event", self._on_window_state_event)

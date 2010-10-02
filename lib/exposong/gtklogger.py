@@ -39,7 +39,7 @@ class GTKHandler (logging.Handler, object):
     def emit(self, record):
         r2 = self.format(record).split("\x1e")
         self.liststore.append([record] + r2 + self._get_color(r2[1]))
-        self.scroll_to_end()
+        gobject.timeout_add(150, self.scroll_to_end)
     
     def _get_color(self, levelname):
         if levelname == "CRITICAL":
@@ -69,7 +69,7 @@ class GTKHandler (logging.Handler, object):
             itr = combo.append_text(opt)
         combo.set_active(3)
         list = self.liststore.filter_new()
-        combo.connect("changed", lambda combo: list.refilter())
+        combo.connect("changed", lambda combo: self._refilter(list))
         hbox.pack_start(combo, True, True, 4)
         list.set_visible_func(self._row_filter, combo)
         win.vbox.pack_start(hbox, False, True, 4)
@@ -110,7 +110,7 @@ class GTKHandler (logging.Handler, object):
         win.vbox.pack_start(self.scroll, True, True, 4)
         
         win.show_all()
-        self.scroll_to_end()
+        gobject.timeout_add(150, self.scroll_to_end)
     
     def scroll_to_end(self):
         "Scroll the list to the most recent log entry."
@@ -133,6 +133,11 @@ class GTKHandler (logging.Handler, object):
             return cur <= filt
         except ValueError:
             return False
+    
+    def _refilter(self, list):
+        "Call to force it to refilter the TreeFilter."
+        gobject.timeout_add(150, self.scroll_to_end)
+        list.refilter()
     
     def _save(self, toplevel):
         "Save the log to file."

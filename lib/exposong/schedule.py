@@ -119,6 +119,9 @@ class Schedule(gtk.ListStore):
         'Add a presentation to the schedule.'
         if callable(self.filter_func) and not self.filter_func(pres):
             return False
+        if not self.builtin:
+            exposong.log.info('Adding %s presentation "%s" to schedule "%s".',
+                              pres.get_type(), pres.get_title(), self.title)
         if isinstance(pres, ScheduleItem):
             sched = ScheduleItem(pres.presentation, comment)
         else:
