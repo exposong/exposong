@@ -20,11 +20,13 @@ import cairo
 import time
 import gobject
 import os
+from gtk.gdk import pixbuf_new_from_file as pb_new
 
 import exposong.prefs
 import exposong.slidelist
 import exposong.application
 from exposong.config import config
+from exposong import RESOURCE_PATH
 
 
 def c2dec(color):
@@ -207,7 +209,7 @@ class Screen(exposong._hook.Menu):
         elif self._logo and widget is self.pres:
             if not hasattr(self,"_logo_pbuf"):
                 try:
-                    self._logo_pbuf = gtk.gdk.pixbuf_new_from_file_at_size(
+                    self._logo_pbuf = pb_new_at_size(
                             config.get("screen", "logo"), int(bounds[0]/1.5),
                             int(bounds[1]/1.5))
                 except gobject.GError:
@@ -235,7 +237,7 @@ class Screen(exposong._hook.Menu):
             bgkey = str(bounds[0])+'x'+str(bounds[1])
             try:
                 if self.bg_dirty or bgkey not in self.bg_img:
-                    pixbuf = gtk.gdk.pixbuf_new_from_file(bgimage)
+                    pixbuf = pb_new(bgimage)
                     self.bg_img[bgkey] = pixbuf.scale_simple(bounds[0],
                                                              bounds[1],
                                                              gtk.gdk.INTERP_BILINEAR)
@@ -439,19 +441,41 @@ class Screen(exposong._hook.Menu):
     def merge_menu(cls, uimanager):
         'Merge new values with the uimanager.'
         global screen
+        factory = gtk.IconFactory()
+        factory.add('screen-bg',gtk.IconSet(pb_new(
+                    os.path.join(RESOURCE_PATH,'screen-bg.png'))))
+        factory.add('screen-black',gtk.IconSet(pb_new(
+                    os.path.join(RESOURCE_PATH,'screen-black.png'))))
+        factory.add('screen-freeze',gtk.IconSet(pb_new(
+                    os.path.join(RESOURCE_PATH,'screen-freeze.png'))))
+        factory.add('screen-hide',gtk.IconSet(pb_new(
+                    os.path.join(RESOURCE_PATH,'screen-hide.png'))))
+        factory.add('screen-logo',gtk.IconSet(pb_new(
+                    os.path.join(RESOURCE_PATH,'screen-logo.png'))))
+        factory.add('screen-present',gtk.IconSet(pb_new(
+                    os.path.join(RESOURCE_PATH,'screen-present.png'))))
+        factory.add_default()
+        gtk.stock_add([
+            ("screen-present",_("_Present"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
+            ("screen-bg",_("Bac_kground"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
+            ("screen-logo",_("Lo_go"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
+            ("screen-black",_("_Black"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
+            ("screen-freeze",_("_Freeze"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
+            ("screen-hide",_("Hi_de"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
+            ])
         cls._actions = gtk.ActionGroup('screen')
         cls._actions.add_actions([
-                ('Present', gtk.STOCK_FULLSCREEN, _('_Present'), "F5", None,
+                ('Present', 'screen-present', _('_Present'), "F5", None,
                         screen.show),
-                ('Background', gtk.STOCK_CLEAR, _('Bac_kground'), None, None,
+                ('Background', 'screen-bg', _('Bac_kground'), None, None,
                         screen.to_background),
-                ('Logo', None, _('Lo_go'), "<Ctrl>g", None,
+                ('Logo', 'screen-logo', _('Lo_go'), "<Ctrl>g", None,
                         screen.to_logo),
-                ('Black Screen', None, _('_Black Screen'), "b", None,
+                ('Black Screen', 'screen-black', _('_Black Screen'), "b", None,
                         screen.to_black),
-                ('Freeze', None, _('_Freeze'), None , None,
+                ('Freeze', 'screen-freeze', _('_Freeze'), None , None,
                         screen.freeze),
-                ('Hide', gtk.STOCK_CLOSE, _('Hi_de'), "Escape", None,
+                ('Hide', 'screen-hide', _('Hi_de'), "Escape", None,
                         screen.hide),
                 ])
         
@@ -481,19 +505,24 @@ class Screen(exposong._hook.Menu):
     def get_button_bar(cls):
         "Return the presentation button widget."
         tb = gtk.Toolbar()
+	# TODO Not all buttons are being displayed, so this is a temporary fix.
+	tb.set_size_request(-1, 190)
         tb.set_orientation(gtk.ORIENTATION_VERTICAL)
         tb.set_style(gtk.TOOLBAR_BOTH_HORIZ)
         tb.set_icon_size(gtk.ICON_SIZE_SMALL_TOOLBAR)
         button = cls._actions.get_action('Present').create_tool_item()
+	button.set_is_important(True)
         tb.add(button)
         button = cls._actions.get_action('Background').create_tool_item()
         tb.add(button)
         button = cls._actions.get_action('Logo').create_tool_item()
         tb.add(button)
         button = cls._actions.get_action('Black Screen').create_tool_item()
+	button.set_is_important(True)
         tb.add(button)
         button = cls._actions.get_action('Freeze').create_tool_item()
         tb.add(button)
         button = cls._actions.get_action('Hide').create_tool_item()
+	button.set_is_important(True)
         tb.add(button)
         return tb
