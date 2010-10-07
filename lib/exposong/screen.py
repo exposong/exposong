@@ -21,6 +21,7 @@ import time
 import gobject
 import os
 from gtk.gdk import pixbuf_new_from_file as pb_new
+from gtk.gdk import pixbuf_new_from_file_at_size as pb_new_at_size
 
 import exposong.prefs
 import exposong.slidelist
@@ -448,24 +449,18 @@ class Screen(exposong._hook.Menu):
                     os.path.join(RESOURCE_PATH,'screen-black.png'))))
         factory.add('screen-freeze',gtk.IconSet(pb_new(
                     os.path.join(RESOURCE_PATH,'screen-freeze.png'))))
-        factory.add('screen-hide',gtk.IconSet(pb_new(
-                    os.path.join(RESOURCE_PATH,'screen-hide.png'))))
         factory.add('screen-logo',gtk.IconSet(pb_new(
                     os.path.join(RESOURCE_PATH,'screen-logo.png'))))
-        factory.add('screen-present',gtk.IconSet(pb_new(
-                    os.path.join(RESOURCE_PATH,'screen-present.png'))))
         factory.add_default()
         gtk.stock_add([
-            ("screen-present",_("_Present"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
             ("screen-bg",_("Bac_kground"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
             ("screen-logo",_("Lo_go"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
             ("screen-black",_("_Black"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
             ("screen-freeze",_("_Freeze"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
-            ("screen-hide",_("Hi_de"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
             ])
         cls._actions = gtk.ActionGroup('screen')
         cls._actions.add_actions([
-                ('Present', 'screen-present', _('_Present'), "F5", None,
+                ('Present', gtk.STOCK_MEDIA_PLAY, _('_Present'), "F5", None,
                         screen.show),
                 ('Background', 'screen-bg', _('Bac_kground'), None, None,
                         screen.to_background),
@@ -475,8 +470,10 @@ class Screen(exposong._hook.Menu):
                         screen.to_black),
                 ('Freeze', 'screen-freeze', _('_Freeze'), None , None,
                         screen.freeze),
-                ('Hide', 'screen-hide', _('Hi_de'), "Escape", None,
+                ('Hide', gtk.STOCK_MEDIA_STOP, _('Hi_de'), "Escape", None,
                         screen.hide),
+                #('Pause', gtk.STOCK_MEDIA_PAUSE, None, None,
+                #        _('Pause a timed slide.'), screen.pause),
                 ])
         
         uimanager.insert_action_group(cls._actions, -1)
