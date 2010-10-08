@@ -15,13 +15,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import glob
+import gobject
 import gtk
 import gtk.gdk
+import pango
+import os.path
+import shutil
 import xml.dom
 import xml.dom.minidom
-import pango
-import gobject
-import shutil
 
 from gtk.gdk import pixbuf_new_from_file_at_size as pixbuf_new_sz
 from gtk.gdk import pixbuf_new_from_file as pixbuf_new
@@ -98,6 +100,8 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             if not os.path.isabs(self.image):
                 self.image = os.path.join(DATA_PATH, 'image', self.image)
             elif not self.image.startswith(os.path.join(DATA_PATH, 'image')):
+                # TODO Should this happen, or should we throw an error if we
+                # find an image outside of the DATA_PATH?
                 newimg = os.path.join(DATA_PATH, 'image',
                                       os.path.basename(self.image))
                 newimg = find_freefile(newimg)
@@ -107,32 +111,36 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                 raise ImageNotFoundError(self.image)
             
             self._set_id(value)
+            
+            task = self._load_thumbnails()
+            gobject.idle_add(task.next)
         
+        def _load_thumbnails(self):
+            'Load the thumbnails with idle time.'
+            exposong.splash.splash.incr_total(2)
+            yield True
+            self.get_thumb()
+            exposong.splash.splash.incr(1)
+            yield True
+            self._get_pixbuf()
+            exposong.splash.splash.incr(1)
+            yield False
+            
         def get_thumb(self):
             "Return the thumbnail"
-            cache_dir = os.path.join(DATA_PATH, ".cache", "image")
-            if not os.path.exists(cache_dir):
-                os.makedirs(cache_dir)
-            if hasattr(self, "image"):
-                if not hasattr(self, "thumb"):
-                    cpath = os.path.join(cache_dir,
-                                         os.path.basename(self.image))
-                    if os.path.isfile(cpath):
-                        self.thumb = gtk.gdk.pixbuf_new_from_file(cpath)
-                    else:
-                        try:
-                            self.thumb = pixbuf_new_sz(self.image, thsz[0],
-                                                       thsz[1])
-                            self.thumb.rotate_simple(self.rotate)
-                            self.thumb.save(cpath, "png")
-                            return self.thumb
-                        except gobject.GError:
-                            exposong.log.error('Could not open "%s" image.',
-                                         self.image)
-            if hasattr(self, "thumb"):
-                return self.thumb
-            else:
-                return gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, True, 8, 150, 150)
+            if not hasattr(self,'_thumb'):
+                self._thumb = self._get_cache(self.image, thsz)
+            return self._thumb
+        
+        def _get_pixbuf(self):
+            'Create the image for rendering on the screen.'
+            sz = exposong.screen.screen.get_size()
+            if hasattr(self,'_pixbuf') and (sz[0] == self._pixbuf.get_width()
+                    or sz[1] == self._pixbuf.get_height()):
+                return self._pixbuf
+            
+            self._pixbuf = self._get_cache(self.image, sz, False)
+            return self._pixbuf
         
         def to_node(self, document, node):
             'Populate the node element'
@@ -158,6 +166,48 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             'Return the description of the plugin.'
             return "An image presentation type."
         
+        @staticmethod
+        def _get_cache(image, size, png = True):
+            cache_dir = os.path.join(DATA_PATH, ".cache", "image")
+            
+            cname = os.path.basename(image)
+            if png or cname.endswith(".png"):
+                cname = '.'.join((os.path.splitext(cname)[0], "%dx%d" % size,
+                                  "png"))
+                png = True
+            else:
+                cname = '.'.join((os.path.splitext(cname)[0], "%dx%d" % size, "jpg"))
+            cpath = os.path.join(cache_dir, cname)
+            if os.path.isfile(cpath):
+                if os.path.getmtime(cpath) < os.path.getmtime(image):
+                    # If the file is newer than the cached file
+                    exposong.log.warning('Cache expired. Creating cache for image "%s".',
+                                      os.path.basename(image))
+                else:
+                    exposong.log.debug('Opening cached file "%s".',
+                                  os.path.basename(cpath))
+                    try:
+                        return pixbuf_new(cpath)
+                    except gobject.GError:
+                        exposong.log.warning('Could not open cache file "%s".',
+                                           cpath)
+            else:
+                exposong.log.debug('Creating cache for image "%s".',
+                                   os.path.basename(image))
+            
+            try:
+                pb = pixbuf_new_sz(image, size[0], size[1])
+                if png:
+                    pb.save(cpath, "png")
+                else:
+                    pb.save(cpath, "jpeg")
+                return pb
+            except gobject.GError: 
+                exposong.log.error('Could not open "%s" background file.',
+                                   image)
+            # If all else fails, blank image
+            return gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, True, 8, size[0], size[1])
+        
         def draw(self, ccontext, bounds):
             'Override screen to draw an image instead of text.'
             
@@ -165,21 +215,11 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             ccontext.set_source_rgb(0, 0, 0)
             ccontext.paint()
             
-            if not hasattr(self,'pixbuf') or (bounds[0] <> self.pixbuf.get_width()
-                    and bounds[1] <> self.pixbuf.get_height()):
-                try:
-                    exposong.log.debug('Opening file "%s" for presentation "%s".',
-                                       os.path.basename(self.image),
-                                       self.pres.get_title())
-                    self.pixbuf = pixbuf_new_sz(self.image, bounds[0], bounds[1])
-                    if self.rotate <> 'n':
-                        self.pixbuf = self.pixbuf.rotate_simple(self.rotate)
-                except gobject.GError:
-                    exposong.log.error('Could not open "%s" background file.',
-                                 self.image)
-                    return False
-            ccontext.set_source_pixbuf(self.pixbuf, (bounds[0]-self.pixbuf.get_width())/2,
-                                       (bounds[1]-self.pixbuf.get_height())/2)
+            pb = self._get_pixbuf()
+            if not pb:
+                return False
+            ccontext.set_source_pixbuf(pb, (bounds[0]-pb.get_width())/2,
+                                       (bounds[1]-pb.get_height())/2)
             ccontext.paint()
             return True
     
@@ -220,7 +260,8 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         toolbar.insert(img_del, 1)
         vbox.pack_start(toolbar, False, True)
         
-        self._fields['images'] = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_OBJECT)
+        self._fields['images'] = gtk.ListStore(gobject.TYPE_STRING,
+                                               gobject.TYPE_OBJECT)
         imgtree = gtk.TreeView(self._fields['images'])
         imgtree.set_reorderable(True)
         col = gtk.TreeViewColumn()
@@ -305,12 +346,13 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         'Remove an image from the presentation.'
         (model, s_iter) = treeview.get_selection().get_selected()
         if s_iter:
-            thmb = os.path.join(DATA_PATH, '.cache', 'image',
-                                os.path.basename(model.get_value(s_iter, 0)))
+            name = os.path.basename(model.get_value(s_iter, 0))
+            name = os.path.splitext(name)[0]+".*"
+            thmb = glob.glob(os.path.join(DATA_PATH, '.cache', 'image', name))
             if model.get_value(s_iter, 0).startswith(DATA_PATH):
                 self._delete_on_remove += [model.get_value(s_iter, 0)]
-            if os.path.isfile(thmb):
-                self._delete_on_remove += [thmb]
+            if thmb:
+                self._delete_on_remove += thmb
             model.remove(s_iter)
     
     def on_delete(self):

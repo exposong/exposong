@@ -104,6 +104,10 @@ class Screen(exposong._hook.Menu):
                                       preview_height)
         self._size = geometry[2:4]
     
+    def get_size(self):
+        "Get the current screen size."
+        return self._size
+    
     def draw(self):
         '''Redraw the presentation and preview screens.
            Draw preview only when freeze is active'''
