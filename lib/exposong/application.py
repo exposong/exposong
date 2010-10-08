@@ -23,6 +23,7 @@ import webbrowser
 from gtk.gdk import pixbuf_new_from_file as pb_new
 from xml.dom import minidom
 
+import exposong.about
 import exposong.plugins
 import exposong.plugins._abstract
 import exposong.bgselect
@@ -32,7 +33,6 @@ import exposong.help
 from exposong import RESOURCE_PATH, DATA_PATH, SHARED_FILES, HELP_URL
 from exposong import config, prefs, screen, schedlist, splash
 from exposong import preslist, presfilter, slidelist, statusbar
-from exposong.about import About
 from exposong.schedule import Schedule # ? where to put library
 
 main = None
@@ -196,6 +196,8 @@ class Main (gtk.Window):
                 ('file-export', None, _("_Export"), "", _("Export a .expo package")),
                 ('file-print', None, _("_Print"), "", None),
                 ('pres-new', gtk.STOCK_NEW, None, "", _("Create a new presentation")),
+                ('Statistics', None, _("Statistics and System Information"),
+                        None, None, self._on_stats),
                 ('About', gtk.STOCK_ABOUT, None, None, None, self._on_about),
                 ])
         self.main_actions.add_actions([
@@ -244,6 +246,7 @@ class Main (gtk.Window):
                     <menu action="Help">
                         <menuitem action="UsageGuide" />
                         <menuitem action="Contribute" />
+                        <menuitem action="Statistics" />
                         <menuitem action="About" />
                     </menu>
                 </menubar>''')
@@ -362,9 +365,13 @@ class Main (gtk.Window):
         schedlist.schedlist.collapse_row(schedmodel.get_path(libitr))
         yield False
     
+    def _on_stats(self, *args):
+        'Shows the statistics dialog.'
+        exposong.about.Statistics(self)
+    
     def _on_about(self, *args):
         'Shows the about dialog.'
-        About(self)
+        exposong.about.About(self)
     
     def _on_prefs(self, *args):
         'Shows the preferences dialog.'
