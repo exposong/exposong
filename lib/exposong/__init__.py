@@ -14,15 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import __builtin__
+import gettext
+import gettext_windows
 import imp
+import locale
+import logging
 import os
 import os.path
 import pygtk
-import gettext
-import gettext_windows
-import locale
-import __builtin__
-import logging
+import sys
+import traceback
 from os.path import abspath, dirname, join, pardir, expanduser
 
 log = logging.getLogger("exposong")
@@ -49,6 +51,12 @@ log.addHandler(exposong.gtklogger.handler)
 #    log.addHandler(_handler)
 
 log.debug("Starting ExpoSong.")
+
+# Send exceptoins to our logger.
+def excepthook(type, value, tb):
+    "Send exceptions to our custom logger."
+    exposong.log.error("".join(traceback.format_exception(type, value, tb)))
+sys.excepthook = excepthook
 
 
 DATA_PATH = None
