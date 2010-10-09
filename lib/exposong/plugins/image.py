@@ -169,6 +169,8 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         @staticmethod
         def _get_cache(image, size, png = True):
             cache_dir = os.path.join(DATA_PATH, ".cache", "image")
+            if not os.path.exists(cache_dir):
+                os.makedirs(cache_dir)
             
             cname = os.path.basename(image)
             if png or cname.endswith(".png"):
@@ -197,13 +199,17 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             
             try:
                 pb = pixbuf_new_sz(image, size[0], size[1])
-                if png:
-                    pb.save(cpath, "png")
-                else:
-                    pb.save(cpath, "jpeg")
+                try:
+                    if png:
+                        pb.save(cpath, "png")
+                    else:
+                        pb.save(cpath, "jpeg")
+                except gobject.GError: 
+                    exposong.log.error('Could not save "%s" image file.',
+                                       image)
                 return pb
             except gobject.GError: 
-                exposong.log.error('Could not open "%s" background file.',
+                exposong.log.error('Could not open "%s" image file.',
                                    image)
             # If all else fails, blank image
             return gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, True, 8, size[0], size[1])

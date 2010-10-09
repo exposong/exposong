@@ -52,10 +52,10 @@ class Statistics(gtk.Dialog):
     Show a window with stats and data about this instance of ExpoSong.
     '''
     def __init__(self, parent=None):
-    	gtk.Dialog.__init__(self, _("Statistics and System Information"),
-    	                    parent, gtk.DIALOG_DESTROY_WITH_PARENT,
-    	                    (gtk.STOCK_CLOSE, gtk.RESPONSE_NONE))
-    	self.set_modal(False)
+        gtk.Dialog.__init__(self, _("Statistics and System Information"),
+                            parent, gtk.DIALOG_DESTROY_WITH_PARENT,
+                            (gtk.STOCK_CLOSE, gtk.RESPONSE_NONE))
+        self.set_modal(False)
         self.connect("destroy", self._destroy)
         self.connect("response", self._destroy)
         
@@ -66,8 +66,8 @@ class Statistics(gtk.Dialog):
         self.system_info()
         
         self.vbox.pack_start(self.table, True, True, 0)
-    	
-    	self.show_all()
+        
+        self.show_all()
     
     def exposong_stats(self):
         "Display statistics for ExpoSong."

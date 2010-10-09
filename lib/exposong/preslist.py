@@ -26,7 +26,8 @@ import exposong.schedlist
 import exposong.application
 from exposong import DATA_PATH, RESOURCE_PATH
 
-preslist = None #will hold the PresList instance
+# Will hold the PresList instance
+preslist = None
 
 class PresList(gtk.TreeView, exposong._hook.Menu):
     '''
