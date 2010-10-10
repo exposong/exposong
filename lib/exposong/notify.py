@@ -55,8 +55,7 @@ class Notify(gtk.HBox):
     
     def _on_clear(self, *args):
         'The user clicked clear.'
-        exposong.log.info('Clearing notification.',
-                          self.notify.get_text())
+        exposong.log.info('Clearing notification.')
         self.notify.set_text("")
         exposong.screen.screen.notify()
     
