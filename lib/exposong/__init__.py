@@ -58,15 +58,15 @@ def excepthook(type, value, tb):
     exposong.log.error("".join(traceback.format_exception(type, value, tb)))
 sys.excepthook = excepthook
 
+pygtk.require("2.0")
 
+# Set file locations
 DATA_PATH = None
 SHARED_FILES = None
 LOCALE_PATH = None
 RESOURCE_PATH = None
 HELP_PATH = None
 HELP_URL = None
-
-pygtk.require("2.0")
 
 # Find the 'share' folder
 for i in range(6):
