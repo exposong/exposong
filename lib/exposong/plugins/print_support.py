@@ -17,6 +17,7 @@
 import gtk
 import datetime
 import locale
+import pango
 
 import exposong.preslist
 import exposong.application
@@ -34,6 +35,7 @@ information = {
     'required': False,
 }
 
+_COLUMN_COUNT = 3
 
 class Print(Plugin, exposong._hook.Menu):
     '''
@@ -80,19 +82,30 @@ class Print(Plugin, exposong._hook.Menu):
         songs = ""
         for item in library:
             if item[0].get_type() == "lyric":
-                songs += "%s\n"%item[0].title
+                songs += "%s\t"%item[0].get_title()
         
-        markup = """<span face='sans' size='large' weight='bold'>%(title)s</span>
-<span face='sans' size='x-small'>%(date)s</span>\n\n
-<span face='sans 'size='small'>%(text)s</span>
-        """ %{'title':_("Alphabetical list of Songs"),
-                    'date':datetime.datetime.now().strftime(
-                              locale.nl_langinfo(locale.D_FMT)),
-                    'text':songs}
+        if hasattr(locale, 'nl_langinfo'):
+            dfmt = locale.nl_langinfo(locale.D_FMT)
+        else:
+            dfmt = "%x"
+        markup = "<span face='sans' size='large' weight='bold'>%(title)s</span>\n"
+        markup += "<span face='sans' size='x-small'>%(date)s</span>\n\n\n"
+        markup += "<span face='sans 'size='small'>%(text)s</span>\n"
+        markup = markup % {'title':_("Alphabetical list of Songs"),
+                           'date':datetime.datetime.now().strftime(dfmt),
+                           'text':songs}
         
-        #TODO: Multiples Columns, pango cannot do it
-        
+        page_width = context.get_width()*pango.SCALE
         self.pangolayout = context.create_pango_layout()
+        self.pangolayout.set_width(int(page_width))
+        tabs = pango.TabArray(_COLUMN_COUNT, True)
+        print page_width / pango.SCALE,
+        for i in range(_COLUMN_COUNT):
+            pos = int(i * page_width / (_COLUMN_COUNT))
+            tabs.set_tab(i, pango.TAB_LEFT, pos / pango.SCALE)
+            print pos / pango.SCALE,
+        print
+        self.pangolayout.set_tabs(tabs)
         self.pangolayout.set_markup(markup)
         cairo_context = context.get_cairo_context()
         cairo_context.show_layout(self.pangolayout)
