@@ -127,7 +127,7 @@ class Print(Plugin, exposong._hook.Menu):
         
         action = actiongroup.get_action('print-presentation')
         exposong.preslist.preslist.get_selection().connect('changed',
-                                                           gui.treesel_disable_widget,
+                                                           self._print_pres_active,
                                                            action)
         uimanager.insert_action_group(actiongroup, -1)
         
@@ -141,6 +141,17 @@ class Print(Plugin, exposong._hook.Menu):
                 </menu>
             </menubar>
             """)
+    
+    @staticmethod
+    def _print_pres_active(sel, action):
+        "Is printing available for the selected item."
+        if sel.count_selected_rows() > 0:
+            (model, itr) = sel.get_selected()
+            pres = model.get_value(itr, 0)
+            if pres and pres.can_print():
+                action.set_sensitive(True)
+                return
+        action.set_sensitive(False)
     
     @classmethod
     def unmerge_menu(cls, uimanager):
