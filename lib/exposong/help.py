@@ -71,58 +71,58 @@ class Help(exposong._hook.Menu, object):
     def _about(self):
         about = self._h(_('About')) +\
                 self._p(_('ExpoSong is a free, open-source, presentation \
-    program to assist with worship assemblies. Create lyrics or plain-text slides, \
-    create schedules, and put up slides on the screen.'))
+program to assist with worship assemblies. Create lyrics or plain-text slides, \
+create schedules, and put up slides on the screen.'))
         return about
     
     def _schedules(self):
         schedules = self._h(_('Schedules')) +\
                 self._p(_('Schedules are used to create an order of presentations.')) +\
                 self._p(_('To create a schedule, in the menu, select Schedule-&gt;\
-    New. Name your schedule, according to the date or event. Add songs to the \
-    schedule by dragging them from the library onto the schedule.'))
+New. Name your schedule, according to the date or event. Add songs to the \
+schedule by dragging them from the library onto the schedule.'))
         return schedules
     
     def _presentations(self):
         presentations = self._h(_('Creating Presentations')) +\
                 self._p(_('Presentations are a set of slides to be presented on the screen. \
-    To create a new presentation, on the menu, select Presentation-&gt;New, and \
-    then the appropriate presentation type.')) +\
-                self._p(_('Add, edit, or delete slides using the toolbar buttons. \
-    In a schedule, you can drag and drop slides to reorder the slides.')) +\
-                self._p(_('The <b>text</b> presentation is used to create a non-specific, \
-    text slide. It can be used for sermons, announcements, or anything else.')) +\
-                self._p(_('The <b>lyric</b> presentation is for song lyrics. It contains \
-    slide descriptors, such as "Verse #", "Chorus", "Bridge", or "Refrain", which are \
-    for the benefit of the presenter. There are some information tabs, and some of \
-    the data from this area, like author, songbook number, copyright and ccli \
-    number, are displayed on the bottom of the presentation screen.')) +\
-                self._p(_('Lyric presentations can also be reordered. Use the verse \
-    names in brackets and enter them in the order you wish to have in the "Order" \
-    field, for example: "v1 c v2 b c e"')) +\
-                self._p(_('The <b>image</b> presentation is used to present images. \
-    Add multiple images at once by using [shift] or [control] in the add dialog. \
-    Rearrange images by using drag-and-drop.'))
+To create a new presentation, on the menu, select Presentation-&gt;New, and \
+then the appropriate presentation type.')) +\
+            self._p(_('Add, edit, or delete slides using the toolbar buttons. \
+In a schedule, you can drag and drop slides to reorder the slides.')) +\
+            self._p(_('The <b>text</b> presentation is used to create a non-specific, \
+text slide. It can be used for sermons, announcements, or anything else.')) +\
+            self._p(_('The <b>lyric</b> presentation is for song lyrics. It contains \
+slide descriptors, such as "Verse #", "Chorus", "Bridge", or "Refrain", which are \
+for the benefit of the presenter. There are some information tabs, and some of \
+the data from this area, like author, songbook number, copyright and ccli \
+number, are displayed on the bottom of the presentation screen.')) +\
+            self._p(_('Lyric presentations can also be reordered. Use the verse \
+names in brackets and enter them in the order you wish to have in the "Order" \
+field, for example: "v1 c v2 b c e"')) +\
+            self._p(_('The <b>image</b> presentation is used to present images. \
+Add multiple images at once by using [shift] or [control] in the add dialog. \
+Rearrange images by using drag-and-drop.'))
         return presentations
         
     def _notifications(self):
         notifications = self._h(_('Notifications')) +\
                 self._p(_('You may have a need to notify someone in the audience of \
-    something, such as a crying baby in the nursury. A notification can be used \
-    to let them know. The notification can be set using the text box underneath \
-    the preview screen. Use the buttons right to it to display and remove the \
-    message.'))
+something, such as a crying baby in the nursury. A notification can be used \
+to let them know. The notification can be set using the text box underneath \
+the preview screen. Use the buttons right to it to display and remove the \
+message.'))
         return notifications
     
     def _backgrounds(self):
         backgrounds = self._h(_('Backgrounds')) +\
                 self._p(_('The background image for presentations can be a gradient \
-    or an image file. Change the image by using the controls next to the \
-    preview screen.')) +\
+or an image file. Change the image by using the controls next to the \
+preview screen.')) +\
                 self._h(_('Background Image Tips'), 2) +\
                 self._p(_('Background images should generally have a soft focus to them, \
-    and use a minimal amount of contrast. Backgrounds with hard lines, or with \
-    many colors make the text difficult to read.'))
+and use a minimal amount of contrast. Backgrounds with hard lines, or with \
+many colors make the text difficult to read.'))
         return backgrounds
     
     def _shortcuts_table(self):

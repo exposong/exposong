@@ -258,10 +258,10 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu):
             uimanager.remove_ui(self._sched_mergeid)
         
         self._sched_actiongroup = gtk.ActionGroup('addtosched')
+        str = _("Add to Schedule %s")
         self._sched_actiongroup.add_actions(
                 [('pres-add-%s' % s[1], None, s[1], None,
-                 _("_Add to Schedule %s" % s[1]),
-                 s[0].append_action) for s in scheds])
+                 str %s[1], s[0].append_action) for s in scheds])
         
         uimanager.insert_action_group(self._sched_actiongroup)
         self._sched_mergeid = uimanager.add_ui_from_string("""
