@@ -60,7 +60,7 @@ setup(name       = 'exposong',
     * Printing Support
     * OpenLyrics Data Format
     * Full-text search""",
-    author       = 'Exposong Team',
+    author       = 'ExpoSong Team',
     author_email = 'exposong@googlegroups.com',
     maintainer   = 'Samuel Mehrbrodt',
     maintainer_email = 's.mehrbrodt@gmail.com',

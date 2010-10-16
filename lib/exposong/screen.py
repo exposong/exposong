@@ -163,7 +163,7 @@ class Screen(exposong._hook.Menu):
     
     def hide(self, action=None):
         'Remove the presentation screen from view.'
-        self._background = self._black = self._logo = False
+        self._background = self._black = self._logo = self._freeze = False
         self.window.hide()
         self._set_menu_items_disabled()
     
