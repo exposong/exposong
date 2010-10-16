@@ -1,10 +1,19 @@
 +-----------------------------------------+
 | ExpoSong                                |
-| Version 0.7                             |
+| Version 0.7.1                           |
 | Copyright (C) 2008-2010 Exposong.org    |
 +-----------------------------------------+
 
 = Changelog =
+
+== 0.7.1 ==
+ * Many performance improvements. Caching for images speed up loading the
+   program by up to 5 times faster than before.
+ * Logging is available for debugging program issues.
+ * Translations are now working on Windows.
+ * Splash Screen.
+ * Freeze function to allows browsing through the library without affecting the
+   screen.
 
 == 0.7 ==
  * Using OpenLyrics to store Lyrics (http://openlyrics.info)

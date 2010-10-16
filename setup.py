@@ -44,7 +44,7 @@ data_files.append(('share/pixmaps',
                    [normpath('share/exposong/res/es64.png')]))
 
 setup(name       = 'exposong',
-    version      = '0.7',
+    version      = '0.7.1',
     description  = 'Worship presentation software',
     long_description="""
     ExpoSong is a presentation software with a focus on displaying lyrics, 

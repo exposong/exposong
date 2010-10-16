@@ -70,7 +70,7 @@ recursive_add(GTK_DIR+normpath('/share/themes/VistaBut/*'), GTK_DIR)
 
 
 setup(name       = 'exposong',
-    version      = '0.7',
+    version      = '0.7.1',
     description  = 'Worship presentation software',
     long_description="""
     ExpoSong is a presentation software with a focus on displaying lyrics, 

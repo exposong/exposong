@@ -32,7 +32,7 @@ class About:
         self.dialog = gtk.AboutDialog()
         self.dialog.set_transient_for(parent)
         self.dialog.set_name("ExpoSong")
-        self.dialog.set_version("0.7")
+        self.dialog.set_version("0.7.1")
         self.dialog.set_copyright(_("Copyright %s") % "2008-2010 Exposong.org")
         self.dialog.set_authors(("Brad Landis",
                                  "Samuel Mehrbrodt",
@@ -109,12 +109,12 @@ class Statistics(gtk.Dialog):
     @staticmethod
     def get_label(value, isheader = False):
         "Gets a formated label."
-    	label = gtk.Label(value)
-    	if isheader:
-    	    label.set_alignment(1.0, 0.0)
-    	else:
+        label = gtk.Label(value)
+        if isheader:
+            label.set_alignment(1.0, 0.0)
+        else:
             label.set_alignment(0.0, 0.0)
-    	return label
+        return label
     
     def _destroy(self, win, response_id=None):
         "Close the window."

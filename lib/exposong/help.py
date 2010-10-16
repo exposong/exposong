@@ -89,7 +89,7 @@ class Help(exposong._hook.Menu, object):
     To create a new presentation, on the menu, select Presentation-&gt;New, and \
     then the appropriate presentation type.')) +\
                 self._p(_('Add, edit, or delete slides using the toolbar buttons. \
-    You can drag and drop slides to reorder the slides.')) +\
+    In a schedule, you can drag and drop slides to reorder the slides.')) +\
                 self._p(_('The <b>text</b> presentation is used to create a non-specific, \
     text slide. It can be used for sermons, announcements, or anything else.')) +\
                 self._p(_('The <b>lyric</b> presentation is for song lyrics. It contains \
@@ -135,10 +135,10 @@ class Help(exposong._hook.Menu, object):
                      [_("Slide Movement"), None],
                      [_("Next Screen"), _("Down")],
                      [_("Previous Screen"), _("Up")],
-                     [_("Next Screen (Use Order)"), _("PageDown")],
-                     [_("Previous Screen (Use Order)"), _("PageUp")],
-                     [_("Next Presentation"), _("Control-PageDown")],
-                     [_("Previous Presentation"), _("Control-PageUp")],
+                     [_("Next Screen (Use Order)"), _("Page Down")],
+                     [_("Previous Screen (Use Order)"), _("Page Up")],
+                     [_("Next Presentation"), _("Control-Page Down")],
+                     [_("Previous Presentation"), _("Control-Page Up")],
                      [_("Lyrics type"), None],
                      [_("Go to Verse #"), _("1, 2, 3 and so on")],
                      [_("Go to Chorus"), "c"],
