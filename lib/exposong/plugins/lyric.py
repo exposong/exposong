@@ -214,6 +214,15 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
             self.song = openlyrics.Song()
             self.song.createdIn = "ExpoSong"
     
+    def get_slides_in_order(self, editing=False):
+        'Returns the list of songs in order.'
+        if len(self.song.props.verse_order) > 0:
+            return tuple((self.slides[i], self.slides[i].get_markup(editing))
+                         for i in self.get_order())
+        else:
+            return self.get_slide_list()
+    
+    
     def get_order(self):
         'Returns the order in which the slides should be presented.'
         if len(self.song.props.verse_order) > 0:
@@ -846,6 +855,30 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
             if order[i] == old_title:
                 order[i] = new_title
         self._fields['verse_order'].set_text(" ".join(order))
+    
+    def get_print_markup(self):
+        "Return the presentation markup for printing."
+        markup = "<span face='sans' weight='bold' size='large'>%s</span>\n"\
+                 % self.get_title()
+        markup += "<span face='sans' weight='bold' size='x-small'>%s</span>\n"\
+                 % "\n".join(['; '.join(u'%s: %s' %
+                           (auth_types.get(a.type, _("Written By")), str(a))
+                           for a in self.song.props.authors),
+                    u"Copyright \xA9 %s" % self.song.props.copyright,
+                    "CCLI# %s" % config.get("general", "ccli"),
+                    "; ".join(u'%s\xA0#%s' % (s.name, s.entry)
+                            for s in self.song.props.songbooks),
+                    ])
+        markup += "\n\n"
+        # Should this print the slides in order, or just the order list?
+        for slide in self.get_slide_list():
+            markup += "<span weight='bold' face='sans' size='medium'>%s</span>\n"\
+                      % slide[0].get_title()
+            markup += "<span face='sans'>%s</span>\n\n"%slide[0].get_text()
+        
+        #TODO: Handle too long lines
+        
+        return markup
     
     @classmethod
     def is_type(cls, fl):

@@ -37,6 +37,9 @@ information = {
 
 _COLUMN_COUNT = 3
 
+# TODO Multiple pages is not supported right now:
+# http://library.gnome.org/devel/pygtk/stable/class-gtkprintoperation.html#method-gtkprintoperation--set-n-pages
+
 class Print(Plugin, exposong._hook.Menu):
     '''
     Print a song or a list of songs
@@ -46,6 +49,9 @@ class Print(Plugin, exposong._hook.Menu):
     
     def print_presentation(self, *args):
         "Print a single presentation."
+        if not exposong.preslist.preslist.get_active_item().can_print():
+            # TODO Error Dialog
+            return False
         print_op = gtk.PrintOperation()
         print_op.set_n_pages(1)
         print_op.connect("draw_page", self._presentation_markup)
@@ -54,14 +60,9 @@ class Print(Plugin, exposong._hook.Menu):
     def _presentation_markup(self, operation=None, context=None, page_nr=None):
         "Create the page layout for a presentation."
         pres = exposong.preslist.preslist.get_active_item()
-        markup = "<span face='sans' weight='bold' size='large'>%s</span>"%pres.get_title()
-        markup += "\n\n\n"
-        for slide in pres.get_slide_list():
-            markup += "<span weight='bold' face='sans' size='medium'>%s</span>\n"\
-                                %slide[0].get_title()
-            markup += "<span face='sans'>%s</span>\n\n"%slide[0].get_text()
-        
-        #TODO: Handle too long lines
+        markup = pres.get_print_markup()
+        if markup == NotImplemented:
+            return False
         
         self.pangolayout = context.create_pango_layout()
         self.pangolayout.set_markup(markup)

@@ -245,6 +245,24 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             i += 1
         return -1
     
+    def get_print_markup(self):
+        "Return the presentation markup for printing."
+        markup = "<span face='sans' weight='bold' size='large'>%s</span>"\
+                 % self.get_title()
+        markup += "\n\n\n"
+        for slide in self.get_slide_list():
+            markup += "<span weight='bold' face='sans' size='medium'>%s</span>\n"\
+                      % slide[0].get_title()
+            markup += "<span face='sans'>%s</span>\n\n"%slide[0].get_text()
+        
+        #TODO: Handle too long lines
+        
+        return markup
+    
+    def can_print(self):
+        "Return True of printing is available."
+        return True
+    
     @staticmethod
     def get_type():
         "Return the presentation type."

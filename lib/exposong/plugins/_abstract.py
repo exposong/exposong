@@ -377,6 +377,14 @@ class Presentation:
         'Get the slide list.'
         return tuple( (sl, sl.get_markup(editing)) for sl in self.slides)
     
+    def get_print_markup(self):
+        "Return the presentation markup for printing."
+        return NotImplemented
+    
+    def can_print(self):
+        "Return True of printing is available."
+        return False
+    
     @classmethod
     def _on_pres_new(cls, action):
         pres = cls()
