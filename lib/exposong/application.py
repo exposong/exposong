@@ -328,7 +328,7 @@ class Main (gtk.Window):
         directory = os.path.join(DATA_PATH, "sched")
         self.library = Schedule(_("Library"))
         task = self.build_pres_list()
-        gobject.idle_add(task.next, priority=gobject.PRIORITY_HIGH_IDLE)
+        gobject.idle_add(task.next, priority=gobject.PRIORITY_DEFAULT_IDLE - 10)
         yield True
         libitr = schedlist.schedlist.append(None, self.library, 1)
         schedlist.schedlist.get_selection().select_iter(libitr)

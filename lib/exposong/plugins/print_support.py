@@ -119,6 +119,7 @@ class Print(Plugin, exposong._hook.Menu):
             print pos / pango.SCALE,
         print
         self.pangolayout.set_tabs(tabs)
+        # Negative indent does weird things without newlines.
         
         size = 10000
         markup_keys['fontsize'] = size
