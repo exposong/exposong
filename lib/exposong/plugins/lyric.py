@@ -860,21 +860,27 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
         "Return the presentation markup for printing."
         markup = "<span face='sans' weight='bold' size='large'>%s</span>\n"\
                  % self.get_title()
+        info = []
+        if self.song.props.authors:
+            info.append('; '.join(u'%s: %s' %
+                        (auth_types.get(a.type, _("Written By")), str(a))
+                        for a in self.song.props.authors))
+        if self.song.props.copyright:
+            info.append(u"Copyright \xA9 %s" % self.song.props.copyright)
+        if config.get("general", "ccli"):
+            info.append("CCLI# %s" % config.get("general", "ccli"))
+        if self.song.props.songbooks:
+            info.append("; ".join(u'%s\xA0#%s' % (s.name, s.entry)
+                        for s in self.song.props.songbooks))
         markup += "<span face='sans' weight='bold' size='x-small'>%s</span>\n"\
-                 % "\n".join(['; '.join(u'%s: %s' %
-                           (auth_types.get(a.type, _("Written By")), str(a))
-                           for a in self.song.props.authors),
-                    u"Copyright \xA9 %s" % self.song.props.copyright,
-                    "CCLI# %s" % config.get("general", "ccli"),
-                    "; ".join(u'%s\xA0#%s' % (s.name, s.entry)
-                            for s in self.song.props.songbooks),
-                    ])
+                 % "\n".join(info)
         markup += "\n\n"
         # Should this print the slides in order, or just the order list?
         for slide in self.get_slide_list():
-            markup += "<span weight='bold' face='sans' size='medium'>%s</span>\n"\
+            markup += "<span weight='bold' face='sans' size='%%(fontsize)d'>%s</span>\n"\
                       % slide[0].get_title()
-            markup += "<span face='sans'>%s</span>\n\n"%slide[0].get_text()
+            markup += "<span face='sans' size='%%(fontsize)d'>%s</span>\n\n"\
+                      % slide[0].get_text()
         
         #TODO: Handle too long lines
         

@@ -251,11 +251,9 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                  % self.get_title()
         markup += "\n\n\n"
         for slide in self.get_slide_list():
-            markup += "<span weight='bold' face='sans' size='medium'>%s</span>\n"\
+            markup += "<span weight='bold' face='sans' size='%%(fontsize)d'>%s</span>\n"\
                       % slide[0].get_title()
-            markup += "<span face='sans'>%s</span>\n\n"%slide[0].get_text()
-        
-        #TODO: Handle too long lines
+            markup += "<span face='sans' size='%%(fontsize)d'>%s</span>\n\n" % slide[0].get_text()
         
         return markup
     

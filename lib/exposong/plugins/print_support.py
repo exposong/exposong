@@ -64,8 +64,19 @@ class Print(Plugin, exposong._hook.Menu):
         if markup == NotImplemented:
             return False
         
+        page_width = context.get_width() * pango.SCALE
+        page_height = context.get_height() * pango.SCALE
         self.pangolayout = context.create_pango_layout()
-        self.pangolayout.set_markup(markup)
+        self.pangolayout.set_width(int(page_width))
+        self.pangolayout.set_indent(-64 * pango.SCALE)
+        
+        size = 12000
+        self.pangolayout.set_markup(markup % {'fontsize': size})
+        while self.pangolayout.get_size()[1] > page_height:
+            size *= 0.95
+            self.pangolayout.set_indent(-int(size / 1000 * pango.SCALE * 20))
+            self.pangolayout.set_markup(markup % {'fontsize': int(size)})
+        
         cairo_context = context.get_cairo_context()
         cairo_context.show_layout(self.pangolayout)
         return
@@ -89,14 +100,15 @@ class Print(Plugin, exposong._hook.Menu):
             dfmt = locale.nl_langinfo(locale.D_FMT)
         else:
             dfmt = "%x"
-        markup = "<span face='sans' size='large' weight='bold'>%(title)s</span>\n"
-        markup += "<span face='sans' size='x-small'>%(date)s</span>\n\n\n"
-        markup += "<span face='sans 'size='small'>%(text)s</span>\n"
-        markup = markup % {'title':_("Alphabetical list of Songs"),
-                           'date':datetime.datetime.now().strftime(dfmt),
-                           'text':songs}
+        markup = "<span face='sans' size='18000' weight='bold'>%(title)s</span>\n"
+        markup += "<span face='sans' size='12000'>%(date)s</span>\n\n\n"
+        markup += "<span face='sans' size='%(fontsize)d'>%(text)s</span>\n"
+        markup_keys = {'title':_("Alphabetical list of Songs"),
+                       'date':datetime.datetime.now().strftime(dfmt),
+                       'text':songs}
         
         page_width = context.get_width()*pango.SCALE
+        page_height = context.get_height()*pango.SCALE
         self.pangolayout = context.create_pango_layout()
         self.pangolayout.set_width(int(page_width))
         tabs = pango.TabArray(_COLUMN_COUNT, True)
@@ -107,7 +119,15 @@ class Print(Plugin, exposong._hook.Menu):
             print pos / pango.SCALE,
         print
         self.pangolayout.set_tabs(tabs)
-        self.pangolayout.set_markup(markup)
+        
+        size = 10000
+        markup_keys['fontsize'] = size
+        self.pangolayout.set_markup(markup % (markup_keys))
+        while self.pangolayout.get_size()[1] > page_height:
+            size *= 0.95
+            markup_keys['fontsize'] = size
+            self.pangolayout.set_markup(markup % (markup_keys))
+        
         cairo_context = context.get_cairo_context()
         cairo_context.show_layout(self.pangolayout)
         return
