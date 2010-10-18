@@ -17,7 +17,7 @@
 import os
 import gtk
 import webbrowser
-from urllib import pathname2url
+import urllib
 
 import exposong._hook
 from exposong import RESOURCE_PATH, DATA_PATH
@@ -38,7 +38,7 @@ class Help(exposong._hook.Menu, object):
         f.write(all)
         exposong.log.info("Help page generated.")
         f.close()
-        webbrowser.open("file:"+pathname2url(self.helpfile))
+        webbrowser.open("file:"+urllib.pathname2url(self.helpfile))
         statusbar.statusbar.output(_("Help page opened in Web Browser"))
         exposong.log.info("Help page opened in Web Browser.")
     
@@ -47,6 +47,47 @@ class Help(exposong._hook.Menu, object):
         webbrowser.open("http://exposong.org/contribute")
         exposong.log.info("Contribute page opened in Web Browser.")
     
+    def _check_for_update(self, *args):
+        "Let the user know if a new version is out."
+        msg = ""
+        err = new_version = False
+        try:
+            fl = urllib.urlopen("http://exposong.org/_current-version/")
+            if fl.getcode() <> 200:
+                err = True
+                msg = _("Could not read the website (error code %d).")\
+                      % fl.getcode()
+            else:
+                version = fl.read().strip()
+                if version > exposong.about.About.get_version():
+                    new_version = True
+                    msg = _("A new version (%s) is available. Would you like to be taken to the download page?")\
+                            % version
+                else:
+                    new_version = False
+                    msg = _("You are using the most recent version.")
+        except IOError:
+            err = True
+            msg = _("Could not connect to %s.") % "exposong.org"
+        finally:
+            fl.close()
+        
+        if err:
+            dlg = gtk.MessageDialog(exposong.application.main, 0,
+                                    gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE, msg)
+            dlg.set_title(_("An Error Occurred"))
+        elif new_version:
+            dlg = gtk.MessageDialog(exposong.application.main, 0,
+                                    gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO, msg)
+            dlg.set_title(_("A New Version is Available"))
+        else:
+            dlg = gtk.MessageDialog(exposong.application.main, 0,
+                                    gtk.MESSAGE_INFO, gtk.BUTTONS_OK, msg)
+            dlg.set_title(_("ExpoSong is Up to Date"))
+        if dlg.run() == gtk.RESPONSE_YES:
+            webbrowser.open("http://exposong.org/download/")
+        dlg.destroy()
+
     def delete_help_file(self):
         'Delete the generated help file'
         if os.path.exists(self.helpfile):
@@ -175,6 +216,8 @@ many colors make the text difficult to read.'))
                 ('UsageGuide', None, _("Usage Guide"), None, None, self.show),
                 ('Contribute', None, _("Contribute"), None, None,
                         self.show_contrib),
+                ('CheckUpdate', None, _("Check for New _Version"), None, None,
+                        self._check_for_update),
                 ])
         
         uimanager.insert_action_group(cls._actions, -1)
@@ -183,6 +226,7 @@ many colors make the text difficult to read.'))
                 <menu action="Help">
                     <menuitem action="UsageGuide" />
                     <menuitem action="Contribute" />
+                    <menuitem action="CheckUpdate" />
                 </menu>
             </menubar>
             """)
