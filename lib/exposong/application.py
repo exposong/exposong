@@ -160,10 +160,14 @@ class Main (gtk.Window):
         
         win_v.show_all()
         self.add(win_v)
+        self.show_all()
         
         self.restore_window()
         gobject.idle_add(self.restore_panes,
                          priority=gobject.PRIORITY_HIGH_IDLE + 2)
+        # Need to call twice because some in some themes
+        # the left divider would move down at each start
+        gobject.idle_add(self.restore_panes)
         # All custom schedules should load after the presentations.
         gobject.idle_add(self._ready, priority=gobject.PRIORITY_LOW)
         exposong.log.debug("Loading Main completed.")
@@ -171,7 +175,6 @@ class Main (gtk.Window):
     def _ready(self):
         "Called when ExpoSong is fully loaded."
         gobject.timeout_add(200, splash.splash.destroy)
-        self.show_all()
         statusbar.statusbar.output(_("Ready"))
         exposong.log.info('Ready.')
         return False
