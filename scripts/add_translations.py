@@ -25,7 +25,7 @@ import os
 import shutil
 
 # i18n folder in translations-export branch from launchpad
-PO_FILES = ""
+PO_FILES = "/home/sam/programming/translation-export/i18n"
 EXPOSONG_TRANSLATIONS = "../share/exposong/i18n"
 
 # Copy po files
