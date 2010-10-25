@@ -470,9 +470,9 @@ class SlideEdit(gtk.Dialog):
             info_dialog.run()
             info_dialog.destroy()
             self._title_entry.grab_focus()
-            return False
-        self._save()
-        self.destroy()
+        else:
+            self._save()
+            self.destroy()
     
     def _quit_without_save(self, event, *args):
         if self._ok_to_continue():
