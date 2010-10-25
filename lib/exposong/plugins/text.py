@@ -51,12 +51,14 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         
         def _edit_window(self, parent):
             editor = SlideEdit(parent, self)
-            editor.run()
-            if editor.changed:
-                self.title = editor.get_slide_title()
-                self.text = editor.get_slide_text()
-                return True
-            return False
+            while True:
+                if editor.run() == gtk.RESPONSE_ACCEPT:
+                    if editor.changed:
+                        self.title = editor.get_slide_title()
+                        self.text = editor.get_slide_text()
+                        return True
+                else:
+                    return False
         
         @staticmethod
         def get_version():
@@ -431,7 +433,7 @@ class SlideEdit(gtk.Dialog):
         bounds = self._buffer.get_bounds()
         self.slide_text = self._buffer.get_text(bounds[0], bounds[1])
         self.changed = True
-            
+    
     def _ok_to_continue(self):
         if self._buffer.can_undo or self._get_title_value() != self.slide_title:
             msg = _('Unsaved Changes exist. Do you really want to continue without saving?')
@@ -470,9 +472,9 @@ class SlideEdit(gtk.Dialog):
             info_dialog.run()
             info_dialog.destroy()
             self._title_entry.grab_focus()
-        else:
-            self._save()
-            self.destroy()
+            return False
+        self._save()
+        self.destroy()
     
     def _quit_without_save(self, event, *args):
         if self._ok_to_continue():
