@@ -26,15 +26,12 @@ data_files = []
 data_files.append((normpath('share/exposong/res'),
                    glob.glob(normpath('share/exposong/res/*.png'))))
 
+# Add css file(s)
+data_files.append((normpath('share/exposong/res'),
+                   glob.glob(normpath('share/exposong/res/*.css'))))
+
 # Add translations
 for filepath in glob.glob(normpath('share/exposong/i18n/*/LC_MESSAGES/exposong.mo')):
-    data_files.append((os.path.dirname(filepath), [filepath]))
-
-# Add help files
-data_files.append((normpath('share/exposong/help'),
-                   [normpath('share/exposong/help/es.png'),
-                    normpath('share/exposong/help/style.css')]))
-for filepath in glob.glob(normpath('share/exposong/help/*/index.html')):
     data_files.append((os.path.dirname(filepath), [filepath]))
 
 # Add menu entry for Linux

@@ -1,3 +1,9 @@
+exposong (0.7.1) lucid; urgency=low
+
+  * New ExpoSong release
+
+ -- Samuel Mehrbrodt <s.mehrbrodt@gmail.com>  Tue, 26 Oct 2010 17:50:01 +0200
+
 exposong (0.7-2) lucid; urgency=low
 
   * Removing unneeded dependency (gettext)
