@@ -8,18 +8,18 @@ msgstr ""
 "Project-Id-Version: exposong\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-10-16 22:27+0000\n"
-"PO-Revision-Date: 2010-10-22 18:33+0000\n"
-"Last-Translator: André Gondim <andregondim@ubuntu.com>\n"
+"PO-Revision-Date: 2010-10-25 19:45+0000\n"
+"Last-Translator: Samuel Mehrbrodt <Unknown>\n"
 "Language-Team: Brazilian Portuguese <pt_BR@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-10-23 05:03+0000\n"
+"X-Launchpad-Export-Date: 2010-10-26 04:51+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: lib/exposong/__init__.py:95
 msgid "en"
-msgstr "en"
+msgstr "pt-BR"
 
 #: lib/exposong/about.py:36
 msgid "Copyright %s"
@@ -31,7 +31,8 @@ msgstr ""
 "Launchpad Contributions:\n"
 "  André Gondim https://launchpad.net/~andregondim\n"
 "  Engenilk https://launchpad.net/~engenilk\n"
-"  Eugênio F https://launchpad.net/~eugf"
+"  Eugênio F https://launchpad.net/~eugf\n"
+"  Samuel Mehrbrodt https://launchpad.net/~sam92"
 
 #: lib/exposong/about.py:55 lib/exposong/application.py:199
 msgid "Statistics and System Information"

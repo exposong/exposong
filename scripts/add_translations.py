@@ -23,9 +23,16 @@ files will be overwritten.
 
 import os
 import shutil
+import sys
 
 # i18n folder in translations-export branch from launchpad
-PO_FILES = "/home/sam/programming/translation-export/i18n"
+
+if len(sys.argv)>1 and os.path.isdir(sys.argv[1]):
+  PO_FILES = sys.argv[1]
+else:
+  print "Please pass the i18n folder in translation-export branch from"+\
+        "Launchpad as a command line argument"
+  sys.exit(0)
 EXPOSONG_TRANSLATIONS = "../share/exposong/i18n"
 
 # Copy po files

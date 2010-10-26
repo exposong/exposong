@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: exposong\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-10-16 22:27+0000\n"
-"PO-Revision-Date: 2010-10-24 17:12+0000\n"
-"Last-Translator: Hugues Belaib <Unknown>\n"
+"PO-Revision-Date: 2010-10-25 19:37+0000\n"
+"Last-Translator: Samuel Mehrbrodt <Unknown>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-10-25 04:50+0000\n"
+"X-Launchpad-Export-Date: 2010-10-26 04:51+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: lib/exposong/__init__.py:95
@@ -32,6 +32,7 @@ msgstr ""
 "  Audiger Jeremy https://launchpad.net/~skynet\n"
 "  Bernard Opic https://launchpad.net/~cpio\n"
 "  Gabriel U. https://launchpad.net/~gabriel-ull\n"
+"  Gérard Duteil https://launchpad.net/~gerardduteil\n"
 "  Hugues Belaib https://launchpad.net/~hugues-belaib\n"
 "  Jean-Paul GERST https://launchpad.net/~jp-gerst\n"
 "  Nicolas Delvaux https://launchpad.net/~malaria\n"
@@ -67,7 +68,7 @@ msgstr "Plateforme :"
 
 #: lib/exposong/about.py:85
 msgid "Distribution:"
-msgstr "Distribution :"
+msgstr "Distribution:"
 
 #: lib/exposong/application.py:175
 msgid "Ready"
