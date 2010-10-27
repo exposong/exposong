@@ -88,6 +88,7 @@ class Main (gtk.Window):
         
         exposong.log.debug("Laying out the schedlist and preslist.")
         ## Main Window Area
+        win_h_mn = gtk.HBox()
         self.win_h = gtk.HPaned()
         ### Main left area
         left_vbox = gtk.VBox()
@@ -117,36 +118,12 @@ class Main (gtk.Window):
         slidelist.slide_scroll.add(slidelist.slidelist)
         slidelist.slide_scroll.set_policy(gtk.POLICY_AUTOMATIC,
                                           gtk.POLICY_AUTOMATIC)
-        win_rt.pack_start(slidelist.slide_scroll)
         
-        exposong.log.debug("Laying out the preview area.")
-        #### Preview and Presentation Buttons
-        win_rt_btm = gtk.HBox()
+        self.win_h.pack2(slidelist.slide_scroll, True, False)
+        win_h_mn.pack_start(self.win_h, True, True, 0)
         
-        exposong.log.debug(" * BGSelect")
-        exposong.bgselect.bgselect = exposong.bgselect.BGSelect()
-        win_rt_btm.pack_start(exposong.bgselect.bgselect, False, True, 10)
-        
-        exposong.log.debug(" * Preview")
-        # Wrap the pres_preview it so that the aspect ratio is kept
-        prev_box = gtk.VBox()
-        prev_aspect = gtk.AspectFrame(None, 0.5, 0.5,
-                                      exposong.screen.screen.aspect, False)
-        prev_aspect.set_shadow_type(gtk.SHADOW_NONE)
-        prev_aspect.add(screen.screen.preview)
-        prev_box.pack_start(prev_aspect, True, False, 0)
-        
-        exposong.log.debug(" * Notification")
-        exposong.notify.notify = exposong.notify.Notify()
-        prev_box.pack_start(exposong.notify.notify, True, False, 0)
-        win_rt_btm.pack_start(prev_box, True, False, 10)
-        
-        exposong.log.debug(" * Buttons")
-        
-        win_rt_btm.pack_end(screen.screen.get_button_bar(), False, False, 10)
-        win_rt.pack_start(win_rt_btm, False, True)
-        self.win_h.pack2(win_rt, True, False)
-        win_v.pack_start(self.win_h, True)
+        win_h_mn.pack_start(self._pane_right(), False, True, 10)
+        win_v.pack_start(win_h_mn, True)
         
         ## Status bar
         exposong.log.debug("Status bar.")
@@ -164,6 +141,9 @@ class Main (gtk.Window):
         self.restore_window()
         gobject.idle_add(self.restore_panes,
                          priority=gobject.PRIORITY_HIGH_IDLE + 2)
+        # Need to call twice because some in some themes
+        # the left divider would move down at each start
+        gobject.idle_add(self.restore_panes)
         # All custom schedules should load after the presentations.
         gobject.idle_add(self._ready, priority=gobject.PRIORITY_LOW)
         exposong.log.debug("Loading Main completed.")
@@ -175,6 +155,43 @@ class Main (gtk.Window):
         statusbar.statusbar.output(_("Ready"))
         exposong.log.info('Ready.')
         return False
+    
+    def _pane_right(self):
+        "Render the right pane with the preview screen and other settings."
+        exposong.log.debug("Laying out the preview area.")
+        #### Preview and Presentation Buttons
+        vbox = gtk.VBox()
+        vbox.pack_start(gtk.VSeparator(), False, True, 10)
+        exposong.log.debug("Rendering Main Buttons")
+        vbox.pack_start(screen.screen.get_button_bar_main(), False, False, 0)
+        
+        exposong.log.debug("Rendering Preview")
+        # Wrap the pres_preview it so that the aspect ratio is kept
+        prev_aspect = gtk.AspectFrame(None, 0.5, 0.5,
+                                      exposong.screen.screen.aspect, False)
+        prev_aspect.set_label(_("Preview"))
+        prev_aspect.add(screen.screen.preview)
+        vbox.pack_start(prev_aspect, False, False, 0)
+        
+        #TODO Move bgselect to a popup menu
+        exposong.log.debug("Rendering BGSelect")
+        frame = gtk.Frame()
+        frame.set_label(_("Background Select"))
+        exposong.bgselect.bgselect = exposong.bgselect.BGSelect()
+        frame.add(exposong.bgselect.bgselect)
+        vbox.pack_start(frame, False, False, 0)
+        
+        exposong.log.debug("Rendering Notification")
+        frame = gtk.Frame()
+        frame.set_label(_("Notify"))
+        exposong.notify.notify = exposong.notify.Notify()
+        frame.add(exposong.notify.notify)
+        vbox.pack_start(frame, False, False, 0)
+        
+        exposong.log.debug("Rendering Secondary Buttons")
+        vbox.pack_start(screen.screen.get_button_bar_secondary(), False, False, 10)
+        
+        return vbox
     
     def _create_menu(self):
         'Set up the menus and popup menus.'

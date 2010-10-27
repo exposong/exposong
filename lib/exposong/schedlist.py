@@ -36,7 +36,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu):
     '''
     def __init__(self):
         gtk.TreeView.__init__(self)
-        self.set_size_request(200, 190)
+        self.set_size_request(200, 80)
         #Columns: Schedule, Name
         self.model = gtk.TreeStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING,
                                    gobject.TYPE_STRING)

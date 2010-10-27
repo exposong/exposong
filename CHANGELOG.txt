@@ -12,7 +12,7 @@
  * Logging is available for debugging program issues.
  * Translations are now working on Windows.
  * Splash Screen.
- * Freeze function to allows browsing through the library without affecting the
+ * Freeze function to allow browsing through the library without affecting the
    screen.
 
 == 0.7 ==

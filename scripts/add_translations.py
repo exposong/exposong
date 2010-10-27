@@ -23,30 +23,36 @@ files will be overwritten.
 
 import os
 import shutil
+import sys
 
 # i18n folder in translations-export branch from launchpad
-PO_FILES = ""
+
+if len(sys.argv)>1 and os.path.isdir(sys.argv[1]):
+  PO_FILES = sys.argv[1]
+else:
+  print "Please pass the i18n folder in translation-export branch from"+\
+        "Launchpad as a command line argument"
+  sys.exit(0)
 EXPOSONG_TRANSLATIONS = "../share/exposong/i18n"
 
 # Copy po files
 for file in os.listdir(PO_FILES):
-  if not os.path.isfile(os.path.join(PO_FILES, file)):
-    continue
-  path = os.path.join(EXPOSONG_TRANSLATIONS, file.rstrip(".po"))
-  if not os.path.exists(path):
-    os.mkdir(path)
-  shutil.copy(os.path.join(PO_FILES, file),
-              os.path.join(path, file))
+    if not os.path.isfile(os.path.join(PO_FILES, file)):
+        continue
+    path = os.path.join(EXPOSONG_TRANSLATIONS, file.rstrip(".po"))
+    if not os.path.exists(path):
+        os.mkdir(path)
+    shutil.copy(os.path.join(PO_FILES, file), os.path.join(path, file))
   
 # Generate mo-files
 for folder in os.listdir(EXPOSONG_TRANSLATIONS):
-  if not os.path.isdir(os.path.join(EXPOSONG_TRANSLATIONS, folder))\
-      or folder.startswith("."):
-    continue
-  path = os.path.join(EXPOSONG_TRANSLATIONS, folder)
-  mo_dir = os.path.join(path, "LC_MESSAGES")
-  mo_file = os.path.join(mo_dir, "exposong.mo")
-  if not os.path.exists(mo_dir):
-    os.mkdir(mo_dir)
-  po_file = os.path.join(path, folder+".po")
-  os.system("msgfmt -o %(mo)s %(po)s"%{"mo":mo_file,"po":po_file})
+    if not os.path.isdir(os.path.join(EXPOSONG_TRANSLATIONS, folder))\
+            or folder.startswith("."):
+        continue
+    path = os.path.join(EXPOSONG_TRANSLATIONS, folder)
+    mo_dir = os.path.join(path, "LC_MESSAGES")
+    mo_file = os.path.join(mo_dir, "exposong.mo")
+    if not os.path.exists(mo_dir):
+        os.mkdir(mo_dir)
+    po_file = os.path.join(path, folder+".po")
+    os.system("msgfmt -o %(mo)s %(po)s"%{"mo":mo_file,"po":po_file})

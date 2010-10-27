@@ -26,15 +26,12 @@ data_files = []
 data_files.append((normpath('share/exposong/res'),
                    glob.glob(normpath('share/exposong/res/*.png'))))
 
+# Add css file(s)
+data_files.append((normpath('share/exposong/res'),
+                   glob.glob(normpath('share/exposong/res/*.css'))))
+
 # Add translations
 for filepath in glob.glob(normpath('share/exposong/i18n/*/LC_MESSAGES/exposong.mo')):
-    data_files.append((os.path.dirname(filepath), [filepath]))
-
-# Add help files
-data_files.append((normpath('share/exposong/help'),
-                   [normpath('share/exposong/help/es.png'),
-                    normpath('share/exposong/help/style.css')]))
-for filepath in glob.glob(normpath('share/exposong/help/*/index.html')):
     data_files.append((os.path.dirname(filepath), [filepath]))
 
 # Add menu entry for Linux
@@ -45,7 +42,7 @@ data_files.append(('share/pixmaps',
 
 setup(name       = 'exposong',
     version      = '0.7.1',
-    description  = 'Worship presentation software',
+    description  = 'ExpoSong',
     long_description="""
     ExpoSong is a presentation software with a focus on displaying lyrics, 
     text and image slides in a Christian setting.
@@ -70,6 +67,6 @@ setup(name       = 'exposong',
     package_dir  = {'': 'lib'},
     packages     = ['exposong', 'exposong.plugins',
                     'openlyrics', 'openlyrics.tools'],
-    py_modules   = ['undobuffer'],
+    py_modules   = ['undobuffer', 'gettext_windows'],
     data_files   = data_files,
     )
