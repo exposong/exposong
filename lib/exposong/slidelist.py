@@ -36,7 +36,7 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
         self.__timer = 0
 
         gtk.TreeView.__init__(self)
-        self.set_size_request(280, 200)
+        self.set_size_request(250, -1)
         self.set_enable_search(False)
         #self.set_headers_visible(False)
         

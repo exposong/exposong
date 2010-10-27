@@ -504,17 +504,29 @@ class Screen(exposong._hook.Menu):
         cls._actions.get_action("Hide").set_sensitive(False)
     
     @classmethod
-    def get_button_bar(cls):
+    def get_button_bar_main(cls):
         "Return the presentation button widget."
         tb = gtk.Toolbar()
-        # TODO Not all buttons are being displayed, so this is a temporary fix.
-        tb.set_size_request(-1, 190)
-        tb.set_orientation(gtk.ORIENTATION_VERTICAL)
+        # FIXME It would be nice to get rid of the shadow on the toolbars, but
+        # they are read-only style properties.
         tb.set_style(gtk.TOOLBAR_BOTH_HORIZ)
         tb.set_icon_size(gtk.ICON_SIZE_SMALL_TOOLBAR)
         button = cls._actions.get_action('Present').create_tool_item()
         button.set_is_important(True)
         tb.add(button)
+        button = cls._actions.get_action('Hide').create_tool_item()
+        button.set_is_important(True)
+        tb.add(button)
+        return tb
+    
+    @classmethod
+    def get_button_bar_secondary(cls):
+        "Return the presentation button widget."
+        tb = gtk.Toolbar()
+        # FIXME It would be nice to get rid of the shadow on the toolbars, but
+        # they are read-only style properties.
+        tb.set_style(gtk.TOOLBAR_BOTH_HORIZ)
+        tb.set_icon_size(gtk.ICON_SIZE_SMALL_TOOLBAR)
         button = cls._actions.get_action('Background').create_tool_item()
         tb.add(button)
         button = cls._actions.get_action('Logo').create_tool_item()
@@ -523,8 +535,5 @@ class Screen(exposong._hook.Menu):
         button.set_is_important(True)
         tb.add(button)
         button = cls._actions.get_action('Freeze').create_tool_item()
-        tb.add(button)
-        button = cls._actions.get_action('Hide').create_tool_item()
-        button.set_is_important(True)
         tb.add(button)
         return tb
