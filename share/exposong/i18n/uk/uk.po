@@ -1,0 +1,1114 @@
+# Ukrainian translation for exposong
+# Copyright (c) 2010 Rosetta Contributors and Canonical Ltd 2010
+# This file is distributed under the same license as the exposong package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: exposong\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2010-10-16 22:27+0000\n"
+"PO-Revision-Date: 2010-10-23 19:30+0000\n"
+"Last-Translator: Serge Gavrilenko <Unknown>\n"
+"Language-Team: Ukrainian <uk@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2010-10-24 05:06+0000\n"
+"X-Generator: Launchpad (build Unknown)\n"
+
+#: lib/exposong/__init__.py:95
+msgid "en"
+msgstr "Англійська"
+
+#: lib/exposong/about.py:36
+msgid "Copyright %s"
+msgstr "Авторські права %s"
+
+#: lib/exposong/about.py:41 lib/exposong/about.py:42
+msgid "translator-credits"
+msgstr ""
+"Launchpad Contributions:\n"
+"  Serge Gavrilenko https://launchpad.net/~screamer-sg"
+
+#: lib/exposong/about.py:55 lib/exposong/application.py:199
+msgid "Statistics and System Information"
+msgstr "Статистичні дані та системна інформація"
+
+#: lib/exposong/about.py:74
+msgid "ExpoSong Statistics"
+msgstr "Статистичні дані ExpoSong"
+
+#: lib/exposong/about.py:76 lib/exposong/application.py:355
+msgid "Custom Schedules"
+msgstr "Користувацький розклад"
+
+#: lib/exposong/about.py:78 lib/exposong/preslist.py:44
+msgid "Presentations"
+msgstr "Презентації"
+
+#: lib/exposong/about.py:82
+msgid "System Information"
+msgstr "Інформація про систему"
+
+#: lib/exposong/about.py:83
+msgid "Platform:"
+msgstr "Платформа:"
+
+#: lib/exposong/about.py:85
+msgid "Distribution:"
+msgstr "Збірка:"
+
+#: lib/exposong/application.py:175
+msgid "Ready"
+msgstr "Виконано"
+
+#: lib/exposong/application.py:186
+msgid "_File"
+msgstr "_Файл"
+
+#: lib/exposong/application.py:187
+msgid "_Edit"
+msgstr "_Правка"
+
+#: lib/exposong/application.py:188
+msgid "_Schedule"
+msgstr "_Розклад"
+
+#: lib/exposong/application.py:189
+msgid "P_resentation"
+msgstr "_Презентація"
+
+#: lib/exposong/application.py:190
+msgid "_Help"
+msgstr "_Довідка"
+
+#: lib/exposong/application.py:194
+msgid "_Import"
+msgstr "_Імпортувати"
+
+#: lib/exposong/application.py:195
+msgid "Import a .expo package or other format"
+msgstr "Імпортувати пакет .expo в інший формат"
+
+#: lib/exposong/application.py:196
+msgid "Export a .expo package"
+msgstr "Експортувати .expo пакет"
+
+#: lib/exposong/application.py:196
+msgid "_Export"
+msgstr "_Експорт"
+
+#: lib/exposong/application.py:197
+msgid "_Print"
+msgstr "_Друк"
+
+#: lib/exposong/application.py:198
+msgid "Create a new presentation"
+msgstr "Створити нову презентацію"
+
+#: lib/exposong/application.py:204
+msgid "View _Log"
+msgstr "Переглянути _журнал"
+
+#: lib/exposong/application.py:205
+msgid "Show the event log"
+msgstr "Переглянути журнал подій"
+
+#: lib/exposong/application.py:329
+msgid "Library"
+msgstr "Бібліотека"
+
+#: lib/exposong/bgselect.py:69
+msgid "Add"
+msgstr "Додати"
+
+#: lib/exposong/bgselect.py:153 lib/exposong/plugins/image.py:334
+msgid "Image Types"
+msgstr "Типи зображень"
+
+#: lib/exposong/bgselect.py:157
+msgid "Add Image"
+msgstr "Додати зображення"
+
+#: lib/exposong/gtklogger.py:66
+msgid "Filter Severity:"
+msgstr "Сортувати за важливістю"
+
+#: lib/exposong/gtklogger.py:79
+msgid "Time"
+msgstr "Час"
+
+#: lib/exposong/gtklogger.py:87
+msgid "Severity"
+msgstr "Ретельність"
+
+#: lib/exposong/gtklogger.py:96
+msgid "Message"
+msgstr "Повідомлення"
+
+#: lib/exposong/gui.py:62
+msgid "Choose File"
+msgstr "Вибрати файл"
+
+#: lib/exposong/gui.py:75
+msgid "Choose Folder"
+msgstr "Обрати каталог"
+
+#: lib/exposong/gui.py:159
+msgid "Language Code"
+msgstr "Мовний код"
+
+#: lib/exposong/help.py:42
+msgid "Help page opened in Web Browser"
+msgstr "Довідку відкрито у вікні інтернет-браузера"
+
+#: lib/exposong/help.py:66
+msgid "ExpoSong Help"
+msgstr "Довідка ExpoSong"
+
+#: lib/exposong/help.py:72
+msgid "About"
+msgstr "Про..."
+
+#: lib/exposong/help.py:73
+msgid ""
+"ExpoSong is a free, open-source, presentation program to assist with worship "
+"assemblies. Create lyrics or plain-text slides, create schedules, and put up "
+"slides on the screen."
+msgstr ""
+"ExpoSong це вільна програма з відкритим вихідним кодом для створення "
+"презентацій. Створюйте вірші або слайди з простим текстом, розклади "
+"(списки), та легко виводьте слайди на екран."
+
+#: lib/exposong/help.py:79 lib/exposong/schedlist.py:49
+msgid "Schedules"
+msgstr "Розклади (списки)"
+
+#: lib/exposong/help.py:80
+msgid "Schedules are used to create an order of presentations."
+msgstr "Розклад використовується для створення черговості презентацій."
+
+#: lib/exposong/help.py:81
+msgid ""
+"To create a schedule, in the menu, select Schedule-&gt;New. Name your "
+"schedule, according to the date or event. Add songs to the schedule by "
+"dragging them from the library onto the schedule."
+msgstr ""
+"Для створення розкладу, оберіть в меню: Розклад (список) -&gt;Створити. "
+"Дайте списку ім'я відповідно до дати або події. Додайте до розкладу пісні, "
+"перетягуючи їх з бібліотеки."
+
+#: lib/exposong/help.py:87
+msgid "Creating Presentations"
+msgstr "Створення презентації"
+
+#: lib/exposong/help.py:88
+msgid ""
+"Presentations are a set of slides to be presented on the screen. To create a "
+"new presentation, on the menu, select Presentation-&gt;New, and then the "
+"appropriate presentation type."
+msgstr ""
+"Презентіція - це набір слайдів, що будуть показані на екрані. Для створення "
+"презентації, обервть в меню Презентація→Нова (створити) а потім - потрібний "
+"тип презентації."
+
+#: lib/exposong/help.py:91
+msgid ""
+"Add, edit, or delete slides using the toolbar buttons. In a schedule, you "
+"can drag and drop slides to reorder the slides."
+msgstr ""
+"Додавайте, редагуйте та видаляйте слайди користуючись кнорками на панелі "
+"інструментів. В списку ви можете перетягувати слайди, щоб задати порядок їх "
+"показу."
+
+#: lib/exposong/help.py:93
+msgid ""
+"The <b>text</b> presentation is used to create a non-specific, text slide. "
+"It can be used for sermons, announcements, or anything else."
+msgstr ""
+"Тип презентації <b>текст</b> використовується для створення неспецифічних "
+"текстових слайдів. Вони використовуються для створення виступів, анонсів, "
+"тощо..."
+
+#: lib/exposong/help.py:95
+msgid ""
+"The <b>lyric</b> presentation is for song lyrics. It contains slide "
+"descriptors, such as \"Verse #\", \"Chorus\", \"Bridge\", or \"Refrain\", "
+"which are for the benefit of the presenter. There are some information tabs, "
+"and some of the data from this area, like author, songbook number, copyright "
+"and ccli number, are displayed on the bottom of the presentation screen."
+msgstr ""
+"Тип презентації <b>вірш</b> для текстів пісень . Вони містять описи слайдів, "
+"такі як \"Вірш #\", \"Хор\", \"Перехід\", або \"Приспів\", що є корисними "
+"для презентуючого. Також є кілька інформаційних колонок, та колонок з "
+"даними, на зразок автора, номера в пісеннику, авторських прав та ccli "
+"номера, що будуть виведені внизу екрана презентації."
+
+#: lib/exposong/help.py:100
+msgid ""
+"Lyric presentations can also be reordered. Use the verse names in brackets "
+"and enter them in the order you wish to have in the \"Order\" field, for "
+"example: \"v1 c v2 b c e\""
+msgstr ""
+"Віршеві презентації також можуть бути перевпорядковані. Використовуйте назви "
+"віршів в дужках та уведіть їх в порядку, що хочете отримати в полі "
+"\"Порядок\", наприклад: \"v1 c v2 b c e\""
+
+#: lib/exposong/help.py:103
+msgid ""
+"The <b>image</b> presentation is used to present images. Add multiple images "
+"at once by using [shift] or [control] in the add dialog. Rearrange images by "
+"using drag-and-drop."
+msgstr ""
+"Презентації типу <b>зображення</b> використовуються для представлення "
+"зображень. Додавайте кілька зображень за раз використовуючи клавіші [shift] "
+"чи [control] у вікні додавання зображень. Змінюйте розмари та положення "
+"зображень використовуючи функцію \"потягни-та-відпусти\"."
+
+#: lib/exposong/help.py:109
+msgid "Notifications"
+msgstr "Повідомлення"
+
+#: lib/exposong/help.py:110
+msgid ""
+"You may have a need to notify someone in the audience of something, such as "
+"a crying baby in the nursury. A notification can be used to let them know. "
+"The notification can be set using the text box underneath the preview "
+"screen. Use the buttons right to it to display and remove the message."
+msgstr ""
+"Вам може знадобитися сповістити когось з присутніх про дещо, наприклад про "
+"дитину що плаче в дитячій кімнаті. Повідомлення можуть допомогти в цьому. "
+"Повідомлення можуть бути виведені в текстовому полі внизу екрану "
+"попереднього перегляду. Використовуйте кнопки прямо на ньому щоб показати та "
+"видалити повідомлення."
+
+#: lib/exposong/help.py:118
+msgid "Backgrounds"
+msgstr "Фонові зображення"
+
+#: lib/exposong/help.py:119
+msgid ""
+"The background image for presentations can be a gradient or an image file. "
+"Change the image by using the controls next to the preview screen."
+msgstr ""
+"Фоновим зображенням презентації може бути заливка кольором або файл "
+"зображення. змінюйте зображення використовуючи елементи керування наступні "
+"за екраном попереднього перегляду."
+
+#: lib/exposong/help.py:122
+msgid "Background Image Tips"
+msgstr "Підказки щодо фонового зображення"
+
+#: lib/exposong/help.py:123
+msgid ""
+"Background images should generally have a soft focus to them, and use a "
+"minimal amount of contrast. Backgrounds with hard lines, or with many colors "
+"make the text difficult to read."
+msgstr ""
+"Фонові зображення повинні мати м'який фокус та мінімальні значення "
+"контрасту. Фон з різкими лініями, або багатьма кольорами робить текст "
+"складним для читання."
+
+#: lib/exposong/help.py:130 lib/exposong/prefs.py:110
+msgid "Screen"
+msgstr "Екран"
+
+#: lib/exposong/help.py:131
+msgid "Present"
+msgstr "Наявний"
+
+#: lib/exposong/help.py:132
+msgid "Control-g"
+msgstr "Control-g"
+
+#: lib/exposong/help.py:132
+msgid "Logo Screen"
+msgstr "Екран заставки"
+
+#: lib/exposong/help.py:133
+msgid "Black Screen"
+msgstr "Чорний екран"
+
+#: lib/exposong/help.py:134
+msgid "Hide"
+msgstr "Приховати"
+
+#: lib/exposong/help.py:135
+msgid "Slide Movement"
+msgstr "Рух слайдів"
+
+#: lib/exposong/help.py:136
+msgid "Down"
+msgstr "Вниз"
+
+#: lib/exposong/help.py:136
+msgid "Next Screen"
+msgstr "Наступний екран"
+
+#: lib/exposong/help.py:137
+msgid "Previous Screen"
+msgstr "Попередній екран"
+
+#: lib/exposong/help.py:137
+msgid "Up"
+msgstr "Вгору"
+
+#: lib/exposong/help.py:138
+msgid "Next Screen (Use Order)"
+msgstr "Наступний екран (згідно порядку)"
+
+#: lib/exposong/help.py:138
+msgid "Page Down"
+msgstr "На сторінку вниз"
+
+#: lib/exposong/help.py:139
+msgid "Page Up"
+msgstr "На сторінку вгору"
+
+#: lib/exposong/help.py:139
+msgid "Previous Screen (Use Order)"
+msgstr "Попередній екран (згідно порядку)"
+
+#: lib/exposong/help.py:140
+msgid "Control-Page Down"
+msgstr "Control-Page Down"
+
+#: lib/exposong/help.py:140 lib/exposong/preslist.py:307
+msgid "Next Presentation"
+msgstr "Наступна презентація"
+
+#: lib/exposong/help.py:141
+msgid "Control-Page Up"
+msgstr "Control-Page Up"
+
+#: lib/exposong/help.py:141 lib/exposong/preslist.py:305
+msgid "Previous Presentation"
+msgstr "Попередня презентація"
+
+#: lib/exposong/help.py:142
+msgid "Lyrics type"
+msgstr "Тип вірша"
+
+#: lib/exposong/help.py:143
+msgid "1, 2, 3 and so on"
+msgstr "1, 2, 3 і так далі"
+
+#: lib/exposong/help.py:143
+msgid "Go to Verse #"
+msgstr "Перейти до вірша №"
+
+#: lib/exposong/help.py:144
+msgid "Go to Chorus"
+msgstr "Перейти до приспіву"
+
+#: lib/exposong/help.py:145 lib/exposong/plugins/lyric.py:498
+msgid "Other"
+msgstr "Інше"
+
+#: lib/exposong/help.py:146
+msgid "Ctrl-N"
+msgstr "Ctrl-N"
+
+#: lib/exposong/help.py:146 lib/exposong/schedlist.py:185
+msgid "New Schedule"
+msgstr "Новий розклад"
+
+#: lib/exposong/help.py:147
+msgid "Ctrl-F"
+msgstr "Ctrl-F"
+
+#: lib/exposong/help.py:147
+msgid "Find Presentation"
+msgstr "Знайти презентацію"
+
+#: lib/exposong/help.py:149
+msgid "Shortcut Keys"
+msgstr "Сполучення клавіш"
+
+#: lib/exposong/help.py:175
+msgid "Usage Guide"
+msgstr "Довідка щодо користування"
+
+#: lib/exposong/help.py:176
+msgid "Contribute"
+msgstr "Додати"
+
+#: lib/exposong/plugins/_abstract.py:233
+msgid "New Presentation"
+msgstr "Нова презентація"
+
+#: lib/exposong/plugins/_abstract.py:239
+msgid "Editing \"%s\""
+msgstr "Редагування \"%s\""
+
+#: lib/exposong/plugins/_abstract.py:242
+msgid "New %s Presentation"
+msgstr "Нова презентація %s"
+
+#: lib/exposong/plugins/_abstract.py:285
+msgid "Use Timer"
+msgstr "Використовувати таймер"
+
+#: lib/exposong/plugins/_abstract.py:295
+msgid "Seconds Per Slide"
+msgstr "Секунд на слайд"
+
+#: lib/exposong/plugins/_abstract.py:309
+msgid "Loop Slides"
+msgstr "Цикл слайдів"
+
+#: lib/exposong/plugins/_abstract.py:314
+msgid "Timer"
+msgstr "Таймер"
+
+#: lib/exposong/plugins/export_import.py:36
+msgid "Export/Import Functions"
+msgstr "Функції импорту/експорту"
+
+#: lib/exposong/plugins/export_import.py:64
+msgid "Export Current Schedule"
+msgstr "Експортувати наявний список"
+
+#: lib/exposong/plugins/export_import.py:110
+msgid "Export Library"
+msgstr "Експортувати бібліотеку"
+
+#: lib/exposong/plugins/export_import.py:116
+msgid "exposong_library.expo"
+msgstr "exposong_library.expo"
+
+#: lib/exposong/plugins/export_import.py:155
+msgid "Export Backgrounds"
+msgstr "Експорт фонових зображень"
+
+#: lib/exposong/plugins/export_import.py:162
+msgid "exposong_backgrounds.expo"
+msgstr "exposong_backgrounds.expo"
+
+#: lib/exposong/plugins/export_import.py:190
+msgid "Import"
+msgstr "Імпортувати"
+
+#: lib/exposong/plugins/export_import.py:281
+msgid "_ExpoSong Data (.expo)..."
+msgstr ""
+
+#: lib/exposong/plugins/export_import.py:282
+msgid "Import a schedule, presentations or backgrounds"
+msgstr ""
+
+#: lib/exposong/plugins/export_import.py:285
+msgid "_Current Schedule with Presentations..."
+msgstr ""
+
+#: lib/exposong/plugins/export_import.py:287
+msgid "Whole _Library..."
+msgstr ""
+
+#: lib/exposong/plugins/export_import.py:289
+msgid "_Backgrounds..."
+msgstr ""
+
+#: lib/exposong/plugins/image.py:41
+msgid "Image Presentation"
+msgstr ""
+
+#: lib/exposong/plugins/image.py:253 lib/exposong/plugins/lyric.py:598
+#: lib/exposong/plugins/text.py:92 lib/exposong/plugins/text.py:399
+msgid "Title:"
+msgstr ""
+
+#: lib/exposong/plugins/image.py:289 lib/exposong/plugins/text.py:141
+msgid "Edit"
+msgstr ""
+
+#: lib/exposong/plugins/image.py:317
+msgid "Please enter a Title"
+msgstr ""
+
+#: lib/exposong/plugins/image.py:325
+msgid "Add Images"
+msgstr ""
+
+#: lib/exposong/plugins/image.py:406
+msgid "_Image"
+msgstr ""
+
+#: lib/exposong/plugins/image.py:432
+msgid "Image Presentations"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:45
+msgid "Lyric Presentation"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:55
+msgid "Words"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:56
+msgid "Music"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:57
+msgid "Translation"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:58 lib/exposong/plugins/lyric.py:144
+#: lib/exposong/plugins/lyric.py:865
+msgid "Written By"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:61
+msgid "Verse"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:62
+msgid "Pre-Chorus"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:63
+msgid "Chorus"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:64
+msgid "Refrain"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:65
+msgid "Bridge"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:66
+msgid "Ending"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:68
+msgid "Miscellaneous"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:276 lib/exposong/plugins/lyric.py:303
+msgid "Title"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:282 lib/exposong/plugins/lyric.py:345
+#: lib/exposong/plugins/lyric.py:403
+msgid "Language"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:293
+msgid "Variant:"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:296
+msgid "Custom Version:"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:299
+msgid "Release Date:"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:335
+msgid "Author"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:340
+msgid "Type"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:355
+msgid "Copyright:"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:359
+msgid "CCLI Song ID:"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:361
+msgid "Publisher:"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:365
+msgid "Ownership"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:397 lib/exposong/plugins/lyric.py:424
+msgid "Theme"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:409
+msgid "ID"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:421
+msgid "Keywords:"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:456
+msgid "Songbook Name"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:462
+msgid "Entry"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:477
+msgid "Transposition:"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:479
+msgid "Tempo:"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:482
+msgid "Tempo Type:"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:483
+msgid "Text"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:483
+msgid "bpm"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:488
+msgid "Key:"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:491
+msgid "Music Info"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:496
+msgid "Comments:"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:508
+msgid "Verse Order:"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:510
+msgid "Use the Slide names in brackets to modify the order"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:581
+msgid "New Title"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:593
+msgid "Editing Title \"%s\""
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:609 lib/exposong/plugins/text.py:167
+#: lib/exposong/plugins/text.py:471
+msgid "Please enter a Title."
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:636
+msgid "New Author"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:648
+msgid "Editing Author \"%s\""
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:657
+msgid "Author Name:"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:658
+msgid "Author Type:"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:673
+msgid "Please enter an Author Name."
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:703
+msgid "New Theme"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:715
+msgid "Editing Theme \"%s\""
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:718
+msgid "Theme Name:"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:727
+msgid "Please enter an Theme Name."
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:754
+msgid "New songbook"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:766
+msgid "Editing Songbook \"%s\""
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:769
+msgid "Songbook Name:"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:770
+msgid "Entry:"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:778
+msgid "Please enter a Songbook."
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:804
+msgid "You must enter at least one title."
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:916
+msgid "_Lyric"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:942
+msgid "Lyric Presentations"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:977
+msgid "Name:"
+msgstr ""
+
+#: lib/exposong/plugins/lyric.py:994
+msgid "Index:"
+msgstr ""
+
+#: lib/exposong/plugins/lyric_legacy_convert.py:35
+msgid "ExpoSong Lyrics Converter"
+msgstr ""
+
+#: lib/exposong/plugins/lyric_legacy_convert.py:96
+msgid "Undefined Title"
+msgstr ""
+
+#: lib/exposong/plugins/lyric_legacy_convert.py:117
+msgid "Import ExpoSong Legacy File(s)"
+msgstr ""
+
+#: lib/exposong/plugins/lyric_legacy_convert.py:123
+msgid "ExpoSong Legacy File"
+msgstr ""
+
+#: lib/exposong/plugins/lyric_legacy_convert.py:140
+msgid "_ExpoSong Legacy File(s) ..."
+msgstr ""
+
+#: lib/exposong/plugins/lyric_legacy_convert.py:141
+msgid "Import a Lyric Presentation from ExpoSong before 0.7"
+msgstr ""
+
+#: lib/exposong/plugins/opensong_convert.py:33
+msgid "OpenSong Lyrics Converter"
+msgstr ""
+
+#: lib/exposong/plugins/opensong_convert.py:73
+msgid "Import OpenSong File(s)"
+msgstr ""
+
+#: lib/exposong/plugins/opensong_convert.py:92
+msgid "_OpenSong File(s) ..."
+msgstr ""
+
+#: lib/exposong/plugins/opensong_convert.py:93
+msgid "Import a Lyric Presentation from OpenSong"
+msgstr ""
+
+#: lib/exposong/plugins/print_support.py:33
+msgid "Print"
+msgstr ""
+
+#: lib/exposong/plugins/print_support.py:95
+msgid "Alphabetical list of Songs"
+msgstr ""
+
+#: lib/exposong/plugins/print_support.py:122
+msgid "_Current Presentation"
+msgstr ""
+
+#: lib/exposong/plugins/print_support.py:124
+msgid "_List of all Songs"
+msgstr ""
+
+#: lib/exposong/plugins/songselect_convert.py:38
+msgid "SongSelect Lyrics Converter"
+msgstr ""
+
+#: lib/exposong/plugins/songselect_convert.py:162
+msgid "Import SongSelect Lyrics"
+msgstr ""
+
+#: lib/exposong/plugins/songselect_convert.py:169
+msgid "SongSelect File (%s)"
+msgstr ""
+
+#: lib/exposong/plugins/songselect_convert.py:186
+msgid "_SongSelect Lyrics ..."
+msgstr ""
+
+#: lib/exposong/plugins/songselect_convert.py:187
+msgid "Converts a SongSelect file to OpenLyrics"
+msgstr ""
+
+#: lib/exposong/plugins/text.py:32
+msgid "Text Presentation"
+msgstr ""
+
+#: lib/exposong/plugins/text.py:112
+msgid "Slide"
+msgstr ""
+
+#: lib/exposong/plugins/text.py:172
+msgid "The presentation must have at least one slide."
+msgstr ""
+
+#: lib/exposong/plugins/text.py:222
+msgid "Are you sure you want to delete this slide? This cannot be undone."
+msgstr ""
+
+#: lib/exposong/plugins/text.py:226
+msgid "Delete Slide?"
+msgstr ""
+
+#: lib/exposong/plugins/text.py:283
+msgid "_Text"
+msgstr ""
+
+#: lib/exposong/plugins/text.py:309
+msgid "Text Presentations"
+msgstr ""
+
+#: lib/exposong/plugins/text.py:332
+msgid "Editing Slide"
+msgstr ""
+
+#: lib/exposong/plugins/text.py:439
+msgid "Unsaved Changes exist. Do you really want to continue without saving?"
+msgstr ""
+
+#: lib/exposong/prefs.py:36
+msgid "Preferences"
+msgstr ""
+
+#: lib/exposong/prefs.py:50
+msgid "Data folder"
+msgstr ""
+
+#: lib/exposong/prefs.py:51
+msgid ""
+"The place where all your presentations, schedules and background images are "
+"stored."
+msgstr ""
+
+#: lib/exposong/prefs.py:54
+msgid "Legal"
+msgstr ""
+
+#: lib/exposong/prefs.py:57
+msgid "General"
+msgstr ""
+
+#: lib/exposong/prefs.py:62
+msgid "Font"
+msgstr ""
+
+#: lib/exposong/prefs.py:63
+msgid "Text Color"
+msgstr ""
+
+#: lib/exposong/prefs.py:65
+msgid "Text Shadow"
+msgstr ""
+
+#: lib/exposong/prefs.py:68
+msgid "Max Font Size"
+msgstr ""
+
+#: lib/exposong/prefs.py:72
+msgid "Logo"
+msgstr ""
+
+#: lib/exposong/prefs.py:73
+msgid "Image"
+msgstr ""
+
+#: lib/exposong/prefs.py:74 lib/exposong/prefs.py:78
+msgid "Background"
+msgstr ""
+
+#: lib/exposong/prefs.py:77
+msgid "Notify"
+msgstr ""
+
+#: lib/exposong/prefs.py:86
+msgid "Primary"
+msgstr ""
+
+#: lib/exposong/prefs.py:86
+msgid "Primary (Bottom-Right)"
+msgstr ""
+
+#: lib/exposong/prefs.py:87
+msgid "Monitor 4"
+msgstr ""
+
+#: lib/exposong/prefs.py:87
+msgid "Secondary"
+msgstr ""
+
+#: lib/exposong/prefs.py:87
+msgid "Tertiary"
+msgstr ""
+
+#: lib/exposong/prefs.py:107
+msgid "Position"
+msgstr ""
+
+#: lib/exposong/prefs.py:108
+msgid "Monitor"
+msgstr ""
+
+#: lib/exposong/prefs.py:117
+msgid ""
+"You will have to restart ExpoSong so that the new data folder will be used."
+msgstr ""
+
+#: lib/exposong/presfilter.py:73
+msgid "Search"
+msgstr ""
+
+#: lib/exposong/presfilter.py:168
+msgid "_Find Presentation"
+msgstr ""
+
+#: lib/exposong/presfilter.py:169
+msgid "Search for a presentation"
+msgstr ""
+
+#: lib/exposong/preslist.py:204
+msgid "Are you sure you want to delete \"%s\" from your library?"
+msgstr ""
+
+#: lib/exposong/preslist.py:208
+msgid "Delete Presentation?"
+msgstr ""
+
+#: lib/exposong/preslist.py:293
+msgid "_Add to Schedule"
+msgstr ""
+
+#: lib/exposong/preslist.py:294
+msgid "Add the Selected Presentation to a Schedule"
+msgstr ""
+
+#: lib/exposong/preslist.py:297
+msgid "Edit the currently selected presentation"
+msgstr ""
+
+#: lib/exposong/preslist.py:300
+msgid "_Remove from Schedule"
+msgstr ""
+
+#: lib/exposong/preslist.py:301
+msgid "Remove the presentation from schedule"
+msgstr ""
+
+#: lib/exposong/preslist.py:304
+msgid "Delete the presentation"
+msgstr ""
+
+#: lib/exposong/schedlist.py:139
+msgid "Are you sure you want to delete \"%s\"?"
+msgstr ""
+
+#: lib/exposong/schedlist.py:141
+msgid "Delete Schedule?"
+msgstr ""
+
+#: lib/exposong/schedlist.py:177
+msgid "Added Presentation \"%(presentation)s\" to Schedule \"%(schedule)s\""
+msgstr ""
+
+#: lib/exposong/schedlist.py:261
+msgid "Add to Schedule %s"
+msgstr ""
+
+#: lib/exposong/schedlist.py:285
+msgid "Create a new schedule"
+msgstr ""
+
+#: lib/exposong/schedlist.py:286
+msgid "_Rename"
+msgstr ""
+
+#: lib/exposong/schedlist.py:287
+msgid "Rename the selected schedule"
+msgstr ""
+
+#: lib/exposong/schedlist.py:289
+msgid "Delete the currently selected schedule"
+msgstr ""
+
+#: lib/exposong/screen.py:144
+msgid "No Logo set. Do you want to choose a Logo now?"
+msgstr ""
+
+#: lib/exposong/screen.py:148
+msgid "Set Logo?"
+msgstr ""
+
+#: lib/exposong/screen.py:461 lib/exposong/screen.py:470
+msgid "Bac_kground"
+msgstr ""
+
+#: lib/exposong/screen.py:462 lib/exposong/screen.py:472
+msgid "Lo_go"
+msgstr ""
+
+#: lib/exposong/screen.py:463
+msgid "_Black"
+msgstr ""
+
+#: lib/exposong/screen.py:464 lib/exposong/screen.py:476
+msgid "_Freeze"
+msgstr ""
+
+#: lib/exposong/screen.py:468
+msgid "_Present"
+msgstr ""
+
+#: lib/exposong/screen.py:474
+msgid "_Black Screen"
+msgstr ""
+
+#: lib/exposong/screen.py:478
+msgid "Hi_de"
+msgstr ""
+
+#: lib/exposong/slidelist.py:43
+msgid "Slides"
+msgstr ""
+
+#: lib/exposong/slidelist.py:160
+msgid "Previous Slide"
+msgstr ""
+
+#: lib/exposong/slidelist.py:162
+msgid "Next Slide"
+msgstr ""
+
+#: lib/exposong/splash.py:37
+msgid "Loading ExpoSong"
+msgstr ""
+
+#: lib/exposong/splash.py:48
+msgid "Loading, Please Wait."
+msgstr ""
