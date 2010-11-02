@@ -52,6 +52,7 @@ class Config(ConfigParser.SafeConfigParser):
         self.add_section("screen")
         
         self.set("general", "ccli", "")
+        self.set("general", "title_slide", "1")
         self.set("screen", "bg_type", 'color')
         self.set("screen", "bg_image", "")
         self.setcolor("screen", "bg_color_1", (0, 13107, 19660))

@@ -175,6 +175,12 @@ def append_language_combo(table, value, top):
     table.attach(lang, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, _WIDGET_SPACING)
     return lang
 
+def append_checkbutton(table, label, buttonlabel, top):
+    set_label(table, label, top)
+    cb = gtk.CheckButton(buttonlabel)
+    table.attach(cb, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, _WIDGET_SPACING)
+    return cb
+
 def append_section_title(table, title, top):
     'Adds a title for the current section.'
     label = gtk.Label()
