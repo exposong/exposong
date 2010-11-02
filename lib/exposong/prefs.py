@@ -41,7 +41,7 @@ class PrefsDialog(gtk.Dialog):
         self.vbox.pack_start(notebook, True, True, 5)
         
         #General Page
-        table = gui.Table(8)
+        table = gui.Table(10)
         
         if config.has_option("general", "data-path"):
             folder = config.get("general", "data-path")
@@ -51,8 +51,12 @@ class PrefsDialog(gtk.Dialog):
         msg = _("The place where all your presentations, schedules and background images are stored.")
         g_data.set_tooltip_text(msg)
         
-        gui.append_section_title(table, _("Legal"), 1)
-        g_ccli = gui.append_entry(table, "CCLI #", config.get("general","ccli"), 2)
+        g_title = gui.append_checkbutton(table, _("Slides"), _("Insert title slide"), 1)
+        if config.get("general", "title_slide") == "True":
+            g_title.set_active(True)
+        
+        gui.append_section_title(table, _("Legal"), 2)
+        g_ccli = gui.append_entry(table, "CCLI #", config.get("general","ccli"), 3)
         
         notebook.append_page(table, gtk.Label( _("General") ))
         
@@ -112,6 +116,8 @@ class PrefsDialog(gtk.Dialog):
         self.show_all()
         if self.run() == gtk.RESPONSE_ACCEPT:
             config.set("general", "ccli", g_ccli.get_text())
+            config.set("general", "title_slide", str(g_title.get_active()))
+            #TODO: Reload active presentation if title_slide changed
             if g_data.get_current_folder() != DATA_PATH:
                 config.set("general", "data-path", g_data.get_current_folder())
                 msg = _("You will have to restart ExpoSong so that the new data folder will be used.")

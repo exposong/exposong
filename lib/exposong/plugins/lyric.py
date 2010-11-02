@@ -856,6 +856,16 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
                 order[i] = new_title
         self._fields['verse_order'].set_text(" ".join(order))
     
+    def get_slide_list(self, editing=False):
+        'Get the slide list.'
+        if config.get("general", "title_slide") == "True" and not editing:
+            verse = openlyrics.Verse()
+            verse.name = _("Title")
+            slide = self.Slide(self, verse)
+            slide._set_lines(self.get_title())
+            return ((slide, slide.get_markup()),) + _abstract.Presentation.get_slide_list(self)
+        return _abstract.Presentation.get_slide_list(self)
+    
     def get_print_markup(self):
         "Return the presentation markup for printing."
         markup = "<span face='sans' weight='bold' size='large'>%s</span>\n"\
