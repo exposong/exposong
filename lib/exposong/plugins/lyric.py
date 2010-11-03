@@ -36,6 +36,7 @@ from exposong import gui
 from exposong.plugins import Plugin, _abstract, text
 from exposong.prefs import config
 from openlyrics import openlyrics
+from exposong import version
 
 
 """
@@ -212,7 +213,6 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
                 self.slides.append(self.Slide(self, v))
         else:
             self.song = openlyrics.Song()
-            self.song.createdIn = "ExpoSong"
     
     def get_slides_in_order(self, editing=False):
         'Returns the list of songs in order.'
@@ -811,10 +811,11 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
         'Save the data to disk.'
         if self.filename:
             self.filename = check_filename(self.get_title(), self.filename)
+            self.song.modifiedIn = "ExpoSong %s" %exposong.version.__version__
         else:
             self.filename = check_filename(self.get_title(),
                     os.path.join(DATA_PATH, "pres"))
-        self.song.createdIn = "ExpoSong"
+            self.song.createdIn = "ExpoSong %s"%exposong.version.__version__
         self.song.write(self.filename)
     
     def get_title(self):
