@@ -31,7 +31,7 @@ import exposong.notify
 import exposong._hook
 import exposong.help
 from exposong import RESOURCE_PATH, DATA_PATH, SHARED_FILES, HELP_URL
-from exposong import config, prefs, screen, schedlist, splash
+from exposong import config, prefs, screen, schedlist, splash, exampledata
 from exposong import preslist, presfilter, slidelist, statusbar
 from exposong.schedule import Schedule # ? where to put library
 
@@ -81,6 +81,7 @@ class Main (gtk.Window):
         presfilter.presfilter = presfilter.PresFilter()
         preslist.preslist = preslist.PresList()
         slidelist.slidelist = slidelist.SlideList()
+        exampledata.exampledata = exampledata.ExampleData(self)
         
         exposong.log.debug("Creating the menus.")
         menu = self._create_menu()
@@ -131,7 +132,7 @@ class Main (gtk.Window):
         win_v.pack_end(statusbar.statusbar, False)
         
         gtk.settings_get_default().set_long_property('gtk-button-images', True,
-                                                     'application:__init__')    
+                                                     'application:__init__')
         task = self.build_schedule()
         gobject.idle_add(task.next)
         
@@ -154,6 +155,7 @@ class Main (gtk.Window):
         self.show_all()
         statusbar.statusbar.output(_("Ready"))
         exposong.log.info('Ready.')
+        exampledata.exampledata.check_presentations(self)
         return False
     
     def _pane_right(self):
@@ -411,7 +413,7 @@ class Main (gtk.Window):
         'Enables keyboard shortcuts after disabling.'
         for k in keys_to_disable:
             screen.screen._actions.get_action(k).connect_accelerator()
-
+    
     def _on_configure_event(self, widget, *args):
         'Sets the size and position in the config (matters, if not maximized)'
         if not config.config.has_option("main_window", "maximized") or \
