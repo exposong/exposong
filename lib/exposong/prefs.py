@@ -116,8 +116,9 @@ class PrefsDialog(gtk.Dialog):
         self.show_all()
         if self.run() == gtk.RESPONSE_ACCEPT:
             config.set("general", "ccli", g_ccli.get_text())
-            config.set("general", "title_slide", str(g_title.get_active()))
-            #TODO: Reload active presentation if title_slide changed
+            if config.get("general", "title_slide") != str(g_title.get_active()):
+                config.set("general", "title_slide", str(g_title.get_active()))
+                exposong.preslist.preslist._on_pres_activate()
             if g_data.get_current_folder() != DATA_PATH:
                 config.set("general", "data-path", g_data.get_current_folder())
                 msg = _("You will have to restart ExpoSong so that the new data folder will be used.")
