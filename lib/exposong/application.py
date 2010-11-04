@@ -30,7 +30,7 @@ import exposong.bgselect
 import exposong.notify
 import exposong._hook
 import exposong.help
-from exposong import RESOURCE_PATH, DATA_PATH, SHARED_FILES, HELP_URL
+from exposong import RESOURCE_PATH, DATA_PATH, SHARED_FILES
 from exposong import config, prefs, screen, schedlist, splash, exampledata
 from exposong import preslist, presfilter, slidelist, statusbar
 from exposong.schedule import Schedule # ? where to put library

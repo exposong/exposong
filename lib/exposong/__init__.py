@@ -65,8 +65,6 @@ DATA_PATH = None
 SHARED_FILES = None
 LOCALE_PATH = None
 RESOURCE_PATH = None
-HELP_PATH = None
-HELP_URL = None
 
 # Find the 'share' folder
 for i in range(6):
@@ -80,7 +78,6 @@ else:
 
 log.debug('Shared files found at "%s".', SHARED_FILES)
 
-HELP_PATH = join(SHARED_FILES, 'help')
 LOCALE_PATH = join(SHARED_FILES, 'i18n')
 RESOURCE_PATH = join(SHARED_FILES, 'res')
 
@@ -91,8 +88,6 @@ log.debug('Locale set to "%s".', locale.LC_ALL)
 gettext.bindtextdomain('exposong', LOCALE_PATH)
 gettext.textdomain('exposong')
 __builtin__._ = gettext.gettext
-
-HELP_URL = join(HELP_PATH, _('en'), 'index.html')
 
 # This needs to be after we locate SHARED_FILES, but before DATA_PATH is
 # defined.
