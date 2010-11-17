@@ -230,13 +230,22 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
                          self.song.props.verse_order \
                          if self.get_slide_from_order(n) >= 0)
         else:
+            if config.get("general", "title_slide") == "True":
+                #Skip title slide in default order
+                order = _abstract.Presentation.get_order(self)
+                order.remove(0)
+                order.append(order[-1]+1)
+                return order
             return _abstract.Presentation.get_order(self)
 
     def get_slide_from_order(self, order_value):
         'Gets the slide index.'
         i = 0
+        #When there is a title slide (index 0), skip it
+        if config.get("general", "title_slide") == "True":
+            i = 1
         for sl in self.slides:
-            if re.match(order_value,sl.title.lower()):
+            if re.match(order_value, sl.title.lower()):
                 return i
             i += 1
         exposong.log.warning("Slide in order does not exist: %s", order_value)
