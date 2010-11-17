@@ -25,6 +25,7 @@ import exposong._hook
 from exposong.glob import *
 from exposong import DATA_PATH
 from exposong.plugins import Plugin, _abstract
+from exposong.prefs import config
 
 """
 A converter from OpenSong Lyrics type.
@@ -75,13 +76,14 @@ class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK,
                 gtk.RESPONSE_ACCEPT))
         dlg.set_select_multiple(True)
-        dlg.set_current_folder(os.path.expanduser("~"))
+        dlg.set_current_folder(config.get("dialogs", "opensong-import-dir"))
         if dlg.run() == gtk.RESPONSE_ACCEPT:
             dlg.hide()
             files = dlg.get_filenames()
             for file in files:
                 filename = cls.convert(file)
                 exposong.application.main.load_pres(filename)
+            config.set("dialogs", "opensong-import-dir", os.path.dirname(file))
         dlg.destroy()
     
     @classmethod

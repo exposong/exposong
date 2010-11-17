@@ -28,6 +28,8 @@ from exposong.plugins import Plugin, _abstract
 from exposong.prefs import config
 from openlyrics import openlyrics
 
+# TODO Possible, there is also a text format...
+
 """
 A converter from ExpoSong (< 0.7) Lyrics type.
 """
@@ -123,13 +125,14 @@ class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
         filter.set_name(_("ExpoSong Legacy File"))
         filter.add_pattern("*.xml")
         dlg.add_filter(filter)
-        dlg.set_current_folder(os.path.expanduser("~"))
+        dlg.set_current_folder(config.get("dialogs", "exposong_legacy-import-dir"))
         if dlg.run() == gtk.RESPONSE_ACCEPT:
             dlg.hide()
             files = dlg.get_filenames()
             for file in files:
                 filename = cls.convert(file, True)
                 exposong.application.main.load_pres(filename)
+            config.set("dialogs", "exposong_legacy-import-dir", os.path.dirname(file))
         dlg.destroy()
     
     @classmethod

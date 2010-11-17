@@ -48,11 +48,18 @@ class Config(ConfigParser.SafeConfigParser):
         del d
         
         self.add_section("main_window")
+        self.add_section("dialogs")
         self.add_section("general")
         self.add_section("screen")
         
+        
+        self.set("dialogs", "songselect-import-dir", os.path.expanduser("~"))
+        self.set("dialogs", "exposong_legacy-import-dir", os.path.expanduser("~"))
+        self.set("dialogs", "opensong-import-dir", os.path.expanduser("~"))
+        
         self.set("general", "ccli", "")
         self.set("general", "title_slide", "True")
+        
         self.set("screen", "bg_type", 'color')
         self.set("screen", "bg_image", "")
         self.setcolor("screen", "bg_color_1", (0, 13107, 19660))
