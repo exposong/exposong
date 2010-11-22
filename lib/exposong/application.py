@@ -175,6 +175,9 @@ class Main (gtk.Window):
         prev_aspect.add(screen.screen.preview)
         vbox.pack_start(prev_aspect, False, False, 0)
         
+        exposong.log.debug("Rendering Secondary Buttons")
+        vbox.pack_start(screen.screen.get_button_bar_secondary(), False, False, 10)
+        
         #TODO Move bgselect to a popup menu
         exposong.log.debug("Rendering BGSelect")
         frame = gtk.Frame()
@@ -189,9 +192,6 @@ class Main (gtk.Window):
         exposong.notify.notify = exposong.notify.Notify()
         frame.add(exposong.notify.notify)
         vbox.pack_start(frame, False, False, 0)
-        
-        exposong.log.debug("Rendering Secondary Buttons")
-        vbox.pack_start(screen.screen.get_button_bar_secondary(), False, False, 10)
         
         return vbox
     

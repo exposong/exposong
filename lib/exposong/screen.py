@@ -117,12 +117,12 @@ class Screen(exposong._hook.Menu):
             self.pres.queue_draw()
     
     def freeze(self, action=None):
-        'Set the screen to be freezed or not'
+        'Set the screen to be freezed'
         self._freeze = True
-        self._actions.get_action("Background").set_sensitive(False)
-        self._actions.get_action("Logo").set_sensitive(False)
-        self._actions.get_action("Black Screen").set_sensitive(False)
-        self._actions.get_action("Freeze").set_sensitive(False)
+        #self._actions.get_action("Background").set_sensitive(False)
+        #self._actions.get_action("Logo").set_sensitive(False)
+        #self._actions.get_action("Black Screen").set_sensitive(False)
+        #self._actions.get_action("Freeze").set_sensitive(False)
     
     def to_black(self, action=None):
         'Set the screen to black / show the presentation if screen was black'
@@ -437,6 +437,7 @@ class Screen(exposong._hook.Menu):
     def _set_menu_items_disabled(self):
         'Disable buttons if the presentation is not shown.'
         enabled = self.is_viewable()
+        self._actions.get_action("Normal").set_sensitive(enabled)
         self._actions.get_action("Background").set_sensitive(enabled)
         self._actions.get_action("Logo").set_sensitive(enabled)
         self._actions.get_action("Black Screen").set_sensitive(enabled)
@@ -448,6 +449,8 @@ class Screen(exposong._hook.Menu):
         'Merge new values with the uimanager.'
         global screen
         factory = gtk.IconFactory()
+        factory.add('screen-normal',gtk.IconSet(pb_new(
+                    os.path.join(RESOURCE_PATH,'pres_text.png'))))
         factory.add('screen-bg',gtk.IconSet(pb_new(
                     os.path.join(RESOURCE_PATH,'screen-bg.png'))))
         factory.add('screen-black',gtk.IconSet(pb_new(
@@ -458,6 +461,7 @@ class Screen(exposong._hook.Menu):
                     os.path.join(RESOURCE_PATH,'screen-logo.png'))))
         factory.add_default()
         gtk.stock_add([
+            ("screen-normal",_("_Normal"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
             ("screen-bg",_("Bac_kground"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
             ("screen-logo",_("Lo_go"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
             ("screen-black",_("_Black"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
@@ -466,6 +470,8 @@ class Screen(exposong._hook.Menu):
         cls._actions = gtk.ActionGroup('screen')
         cls._actions.add_actions([
                 ('Present', gtk.STOCK_MEDIA_PLAY, _('_Present'), "F5", None,
+                        screen.show),
+                ('Normal', 'screen-normal', _('_Normal State'), "F5", None,
                         screen.show),
                 ('Background', 'screen-bg', _('Bac_kground'), None, None,
                         screen.to_background),
@@ -497,6 +503,7 @@ class Screen(exposong._hook.Menu):
         # unmerge_menu not implemented, because we will never uninstall this as
         # a module.
         
+        cls._actions.get_action("Normal").set_sensitive(False)
         cls._actions.get_action("Background").set_sensitive(False)
         cls._actions.get_action("Logo").set_sensitive(False)
         cls._actions.get_action("Black Screen").set_sensitive(False)
@@ -525,8 +532,10 @@ class Screen(exposong._hook.Menu):
         tb = gtk.Toolbar()
         # FIXME It would be nice to get rid of the shadow on the toolbars, but
         # they are read-only style properties.
-        tb.set_style(gtk.TOOLBAR_BOTH_HORIZ)
-        tb.set_icon_size(gtk.ICON_SIZE_SMALL_TOOLBAR)
+        tb.set_style(gtk.TOOLBAR_ICONS)
+        tb.set_icon_size(gtk.ICON_SIZE_LARGE_TOOLBAR)
+        button = cls._actions.get_action('Normal').create_tool_item()
+        tb.add(button)
         button = cls._actions.get_action('Background').create_tool_item()
         tb.add(button)
         button = cls._actions.get_action('Logo').create_tool_item()
