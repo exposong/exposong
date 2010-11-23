@@ -120,7 +120,10 @@ class Main (gtk.Window):
         slidelist.slide_scroll.set_policy(gtk.POLICY_AUTOMATIC,
                                           gtk.POLICY_AUTOMATIC)
         
-        self.win_h.pack2(slidelist.slide_scroll, True, False)
+        slide_v = gtk.VBox()
+        slide_v.pack_start(slidelist.slide_scroll, True, True)
+        slide_v.pack_start(slidelist.slidelist.get_slide_control_bar(), False, True, 3)
+        self.win_h.pack2(slide_v)
         win_h_mn.pack_start(self.win_h, True, True, 0)
         
         win_h_mn.pack_start(self._pane_right(), False, True, 10)

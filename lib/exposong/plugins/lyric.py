@@ -214,6 +214,9 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
         else:
             self.song = openlyrics.Song()
     
+    def get_order_string(self):
+        return " ".join(self.song.props.verse_order)
+    
     def get_slides_in_order(self, editing=False):
         'Returns the list of songs in order.'
         if len(self.song.props.verse_order) > 0:
@@ -221,7 +224,6 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
                          for i in self.get_order())
         else:
             return self.get_slide_list()
-    
     
     def get_order(self):
         'Returns the order in which the slides should be presented.'

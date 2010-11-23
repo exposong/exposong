@@ -65,6 +65,7 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
                 slist.append(slide)
             self.slide_order = pres.get_order()
             self.slide_order_index = -1
+            self.order_entry.set_text(pres.get_order_string())
         self.__timer += 1
         men = slist.get_iter_first() is not None
         self._actions.get_action("pres-slide-next").set_sensitive(men)
@@ -176,3 +177,20 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
         cls._actions.get_action("pres-slide-prev").set_sensitive(False)
         # unmerge_menu not implemented, because we will never uninstall this as
         # a module.
+        
+    @classmethod
+    def get_slide_control_bar(cls):
+        "Return the slide control bar widget."
+        h = gtk.HBox()
+        #cls.checkbox_use_order = gtk.CheckButton("Use Order")
+        #h.pack_start(cls.checkbox_use_order)
+        button = gtk.Button("<")
+        cls._actions.get_action('pres-slide-prev').connect_proxy(button)
+        h.pack_start(button)
+        cls.order_entry = gtk.Entry()
+        cls.order_entry.set_sensitive(False)
+        h.pack_start(cls.order_entry)
+        button = gtk.Button(">")
+        cls._actions.get_action('pres-slide-next').connect_proxy(button)
+        h.pack_start(button)
+        return h
