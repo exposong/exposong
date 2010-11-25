@@ -434,6 +434,21 @@ class Screen(exposong._hook.Menu):
             ccontext.show_layout(layout)
         return True
     
+    def _on_screen_state_changed(self, action, current):
+        global screen
+        action = ('Normal', 'Background', 'Logo', 'Black Screen', 'Freeze' )\
+                [action.get_current_value()]
+        if action == 'Normal':
+            screen.show()
+        elif action == 'Background':
+            screen.to_background()
+        elif action == 'Logo':
+            screen.to_logo()
+        elif action == 'Black Screen':
+            screen.to_black()
+        elif action == 'Freeze':
+            screen.freeze()
+    
     def _set_menu_items_disabled(self):
         'Disable buttons if the presentation is not shown.'
         enabled = self.is_viewable()
@@ -471,32 +486,39 @@ class Screen(exposong._hook.Menu):
         cls._actions.add_actions([
                 ('Present', gtk.STOCK_MEDIA_PLAY, _('_Present'), "F5", None,
                         screen.show),
-                ('Normal', 'screen-normal', _('_Normal State'), "F5", None,
-                        screen.show),
-                ('Background', 'screen-bg', _('Bac_kground'), None, None,
-                        screen.to_background),
-                ('Logo', 'screen-logo', _('Lo_go'), "<Ctrl>g", None,
-                        screen.to_logo),
-                ('Black Screen', 'screen-black', _('_Black Screen'), "b", None,
-                        screen.to_black),
-                ('Freeze', 'screen-freeze', _('_Freeze'), None , None,
-                        screen.freeze),
                 ('Hide', gtk.STOCK_MEDIA_STOP, _('Hi_de'), "Escape", None,
                         screen.hide),
                 #('Pause', gtk.STOCK_MEDIA_PAUSE, None, None,
                 #        _('Pause a timed slide.'), screen.pause),
                 ])
+        #cls._actions2 = gtk.ActionGroup('screen2')
+        cls._actions.add_radio_actions([
+                ('Normal', 'screen-normal', _('_Normal State'), "F5", None,
+                        0),
+                ('Background', 'screen-bg', _('Bac_kground'), None, None,
+                        1),
+                ('Logo', 'screen-logo', _('Lo_go'), "<Ctrl>g", None,
+                        2),
+                ('Black Screen', 'screen-black', _('_Black Screen'), "b", None,
+                        3),
+                ('Freeze', 'screen-freeze', _('_Freeze'), None , None,
+                        4),
+                ],0, screen._on_screen_state_changed)
+
         
         uimanager.insert_action_group(cls._actions, -1)
         uimanager.add_ui_from_string("""
             <menubar name="MenuBar">
                 <menu action="Presentation">
                     <menuitem action="Present" position="bot" />
-                    <menuitem action="Background" position="bot" />
-                    <menuitem action="Logo" position="bot" />
-                    <menuitem action="Black Screen" position="bot" />
-                    <menuitem action="Freeze" position="bot" />
                     <menuitem action="Hide" position="bot" />
+                    <menu action="pres-controls">
+                        <menuitem action="Normal" position="bot" />
+                        <menuitem action="Background" position="bot" />
+                        <menuitem action="Logo" position="bot" />
+                        <menuitem action="Black Screen" position="bot" />
+                        <menuitem action="Freeze" position="bot" />
+                    </menu>
                 </menu>
             </menubar>
             """)

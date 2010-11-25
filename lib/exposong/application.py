@@ -209,6 +209,7 @@ class Main (gtk.Window):
                 ('Edit', None, _('_Edit')),
                 ('Schedule', None, _("_Schedule")),
                 ('Presentation', None, _('P_resentation')),
+                ('pres-controls', None, _("Presentation _Controls")),
                 ('Help', None, _('_Help')),
                 ('Quit', gtk.STOCK_QUIT, None, None, None, self._quit),
                 ('Preferences', gtk.STOCK_PREFERENCES,
@@ -254,11 +255,14 @@ class Main (gtk.Window):
                         <menuitem action="pres-remove-from-schedule" />
                         <separator />
                         <menuitem action="Present" position="bot" />
-                        <menuitem action="Background" position="bot" />
-                        <menuitem action="Logo" position="bot" />
-                        <menuitem action="Black Screen" position="bot" />
-                        <menuitem action="Freeze" position="bot" />
                         <menuitem action="Hide" position="bot" />
+                        <menu action="pres-controls" position="bot">
+                            <menuitem action="Normal" position="bot" />
+                            <menuitem action="Background" position="bot" />
+                            <menuitem action="Logo" position="bot" />
+                            <menuitem action="Black Screen" position="bot" />
+                            <menuitem action="Freeze" position="bot" />
+                        </menu>
                         <separator />
                         <menuitem action="pres-prev" position="bot" />
                         <menuitem action="pres-next" position="bot" />
