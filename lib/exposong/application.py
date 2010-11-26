@@ -169,6 +169,7 @@ class Main (gtk.Window):
         vbox.pack_start(gtk.VSeparator(), False, True, 10)
         exposong.log.debug("Rendering Main Buttons")
         vbox.pack_start(screen.screen.get_button_bar_main(), False, False, 0)
+        screen.screen.set_hide_action_visible(False)
         
         exposong.log.debug("Rendering Preview")
         # Wrap the pres_preview it so that the aspect ratio is kept

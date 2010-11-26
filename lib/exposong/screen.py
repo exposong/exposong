@@ -130,7 +130,7 @@ class Screen(exposong._hook.Menu):
             self.draw()
     
     def to_logo(self, action=None):
-        'Set the screen to a the ExpoSong logo or a user-defined one.'
+        'Set the screen to the ExpoSong logo or a user-defined one.'
         if config.has_option("screen", "logo") and \
                 os.path.isfile(config.get("screen", "logo")):
             self._logo = True
@@ -149,7 +149,7 @@ class Screen(exposong._hook.Menu):
                 if os.path.isfile(config.get("screen", "logo")):
                     self.to_logo()
             else:
-                self.to_background() 
+                self.to_background()
     
     def to_background(self, action=None):
         'Hide text from the screen.'
@@ -159,6 +159,8 @@ class Screen(exposong._hook.Menu):
     
     def hide(self, action=None):
         'Remove the presentation screen from view.'
+        self._actions.get_action("Hide").set_property("visible", False)
+        self._actions.get_action("Present").set_property("visible", True)
         self._background = self._black = self._logo = self._freeze = False
         self.window.hide()
         self._set_menu_items_disabled()
@@ -166,6 +168,8 @@ class Screen(exposong._hook.Menu):
     def show(self, *args):
         'Show the presentation screen.'
         exposong.log.info('Showing the presentation screen.')
+        self._actions.get_action("Present").set_property("visible", False)
+        self._actions.get_action("Hide").set_property("visible", True)
         self._background = self._black = self._logo = self._freeze = False
         self.window.show_all()
         self._set_menu_items_disabled()
@@ -177,7 +181,7 @@ class Screen(exposong._hook.Menu):
         'Redraw `widget`.'
         self._draw(widget)
     
-    def set_dirty(self, dirty = True):
+    def set_dirty(self, dirty=True):
         'Reload the background image if necessary.'
         self.bg_dirty = dirty
     
@@ -187,12 +191,15 @@ class Screen(exposong._hook.Menu):
         self.draw()
     
     def is_viewable(self):
-        return self.pres.window and self.pres.window.is_viewable()
+        state = self.pres.window and self.pres.window.is_viewable()
+        if state is None:
+            return False
+        return state
     
     def is_running(self):
         'If the presentation is visible and running (not black or background).'
         return self.is_viewable() and \
-                not (self._black or self._logo or self._background)
+            not (self._black or self._logo or self._background or self._freeze)
                 
     
     def _set_background(self, widget, ccontext = None, bounds = None):
@@ -431,6 +438,7 @@ class Screen(exposong._hook.Menu):
         return True
     
     def _on_screen_state_changed(self, action, current):
+        'Called when the screen changes to background, logo, black or freeze'
         global screen
         action = ('Normal', 'Background', 'Logo', 'Black Screen', 'Freeze' )\
                 [action.get_current_value()]
@@ -445,6 +453,10 @@ class Screen(exposong._hook.Menu):
         elif action == 'Freeze':
             screen.freeze()
     
+    def set_hide_action_visible(self, visible):
+        'Activates or deactivates the Hide action'
+        self._actions.get_action('Hide').set_property("visible", visible)
+    
     def _set_menu_items_disabled(self):
         'Disable buttons if the presentation is not shown.'
         enabled = self.is_viewable()
@@ -453,7 +465,7 @@ class Screen(exposong._hook.Menu):
         self._actions.get_action("Logo").set_sensitive(enabled)
         self._actions.get_action("Black Screen").set_sensitive(enabled)
         self._actions.get_action("Freeze").set_sensitive(enabled)
-        self._actions.get_action("Hide").set_sensitive(enabled)
+        self._actions.get_action('Hide').set_sensitive(enabled)
     
     @classmethod
     def merge_menu(cls, uimanager):
@@ -480,9 +492,9 @@ class Screen(exposong._hook.Menu):
             ])
         cls._actions = gtk.ActionGroup('screen')
         cls._actions.add_actions([
-                ('Present', gtk.STOCK_MEDIA_PLAY, _('_Present'), "F5",
+                ('Present', gtk.STOCK_MEDIA_PLAY, _('Start _Presentation'), "F5",
                         _("Show the presentation screen"), screen.show),
-                ('Hide', gtk.STOCK_MEDIA_STOP, _('Hi_de'), "Escape",
+                ('Hide', gtk.STOCK_MEDIA_STOP, _('_Exit Presentation'), "Escape",
                         _("Hide the presentation screen"), screen.hide),
                 #('Pause', gtk.STOCK_MEDIA_PAUSE, None, None,
                 #        _('Pause a timed slide.'), screen.pause),
@@ -500,7 +512,6 @@ class Screen(exposong._hook.Menu):
                 ('Freeze', 'screen-freeze', _('_Freeze'), None ,
                         _("Freeze Screen"), 4),
                 ],0, screen._on_screen_state_changed)
-
         
         uimanager.insert_action_group(cls._actions, -1)
         uimanager.add_ui_from_string("""
@@ -521,12 +532,7 @@ class Screen(exposong._hook.Menu):
         # unmerge_menu not implemented, because we will never uninstall this as
         # a module.
         
-        cls._actions.get_action("Normal").set_sensitive(False)
-        cls._actions.get_action("Background").set_sensitive(False)
-        cls._actions.get_action("Logo").set_sensitive(False)
-        cls._actions.get_action("Black Screen").set_sensitive(False)
-        cls._actions.get_action("Freeze").set_sensitive(False)
-        cls._actions.get_action("Hide").set_sensitive(False)
+        cls._set_menu_items_disabled(screen)
     
     @classmethod
     def get_button_bar_main(cls):
