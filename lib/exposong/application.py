@@ -98,13 +98,13 @@ class Main (gtk.Window):
         schedule_scroll = gtk.ScrolledWindow()
         schedule_scroll.add(schedlist.schedlist)
         schedule_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        self.win_lft.pack1(schedule_scroll, True, True)
+        self.win_lft.pack1(schedule_scroll, False, False)
         
         #### Presentation List
         preslist_scroll = gtk.ScrolledWindow()
         preslist_scroll.add(preslist.preslist)
         preslist_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        self.win_lft.pack2(preslist_scroll, True, True)
+        self.win_lft.pack2(preslist_scroll, False, False)
         left_vbox.pack_start(self.win_lft, True, True)
         left_vbox.pack_start(presfilter.presfilter, False, True, 2)
         
@@ -123,7 +123,7 @@ class Main (gtk.Window):
         slide_v = gtk.VBox()
         slide_v.pack_start(slidelist.slide_scroll, True, True)
         slide_v.pack_start(slidelist.slidelist.get_slide_control_bar(), False, True, 3)
-        self.win_h.pack2(slide_v)
+        self.win_h.pack2(slide_v, False, False)
         win_h_mn.pack_start(self.win_h, True, True, 0)
         
         win_h_mn.pack_start(self._pane_right(), False, True, 10)
