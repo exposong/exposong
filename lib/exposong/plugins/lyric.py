@@ -870,13 +870,17 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
     
     def get_slide_list(self, editing=False):
         'Get the slide list.'
-        if config.get("general", "title_slide") == "True" and not editing:
+        return _abstract.Presentation.get_slide_list(self)
+        
+    def get_slide_list_with_title(self):
+        if config.get("general", "title_slide") == "True":
             verse = openlyrics.Verse()
             verse.name = _("Title")
             slide = self.Slide(self, verse)
             slide._set_lines(self.get_title())
             return ((slide, slide.get_markup()),) + _abstract.Presentation.get_slide_list(self)
-        return _abstract.Presentation.get_slide_list(self)
+        else:
+            self.get_slide_list()
     
     def get_print_markup(self):
         "Return the presentation markup for printing."
@@ -896,12 +900,23 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
                         for s in self.song.props.songbooks))
         markup += "<span face='sans' weight='bold' size='x-small'>%s</span>\n"\
                  % "\n".join(info)
+        if self.song.props.verse_order:
+            markup += "\n"
+            verses = _("Order:")
+            for v in self.song.props.verse_order:
+                verses += " %s" %verse_names[v[0]]
+                if v[1:]:
+                    verses += " %s"%v[1:]
+                verses += ","
+            verses = verses.strip(",") #remove last comma
+            markup += "<span face='sans' size='x-small'>%s</span>" %verses
         markup += "\n\n"
         # Should this print the slides in order, or just the order list?
+        ##  I think the order list is ok. In Songbooks you also have each verse only once
         for slide in self.get_slide_list():
             markup += "<span weight='bold' face='sans' size='%%(fontsize)d'>%s</span>\n"\
                       % slide[0].get_title()
-            markup += "<span face='sans' size='%%(fontsize)d'>%s</span>\n\n"\
+            markup += "<span face='serif' size='%%(fontsize)d'>%s</span>\n\n"\
                       % slide[0].get_text()
         
         return markup

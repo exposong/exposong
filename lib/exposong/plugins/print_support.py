@@ -47,12 +47,21 @@ class Print(Plugin, exposong._hook.Menu):
     def __init__(self):
         pass
     
+    def _get_page_setup(self):
+        ps = gtk.PageSetup()
+        ps.set_left_margin(20, gtk.UNIT_MM)
+        ps.set_right_margin(20, gtk.UNIT_MM)
+        ps.set_top_margin(20, gtk.UNIT_MM)
+        ps.set_bottom_margin(20, gtk.UNIT_MM)
+        return ps
+    
     def print_presentation(self, *args):
         "Print a single presentation."
         if not exposong.preslist.preslist.get_active_item().can_print():
             # TODO Error Dialog
             return False
         print_op = gtk.PrintOperation()
+        print_op.set_default_page_setup(self._get_page_setup())
         print_op.set_n_pages(1)
         print_op.connect("draw_page", self._presentation_markup)
         res = print_op.run(gtk.PRINT_OPERATION_ACTION_PRINT_DIALOG, None)
@@ -85,6 +94,7 @@ class Print(Plugin, exposong._hook.Menu):
     def print_songlist(self, *args):
         "Print a list of all songs"
         print_op = gtk.PrintOperation()
+        print_op.set_default_page_setup(self._get_page_setup())
         print_op.set_n_pages(1)
         print_op.connect("draw_page", self._songlist_markup)
         res = print_op.run(gtk.PRINT_OPERATION_ACTION_PRINT_DIALOG, None)

@@ -61,7 +61,7 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
                 self.pres_type = pres.get_type()
                 pres.slide_column(self.column1, exposong.slidelist.slidelist)
             slist = self.get_model()
-            for slide in pres.get_slide_list():
+            for slide in pres.get_slide_list_with_title():
                 slist.append(slide)
             self.slide_order = pres.get_order()
             self.slide_order_index = -1
