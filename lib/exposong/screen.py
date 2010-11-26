@@ -119,10 +119,6 @@ class Screen(exposong._hook.Menu):
     def freeze(self, action=None):
         'Set the screen to be freezed'
         self._freeze = True
-        #self._actions.get_action("Background").set_sensitive(False)
-        #self._actions.get_action("Logo").set_sensitive(False)
-        #self._actions.get_action("Black Screen").set_sensitive(False)
-        #self._actions.get_action("Freeze").set_sensitive(False)
     
     def to_black(self, action=None):
         'Set the screen to black / show the presentation if screen was black'
@@ -130,7 +126,7 @@ class Screen(exposong._hook.Menu):
             self.show()
         else:
             self._black = True
-            self._background = self._logo = False
+            self._background = self._logo = self._freeze= False
             self.draw()
     
     def to_logo(self, action=None):
@@ -138,7 +134,7 @@ class Screen(exposong._hook.Menu):
         if config.has_option("screen", "logo") and \
                 os.path.isfile(config.get("screen", "logo")):
             self._logo = True
-            self._black = self._background = False
+            self._black = self._background = self._freeze = False
             self.draw()
         else:
             msg = _('No Logo set. Do you want to choose a Logo now?')
@@ -158,7 +154,7 @@ class Screen(exposong._hook.Menu):
     def to_background(self, action=None):
         'Hide text from the screen.'
         self._background = True
-        self._black = self._logo = False
+        self._black = self._logo = self._freeze = False
         self.draw()
     
     def hide(self, action=None):
@@ -484,25 +480,25 @@ class Screen(exposong._hook.Menu):
             ])
         cls._actions = gtk.ActionGroup('screen')
         cls._actions.add_actions([
-                ('Present', gtk.STOCK_MEDIA_PLAY, _('_Present'), "F5", None,
-                        screen.show),
-                ('Hide', gtk.STOCK_MEDIA_STOP, _('Hi_de'), "Escape", None,
-                        screen.hide),
+                ('Present', gtk.STOCK_MEDIA_PLAY, _('_Present'), "F5",
+                        _("Show the presentation screen"), screen.show),
+                ('Hide', gtk.STOCK_MEDIA_STOP, _('Hi_de'), "Escape",
+                        _("Hide the presentation screen"), screen.hide),
                 #('Pause', gtk.STOCK_MEDIA_PAUSE, None, None,
                 #        _('Pause a timed slide.'), screen.pause),
                 ])
         #cls._actions2 = gtk.ActionGroup('screen2')
         cls._actions.add_radio_actions([
-                ('Normal', 'screen-normal', _('_Normal State'), "F5", None,
-                        0),
-                ('Background', 'screen-bg', _('Bac_kground'), None, None,
-                        1),
-                ('Logo', 'screen-logo', _('Lo_go'), "<Ctrl>g", None,
-                        2),
-                ('Black Screen', 'screen-black', _('_Black Screen'), "b", None,
-                        3),
-                ('Freeze', 'screen-freeze', _('_Freeze'), None , None,
-                        4),
+                ('Normal', 'screen-normal', _('_Normal State'), "F5",
+                        _("Back to normal state"), 0),
+                ('Background', 'screen-bg', _('Bac_kground'), None,
+                        _("Show background"), 1),
+                ('Logo', 'screen-logo', _('Lo_go'), "<Ctrl>g",
+                        _("Show Logo"), 2),
+                ('Black Screen', 'screen-black', _('_Black Screen'), "b",
+                        _("Black Screen"), 3),
+                ('Freeze', 'screen-freeze', _('_Freeze'), None ,
+                        _("Freeze Screen"), 4),
                 ],0, screen._on_screen_state_changed)
 
         
