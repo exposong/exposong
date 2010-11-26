@@ -69,6 +69,7 @@ class Print(Plugin, exposong._hook.Menu):
         self.pangolayout = context.create_pango_layout()
         self.pangolayout.set_width(int(page_width))
         self.pangolayout.set_indent(-64 * pango.SCALE)
+        self.pangolayout.set_wrap(pango.WRAP_WORD)
         
         size = 12000
         self.pangolayout.set_markup(markup % {'fontsize': size})

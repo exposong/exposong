@@ -904,8 +904,6 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
             markup += "<span face='sans' size='%%(fontsize)d'>%s</span>\n\n"\
                       % slide[0].get_text()
         
-        #TODO: Handle too long lines
-        
         return markup
     
     @classmethod
