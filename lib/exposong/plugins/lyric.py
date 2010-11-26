@@ -898,10 +898,7 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
         if self.song.props.songbooks:
             info.append("; ".join(u'%s\xA0#%s' % (s.name, s.entry)
                         for s in self.song.props.songbooks))
-        markup += "<span face='sans' weight='bold' size='x-small'>%s</span>\n"\
-                 % "\n".join(info)
         if self.song.props.verse_order:
-            markup += "\n"
             verses = _("Order:")
             for v in self.song.props.verse_order:
                 verses += " %s" %verse_names[v[0]]
@@ -909,7 +906,9 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
                     verses += " %s"%v[1:]
                 verses += ","
             verses = verses.strip(",") #remove last comma
-            markup += "<span face='sans' size='x-small'>%s</span>" %verses
+            info.append(verses)
+        markup += "<span face='sans' weight='bold' size='x-small'>%s</span>\n"\
+                 % "\n".join(info)
         markup += "\n\n"
         # Should this print the slides in order, or just the order list?
         ##  I think the order list is ok. In Songbooks you also have each verse only once
