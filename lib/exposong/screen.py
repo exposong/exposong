@@ -498,15 +498,15 @@ class Screen(exposong._hook.Menu):
         #cls._actions2 = gtk.ActionGroup('screen2')
         cls._actions.add_radio_actions([
                 ('Normal', 'screen-normal', _('_Normal State'), "F5",
-                        _("Back to normal state"), 0),
+                        _("Show the screen normally."), 0),
                 ('Background', 'screen-bg', _('Bac_kground'), None,
-                        _("Show background"), 1),
+                        _("Show only the background."), 1),
                 ('Logo', 'screen-logo', _('Lo_go'), "<Ctrl>g",
-                        _("Show Logo"), 2),
+                        _("Display the logo."), 2),
                 ('Black Screen', 'screen-black', _('_Black Screen'), "b",
-                        _("Black Screen"), 3),
+                        _("Show a black screen."), 3),
                 ('Freeze', 'screen-freeze', _('_Freeze'), None ,
-                        _("Freeze Screen"), 4),
+                        _("Freeze the screen."), 4),
                 ],0, screen._on_screen_state_changed)
         
         uimanager.insert_action_group(cls._actions, -1)
