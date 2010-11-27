@@ -156,6 +156,8 @@ class Main (gtk.Window):
         "Called when ExpoSong is fully loaded."
         gobject.timeout_add(200, splash.splash.destroy)
         self.show_all()
+        # Prepares all button visibility by hiding the screen.
+        screen.screen.hide()
         statusbar.statusbar.output(_("Ready"))
         exposong.log.info('Ready.')
         exampledata.exampledata.check_presentations(self)
@@ -169,7 +171,6 @@ class Main (gtk.Window):
         vbox.pack_start(gtk.VSeparator(), False, True, 10)
         exposong.log.debug("Rendering Main Buttons")
         vbox.pack_start(screen.screen.get_button_bar_main(), False, False, 0)
-        screen.screen.set_hide_action_visible(False)
         
         exposong.log.debug("Rendering Preview")
         # Wrap the pres_preview it so that the aspect ratio is kept

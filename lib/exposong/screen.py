@@ -159,8 +159,8 @@ class Screen(exposong._hook.Menu):
     
     def hide(self, action=None):
         'Remove the presentation screen from view.'
-        self._actions.get_action("Hide").set_property("visible", False)
-        self._actions.get_action("Present").set_property("visible", True)
+        self._actions.get_action("Present").set_visible(True)
+        self._actions.get_action("Hide").set_visible(False)
         self._background = self._black = self._logo = self._freeze = False
         self.window.hide()
         self._set_menu_items_disabled()
@@ -168,8 +168,8 @@ class Screen(exposong._hook.Menu):
     def show(self, *args):
         'Show the presentation screen.'
         exposong.log.info('Showing the presentation screen.')
-        self._actions.get_action("Present").set_property("visible", False)
-        self._actions.get_action("Hide").set_property("visible", True)
+        self._actions.get_action("Hide").set_visible(True)
+        self._actions.get_action("Present").set_visible(False)
         self._background = self._black = self._logo = self._freeze = False
         self.window.show_all()
         self._set_menu_items_disabled()
@@ -453,10 +453,6 @@ class Screen(exposong._hook.Menu):
         elif action == 'Freeze':
             screen.freeze()
     
-    def set_hide_action_visible(self, visible):
-        'Activates or deactivates the Hide action'
-        self._actions.get_action('Hide').set_property("visible", visible)
-    
     def _set_menu_items_disabled(self):
         'Disable buttons if the presentation is not shown.'
         enabled = self.is_viewable()
@@ -502,15 +498,15 @@ class Screen(exposong._hook.Menu):
         #cls._actions2 = gtk.ActionGroup('screen2')
         cls._actions.add_radio_actions([
                 ('Normal', 'screen-normal', _('_Normal State'), "F5",
-                        _("Back to normal state"), 0),
+                        _("Show the screen normally."), 0),
                 ('Background', 'screen-bg', _('Bac_kground'), None,
-                        _("Show background"), 1),
+                        _("Show only the background."), 1),
                 ('Logo', 'screen-logo', _('Lo_go'), "<Ctrl>g",
-                        _("Show Logo"), 2),
+                        _("Display the logo."), 2),
                 ('Black Screen', 'screen-black', _('_Black Screen'), "b",
-                        _("Black Screen"), 3),
+                        _("Show a black screen."), 3),
                 ('Freeze', 'screen-freeze', _('_Freeze'), None ,
-                        _("Freeze Screen"), 4),
+                        _("Freeze the screen."), 4),
                 ],0, screen._on_screen_state_changed)
         
         uimanager.insert_action_group(cls._actions, -1)

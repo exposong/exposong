@@ -877,7 +877,7 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
             slide._set_lines(self.get_title())
             return ((slide, slide.get_markup()),) + _abstract.Presentation.get_slide_list(self)
         else:
-            self.get_slide_list()
+            return self.get_slide_list()
     
     def get_print_markup(self):
         "Return the presentation markup for printing."
