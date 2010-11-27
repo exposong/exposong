@@ -159,8 +159,8 @@ class Screen(exposong._hook.Menu):
     
     def hide(self, action=None):
         'Remove the presentation screen from view.'
-        self._actions.get_action("Hide").set_property("visible", False)
-        self._actions.get_action("Present").set_property("visible", True)
+        self._actions.get_action("Present").set_visible(True)
+        self._actions.get_action("Hide").set_visible(False)
         self._background = self._black = self._logo = self._freeze = False
         self.window.hide()
         self._set_menu_items_disabled()
@@ -168,8 +168,8 @@ class Screen(exposong._hook.Menu):
     def show(self, *args):
         'Show the presentation screen.'
         exposong.log.info('Showing the presentation screen.')
-        self._actions.get_action("Present").set_property("visible", False)
-        self._actions.get_action("Hide").set_property("visible", True)
+        self._actions.get_action("Hide").set_visible(True)
+        self._actions.get_action("Present").set_visible(False)
         self._background = self._black = self._logo = self._freeze = False
         self.window.show_all()
         self._set_menu_items_disabled()
@@ -452,10 +452,6 @@ class Screen(exposong._hook.Menu):
             screen.to_black()
         elif action == 'Freeze':
             screen.freeze()
-    
-    def set_hide_action_visible(self, visible):
-        'Activates or deactivates the Hide action'
-        self._actions.get_action('Hide').set_property("visible", visible)
     
     def _set_menu_items_disabled(self):
         'Disable buttons if the presentation is not shown.'
