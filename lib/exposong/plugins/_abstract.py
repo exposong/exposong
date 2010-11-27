@@ -377,6 +377,13 @@ class Presentation:
         'Get the slide list.'
         return tuple( (sl, sl.get_markup(editing)) for sl in self.slides)
     
+    def get_slide_list_with_title(self):
+        'Get the slide list with a title if available.'
+        return self.get_slide_list()
+    
+    def get_order_string(self):
+        return ""
+    
     def get_print_markup(self):
         "Return the presentation markup for printing."
         return NotImplemented
