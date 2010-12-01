@@ -23,11 +23,13 @@ import os
 from gtk.gdk import pixbuf_new_from_file as pb_new
 from gtk.gdk import pixbuf_new_from_file_at_size as pb_new_at_size
 
+import exposong.application
 import exposong.prefs
 import exposong.slidelist
-import exposong.application
+import exposong.theme
 from exposong.config import config
-from exposong import RESOURCE_PATH
+from exposong import RESOURCE_PATH, DATA_PATH
+import exposong.notify
 
 
 def c2dec(color):
@@ -37,7 +39,7 @@ def c2dec(color):
         return color / 65535.0
 
 screen = None # will be the instance variable for Screen once Main runs
-preview_height = 145
+PREV_HEIGHT = 145
 
 class Screen(exposong._hook.Menu):
     '''
@@ -47,18 +49,18 @@ class Screen(exposong._hook.Menu):
     def __init__(self):
         self._black = self._background = self._logo  = self._freeze = False
         self.bg_dirty = False
-        self._notification = None
         self.bg_img = {}
+        self.theme = exposong.theme.Theme(os.path.join(DATA_PATH,'theme','exposong.xml'))
         
         self.window = gtk.Window(gtk.WINDOW_POPUP)
         
         self.pres = gtk.DrawingArea()
-        self.pres.connect("expose-event", self.expose)
+        self.pres.connect("expose-event", self._expose_pres)
         #self.pres.set_redraw_on_allocate(False) #This may fix the compiz redraw problem.
         self.window.add(self.pres)
         
         self.preview = gtk.DrawingArea()
-        self.preview.connect("expose-event", self.expose)
+        self.preview.connect("expose-event", self._expose_preview)
         
         #self.draw()
     
@@ -100,8 +102,7 @@ class Screen(exposong._hook.Menu):
         self.window.move(geometry[0], geometry[1])
         self.window.resize(geometry[2], geometry[3])
         self.aspect = float(geometry[2])/geometry[3]
-        self.preview.set_size_request(int(preview_height*self.aspect),
-                                      preview_height)
+        self.preview.set_size_request(int(PREV_HEIGHT*self.aspect), PREV_HEIGHT)
         self._size = geometry[2:4]
     
     def get_size(self):
@@ -177,18 +178,17 @@ class Screen(exposong._hook.Menu):
         exposong.slidelist.slidelist.grab_focus()
         exposong.slidelist.slidelist.reset_timer()
     
-    def expose(self, widget, event):
-        'Redraw `widget`.'
-        self._draw(widget)
+    def _expose_pres(self, widget, event):
+        'Redraw the presentation screen.'
+        self._draw(self.pres)
+    
+    def _expose_preview(self, widget, event):
+        'Redraw the preview widget.'
+        self._draw(self.preview)
     
     def set_dirty(self, dirty=True):
         'Reload the background image if necessary.'
         self.bg_dirty = dirty
-    
-    def notify(self, text = None):
-        'Put up notification text on the screen.'
-        self._notification = text
-        self.draw()
     
     def is_viewable(self):
         state = self.pres.window and self.pres.window.is_viewable()
@@ -202,125 +202,29 @@ class Screen(exposong._hook.Menu):
             not (self._black or self._logo or self._background or self._freeze)
                 
     
-    def _set_background(self, widget, ccontext = None, bounds = None):
-        'Set the background of `widget` to a color or image.'
-        if not widget.window:
-            return False
-        
-        if ccontext is None:
-            ccontext = widget.window.cairo_create()
-        if bounds is None:
-            bounds = widget.window.get_size()
-        
-        if self._black and widget is self.pres:
-            bgtype = 'color'
-            bgcolor1 = bgcolor2 = (0, 0, 0)
-        elif self._logo and widget is self.pres:
-            if not hasattr(self,"_logo_pbuf"):
-                try:
-                    self._logo_pbuf = pb_new_at_size(
-                            config.get("screen", "logo"), int(bounds[0]/1.5),
-                            int(bounds[1]/1.5))
-                except gobject.GError:
-                    exposong.log.error('Could not open logo "%s".',
-                                       config.get('screen', 'logo'))
-                    self._logo_pbuf = None
-            bg = c2dec(config.getcolor("screen", "logo_bg"))
-            ccontext.set_source_rgb(bg[0], bg[1], bg[2])
-            ccontext.paint()
-            if self._logo_pbuf <> None:
-                ccontext.set_source_pixbuf(self._logo_pbuf,
-                                           (bounds[0]-self._logo_pbuf.get_width())/2,
-                                           (bounds[1]-self._logo_pbuf.get_height())/2)
-                ccontext.paint()
-            return
-        else:
-            bgtype = config.get("screen", "bg_type")
-            bgimage = config.get("screen", "bg_image")    
-            bgcolor1 = config.getcolor("screen", "bg_color_1")
-            bgcolor2 = config.getcolor("screen", "bg_color_2")
-        
-        if bgtype == "image":
-            if bgimage == "":
-                pass
-            bgkey = str(bounds[0])+'x'+str(bounds[1])
-            try:
-                if self.bg_dirty or bgkey not in self.bg_img:
-                    pixbuf = pb_new(bgimage)
-                    self.bg_img[bgkey] = pixbuf.scale_simple(bounds[0],
-                                                             bounds[1],
-                                                             gtk.gdk.INTERP_BILINEAR)
-            except gobject.GError:
-                exposong.log.error('Could not open background file "%s".', bgimage)
-                if hasattr(self, 'bg_img') and bgkey in self.bg_img:
-                    del self.bg_img[bgkey]
-                config.set("screen", "bg_image", "")
-                config.set("screen", "bg_type", "color")
-                exposong.bgselect.bgselect.set_background_to_color()
-            else:
-                ccontext.set_source_pixbuf(self.bg_img[bgkey], 0, 0)
-                ccontext.paint()
-                return
-            finally:
-                self.bg_dirty = False
-        
-        elif bgtype == 'color':
-            color = (c2dec(bgcolor1), c2dec(bgcolor2))
-        
-            if len(color) >= 3 and isinstance(color[0], (float, int)):
-                # Draw a solid color
-                ccontext.set_source_rgb(color[0], color[1], color[2])
-                ccontext.paint()
-            elif isinstance(color[0], tuple):
-                # Draw a gradiant
-                if config.get("screen", "bg_angle") == u"\u2193": #Down
-                    gr_x1 = gr_y1 = gr_x2 = 0
-                    gr_y2 = bounds[1]
-                elif config.get("screen", "bg_angle") == u'\u2199': #Down-Left
-                    gr_x2 = gr_y1 = 0
-                    (gr_x1, gr_y2) = bounds
-                elif config.get("screen", "bg_angle") == u'\u2192': #Right
-                    gr_x1 = gr_y1 = gr_y2 = 0
-                    gr_x2 = bounds[0]
-                else: # Down-Right
-                    gr_x1 = gr_y1 = 0
-                    (gr_x2, gr_y2) = bounds
-                gradient = cairo.LinearGradient(gr_x1, gr_y1, gr_x2, gr_y2)
-                for i in range(len(color)):
-                    gradient.add_color_stop_rgb(1.0*i/(len(color)-1), color[i][0],
-                            color[i][1], color[i][2])
-                ccontext.rectangle(0,0, bounds[0], bounds[1])
-                ccontext.set_source(gradient)
-                ccontext.fill()
-            else:
-                exposong.log.error('_set_background: Incorrect color `%s`.',
-                    repr(color))
-    
     def _draw(self, widget):
         'Render `widget`.'
         if not widget.window or not widget.window.is_viewable():
             return False
         
-        ccontext = widget.window.cairo_create()
-        screenW, screenH = widget.window.get_size()
         if self.pres.window and self.pres.window.get_size() <> self._size:
             exposong.log.error('The screen sizes are inconsistent. '
                                + 'Screen: "%s"; Stored: "%s".',
                                self.pres.window.get_size(), self._size)
             self._size = self.pres.window.get_size()
+        
+        ccontext = widget.window.cairo_create()
+        bounds = widget.window.get_size()
         if widget is self.preview:
-            win_sz = None
             if self.pres.window:
                 #Scale if the presentation window size is available
-                win_sz = self.pres.window.get_size()
+                bounds = self.pres.window.get_size()
             elif self._size:
-                win_sz = self._size
-            if win_sz:
-                width = int(float(preview_height)*win_sz[0]/win_sz[1])
-                screenW = screenW*win_sz[0]/width
-                screenH = screenH*win_sz[1]/preview_height
-                ccontext.scale(float(width)/win_sz[0],
-                               float(preview_height)/win_sz[1])
+                bounds = self._size
+            if bounds:
+                width = int(float(PREV_HEIGHT)*bounds[0]/bounds[1])
+                ccontext.scale(float(width)/bounds[0],
+                               float(PREV_HEIGHT)/bounds[1])
         elif widget is self.pres:
             self.preview.queue_draw()
         
@@ -329,112 +233,11 @@ class Screen(exposong._hook.Menu):
         if widget is self.pres and \
                 (self._background or self._black or self._logo) or not slide:
             #When there's no text to render, just draw the background
-            self._set_background(widget, ccontext, (screenW, screenH))
+            self.theme.render(ccontext, bounds, None)
         else:
+            self.theme.render(ccontext, bounds, slide)
+        exposong.notify.notify.draw(ccontext, bounds)
             
-            if slide.draw(ccontext, (screenW, screenH)) is not NotImplemented:
-                return True
-            
-            self._set_background(widget, ccontext, (screenW, screenH))
-            
-            txcol = c2dec(config.getcolor("screen", "text_color"))
-            screenCenterY = screenH/2
-            # Header text
-            # TODO
-            
-            # Footer text
-            ftext = slide.footer_text()
-            if ftext is not NotImplemented:
-                ftext = str(ftext)
-                if isinstance(ftext, (unicode, str)) and len(ftext):
-                    layout = ccontext.create_layout()
-                    layout.set_text(ftext)
-                    layout.set_alignment(pango.ALIGN_CENTER)
-                    layout.set_width(int(screenW*pango.SCALE * 0.97))
-                    
-                    layout.set_font_description(pango.FontDescription(
-                                        "Sans Bold "+str(int(screenH/54.0))))
-                    
-                    footer_height = layout.get_pixel_size()[1]
-                    
-                    ccontext.set_source_rgba(txcol[0], txcol[1], txcol[2], 1.0)
-                    ccontext.move_to(screenW * 0.015, screenH - footer_height)
-                    ccontext.show_layout(layout)
-                    
-                    screenH -= footer_height
-                    screenCenterY -= footer_height/2
-                    
-            # Body Text
-            layout = ccontext.create_layout()
-            
-            size = 16
-            layout.set_text(str(slide.body_text()))
-            layout.set_alignment(pango.ALIGN_CENTER)
-            layout.set_width(int(screenW*pango.SCALE * 0.97))
-            
-            layout.set_font_description(pango.FontDescription(
-                                        "Sans Bold "+str(size)))
-            
-            min_sz = 0
-            max_sz = config.getfloat("screen", "max_font_size")
-            
-            # Loop through until the text is between 78% of the height and 94%,
-            # or until we get a number that is not a multiple of 4 (2,6,10,14,
-            # etc) to make it simpler...
-            # TODO Double check that it doesn't overflow
-            while True:
-                if layout.get_pixel_size()[0] > screenW*0.97 \
-                        or layout.get_pixel_size()[1] > screenH*0.94:
-                    max_sz = size
-                    size = (min_sz + max_sz) / 2
-                elif size % 4 != 0 or max_sz - min_sz < 3:
-                    break
-                elif layout.get_pixel_size()[1] < screenH*0.78:
-                    min_sz = size
-                    if(max_sz):
-                        size = (min_sz + max_sz) / 2
-                    else:
-                        size = size * 2
-                else:
-                    break
-                layout.set_font_description(pango.FontDescription(
-                                            "Sans Bold "+str(size)))
-            
-            if config.getcolor("screen", "text_shadow"):
-                shcol = c2dec(config.getcolor("screen", "text_shadow"))
-                ccontext.set_source_rgba(shcol[0], shcol[1], shcol[2], shcol[3])
-                ccontext.move_to(screenW * 0.015 + size*0.1,
-                        screenCenterY - layout.get_pixel_size()[1]/2.0 + size*0.1)
-                ccontext.show_layout(layout)
-            ccontext.set_source_rgba(txcol[0], txcol[1], txcol[2], 1.0)
-            ccontext.move_to(screenW * 0.015,screenCenterY - layout.get_pixel_size()[1]/2.0)
-            ccontext.show_layout(layout)
-        
-        #Draw notification
-        if widget is self.pres and self._notification:
-            layout = ccontext.create_layout()
-            layout.set_text(self._notification)
-            
-            notify_sz = int(screenH/12.0)
-            layout.set_font_description(pango.FontDescription(
-                                        "Sans Bold "+str(notify_sz)))
-            while layout.get_pixel_size()[0] > screenW*0.6:
-                notify_sz = int(notify_sz*0.89)
-                layout.set_font_description(pango.FontDescription(
-                                            "Sans Bold "+str(notify_sz)))
-            sbounds = widget.window.get_size()
-            nbounds = layout.get_pixel_size()
-            pad = notify_sz/14.0
-            ccontext.rectangle(sbounds[0]-nbounds[0]-pad*2,
-                               sbounds[1]-nbounds[1]-pad*2,
-                               sbounds[0], sbounds[1])
-            ccontext.set_source_rgb(config.getcolor("screen", "notify_bg")[0],
-                                    config.getcolor("screen", "notify_bg")[1],
-                                    config.getcolor("screen", "notify_bg")[2])
-            ccontext.fill()
-            ccontext.set_source_rgb(1.0, 1.0, 1.0)
-            ccontext.move_to(sbounds[0]-nbounds[0]-pad, sbounds[1]-nbounds[1]-pad)
-            ccontext.show_layout(layout)
         return True
     
     def _on_screen_state_changed(self, action, current):

@@ -15,13 +15,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import gtk
+import pango
 
-import exposong.screen
 import exposong.application
+import exposong.screen
+from exposong.config import config
 
 class Notify(gtk.HBox):
     def __init__(self):
         gtk.HBox.__init__(self)
+        self._text = ""
         
         self.notify = gtk.Entry(45)
         self._handler_changed = self.notify.connect_after("changed",
@@ -62,6 +65,33 @@ class Notify(gtk.HBox):
             notify_save.connect("clicked", self._on_save)
             self.pack_start(notify_save, False, True, 0)
     
+    def draw(self, ccontext, bounds):
+        if not self._text:
+            return
+        layout = ccontext.create_layout()
+        w,h = bounds
+        layout.set_text(self._text)
+        
+        sz = int(h / 12.0)
+        layout.set_font_description(pango.FontDescription(
+                                    "Sans Bold " + str(sz)))
+        while layout.get_pixel_size()[0] > w * 0.6:
+            sz = int(sz * 0.89)
+            layout.set_font_description(pango.FontDescription(
+                                        "Sans Bold "+str(sz)))
+        nbounds = layout.get_pixel_size()
+        pad = sz/14.0
+        ccontext.rectangle(w-nbounds[0]-pad*2,
+                           h-nbounds[1]-pad*2,
+                           w, h)
+        ccontext.set_source_rgb(config.getcolor("screen", "notify_bg")[0],
+                                config.getcolor("screen", "notify_bg")[1],
+                                config.getcolor("screen", "notify_bg")[2])
+        ccontext.fill()
+        ccontext.set_source_rgb(1.0, 1.0, 1.0)
+        ccontext.move_to(w-nbounds[0]-pad, h-nbounds[1]-pad)
+        ccontext.show_layout(layout)
+    
     def _on_icon_pressed(self, widget, icon, mouse_button):
         """
         Emit the terms-changed signal without any time out when the clear
@@ -85,13 +115,15 @@ class Notify(gtk.HBox):
         'The user clicked save.'
         exposong.log.info('Setting notification to "%s".',
                           self.notify.get_text())
-        exposong.screen.screen.notify(self.notify.get_text())
+        self._text = self.notify.get_text()
+        exposong.screen.screen.draw()
     
     def _on_clear(self, *args):
         'The user clicked clear.'
         exposong.log.info('Clearing notification.')
         self.notify.set_text("")
-        exposong.screen.screen.notify()
+        self._text = ""
+        exposong.screen.screen.draw()
     
     def _check_style(self):
         """

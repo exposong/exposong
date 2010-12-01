@@ -26,7 +26,6 @@ from xml.dom import minidom
 import exposong.about
 import exposong.plugins
 import exposong.plugins._abstract
-import exposong.bgselect
 import exposong.notify
 import exposong._hook
 import exposong.help
@@ -183,13 +182,12 @@ class Main (gtk.Window):
         exposong.log.debug("Rendering Secondary Buttons")
         vbox.pack_start(screen.screen.get_button_bar_secondary(), False, False, 10)
         
-        #TODO Move bgselect to a popup menu
-        exposong.log.debug("Rendering BGSelect")
-        frame = gtk.Frame()
-        frame.set_label(_("Background Select"))
-        exposong.bgselect.bgselect = exposong.bgselect.BGSelect()
-        frame.add(exposong.bgselect.bgselect)
-        vbox.pack_start(frame, False, False, 0)
+        ##TODO Theme Select
+        #frame = gtk.Frame()
+        #frame.set_label(_("Theme"))
+        #exposong.bgselect.bgselect = exposong.bgselect.BGSelect()
+        #frame.add(exposong.bgselect.bgselect)
+        #vbox.pack_start(frame, False, False, 0)
         
         exposong.log.debug("Rendering Notification")
         frame = gtk.Frame()

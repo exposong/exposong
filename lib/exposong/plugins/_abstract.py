@@ -23,6 +23,7 @@ from xml.parsers.expat import ExpatError
 
 from exposong.glob import *
 from exposong import DATA_PATH
+from exposong import theme
 import exposong.application
 import exposong.schedlist
 
@@ -69,13 +70,22 @@ class Presentation:
         def get_text(self):
             'Get the text for the slide.'
             return self.text
-    
+        
         def get_markup(self, editing=False):
             'Get the text for the slide selection.'
             if self.title:
                 return "<b>" + self.get_title(editing) + "</b>\n" + self.text
             else:
                 return self.text
+        
+        def get_body(self):
+            'Return a list of renderable theme items.'
+            return [theme.Text(self.get_text(), align=theme.CENTER, 
+                    valign=theme.MIDDLE)]
+        
+        def get_footer(self):
+            'Return a list of renderable theme items.'
+            return []
         
         def to_node(self, document, node):
             'Populate the node element'

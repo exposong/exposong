@@ -32,7 +32,7 @@ import exposong._hook
 import undobuffer
 from exposong.glob import *
 from exposong import RESOURCE_PATH, DATA_PATH
-from exposong import gui
+from exposong import gui, theme
 from exposong.plugins import Plugin, _abstract, text
 from exposong.prefs import config
 from openlyrics import openlyrics
@@ -136,6 +136,11 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
                                       self.title[1:])
             else:
                 return self.title
+        
+        def get_footer(self):
+            'Return a list of renderable theme items.'
+            return [theme.Text(self.footer_text(), align=theme.CENTER, 
+                    valign=theme.MIDDLE)]
         
         def footer_text(self):
             'Draw text on the footer.'
