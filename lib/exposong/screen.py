@@ -119,19 +119,25 @@ class Screen(exposong._hook.Menu):
     
     def freeze(self, action=None):
         'Set the screen to be freezed'
+        if self._freeze:
+            self.show()
+            return
         self._freeze = True
     
     def to_black(self, action=None):
         'Set the screen to black / show the presentation if screen was black'
         if self._black:
             self.show()
-        else:
-            self._black = True
-            self._background = self._logo = self._freeze= False
-            self.draw()
+            return
+        self._black = True
+        self._background = self._logo = self._freeze= False
+        self.draw()
     
     def to_logo(self, action=None):
         'Set the screen to the ExpoSong logo or a user-defined one.'
+        if self._logo:
+            self.show()
+            return
         if config.has_option("screen", "logo") and \
                 os.path.isfile(config.get("screen", "logo")):
             self._logo = True
@@ -154,6 +160,9 @@ class Screen(exposong._hook.Menu):
     
     def to_background(self, action=None):
         'Hide text from the screen.'
+        if self._background:
+            self.show()
+            return
         self._background = True
         self._black = self._logo = self._freeze = False
         self.draw()
@@ -259,7 +268,6 @@ class Screen(exposong._hook.Menu):
     def _set_menu_items_disabled(self):
         'Disable buttons if the presentation is not shown.'
         enabled = self.is_viewable()
-        self._actions.get_action("Normal").set_sensitive(enabled)
         self._actions.get_action("Background").set_sensitive(enabled)
         self._actions.get_action("Logo").set_sensitive(enabled)
         self._actions.get_action("Black Screen").set_sensitive(enabled)
@@ -271,8 +279,6 @@ class Screen(exposong._hook.Menu):
         'Merge new values with the uimanager.'
         global screen
         factory = gtk.IconFactory()
-        factory.add('screen-normal',gtk.IconSet(pb_new(
-                    os.path.join(RESOURCE_PATH,'pres_text.png'))))
         factory.add('screen-bg',gtk.IconSet(pb_new(
                     os.path.join(RESOURCE_PATH,'screen-bg.png'))))
         factory.add('screen-black',gtk.IconSet(pb_new(
@@ -283,10 +289,9 @@ class Screen(exposong._hook.Menu):
                     os.path.join(RESOURCE_PATH,'screen-logo.png'))))
         factory.add_default()
         gtk.stock_add([
-            ("screen-normal",_("_Normal"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
+            ("screen-black",_("_Black"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
             ("screen-bg",_("Bac_kground"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
             ("screen-logo",_("Lo_go"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
-            ("screen-black",_("_Black"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
             ("screen-freeze",_("_Freeze"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
             ])
         cls._actions = gtk.ActionGroup('screen')
@@ -299,18 +304,16 @@ class Screen(exposong._hook.Menu):
                 #        _('Pause a timed slide.'), screen.pause),
                 ])
         #cls._actions2 = gtk.ActionGroup('screen2')
-        cls._actions.add_radio_actions([
-                ('Normal', 'screen-normal', _('_Normal State'), "F5",
-                        _("Show the screen normally."), 0),
-                ('Background', 'screen-bg', _('Bac_kground'), None,
-                        _("Show only the background."), 1),
-                ('Logo', 'screen-logo', _('Lo_go'), "<Ctrl>g",
-                        _("Display the logo."), 2),
+        cls._actions.add_toggle_actions([
                 ('Black Screen', 'screen-black', _('_Black Screen'), "b",
-                        _("Show a black screen."), 3),
+                        _("Show a black screen."), screen.to_black),
+                ('Background', 'screen-bg', _('Bac_kground'), None,
+                        _("Show only the background."), screen.to_background),
+                ('Logo', 'screen-logo', _('Lo_go'), "<Ctrl>g",
+                        _("Display the logo."), screen.to_logo),
                 ('Freeze', 'screen-freeze', _('_Freeze'), None ,
-                        _("Freeze the screen."), 4),
-                ],0, screen._on_screen_state_changed)
+                        _("Freeze the screen."), screen.freeze),
+                ])
         
         uimanager.insert_action_group(cls._actions, -1)
         uimanager.add_ui_from_string("""
@@ -319,10 +322,9 @@ class Screen(exposong._hook.Menu):
                     <menuitem action="Present" position="bot" />
                     <menuitem action="Hide" position="bot" />
                     <menu action="pres-controls">
-                        <menuitem action="Normal" position="bot" />
+                        <menuitem action="Black Screen" position="bot" />
                         <menuitem action="Background" position="bot" />
                         <menuitem action="Logo" position="bot" />
-                        <menuitem action="Black Screen" position="bot" />
                         <menuitem action="Freeze" position="bot" />
                     </menu>
                 </menu>
@@ -357,14 +359,12 @@ class Screen(exposong._hook.Menu):
         # they are read-only style properties.
         tb.set_style(gtk.TOOLBAR_ICONS)
         tb.set_icon_size(gtk.ICON_SIZE_LARGE_TOOLBAR)
-        button = cls._actions.get_action('Normal').create_tool_item()
+        button = cls._actions.get_action('Black Screen').create_tool_item()
+        button.set_is_important(True)
         tb.add(button)
         button = cls._actions.get_action('Background').create_tool_item()
         tb.add(button)
         button = cls._actions.get_action('Logo').create_tool_item()
-        tb.add(button)
-        button = cls._actions.get_action('Black Screen').create_tool_item()
-        button.set_is_important(True)
         tb.add(button)
         button = cls._actions.get_action('Freeze').create_tool_item()
         tb.add(button)

@@ -257,10 +257,9 @@ class Main (gtk.Window):
                         <menuitem action="Present" position="bot" />
                         <menuitem action="Hide" position="bot" />
                         <menu action="pres-controls" position="bot">
-                            <menuitem action="Normal" position="bot" />
+                            <menuitem action="Black Screen" position="bot" />
                             <menuitem action="Background" position="bot" />
                             <menuitem action="Logo" position="bot" />
-                            <menuitem action="Black Screen" position="bot" />
                             <menuitem action="Freeze" position="bot" />
                         </menu>
                         <separator />
