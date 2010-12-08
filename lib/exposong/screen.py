@@ -130,6 +130,7 @@ class Screen(exposong._hook.Menu):
         self._actions.get_action("Present").set_visible(False)
         self.window.show_all()
         self._set_menu_items_disabled()
+        self._secondary_button_toggle()
         self.draw()
         exposong.slidelist.slidelist.grab_focus()
         exposong.slidelist.slidelist.reset_timer()
@@ -192,9 +193,11 @@ class Screen(exposong._hook.Menu):
         # TODO
         if widget is self.pres:
             if self._actions.get_action('Black Screen').get_active():
-                pass
+                self.theme.render_color(ccontext, bounds, '#000')
             elif self._actions.get_action('Logo').get_active():
-                pass
+                logoclr = gtk.gdk.Color(*config.getcolor('screen', 'logo_bg'))
+                self.theme.render_color(ccontext, bounds, logoclr.to_string())
+                self.__logo_img.draw(ccontext, bounds, None)
             elif self._actions.get_action('Background').get_active():
                 #When there's no text to render, just draw the background
                 self.theme.render(ccontext, bounds, None)
@@ -205,22 +208,6 @@ class Screen(exposong._hook.Menu):
             self.theme.render(ccontext, bounds, slide)
             
         return True
-    
-    def _on_screen_state_changed(self, action, current):
-        'Called when the screen changes to background, logo, black or freeze'
-        global screen
-        action = ('Normal', 'Background', 'Logo', 'Black Screen', 'Freeze' )\
-                [action.get_current_value()]
-        if action == 'Normal':
-            screen.show()
-        elif action == 'Background':
-            screen.to_background()
-        elif action == 'Logo':
-            screen.to_logo()
-        elif action == 'Black Screen':
-            screen.to_black()
-        elif action == 'Freeze':
-            screen.freeze()
     
     def _set_menu_items_disabled(self):
         'Disable buttons if the presentation is not shown.'
@@ -355,6 +342,17 @@ class Screen(exposong._hook.Menu):
         'Set the screen to the ExpoSong logo or a user-defined one.'
         if config.has_option("screen", "logo") and \
                 os.path.isfile(config.get("screen", "logo")):
+            # TODO should we resize the logo? If not, we need to add the
+            # feature to theme.Image
+            try:
+                if self.__logo_fl <> config.get("screen", "logo"):
+                    self.__logo_fl = config.get('screen', 'logo')
+                    self.__logo_img = exposong.theme.Image(self.__logo_fl,
+                            pos=[0.2, 0.2, 0.8, 0.8])
+            except AttributeError:
+                self.__logo_fl = config.get('screen', 'logo')
+                self.__logo_img = exposong.theme.Image(self.__logo_fl,
+                        pos=[0.2, 0.2, 0.8, 0.8])
             self._secondary_button_toggle(action)
         else:
             self._secondary_button_toggle(None)

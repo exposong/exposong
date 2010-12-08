@@ -53,7 +53,6 @@ TOP = -1
 MIDDLE = 0
 BOTTOM = 1
 
-ASPECT_NONE = False
 ASPECT_FIT = 1
 ASPECT_FILL = 2
 
@@ -107,6 +106,7 @@ class Theme(object):
     
     def render(self, ccontext, bounds, slide):
         "Render the theme to the screen."
+        self.render_color(ccontext, bounds, '#000')
         for bg in self.backgrounds:
             bg.draw(ccontext, bounds)
         if slide:
@@ -114,6 +114,16 @@ class Theme(object):
                 t.draw(ccontext, bounds, self.body)
             for t in slide.get_footer():
                 t.draw(ccontext, bounds, self.footer)
+    
+    @classmethod
+    def render_color(cls, ccontext, bounds, color):
+        "Render a solid color on the screen."
+        clr = gtk.gdk.color_parse(color)
+        solid = cairo.SolidPattern(clr.red / 65535.0, clr.green / 65535.0,
+                                   clr.blue / 65535.0)
+        ccontext.rectangle(0, 0, *bounds)
+        ccontext.set_source(solid)
+        ccontext.fill()
 
 
 class _Renderable(object):
@@ -404,7 +414,8 @@ class _RenderableSection(_Renderable):
     
     def draw(self, ccontext, bounds, section):
         "Render to a Cairo Context."
-        self._set_pos(section)
+        if section:
+            self._set_pos(section)
         _Renderable.draw(self, ccontext, bounds)
         self.rpos[0] += self.margin
         self.rpos[1] += self.margin
@@ -529,7 +540,7 @@ class Image(_RenderableSection):
 ##########################
 #### Helper functions ####
 
-def get_size(pb, size, aspect=ASPECT_NONE):
+def get_size(pb, size, aspect=None):
     """Gets the size according to the aspect ratio for a resized image."""
     if aspect == ASPECT_FIT:
         w, h = map(int, size)
@@ -545,12 +556,12 @@ def get_size(pb, size, aspect=ASPECT_NONE):
     else:
         return size
 
-def scale_image(pb, size, aspect=ASPECT_NONE):
+def scale_image(pb, size, aspect=None):
     """Scales the pixbuf (pb) to size.
     
     size:   [width, height]
     aspect: Any of the following:
-             * ASPECT_NONE - scales width and height individually
+             * None - scales width and height individually
              * ASPECT_FIT - size will be smaller
              * ASPECT_FILL - image will scale up
     """
