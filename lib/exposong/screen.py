@@ -47,7 +47,6 @@ class Screen(exposong._hook.Menu):
     '''
     
     def __init__(self):
-        self._black = self._background = self._logo  = self._freeze = False
         self.bg_dirty = False
         self.bg_img = {}
         self.theme = exposong.theme.Theme(os.path.join(DATA_PATH,'theme','exposong.xml'))
@@ -112,66 +111,15 @@ class Screen(exposong._hook.Menu):
     def draw(self):
         '''Redraw the presentation and preview screens.
            Draw preview only when freeze is active'''
-        if self._freeze or not self.is_viewable():
+        if self._actions.get_action('Freeze').get_active() or not self.is_viewable():
             self.preview.queue_draw()
         else:
             self.pres.queue_draw()
-    
-    def freeze(self, action=None):
-        'Set the screen to be freezed'
-        if self._freeze:
-            self.show()
-            return
-        self._freeze = True
-    
-    def to_black(self, action=None):
-        'Set the screen to black / show the presentation if screen was black'
-        if self._black:
-            self.show()
-            return
-        self._black = True
-        self._background = self._logo = self._freeze= False
-        self.draw()
-    
-    def to_logo(self, action=None):
-        'Set the screen to the ExpoSong logo or a user-defined one.'
-        if self._logo:
-            self.show()
-            return
-        if config.has_option("screen", "logo") and \
-                os.path.isfile(config.get("screen", "logo")):
-            self._logo = True
-            self._black = self._background = self._freeze = False
-            self.draw()
-        else:
-            msg = _('No Logo set. Do you want to choose a Logo now?')
-            dialog = gtk.MessageDialog(exposong.application.main, gtk.DIALOG_MODAL,
-                                       gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
-                                       msg)
-            dialog.set_title( _("Set Logo?") )
-            resp = dialog.run()
-            dialog.destroy()
-            if resp == gtk.RESPONSE_YES:
-                exposong.prefs.PrefsDialog(exposong.application.main)
-                if os.path.isfile(config.get("screen", "logo")):
-                    self.to_logo()
-            else:
-                self.to_background()
-    
-    def to_background(self, action=None):
-        'Hide text from the screen.'
-        if self._background:
-            self.show()
-            return
-        self._background = True
-        self._black = self._logo = self._freeze = False
-        self.draw()
     
     def hide(self, action=None):
         'Remove the presentation screen from view.'
         self._actions.get_action("Present").set_visible(True)
         self._actions.get_action("Hide").set_visible(False)
-        self._background = self._black = self._logo = self._freeze = False
         self.window.hide()
         self._set_menu_items_disabled()
     
@@ -180,7 +128,6 @@ class Screen(exposong._hook.Menu):
         exposong.log.info('Showing the presentation screen.')
         self._actions.get_action("Hide").set_visible(True)
         self._actions.get_action("Present").set_visible(False)
-        self._background = self._black = self._logo = self._freeze = False
         self.window.show_all()
         self._set_menu_items_disabled()
         self.draw()
@@ -207,9 +154,12 @@ class Screen(exposong._hook.Menu):
     
     def is_running(self):
         'If the presentation is visible and running (not black or background).'
-        return self.is_viewable() and \
-            not (self._black or self._logo or self._background or self._freeze)
-                
+        # TODO
+        return self.is_viewable() and not (
+                self._actions.get_action('Black Screen').get_active() or
+                self._actions.get_action('Logo').get_active() or
+                self._actions.get_action('Background').get_active() or
+                self._actions.get_action('Freeze').get_active())
     
     def _draw(self, widget):
         'Render `widget`.'
@@ -239,13 +189,20 @@ class Screen(exposong._hook.Menu):
         
         slide = exposong.slidelist.slidelist.get_active_item()
         
-        if widget is self.pres and \
-                (self._background or self._black or self._logo) or not slide:
-            #When there's no text to render, just draw the background
-            self.theme.render(ccontext, bounds, None)
+        # TODO
+        if widget is self.pres:
+            if self._actions.get_action('Black Screen').get_active():
+                pass
+            elif self._actions.get_action('Logo').get_active():
+                pass
+            elif self._actions.get_action('Background').get_active():
+                #When there's no text to render, just draw the background
+                self.theme.render(ccontext, bounds, None)
+            else:
+                self.theme.render(ccontext, bounds, slide)
+            exposong.notify.notify.draw(ccontext, bounds)
         else:
             self.theme.render(ccontext, bounds, slide)
-        exposong.notify.notify.draw(ccontext, bounds)
             
         return True
     
@@ -306,13 +263,16 @@ class Screen(exposong._hook.Menu):
         #cls._actions2 = gtk.ActionGroup('screen2')
         cls._actions.add_toggle_actions([
                 ('Black Screen', 'screen-black', _('_Black Screen'), "b",
-                        _("Show a black screen."), screen.to_black),
+                        _("Show a black screen."),
+                        screen._secondary_button_toggle),
                 ('Background', 'screen-bg', _('Bac_kground'), None,
-                        _("Show only the background."), screen.to_background),
+                        _("Show only the background."),
+                        screen._secondary_button_toggle),
                 ('Logo', 'screen-logo', _('Lo_go'), "<Ctrl>g",
                         _("Display the logo."), screen.to_logo),
                 ('Freeze', 'screen-freeze', _('_Freeze'), None ,
-                        _("Freeze the screen."), screen.freeze),
+                        _("Freeze the screen."),
+                        screen._secondary_button_toggle),
                 ])
         
         uimanager.insert_action_group(cls._actions, -1)
@@ -369,3 +329,45 @@ class Screen(exposong._hook.Menu):
         button = cls._actions.get_action('Freeze').create_tool_item()
         tb.add(button)
         return tb
+    
+    def _secondary_button_toggle(self, action=None):
+        'Set the screen to be freezed'
+        try:
+            if self.__block_toggle:
+                return
+        except Exception:
+            pass
+        self.__block_toggle = True
+        for nm in ('Freeze', 'Background', 'Logo', 'Black Screen'):
+            nmaction = self._actions.get_action(nm)
+            if nmaction == self._actions.get_action(nm) == 'Logo':
+                nmfunc = self.to_logo
+            else:
+                nmfunc = self._secondary_button_toggle
+            if action <> nmaction:
+                nmaction.set_active(False)
+            else:
+                self.show()
+        self.draw()
+        self.__block_toggle = False
+    
+    def to_logo(self, action=None):
+        'Set the screen to the ExpoSong logo or a user-defined one.'
+        if config.has_option("screen", "logo") and \
+                os.path.isfile(config.get("screen", "logo")):
+            self._secondary_button_toggle(action)
+        else:
+            self._secondary_button_toggle(None)
+            msg = _('No Logo set. Do you want to choose a Logo now?')
+            dialog = gtk.MessageDialog(exposong.application.main, gtk.DIALOG_MODAL,
+                                       gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
+                                       msg)
+            dialog.set_title( _("Set Logo?") )
+            resp = dialog.run()
+            dialog.destroy()
+            if resp == gtk.RESPONSE_YES:
+                exposong.prefs.PrefsDialog(exposong.application.main)
+                if os.path.isfile(config.get("screen", "logo")):
+                    self.to_logo()
+            else:
+                self.to_background()
