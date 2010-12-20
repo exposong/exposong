@@ -14,6 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+A widget to handle logged data for easy user access and filtering.
+"""
+
 import logging
 import gobject
 import gtk

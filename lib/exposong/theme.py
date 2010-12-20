@@ -121,7 +121,12 @@ class Theme(object):
         clr = gtk.gdk.color_parse(color)
         solid = cairo.SolidPattern(clr.red / 65535.0, clr.green / 65535.0,
                                    clr.blue / 65535.0)
-        ccontext.rectangle(0, 0, *bounds)
+        if len(bounds) == 2:
+            ccontext.rectangle(0, 0, *bounds)
+        elif len(bounds) == 4:
+            ccontext.rectangle(*bounds)
+        else:
+            raise Exception("`bounds` must have 2 or 4 arguments.")
         ccontext.set_source(solid)
         ccontext.fill()
 
@@ -149,7 +154,16 @@ class _Renderable(object):
     
     def draw(self, ccontext, bounds):
         "Render the background to the context."
-        self.rpos = map(_product, bounds*2, self.pos)
+        if len(bounds) == 2:
+            self.rpos = map(_product, bounds*2, self.pos)
+        elif len(bounds) == 4:
+            self.rpos = map(_product, bounds[-2:]*2, self.pos)
+            self.rpos[0] += bounds[0]
+            self.rpos[1] += bounds[1]
+            self.rpos[2] += bounds[0]
+            self.rpos[3] += bounds[1]
+        else:
+            raise Exception("`bounds` must have 2 or 4 elements")
 
 
 class _Element(object):

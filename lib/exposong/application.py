@@ -29,6 +29,7 @@ import exposong.plugins._abstract
 import exposong.notify
 import exposong._hook
 import exposong.help
+import exposong.themeselect
 from exposong import RESOURCE_PATH, DATA_PATH, SHARED_FILES
 from exposong import config, prefs, screen, schedlist, splash, exampledata
 from exposong import preslist, presfilter, slidelist, statusbar
@@ -183,11 +184,12 @@ class Main (gtk.Window):
         vbox.pack_start(screen.screen.get_button_bar_secondary(), False, False, 10)
         
         ##TODO Theme Select
-        #frame = gtk.Frame()
-        #frame.set_label(_("Theme"))
+        frame = gtk.Frame()
+        frame.set_label(_("Theme"))
         #exposong.bgselect.bgselect = exposong.bgselect.BGSelect()
-        #frame.add(exposong.bgselect.bgselect)
-        #vbox.pack_start(frame, False, False, 0)
+        exposong.themeselect.themeselect = exposong.themeselect.ThemeSelect()
+        frame.add(exposong.themeselect.themeselect)
+        vbox.pack_start(frame, False, False, 0)
         
         exposong.log.debug("Rendering Notification")
         frame = gtk.Frame()

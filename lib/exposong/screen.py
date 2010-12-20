@@ -49,7 +49,8 @@ class Screen(exposong._hook.Menu):
     def __init__(self):
         self.bg_dirty = False
         self.bg_img = {}
-        self.theme = exposong.theme.Theme(os.path.join(DATA_PATH,'theme','exposong.xml'))
+        self.aspect = 4 / 3
+        self._size = None
         
         self.window = gtk.Window(gtk.WINDOW_POPUP)
         
@@ -107,6 +108,9 @@ class Screen(exposong._hook.Menu):
     def get_size(self):
         "Get the current screen size."
         return self._size
+    
+    def get_aspect(self):
+        return self.aspect
     
     def draw(self):
         '''Redraw the presentation and preview screens.
@@ -190,22 +194,25 @@ class Screen(exposong._hook.Menu):
         
         slide = exposong.slidelist.slidelist.get_active_item()
         
-        # TODO
+        theme = exposong.themeselect.themeselect.get_active()
+        if not theme:
+            exposong.themeselect.themeselect.set_active(0)
+            theme = exposong.themeselect.themeselect.get_active()
         if widget is self.pres:
             if self._actions.get_action('Black Screen').get_active():
-                self.theme.render_color(ccontext, bounds, '#000')
+                exposong.theme.Theme.render_color(ccontext, bounds, '#000')
             elif self._actions.get_action('Logo').get_active():
                 logoclr = gtk.gdk.Color(*config.getcolor('screen', 'logo_bg'))
-                self.theme.render_color(ccontext, bounds, logoclr.to_string())
+                exposong.theme.Theme.render_color(ccontext, bounds, logoclr.to_string())
                 self.__logo_img.draw(ccontext, bounds, None)
             elif self._actions.get_action('Background').get_active():
                 #When there's no text to render, just draw the background
-                self.theme.render(ccontext, bounds, None)
+                theme.render(ccontext, bounds, None)
             else:
-                self.theme.render(ccontext, bounds, slide)
+                theme.render(ccontext, bounds, slide)
             exposong.notify.notify.draw(ccontext, bounds)
         else:
-            self.theme.render(ccontext, bounds, slide)
+            theme.render(ccontext, bounds, slide)
             
         return True
     
