@@ -337,9 +337,11 @@ class ImageBackground(_Background, _Renderable):
                 self._original = pb_new(os.path.join(DATA_PATH,'theme',
                                              'res', self.src))
             except gobject.GError:
+                exposong.log.error('Could not find "%s".', self.src)
                 return False
         
-        skey = 'x'.join(map(str, get_size(self._original, size, self.aspect)))
+        size[:] = get_size(self._original, size, self.aspect)
+        skey = 'x'.join(map(str, size))
         if skey not in self._cache:
             self._cache[skey] = scale_image(self._original, size, self.aspect)
         return self._cache[skey]
@@ -353,8 +355,10 @@ class ImageBackground(_Background, _Renderable):
         size = map(_subtract, self.rpos[2:4], self.rpos[:2])
         
         img = self.load(size)
+        pos = [(self.rpos[0] + self.rpos[2] - size[0])/2,
+               (self.rpos[1] + self.rpos[3] - size[1])/2]
         if img:
-            ccontext.set_source_pixbuf(img, *self.rpos[:2])
+            ccontext.set_source_pixbuf(img, *pos)
             ccontext.paint()
     
     @staticmethod
@@ -515,7 +519,7 @@ class Image(_RenderableSection):
             try:
                 self._original = pb_new(self.src)
             except gobject.GError:
-                print "Could not find %s." % self.src
+                exposong.log.error('Could not find "%s".', self.src)
                 return False
         
         skey = 'x'.join(map(str, get_size(self._original, size, self.aspect)))

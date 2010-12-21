@@ -144,13 +144,13 @@ class CellRendererTheme(gtk.GenericCellRenderer):
         calc_height = self.ypad * 2 + CELL_HEIGHT
         
         if cell_area:
-            x_offset = self.xalign * (cell_area.width - calc_width + self.xpad)
+            x_offset = self.xalign * (cell_area.width - calc_width) + self.xpad
             x_offset = max(x_offset, 0)
-            y_offset = self.yalign * (cell_area.height - calc_height + self.ypad)
+            y_offset = self.yalign * (cell_area.height - calc_height) + self.ypad
             y_offset = max(y_offset, 0)            
         else:
-            x_offset = self.xalign * self.xpad
-            y_offset = self.yalign * self.ypad
+            x_offset = self.xpad
+            y_offset = self.ypad
         
         return int(x_offset), int(y_offset), int(calc_width), int(calc_height)
     
