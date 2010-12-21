@@ -24,6 +24,7 @@ import gobject
 import gtk
 import os.path
 import pango
+from gtk.gdk import pixbuf_new_from_file as pb_new
 
 import exposong.screen
 import exposong.theme
@@ -113,6 +114,7 @@ class CellRendererTheme(gtk.GenericCellRenderer):
         self.xalign = 0.5
         self.yalign = 0.5
         self.active = 0
+        self._pb = {}
     
     def on_render(self, window, widget, background_area, cell_area, expose_area,
                flags):
@@ -120,6 +122,11 @@ class CellRendererTheme(gtk.GenericCellRenderer):
         global _example_slide
         if not self.theme:
             return
+        cache_dir = os.path.join(DATA_PATH, ".cache", "theme")
+        if not os.path.exists(cache_dir):
+            os.makedirs(cache_dir)
+        fname = os.path.basename(os.path.splitext(self.theme.filename)[0])+'-prev.png'
+        cpath = os.path.join(cache_dir, fname)
         x_offset, y_offset, width, height = self.on_get_size(widget, cell_area)
         width -= self.xpad*2
         height -= self.ypad*2
@@ -128,15 +135,29 @@ class CellRendererTheme(gtk.GenericCellRenderer):
             return
         
         ccontext = window.cairo_create()
-        size = exposong.screen.screen.get_size()
-        ccontext.scale(float(width) / size[0] * UNSCALE,
-                       float(height) / size[1] * UNSCALE)
-        bounds = ((cell_area.x + x_offset) * size[0] / float(width) / UNSCALE,
-                  (cell_area.y + y_offset) * size[1] / float(height) / UNSCALE,
-                  size[0] / UNSCALE, size[1] / UNSCALE)
-        if _example_slide is None:
-            _example_slide = _ExampleSlide()
-        self.theme.render(ccontext, bounds, _example_slide)
+        
+        if os.path.exists(cpath):
+            if fname not in self._pb:
+                self._pb[fname] = pb_new(cpath)
+            ccontext.set_source_pixbuf(self._pb[fname], cell_area.x + x_offset,
+                                       cell_area.y + y_offset)
+            ccontext.paint()
+        else:
+            size = exposong.screen.screen.get_size()
+            bounds = ((cell_area.x + x_offset) * size[0] / float(width) / UNSCALE,
+                      (cell_area.y + y_offset) * size[1] / float(height) / UNSCALE,
+                      size[0] / UNSCALE, size[1] / UNSCALE)
+            ccontext.scale(float(width) / size[0] * UNSCALE,
+                           float(height) / size[1] * UNSCALE)
+            if _example_slide is None:
+                _example_slide = _ExampleSlide()
+            self.theme.render(ccontext, bounds, _example_slide)
+            pb = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, True, 8, width,
+                                height)
+            pb.get_from_drawable(window, window.get_colormap(),
+                                 cell_area.x + x_offset, cell_area.y + y_offset,
+                                 0, 0, width, height)
+            pb.save(cpath, "png")
     
     def on_get_size(self, widget, cell_area):
         ""
