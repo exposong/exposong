@@ -173,30 +173,34 @@ class Main (gtk.Window):
         vbox.pack_start(screen.screen.get_button_bar_main(), False, False, 0)
         
         exposong.log.debug("Rendering Preview")
+        label = gtk.Label()
+        label.set_markup("<b>%s</b>" % _("Preview"))
+        label.set_alignment(0.0, 1.0)
+        vbox.pack_start(label, False, True, 4)
         # Wrap the pres_preview it so that the aspect ratio is kept
         prev_aspect = gtk.AspectFrame(None, 0.5, 0.5,
                                       exposong.screen.screen.aspect, False)
-        prev_aspect.set_label(_("Preview"))
+        prev_aspect.set_shadow_type(gtk.SHADOW_NONE)
         prev_aspect.add(screen.screen.preview)
         vbox.pack_start(prev_aspect, False, False, 0)
         
         exposong.log.debug("Rendering Secondary Buttons")
         vbox.pack_start(screen.screen.get_button_bar_secondary(), False, False, 10)
         
-        ##TODO Theme Select
-        frame = gtk.Frame()
-        frame.set_label(_("Theme"))
-        #exposong.bgselect.bgselect = exposong.bgselect.BGSelect()
+        label = gtk.Label()
+        label.set_markup("<b>%s</b>" % _("Theme Selection"))
+        label.set_alignment(0.0, 1.0)
+        vbox.pack_start(label, False, True, 4)
         exposong.themeselect.themeselect = exposong.themeselect.ThemeSelect()
-        frame.add(exposong.themeselect.themeselect)
-        vbox.pack_start(frame, False, False, 0)
+        vbox.pack_start(exposong.themeselect.themeselect, False, True, 0)
         
         exposong.log.debug("Rendering Notification")
-        frame = gtk.Frame()
-        frame.set_label(_("Notify"))
+        label = gtk.Label()
+        label.set_markup("<b>%s</b>" % _("Notify"))
+        label.set_alignment(0.0, 1.0)
+        vbox.pack_start(label, False, True, 4)
         exposong.notify.notify = exposong.notify.Notify()
-        frame.add(exposong.notify.notify)
-        vbox.pack_start(frame, False, False, 0)
+        vbox.pack_start(exposong.notify.notify, False, True)
         
         return vbox
     
