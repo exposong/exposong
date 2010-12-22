@@ -110,7 +110,7 @@ class CellRendererTheme(gtk.GenericCellRenderer):
         self.__gobject_init__()
         self.theme = None
         self.xpad = 2
-        self.ypad = 8
+        self.ypad = 2
         self.xalign = 0.5
         self.yalign = 0.5
         self.active = 0

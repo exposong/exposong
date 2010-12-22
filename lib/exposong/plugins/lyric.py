@@ -139,8 +139,14 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
         
         def get_footer(self):
             'Return a list of renderable theme items.'
-            return [theme.Text(self.footer_text(), align=theme.CENTER, 
-                    valign=theme.MIDDLE)]
+            f = [theme.Text(self.footer_text(), align=theme.CENTER, 
+                 valign=theme.MIDDLE, pos=[0.25, 0.0, 0.75, 1.0], margin=5)]
+            if len(self.pres.song.props.songbooks) > 0:
+                s = self.pres.song.props.songbooks[0]
+                f.append(theme.Text("<big>%s</big>\n<small>%s</small>" % \
+                         (s.entry, s.name), pos=[0.0, 0.0, 0.25, 1.0],
+                         align=theme.LEFT, valign=theme.BOTTOM, margin=5))
+            return f
         
         def footer_text(self):
             'Draw text on the footer.'
@@ -155,10 +161,6 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
                 jn.append(u"Copyright \xA9 %s" % self.pres.song.props.copyright)
             if config.get("general", "ccli"):
                 jn.append("CCLI# %s" % config.get("general", "ccli"))
-            songbooks = "; ".join(u'%s\xA0#%s' % (s.name, s.entry)
-                    for s in self.pres.song.props.songbooks)
-            if len(songbooks):
-                jn.append(songbooks)
             return '\n'.join(jn)
         
         def _edit_window(self, parent):
