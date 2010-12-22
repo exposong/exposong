@@ -38,6 +38,9 @@ UNSCALE = 4
 
 
 class ThemeSelect(gtk.ComboBox, object):
+    """
+    A theme selection combo box for the main screen.
+    """
     def __init__(self):
         self.liststore = gtk.ListStore(gobject.TYPE_STRING,
                                        gobject.TYPE_PYOBJECT)
@@ -62,6 +65,8 @@ class ThemeSelect(gtk.ComboBox, object):
             return self.liststore.get_value(itr, 1)
     
     def _load_themes(self):
+        "Load all the themes from disk."
+        exposong.log.debug("Loading theme previews.")
         try:
             active = config.get("screen", "theme")
         except Exception:
@@ -74,7 +79,7 @@ class ThemeSelect(gtk.ComboBox, object):
             if not os.path.isfile(os.path.join(dir, filenm)):
                 continue
             path = os.path.join(dir, filenm)
-            exposong.log.info('Loading theme image "%s".',
+            exposong.log.info('Loading theme "%s".',
                               filenm)
             theme = exposong.theme.Theme(path)
             itr = self.liststore.append([path, theme])
@@ -84,24 +89,26 @@ class ThemeSelect(gtk.ComboBox, object):
         yield False
     
     def _get_theme_title(self, column, cell, model, titer):
-        ''
+        "Get the theme name from the filename."
         path = model.get_value(titer, 0)
         if path:
             t = os.path.basename(path).rstrip('.xml')
             cell.set_property('text', t.title())
     
     def _on_change(self, combo):
-        'A new image was selected.'
+        "A new image was selected."
         itr = combo.get_active_iter()
         if itr:
             mod = combo.get_model()
             config.set("screen", "theme", mod.get_value(itr, 0))
+            t = os.path.basename(mod.get_value(itr, 0)).rstrip('.xml').title()
+            exposong.log.info('Changing theme to "%s".',t)
             exposong.screen.screen.set_dirty()
             exposong.screen.screen.draw()
 
 
 class CellRendererTheme(gtk.GenericCellRenderer):
-    "A widget with a theme drawing."
+    "A theme preview cell renderer."
     __gproperties__ = {
                 "theme": (gobject.TYPE_PYOBJECT, "Theme",
                 "Theme", gobject.PARAM_READWRITE),
@@ -118,7 +125,7 @@ class CellRendererTheme(gtk.GenericCellRenderer):
     
     def on_render(self, window, widget, background_area, cell_area, expose_area,
                flags):
-        ""
+        "Display the theme preview."
         global _example_slide
         if not self.theme:
             return
@@ -137,6 +144,7 @@ class CellRendererTheme(gtk.GenericCellRenderer):
         ccontext = window.cairo_create()
         
         if os.path.exists(cpath):
+            # Load the image from memory, or disk if available
             if fname not in self._pb:
                 self._pb[fname] = pb_new(cpath)
             ccontext.set_source_pixbuf(self._pb[fname], cell_area.x + x_offset,
@@ -152,6 +160,7 @@ class CellRendererTheme(gtk.GenericCellRenderer):
             if _example_slide is None:
                 _example_slide = _ExampleSlide()
             self.theme.render(ccontext, bounds, _example_slide)
+            # Save the rendered image to cache
             pb = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, True, 8, width,
                                 height)
             pb.get_from_drawable(window, window.get_colormap(),
@@ -160,7 +169,7 @@ class CellRendererTheme(gtk.GenericCellRenderer):
             pb.save(cpath, "png")
     
     def on_get_size(self, widget, cell_area):
-        ""
+        "Return the widgets size and position."
         calc_width = self.xpad * 2 + CELL_HEIGHT * exposong.screen.screen.get_aspect()
         calc_height = self.ypad * 2 + CELL_HEIGHT
         
@@ -168,7 +177,7 @@ class CellRendererTheme(gtk.GenericCellRenderer):
             x_offset = self.xalign * (cell_area.width - calc_width) + self.xpad
             x_offset = max(x_offset, 0)
             y_offset = self.yalign * (cell_area.height - calc_height) + self.ypad
-            y_offset = max(y_offset, 0)            
+            y_offset = max(y_offset, 0)
         else:
             x_offset = self.xpad
             y_offset = self.ypad
