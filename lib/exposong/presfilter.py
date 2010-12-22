@@ -1,4 +1,5 @@
 # coding: utf-8
+# vim: ts=4 sw=4 expandtab ai:
 #
 # SearchEntry - An enhanced search entry with alternating background colouring 
 #         and timeout support
