@@ -36,7 +36,7 @@ from exposong import preslist, presfilter, slidelist, statusbar
 from exposong.schedule import Schedule # ? where to put library
 
 main = None
-keys_to_disable = ("Background", "Black Screen")
+keys_to_disable = ("Black Screen",)
 
 
 class Main (gtk.Window):

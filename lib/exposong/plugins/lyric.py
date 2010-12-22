@@ -69,26 +69,6 @@ verse_names = {
     "m": _("Miscellaneous"),
 }
 
-def key_shortcuts(accel_group, acceleratable, keyval, modifier):
-    'Adds the shortcuts to skip to a given slide.'
-    pres = exposong.slidelist.slidelist.pres
-    if pres != None:
-        slnum = None
-        if chr(keyval) in string.ascii_letters:
-            slnum = pres.get_slide_from_order(chr(keyval))
-        elif chr(keyval) >= '0' and chr(keyval) <= '9':
-            slnum = pres.get_slide_from_order("v%s" % chr(keyval))
-        if(slnum != None):
-            exposong.slidelist.slidelist.to_slide(slnum)
-
-_lyrics_accel = gtk.AccelGroup()
-_lyrics_accel.connect_group(ord("c"), 0,0, key_shortcuts)
-_lyrics_accel.connect_group(ord("r"), 0,0, key_shortcuts)
-_lyrics_accel.connect_group(ord("b"), 0,0, key_shortcuts)
-_lyrics_accel.connect_group(ord("e"), 0,0, key_shortcuts)
-for i in range(1,10):
-    _lyrics_accel.connect_group(ord("%d"%i), 0,0, key_shortcuts)
-
 
 class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
         _abstract.Schedule, _abstract.Screen):
@@ -999,16 +979,6 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
     def get_description():
         'Return the description of the plugin.'
         return "A lyric presentation type."
-
-    @staticmethod
-    def on_select():
-        'Called when the presentation is focused.'
-        exposong.application.main.add_accel_group(_lyrics_accel)
-
-    @staticmethod
-    def on_deselect():
-        'Called when the presentation is blurred.'
-        exposong.application.main.remove_accel_group(_lyrics_accel)
 
 
 class SlideEdit(text.SlideEdit):
