@@ -21,6 +21,7 @@ import gtk
 import webbrowser
 import urllib
 
+import exposong.version
 import exposong._hook
 from exposong import RESOURCE_PATH, DATA_PATH
 from exposong import statusbar
@@ -61,7 +62,7 @@ class Help(exposong._hook.Menu, object):
                       % fl.getcode()
             else:
                 version = fl.read().strip()
-                if version > exposong.about.About.get_version():
+                if version > exposong.version.__version__:
                     new_version = True
                     msg = _("A new version (%s) is available. Would you like to be taken to the download page?")\
                             % version

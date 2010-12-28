@@ -28,6 +28,7 @@ from gtk.gdk import pixbuf_new_from_file as pb_new
 
 import exposong.screen
 import exposong.theme
+from exposong import themeeditor
 from exposong import DATA_PATH
 from exposong.config import config
 
@@ -37,7 +38,7 @@ CELL_HEIGHT = 65
 UNSCALE = 4
 
 
-class ThemeSelect(gtk.ComboBox, object):
+class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
     """
     A theme selection combo box for the main screen.
     """
@@ -105,6 +106,64 @@ class ThemeSelect(gtk.ComboBox, object):
             exposong.log.info('Changing theme to "%s".',t)
             exposong.screen.screen.set_dirty()
             exposong.screen.screen.draw()
+    
+    def new_theme(self, *args):
+        themeeditor.ThemeEditor(exposong.application.main)
+        
+    def edit_theme(self, *args):
+        print self.get_active()
+        themeeditor.ThemeEditor(exposong.application.main, self.get_active().filename)
+    
+    def delete_theme(self, *args):
+        #TODO
+        pass
+        
+    @classmethod
+    def merge_menu(cls, uimanager):
+        'Merge new values with the uimanager.'
+        global themeselect
+        
+        cls._actions = gtk.ActionGroup('theme')
+        cls._actions.add_actions([
+                ('theme-new', gtk.STOCK_NEW, _('New Theme'), None,
+                        _("Create a new theme using the Theme Editor"), themeselect.new_theme),
+                ('theme-edit', gtk.STOCK_EDIT, _('Edit Theme'), None,
+                        _("Edit the current theme"), themeselect.edit_theme),
+                ('theme-delete', gtk.STOCK_DELETE, _("Delete Theme"), None,
+                        _('Delete the current theme'), themeselect.delete_theme),
+                ])
+        
+        uimanager.insert_action_group(cls._actions, -1)
+        uimanager.add_ui_from_string("""
+            <menubar name="MenuBar">
+                <menu action="Theme">
+                    <menuitem action="theme-new" position="bot" />
+                    <menuitem action="theme-edit" position="bot" />
+                    <menuitem action="theme-delete" position="bot" />
+                </menu>
+            </menubar>
+            """)
+        # unmerge_menu not implemented, because we will never uninstall this as
+        # a module.
+    
+    @classmethod
+    def get_button_bar(cls):
+        "Return the presentation button widget."
+        tb = gtk.Toolbar()
+        # FIXME It would be nice to get rid of the shadow on the toolbars, but
+        # they are read-only style properties.
+        tb.set_style(gtk.TOOLBAR_ICONS)
+        tb.set_icon_size(gtk.ICON_SIZE_SMALL_TOOLBAR)
+        button = cls._actions.get_action('theme-new').create_tool_item()
+        button.set_is_important(True)
+        tb.add(button)
+        button = cls._actions.get_action('theme-edit').create_tool_item()
+        button.set_is_important(True)
+        tb.add(button)
+        button = cls._actions.get_action('theme-delete').create_tool_item()
+        button.set_is_important(True)
+        tb.add(button)
+        return tb
 
 
 class CellRendererTheme(gtk.GenericCellRenderer):

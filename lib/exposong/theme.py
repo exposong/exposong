@@ -330,12 +330,14 @@ class ImageBackground(_Background, _Renderable):
         else:
             self.aspect = ASPECT_FILL
     
+    def get_filename(self):
+        return os.path.join(DATA_PATH,'theme', 'res', self.src)
+    
     def load(self, size):
         ""
         if not self._original:
             try:
-                self._original = pb_new(os.path.join(DATA_PATH,'theme',
-                                             'res', self.src))
+                self._original = pb_new(self.get_filename())
             except gobject.GError:
                 exposong.log.error('Could not find "%s".', self.src)
                 return False

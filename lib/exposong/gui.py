@@ -19,6 +19,7 @@
 import gtk
 import gtk.gdk
 import gobject
+import os
 
 _LABEL_SPACING = 12
 _WIDGET_SPACING = 4
@@ -182,12 +183,33 @@ def append_checkbutton(table, label, buttonlabel, top):
     table.attach(cb, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, _WIDGET_SPACING)
     return cb
 
+def append_font_button(table, label, fontname, top):
+    set_label(table, label, top)
+    fb = gtk.FontButton(fontname)
+    table.attach(fb, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, _WIDGET_SPACING)
+    return fb
+
+def append_hbox(table, label, hbox, top):
+    'Adds a HBox widget to a table and returns it.'
+    set_label(table, label, top)
+    table.attach(hbox, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, _WIDGET_SPACING)
+    return
+
 def append_section_title(table, title, top):
     'Adds a title for the current section.'
     label = gtk.Label()
     label.set_markup("<b>"+title+"</b>")
     label.set_alignment(0.0, 1.0)
     table.attach(label, 0, 4, top, top+1, gtk.FILL, 0, 0)
+
+def append_comment(table, title, top):
+    label = gtk.Label()
+    label.set_markup("<i><small>"+title+"</small></i>")
+    label.set_alignment(0.0, 1.0)
+    table.attach(label, 0, 4, top, top+1, gtk.FILL, 0, 0)
+
+def append_separator(table, top):
+    table.attach(gtk.HSeparator(), 0, 4, top, top+1, gtk.FILL, 0, 0)
 
 def set_label(table, label, top):
     'Returns a label for a widget.'

@@ -31,10 +31,9 @@ import exposong.plugins._abstract
 import exposong.notify
 import exposong._hook
 import exposong.help
-import exposong.themeselect
 from exposong import RESOURCE_PATH, DATA_PATH, SHARED_FILES
 from exposong import config, prefs, screen, schedlist, splash, exampledata
-from exposong import preslist, presfilter, slidelist, statusbar
+from exposong import preslist, presfilter, slidelist, statusbar, themeselect
 from exposong.schedule import Schedule # ? where to put library
 
 main = None
@@ -83,6 +82,7 @@ class Main (gtk.Window):
         presfilter.presfilter = presfilter.PresFilter()
         preslist.preslist = preslist.PresList()
         slidelist.slidelist = slidelist.SlideList()
+        themeselect.themeselect = themeselect.ThemeSelect()
         exampledata.exampledata = exampledata.ExampleData(self)
         
         exposong.log.debug("Creating the menus.")
@@ -193,8 +193,8 @@ class Main (gtk.Window):
         label.set_markup("<b>%s</b>" % _("Theme Selection"))
         label.set_alignment(0.0, 1.0)
         vbox.pack_start(label, False, True, 4)
-        exposong.themeselect.themeselect = exposong.themeselect.ThemeSelect()
         vbox.pack_start(exposong.themeselect.themeselect, False, True, 0)
+        vbox.pack_start(exposong.themeselect.themeselect.get_button_bar(), False, True, 0)
         
         exposong.log.debug("Rendering Notification")
         label = gtk.Label()
@@ -216,6 +216,7 @@ class Main (gtk.Window):
                 ('File', None, _('_File')),
                 ('Edit', None, _('_Edit')),
                 ('Schedule', None, _("_Schedule")),
+                ('Theme', None, _("_Theme")),
                 ('Presentation', None, _('P_resentation')),
                 ('pres-controls', None, _("Presentation _Controls")),
                 ('Help', None, _('_Help')),
@@ -254,6 +255,7 @@ class Main (gtk.Window):
                         <menuitem action="Preferences" position="bot" />
                     </menu>
                     <menu action="Schedule"></menu>
+                    <menu action="Theme"></menu>
                     <menu action="Presentation">
                         <menu action="pres-new" position="top"></menu>
                         <menuitem action="pres-edit" />
@@ -265,10 +267,6 @@ class Main (gtk.Window):
                         <menuitem action="Present" position="bot" />
                         <menuitem action="Hide" position="bot" />
                         <menu action="pres-controls" position="bot">
-                            <menuitem action="Black Screen" position="bot" />
-                            <menuitem action="Background" position="bot" />
-                            <menuitem action="Logo" position="bot" />
-                            <menuitem action="Freeze" position="bot" />
                         </menu>
                         <separator />
                         <menuitem action="pres-prev" position="bot" />
