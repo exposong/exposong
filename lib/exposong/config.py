@@ -36,18 +36,21 @@ class Config(ConfigParser.SafeConfigParser):
     
     def __init__(self):
         ConfigParser.SafeConfigParser.__init__(self)
-        if os.name == 'nt':
-            try:
-                d = os.path.join(os.environ["LOCALAPPDATA"], "exposong")
-            except KeyError:
-                d = os.path.join(os.path.expanduser("~"), "exposong")
+        if exposong.options.config:
+            cfile = os.path.abspath(exposong.options.config)
         else:
-            d = os.path.join(os.path.expanduser("~"), ".config", "exposong")
-        if not os.path.exists(d):
-            os.makedirs(d)
-        cfile = os.path.join(d, "exposong.conf")
-        exposong.log.info('Loading config file from "%s".', cfile)
-        del d
+            if os.name == 'nt':
+                try:
+                    d = os.path.join(os.environ["LOCALAPPDATA"], "exposong")
+                except KeyError:
+                    d = os.path.join(os.path.expanduser("~"), "exposong")
+            else:
+                d = os.path.join(os.path.expanduser("~"), ".config", "exposong")
+            if not os.path.exists(d):
+                os.makedirs(d)
+            cfile = os.path.join(d, "exposong.conf")
+            exposong.log.info('Loading config file from "%s".', cfile)
+            del d
         
         self.add_section("main_window")
         self.add_section("dialogs")

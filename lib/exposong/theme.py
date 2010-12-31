@@ -64,8 +64,10 @@ class Theme(object):
         "Create a theme."
         self.filename = filename
         self.backgrounds = []
-        self.footer = None
-        self.body = None
+        self.body = Section(type_='body', font="Sans 56",
+                            pos=[0.0, 0.0, 1.0, 0.8])
+        self.footer = Section(type_='footer', font="Sans 12",
+                              pos=[0.0, 0.8, 1.0, 1.0])
         if filename:
             tree = etree.parse(filename)
             self.load(tree)
