@@ -42,7 +42,10 @@ parser.add_option('-o', '--log', dest='log', action='store',
                   help='Write the log to a file.')
 parser.add_option('-d', '--data-path', dest='data_path', action='store')
 parser.add_option('-c', '--config', dest='config', action='store')
-parser.add_option('--flush', dest='flush', action='store_true')
+parser.add_option('--reset', dest='reset', action='store_true',
+                  help='Deletes the contents of the data folder.')
+parser.add_option('-e', dest='clear_cache', action='store_true',
+                  help='Clear the cache in case of errors.')
 
 (options, args) = parser.parse_args()
 
@@ -125,7 +128,7 @@ else:
 
 log.debug('Data is located at "%s".', DATA_PATH)
 
-if options.flush:
+if options.reset:
     msg = _("Are you sure you want to empty the data folder? This cannot be undone.")
     dlg = gtk.MessageDialog(type=gtk.MESSAGE_WARNING, buttons=gtk.BUTTONS_YES_NO,
                             message_format=msg)
@@ -133,6 +136,8 @@ if options.flush:
         dlg.hide()
         shutil.rmtree(DATA_PATH)
     dlg.destroy()
+elif options.clear_cache:
+    shutil.rmtree(os.path.join(DATA_PATH,'.cache'))
 
 # Initialize the data directories. This assumes that if they exist, they are
 # either directories or symlinks. We might need to handle the case where they

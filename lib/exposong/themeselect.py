@@ -26,6 +26,7 @@ import os.path
 import pango
 from gtk.gdk import pixbuf_new_from_file as pb_new
 
+import exposong.application
 import exposong.screen
 import exposong.theme
 from exposong import themeeditor
@@ -86,6 +87,20 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
             itr = self.liststore.append([path, theme])
             if path == active or (active == None and path.endswith("/exposong.xml")):
                 self.set_active_iter(itr)
+            yield True
+        task = self._load_theme_thumbs()
+        gobject.idle_add(task.next, priority=gobject.PRIORITY_LOW)
+        yield False
+    
+    def _load_theme_thumbs(self):
+        "Force loading of theme thumbnails."
+        cell = self.get_cells()[0]
+        size = (int(CELL_HEIGHT * exposong.screen.screen.get_aspect()),
+                  CELL_HEIGHT)
+        yield True
+        for row in self.liststore:
+            cell.theme = row[1]
+            cell._get_pixmap(self.window, size)
             yield True
         yield False
     
@@ -180,52 +195,66 @@ class CellRendererTheme(gtk.GenericCellRenderer):
         self.xalign = 0.5
         self.yalign = 0.5
         self.active = 0
-        self._pb = {}
+        self._pm = {}
     
-    def on_render(self, window, widget, background_area, cell_area, expose_area,
-               flags):
-        "Display the theme preview."
+    def _get_pixmap(self, window, size):
+        "Render to an offscreen pixmap."
         global _example_slide
-        if not self.theme:
-            return
+        fname = os.path.basename(os.path.splitext(self.theme.filename)[0])+'-prev.png'
+        if fname in self._pm:
+            return self._pm[fname]
+        
+        exposong.log.info('Generating theme thumbnail "%s".', fname)
+        width, height = size
+        
+        self._pm[fname] = gtk.gdk.Pixmap(window, width, height)
+        
         cache_dir = os.path.join(DATA_PATH, ".cache", "theme")
         if not os.path.exists(cache_dir):
             os.makedirs(cache_dir)
-        fname = os.path.basename(os.path.splitext(self.theme.filename)[0])+'-prev.png'
         cpath = os.path.join(cache_dir, fname)
-        x_offset, y_offset, width, height = self.on_get_size(widget, cell_area)
-        width -= self.xpad*2
-        height -= self.ypad*2
         
-        if width <= 0 or height <= 0:
-            return
-        
-        ccontext = window.cairo_create()
-        
+        ccontext = self._pm[fname].cairo_create()
         if os.path.exists(cpath):
             # Load the image from memory, or disk if available
-            if fname not in self._pb:
-                self._pb[fname] = pb_new(cpath)
-            ccontext.set_source_pixbuf(self._pb[fname], cell_area.x + x_offset,
-                                       cell_area.y + y_offset)
+            pb = pb_new(cpath)
+            ccontext.set_source_pixbuf(pb, 0, 0)
             ccontext.paint()
         else:
-            size = exposong.screen.screen.get_size()
-            bounds = ((cell_area.x + x_offset) * size[0] / float(width) / UNSCALE,
-                      (cell_area.y + y_offset) * size[1] / float(height) / UNSCALE,
-                      size[0] / UNSCALE, size[1] / UNSCALE)
-            ccontext.scale(float(width) / size[0] * UNSCALE,
-                           float(height) / size[1] * UNSCALE)
+            scrsize = exposong.screen.screen.get_size()
+            bounds = (0, 0, scrsize[0] / UNSCALE, scrsize[1] / UNSCALE)
+            ccontext.scale(float(width) / scrsize[0] * UNSCALE,
+                           float(height) / scrsize[1] * UNSCALE)
             if _example_slide is None:
                 _example_slide = _ExampleSlide()
             self.theme.render(ccontext, bounds, _example_slide)
             # Save the rendered image to cache
             pb = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, True, 8, width,
                                 height)
-            pb.get_from_drawable(window, window.get_colormap(),
-                                 cell_area.x + x_offset, cell_area.y + y_offset,
-                                 0, 0, width, height)
+            pb.get_from_drawable(self._pm[fname], self._pm[fname].get_colormap(),
+                                 0, 0, 0, 0, width, height)
             pb.save(cpath, "png")
+        return self._pm[fname]
+
+    def on_render(self, window, widget, background_area, cell_area, expose_area,
+               flags):
+        "Display the theme preview."
+        global _example_slide
+        if not self.theme:
+            return
+        
+        cell_position = list(self.on_get_size(widget, cell_area))
+        cell_position[2] -= self.xpad*2
+        cell_position[3] -= self.ypad*2
+        x_offset, y_offset, width, height = cell_position
+        if width <= 0 or height <= 0:
+            return
+        
+        pm = self._get_pixmap(window, cell_position[2:4])
+        scrsize = exposong.screen.screen.get_size()
+        window.draw_drawable(widget.get_style().fg_gc[gtk.STATE_NORMAL],
+                             pm, 0, 0, cell_area.x + x_offset,
+                             cell_area.y + y_offset, width, height)
     
     def on_get_size(self, widget, cell_area):
         "Return the widgets size and position."
