@@ -149,9 +149,8 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         pres_delete = self._actions.get_action("pres-delete")
         pres_remove = self._actions.get_action("pres-remove-from-schedule")
         pres_add = self._actions.get_action("pres-add-to-schedule")
-        pres_delete.set_sensitive(self.has_selection())
-        pres_remove.set_sensitive(self.has_selection() and
-                                  not self.get_model().builtin)
+        pres_delete.set_sensitive(self.has_selection() and self.get_model().builtin)
+        pres_remove.set_sensitive(self.has_selection() and not self.get_model().builtin)
         pres_remove.set_visible(not self.get_model().builtin)
         pres_add.set_sensitive(self.has_selection())
         for action in exposong.schedlist.schedlist.get_add_sched_actions():
