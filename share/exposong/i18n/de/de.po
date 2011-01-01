@@ -1146,20 +1146,20 @@ msgstr "_Liste aller Lieder"
 
 #: lib/exposong/plugins/songselect_convert.py:37
 msgid "SongSelect Lyrics Converter"
-msgstr "SongSelect Lieder-Converter"
+msgstr "SongSelect-Lieder-Converter"
 
 #: lib/exposong/plugins/songselect_convert.py:161
 msgid "Import SongSelect Lyrics"
-msgstr "SongSelect Liedtexte importieren"
+msgstr "SongSelect-Liedtexte importieren"
 
 #: lib/exposong/plugins/songselect_convert.py:168
 #, python-format
 msgid "SongSelect File (%s)"
-msgstr "SongSelect Datei (%s)"
+msgstr "SongSelect-Datei (%s)"
 
 #: lib/exposong/plugins/songselect_convert.py:186
 msgid "_SongSelect Lyrics ..."
-msgstr "_SongSelect Liedtexte ..."
+msgstr "_SongSelect-Liedtexte ..."
 
 #: lib/exposong/plugins/songselect_convert.py:187
 msgid "Converts a SongSelect file to OpenLyrics"

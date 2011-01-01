@@ -130,7 +130,7 @@ class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
             dlg.hide()
             files = dlg.get_filenames()
             for file in files:
-                filename = cls.convert(file, True)
+                filename = cls.convert(unicode(file), True)
                 exposong.application.main.load_pres(filename)
             config.set("dialogs", "exposong_legacy-import-dir", os.path.dirname(file))
         dlg.destroy()

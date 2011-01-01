@@ -46,7 +46,7 @@ class ExampleData(exposong._hook.Menu):
     
     def _offer_download(self, parent=None):
         msg = _("1. Download the packages you want\n"+\
-                "2. Import them using File->Import")
+                "2. Import them using File->Import->ExpoSong Data (.expo)")
         dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL,
                                    gtk.MESSAGE_INFO, gtk.BUTTONS_CANCEL,
                                    msg)

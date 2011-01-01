@@ -195,7 +195,7 @@ class ExportImport(Plugin, exposong._hook.Menu):
         dlg.add_filter(_FILTER)
         dlg.set_current_folder(os.path.expanduser("~"))
         if dlg.run() == gtk.RESPONSE_ACCEPT:
-            tar = tarfile.open(dlg.get_filename(), "r:gz")
+            tar = tarfile.open(unicode(dlg.get_filename()), "r:gz")
             # Make a temporary directory so that no files are overwritten.
             tmpdir = tempfile.mkdtemp(os.path.split(
                                       dlg.get_filename())[1].rstrip(".expo"))

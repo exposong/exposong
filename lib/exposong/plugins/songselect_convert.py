@@ -137,7 +137,10 @@ class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
                     verses[i] = "/n".join(verses[i].split("/n")[1:])
                 elif miscnm.lower().startswith("(end"):
                     verse.name = "e"
-                    verses[i] = "\n".join(verses[i].split("\n")[1:])
+                    verses[i] = "/n".join(verses[i].split("/n")[1:])
+                elif miscnm.lower().startswith("(pre-chorus"):
+                    verse.name = "p"
+                    verses[i] = "/n".join(verses[i].split("/n")[1:])
             if not verse.name:
                 # How should we handle this?
                 verse.name = 'm'
@@ -173,7 +176,7 @@ class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
             dlg.hide()
             files = dlg.get_filenames()
             for file in files:
-                filename = cls.convert(file, True)
+                filename = cls.convert(unicode(file), True)
                 exposong.application.main.load_pres(filename)
             config.set("dialogs", "songselect-import-dir", os.path.dirname(file))
         dlg.destroy()
