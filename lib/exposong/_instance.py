@@ -52,7 +52,7 @@ class SingleInstance(object):
         except socket.error:
             raise ExposongInstanceError
         self.socket.listen(2)
-        gobject.timeout_add(TIMEOUT*1000, self.listen)
+        gobject.timeout_add(int(TIMEOUT*1000), self.listen)
     
     def listen(self):
         "Attempt to detect any attempted communications."
@@ -69,7 +69,7 @@ class SingleInstance(object):
                     self.handle_request(client, data)
                     data = client.recv(1024)
                 client.close()
-        gobject.timeout_add(TIMEOUT*1000, self.listen)
+        gobject.timeout_add(int(TIMEOUT*1000), self.listen)
     
     def handle_request(self, conn, data):
         if data == 'Is ExpoSong?':
