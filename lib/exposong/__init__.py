@@ -128,6 +128,9 @@ else:
 
 log.debug('Data is located at "%s".', DATA_PATH)
 
+# Make sure only one instance of ExpoSong is running
+import exposong._instance
+
 if options.reset:
     msg = _("Are you sure you want to empty the data folder? This cannot be undone.")
     dlg = gtk.MessageDialog(type=gtk.MESSAGE_WARNING, buttons=gtk.BUTTONS_YES_NO,
