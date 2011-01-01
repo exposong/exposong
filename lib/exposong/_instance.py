@@ -37,8 +37,6 @@ import exposong
 
 TIMEOUT = .1
 
-# TODO Should we change the port number if a program other than ExpoSong is
-#      running on this port?
 HOST, PORT = ('127.0.0.24', 3890)
 
 class SingleInstance(object):
@@ -92,7 +90,9 @@ class SingleInstance(object):
                                     message_format=msg)
             dlg.run()
             dlg.destroy()
-
+            return True
+        else:
+            return False
     
     def __del__(self):
         self.socket.close()
@@ -102,9 +102,14 @@ class ExposongInstanceError(Exception):
     pass
 
 
+# Note: If an application is using the port, and we choose a higher port,
+#       ExpoSong will be able to start twice.
 inst = SingleInstance()
-try:
-    inst.serve()
-except ExposongInstanceError:
-    inst.send()
-    sys.exit(0)
+while True:
+    try:
+        inst.serve()
+        break
+    except ExposongInstanceError:
+        if inst.send():
+            sys.exit(0)
+        PORT += 10000
