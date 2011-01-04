@@ -82,8 +82,8 @@ class ThemeEditor(gtk.Window):
         gui.append_comment(bg_left, "Backgrounds will be drawn starting with the first element in this list moving to the last one.", 0)
         bgs = gtk.TreeView()
         model = gtk.ListStore(gobject.TYPE_STRING)
-        model.append(("hallo"))
-        model.append(("blabla"))
+        #model.append(("hallo"))
+        #model.append(("blabla"))
         bgs.set_model(model)
         bg_left.attach(bgs, 2, 4, 1, 1+1, gtk.EXPAND|gtk.FILL, 0, gui._WIDGET_SPACING)
         
