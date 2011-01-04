@@ -160,8 +160,8 @@ class Screen(exposong._hook.Menu):
         return state
     
     def is_running(self):
-        'If the presentation is visible and running (not black or background).'
-        # TODO
+        'The presentation is visible and running (not black or background).'
+        # TODO ?
         return self.is_viewable() and not (
                 self._actions.get_action('Black Screen').get_active() or
                 self._actions.get_action('Logo').get_active() or

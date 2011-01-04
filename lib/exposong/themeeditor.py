@@ -17,6 +17,8 @@
 import gtk
 import sys
 import os
+import pango
+import gobject
 
 import gui
 import theme
@@ -54,28 +56,38 @@ class ThemeEditor(gtk.Window):
         ######################
         # Page 1: Background #
         ######################
-        bg_top_table = gui.Table(1)
-        #gui.append_section_title(bg_top_table, "Type", 0)
-        type_h = gtk.HBox()
-        self.imageradio = gtk.RadioButton(None, _("Image"))
-        self.imageradio.connect('toggled', self._on_imageradio)
-        type_h.pack_start(self.imageradio)
-        self.solidradio = gtk.RadioButton(self.imageradio, _("Solid"))
-        self.solidradio.connect('toggled', self._on_solidradio)
-        type_h.pack_start(self.solidradio)
-        self.gradientradio = gtk.RadioButton(self.imageradio, _("Gradient"))
-        self.gradientradio.connect('toggled', self._on_gradientradio)
-        type_h.pack_start(self.gradientradio)
-        gui.append_hbox(bg_top_table, _("Type"), type_h, 0)
-        gui.append_separator(bg_top_table, 1)
+        #bg_top_table = gui.Table(1)
+        ##gui.append_section_title(bg_top_table, "Type", 0)
+        #type_h = gtk.HBox()
+        #self.imageradio = gtk.RadioButton(None, _("Image"))
+        #self.imageradio.connect('toggled', self._on_imageradio)
+        #type_h.pack_start(self.imageradio)
+        #self.solidradio = gtk.RadioButton(self.imageradio, _("Solid"))
+        #self.solidradio.connect('toggled', self._on_solidradio)
+        #type_h.pack_start(self.solidradio)
+        #self.gradientradio = gtk.RadioButton(self.imageradio, _("Gradient"))
+        #self.gradientradio.connect('toggled', self._on_gradientradio)
+        #type_h.pack_start(self.gradientradio)
+        #gui.append_hbox(bg_top_table, _("Type"), type_h, 0)
+        #gui.append_separator(bg_top_table, 1)
         
-        self.bg_main_table = gui.Table(2)
-        self._on_imageradio(self.imageradio)
+        #self.bg_main_table = gui.Table(2)
+        #self._on_imageradio(self.imageradio)
+        #
+        #tab_bg = gtk.VBox()
+        #tab_bg.pack_start(bg_top_table)
+        #tab_bg.pack_start(self.bg_main_table)
+        bg_left = gui.Table(10)
+        #gui.append_section_title(bg_left, "Background List", 0)
+        gui.append_comment(bg_left, "Backgrounds will be drawn starting with the first element in this list moving to the last one.", 0)
+        bgs = gtk.TreeView()
+        model = gtk.ListStore(gobject.TYPE_STRING)
+        model.append(("hallo"))
+        model.append(("blabla"))
+        bgs.set_model(model)
+        bg_left.attach(bgs, 2, 4, 1, 1+1, gtk.EXPAND|gtk.FILL, 0, gui._WIDGET_SPACING)
         
-        tab_bg = gtk.VBox()
-        tab_bg.pack_start(bg_top_table)
-        tab_bg.pack_start(self.bg_main_table)
-        notebook.append_page(tab_bg, gtk.Label(_("Background")))
+        notebook.append_page(bg_left, gtk.Label(_("Background")))
         
         
         ######################
@@ -101,8 +113,9 @@ class ThemeEditor(gtk.Window):
                 gtk.Adjustment(1, 1, 10, 1, 5, 0), 0)
         self.body_text_align = gui.append_combo(body_table_right, _("Text Align"),
                 (_("Center"), _("Left"), _("Right")), _("Center"), 1)
-        self.body_hor_align = gui.append_combo(body_table_right, "Text Horizontal Align",
-                (_("Top"), _("Bottom"), _("Center")), _("Top"), 2)
+        # Order for horizontal align must be the same as theme.TOP, theme.MIDDLE, theme.BOTTOM
+        self.body_hor_align = gui.append_combo(body_table_right, "Text Vertical Align",
+                (_("Top"), _("Middle"), _("Bottom")), _("Middle"), 2)
         
         body_h.pack_start(body_table_right)
         notebook.append_page(body_h, gtk.Label(_("Body Text")))
@@ -134,6 +147,7 @@ class ThemeEditor(gtk.Window):
         notebook.append_page(footer_table_left, gtk.Label("Footer Text"))
         
         self.add(main_v)
+        self.show_all()
     
     def _clear_bg_table(self):
         for child in self.bg_main_table.get_children():
@@ -211,25 +225,39 @@ See <a href='http://code.google.com/p/exposong/wiki/ThemeFormat'>Theme Format</a
                 elif bg.aspect == theme.ASPECT_FIT:
                     self.radio_mode_fit.set_active(True)
         
-        #################
-        # Sections      #
-        #################
+        ##################
+        # Sections: Body #
+        ##################
         body = self.theme.get_body()
         self.body_font_button.set_font_name(body.font)
         self.body_color_button.set_color(gtk.gdk.Color(body.color))
         #TODO: No way to enable/disable shadow
         self.body_shadow_color.set_color(gtk.gdk.Color(body.shadow_color))
         #TODO: Line distance, to be implemented in theme
-        #TODO: Alignments
-        #print body.valign
         
+        t = theme.Text("This is an example text")
+        # Horizontal Alignment
+        for i in range(len(align)):
+            if align[i] == align[t.align]:
+                self.body_text_align.set_active(i)
+        # Vertical Alignment
+        self.body_hor_align.set_active(t.valign)
+        
+        ####################
+        # Sections: Footer #
+        ####################
         footer = self.theme.get_footer()
         self.footer_font_button.set_font_name(footer.font)
         self.footer_color_button.set_color(gtk.gdk.Color(footer.color))
         
     def _destroy(self, widget):
-        pass
+        gtk.main_quit()
 
+align = {
+    pango.ALIGN_LEFT : "Left",
+    pango.ALIGN_RIGHT : "Right",
+    pango.ALIGN_CENTER : "Center"
+}
 
 if __name__ == "__main__":
     ThemeEditor()

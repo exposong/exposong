@@ -49,9 +49,9 @@ from exposong import DATA_PATH
 LEFT = pango.ALIGN_LEFT
 CENTER = pango.ALIGN_CENTER
 RIGHT = pango.ALIGN_RIGHT
-TOP = -1
-MIDDLE = 0
-BOTTOM = 1
+TOP = 0
+MIDDLE = 1
+BOTTOM = 2
 
 ASPECT_FIT = 1
 ASPECT_FILL = 2

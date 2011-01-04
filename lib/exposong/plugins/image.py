@@ -368,10 +368,9 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                               os.path.basename(sl.image),
                               self.get_title())
             os.remove(sl.image)
-            if sl.thumb and os.path.isfile(sl.thumb):
+            if hasattr(sl,"thumb") and os.path.isfile(sl.thumb):
                 exposong.log.debug('Removing thumb "%s" for presentation "%s".',
-                                   os.path.basename(self.image),
-                                   self.pres.get_title())
+                        os.path.basename(self.image), self.pres.get_title())
                 os.remove(sl.thumb)
     
     @staticmethod
