@@ -26,27 +26,28 @@ line (e.g. `exposong --next` will move to the next slide).
 
 # http://code.activestate.com/recipes/531824-chat-server-client-using-selectselect/
 
-import gobject
-import gtk
 import select
 import socket
 import sys
 
 import exposong
+# This has to be imported after ExpoSong is started.
+#import exposong.slidelist
 
 
-TIMEOUT = .1
+TIMEOUT = .07
 
 HOST, PORT = ('127.0.0.24', 3890)
 
 class SingleInstance(object):
     """
-    Prevent multiple instances of ExpoSong.
+    Prevent multiple instances of ExpoSong, and send signals to the running instance.
     """
     def __init__(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     
     def serve(self):
+        import gobject
         try:
             self.socket.bind((HOST, PORT))
         except socket.error:
@@ -56,6 +57,7 @@ class SingleInstance(object):
     
     def listen(self):
         "Attempt to detect any attempted communications."
+        import gobject
         try:
             inready, n1, n2 = select.select([self.socket], [], [], TIMEOUT)
         except socket.error, e:
@@ -74,25 +76,55 @@ class SingleInstance(object):
     def handle_request(self, conn, data):
         if data == 'Is ExpoSong?':
             conn.send('Yes')
+        elif data == 'Next':
+            import exposong.slidelist
+            exposong.slidelist.slidelist.next_slide()
+        elif data == 'Prev':
+            import exposong.slidelist
+            exposong.slidelist.slidelist.prev_slide()
         else:
-            exposong.log.debug("Unknown Data on port.")
+            exposong.log.debug('Unknown Data on port.')
     
-    
-    def send(self):
-        "Send something to another instance."
+    def _send(self, text, recv=False):
+        ""
         self.socket.settimeout(TIMEOUT*3)
         self.socket.connect((HOST, PORT))
-        self.socket.send('Is ExpoSong?')
-        data = self.socket.recv(1024)
-        if data == 'Yes':
-            msg = _("ExpoSong is already running.")
+        self.socket.send(text)
+        if recv:
+            return self.socket.recv(1024)
+    
+    def remote(self):
+        ""
+        import gtk
+        try:
+            if exposong.options.next:
+                self._send('Next')
+            elif exposong.options.prev:
+                self._send('Prev')
+            else:
+                return False
+        except socket.timeout:
+            msg = _('ExpoSong is not running.')
             dlg = gtk.MessageDialog(type=gtk.MESSAGE_WARNING, buttons=gtk.BUTTONS_OK,
                                     message_format=msg)
             dlg.run()
             dlg.destroy()
-            return True
-        else:
+        return True
+    
+    def is_running(self):
+        "Send something to another instance."
+        import gtk
+        self.socket.settimeout(TIMEOUT*3)
+        self.socket.connect((HOST, PORT))
+        if self._send('Is ExpoSong?', True) != 'Yes':
             return False
+        
+        msg = _('ExpoSong is already running.')
+        dlg = gtk.MessageDialog(type=gtk.MESSAGE_WARNING, buttons=gtk.BUTTONS_OK,
+                                message_format=msg)
+        dlg.run()
+        dlg.destroy()
+        return True
     
     def __del__(self):
         self.socket.close()
@@ -101,15 +133,20 @@ class SingleInstance(object):
 class ExposongInstanceError(Exception):
     pass
 
+class ExposongNotRunningError(Exception):
+    pass
 
 # Note: If an application is using the port, and we choose a higher port,
 #       ExpoSong will be able to start twice.
 inst = SingleInstance()
-while True:
-    try:
-        inst.serve()
-        break
-    except ExposongInstanceError:
-        if inst.send():
-            sys.exit(0)
-        PORT += 10000
+if inst.remote():
+    sys.exit(0)
+else:
+    while True:
+        try:
+            inst.serve()
+            break
+        except ExposongInstanceError:
+            if inst.is_running():
+                sys.exit(0)
+            PORT += 10000

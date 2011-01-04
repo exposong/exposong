@@ -30,7 +30,7 @@ import pygtk
 import shutil
 import sys
 import traceback
-from optparse import OptionParser
+from optparse import OptionParser, OptionGroup
 from os.path import abspath, dirname, join, pardir, expanduser
 
 
@@ -42,19 +42,46 @@ if sys.platform == 'win32':
 
 
 # Set up argument handling
-parser = OptionParser(version=exposong.version.__version__)
+parser = OptionParser(version=exposong.version.__version__,
+                      description="A presentation software with a focus on Christian worship settings.")
 parser.add_option('-v', '--verbose', dest='debug', action='store_true',
                   help='Print verbose debugging information to the command line')
 parser.add_option('-o', '--log', dest='log', action='store',
                   help='Write the log to a file.')
-parser.add_option('-d', '--data-path', dest='data_path', action='store')
-parser.add_option('-c', '--config', dest='config', action='store')
-parser.add_option('--reset', dest='reset', action='store_true',
-                  help='Deletes the contents of the data folder.')
-parser.add_option('-e', dest='clear_cache', action='store_true',
-                  help='Clear the cache in case of errors.')
+
+group = OptionGroup(parser, 'Locations')
+group.add_option('-d', '--data-path', dest='data_path', action='store',
+                 help='Choose another location for storing program data.')
+group.add_option('-c', '--config', dest='config', action='store',
+                 help='Use a config file at a given location')
+group.add_option('--reset', dest='reset', action='store_true',
+                 help='Deletes the contents of the data folder.')
+group.add_option('-e', dest='clear_cache', action='store_true',
+                 help='Clear the cache in case of errors.')
+parser.add_option_group(group)
+del group
+
+group = OptionGroup(parser, 'Remote Control',
+                    'Use these options to manipulate a running instance of ExpoSong')
+group.add_option('-n', '--next', dest='next', action='store_true',
+                 help='Move to the next slide.')
+group.add_option('-p', '--prev', dest='prev', action='store_true',
+                 help='Move to the previous slide.')
+# group.add_option('-s', '--present', '--show', dest='show', action='store_true',
+#                  help='Show the presentation screen.')
+# group.add_option('-x', '--exit', '--hide', dest='hide', action='store_true',
+#                  help='Hide the presentation screen.')
+# group.add_option('-b', '--black', dest='black', action='store_true',
+#                  help='Show black screen.')
+# group.add_option('--background', dest='background', action='store_true',
+#                  help='Show the background.')
+# group.add_option('--logo', dest='logo', action='store_true',
+#                  help='Show the logo.')
+parser.add_option_group(group)
+del group
 
 (options, args) = parser.parse_args()
+del parser, args
 
 # Set up logging
 log = logging.getLogger("exposong")
@@ -122,6 +149,9 @@ gettext.bindtextdomain('exposong', LOCALE_PATH)
 gettext.textdomain('exposong')
 __builtin__._ = gettext.gettext
 
+# Make sure only one instance of ExpoSong is running
+import exposong._instance
+
 # This needs to be after we locate SHARED_FILES, but before DATA_PATH is
 # defined.
 from exposong import config
@@ -134,9 +164,6 @@ else:
     DATA_PATH = join(expanduser("~"), "exposong", "data")
 
 log.debug('Data is located at "%s".', DATA_PATH)
-
-# Make sure only one instance of ExpoSong is running
-import exposong._instance
 
 if options.reset:
     msg = _("Are you sure you want to empty the data folder? This cannot be undone.")

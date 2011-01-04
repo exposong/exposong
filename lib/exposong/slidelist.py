@@ -105,11 +105,11 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
             return True
         return False
     
-    def prev_slide(self, widget):
+    def prev_slide(self, *args):
         'Move to the previous slide.'
         return self._move_to_slide(-1)
     
-    def next_slide(self, widget):
+    def next_slide(self, *args):
         'Move to the next slide.'
         return self._move_to_slide(1)
     
