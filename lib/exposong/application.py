@@ -156,11 +156,13 @@ class Main (gtk.Window):
     
     def _ready(self):
         "Called when ExpoSong is fully loaded."
-        gobject.timeout_add(200, splash.splash.destroy)
         self.show_all()
         # Prepares all button visibility by hiding the screen.
         screen.screen.hide()
         statusbar.statusbar.output(_("Ready"))
+        while gtk.events_pending():
+            gtk.main_iteration()
+        splash.splash.destroy()
         exposong.log.info('Ready.')
         exampledata.exampledata.check_presentations(self)
         return False
