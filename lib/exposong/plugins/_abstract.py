@@ -1,4 +1,6 @@
 #
+# vim: ts=4 sw=4 expandtab ai:
+#
 # Copyright (C) 2008-2010 Exposong.org
 #
 # ExpoSong is free software: you can redistribute it and/or modify
@@ -78,6 +80,13 @@ class Presentation:
             else:
                 return self.text
         
+        def get_slide(self):
+            '''A list of full screen renderable theme items.
+            
+            Voids get_body and get_footer from being called.'''
+            return NotImplemented
+            
+        
         def get_body(self):
             'Return a list of renderable theme items.'
             return [theme.Text(self.get_text(), align=theme.CENTER, 
@@ -111,8 +120,7 @@ class Presentation:
             'Draw text in the center of the screen.'
             return self.get_text()
         
-        def draw(self, widget, bounds):
-            'Overrides all text rendering to render custom slides.'
+        def get_theme(self):
             return NotImplemented
         
         def copy(self):

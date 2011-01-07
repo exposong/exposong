@@ -112,10 +112,20 @@ class Theme(object):
         for bg in self.backgrounds:
             bg.draw(ccontext, bounds)
         if slide:
-            for t in slide.get_body():
-                t.draw(ccontext, bounds, self.body)
-            for t in slide.get_footer():
-                t.draw(ccontext, bounds, self.footer)
+            cont = slide.get_slide()
+            if cont != NotImplemented:
+                for t in cont:
+                    try:
+                        t.draw(ccontext, bounds, self.slide)
+                    except AttributeError:
+                        self.slide = self.body
+                        self.slide.pos = [0.0, 0.0, 1.0, 1.0]
+                        t.draw(ccontext, bounds, self.slide)
+            else:
+                for t in slide.get_body():
+                    t.draw(ccontext, bounds, self.body)
+                for t in slide.get_footer():
+                    t.draw(ccontext, bounds, self.footer)
     
     @classmethod
     def render_color(cls, ccontext, bounds, color):

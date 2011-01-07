@@ -195,8 +195,12 @@ class Screen(exposong._hook.Menu):
             self.preview.queue_draw()
         
         slide = exposong.slidelist.slidelist.get_active_item()
+        theme = None
         
-        theme = exposong.themeselect.themeselect.get_active()
+        if slide:
+            theme = slide.get_theme()
+        if theme == NotImplemented:
+            theme = exposong.themeselect.themeselect.get_active()
         if not theme:
             # Select the first theme if nothing is set as the default.
             exposong.themeselect.themeselect.set_active(0)

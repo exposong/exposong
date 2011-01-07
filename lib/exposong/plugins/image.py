@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 #
+# vim: ts=4 sw=4 expandtab ai:
+#
 # Copyright (C) 2008-2010 Exposong.org
 #
 # ExpoSong is free software: you can redistribute it and/or modify
@@ -214,20 +216,17 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             # If all else fails, blank image
             return gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, True, 8, size[0], size[1])
         
-        def draw(self, ccontext, bounds):
-            'Override screen to draw an image instead of text.'
-            
-            #draw a black background
-            ccontext.set_source_rgb(0, 0, 0)
-            ccontext.paint()
-            
-            pb = self._get_pixbuf()
-            if not pb:
-                return False
-            ccontext.set_source_pixbuf(pb, (bounds[0]-pb.get_width())/2,
-                                       (bounds[1]-pb.get_height())/2)
-            ccontext.paint()
-            return True
+        def get_slide(self):
+            'Gets the image fullscreen.'
+            return [exposong.theme.Image(self.image)]
+        
+        def get_theme(self):
+            try:
+                return self.__theme
+            except AttributeError:
+                self.__theme = exposong.theme.Theme()
+                return self.__theme
+    
     
     def __init__(self, filename=''):
         _abstract.Presentation.__init__(self, filename)

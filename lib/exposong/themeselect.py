@@ -304,3 +304,7 @@ class _ExampleSlide(object):
     
     def get_footer(self):
         return self.foot
+    
+    def get_slide(self):
+        return NotImplemented
+
