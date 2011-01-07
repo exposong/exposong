@@ -67,16 +67,16 @@ group.add_option('-n', '--next', dest='next', action='store_true',
                  help='Move to the next slide.')
 group.add_option('-p', '--prev', dest='prev', action='store_true',
                  help='Move to the previous slide.')
-# group.add_option('-s', '--present', '--show', dest='show', action='store_true',
-#                  help='Show the presentation screen.')
-# group.add_option('-x', '--exit', '--hide', dest='hide', action='store_true',
-#                  help='Hide the presentation screen.')
-# group.add_option('-b', '--black', dest='black', action='store_true',
-#                  help='Show black screen.')
-# group.add_option('--background', dest='background', action='store_true',
-#                  help='Show the background.')
-# group.add_option('--logo', dest='logo', action='store_true',
-#                  help='Show the logo.')
+group.add_option('-s', '--present', '--show', dest='show', action='store_true',
+                 help='Show the presentation screen.')
+group.add_option('-x', '--exit', '--hide', dest='hide', action='store_true',
+                 help='Hide the presentation screen.')
+group.add_option('-b', '--black', dest='black', action='store_true',
+                 help='Show black screen.')
+group.add_option('--background', dest='background', action='store_true',
+                 help='Show the background.')
+group.add_option('--logo', dest='logo', action='store_true',
+                 help='Show the logo.')
 parser.add_option_group(group)
 del group
 
@@ -100,7 +100,6 @@ import exposong.gtklogger
 exposong.gtklogger.handler = exposong.gtklogger.GTKHandler(logging.DEBUG)
 log.addHandler(exposong.gtklogger.handler)
 
-## TODO Allow the user to pass a variable to the command line
 # Log to a file.
 if options.log:
     _handler = logging.FileHandler(options.log)

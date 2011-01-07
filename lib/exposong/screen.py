@@ -330,20 +330,18 @@ class Screen(exposong._hook.Menu):
         tb.add(button)
         return tb
     
-    def _secondary_button_toggle(self, action=None):
-        'Set the screen to be freezed'
+    def _secondary_button_toggle(self, action=None, state=None):
+        'Toggle a state button.'
         try:
             if self.__block_toggle:
                 return
         except Exception:
             pass
         self.__block_toggle = True
+        if state != None:
+            action.set_active(True)
         for nm in ('Freeze', 'Background', 'Logo', 'Black Screen'):
             nmaction = self._actions.get_action(nm)
-            if nmaction == self._actions.get_action(nm) == 'Logo':
-                nmfunc = self.to_logo
-            else:
-                nmfunc = self._secondary_button_toggle
             if action <> nmaction:
                 nmaction.set_active(False)
             else:
@@ -351,8 +349,18 @@ class Screen(exposong._hook.Menu):
         self.draw()
         self.__block_toggle = False
     
+    def to_black(self):
+        'Set the screen to black.'
+        self._secondary_button_toggle(self._actions.get_action('Black Screen'), True)
+    
+    def to_background(self):
+        'Set the screen to the current theme.'
+        self._secondary_button_toggle(self._actions.get_action('Background'), True)
+    
     def to_logo(self, action=None):
         'Set the screen to the ExpoSong logo or a user-defined one.'
+        if action == None:
+            action = self._actions.get_action('Logo')
         if config.has_option("screen", "logo") and \
                 os.path.isfile(config.get("screen", "logo")):
             # TODO should we resize the logo? If not, we need to add the
@@ -366,7 +374,7 @@ class Screen(exposong._hook.Menu):
                 self.__logo_fl = config.get('screen', 'logo')
                 self.__logo_img = exposong.theme.Image(self.__logo_fl,
                         pos=[0.2, 0.2, 0.8, 0.8])
-            self._secondary_button_toggle(action)
+            self._secondary_button_toggle(action, True)
         else:
             self._secondary_button_toggle(None)
             msg = _('No Logo set. Do you want to choose a Logo now?')

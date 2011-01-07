@@ -31,7 +31,7 @@ import socket
 import sys
 
 import exposong
-# This has to be imported after ExpoSong is started.
+# The following has to be imported after ExpoSong is started.
 #import exposong.slidelist
 
 
@@ -52,7 +52,7 @@ class SingleInstance(object):
             self.socket.bind((HOST, PORT))
         except socket.error:
             raise ExposongInstanceError
-        self.socket.listen(2)
+        self.socket.listen(4)
         gobject.timeout_add(int(TIMEOUT*1000), self.listen)
     
     def listen(self):
@@ -82,7 +82,23 @@ class SingleInstance(object):
         elif data == 'Prev':
             import exposong.slidelist
             exposong.slidelist.slidelist.prev_slide()
+        elif data == 'Show':
+            import exposong.screen
+            exposong.screen.screen.show()
+        elif data == 'Hide':
+            import exposong.screen
+            exposong.screen.screen.hide()
+        elif data == 'Black':
+            import exposong.screen
+            exposong.screen.screen.to_black()
+        elif data == 'Background':
+            import exposong.screen
+            exposong.screen.screen.to_background()
+        elif data == 'Logo':
+            import exposong.screen
+            exposong.screen.screen.to_logo()
         else:
+            import exposong
             exposong.log.debug('Unknown Data on port.')
     
     def _send(self, text, recv=False):
@@ -101,6 +117,16 @@ class SingleInstance(object):
                 self._send('Next')
             elif exposong.options.prev:
                 self._send('Prev')
+            elif exposong.options.show:
+                self._send('Show')
+            elif exposong.options.hide:
+                self._send('Hide')
+            elif exposong.options.black:
+                self._send('Black')
+            elif exposong.options.background:
+                self._send('Background')
+            elif exposong.options.logo:
+                self._send('Logo')
             else:
                 return False
         except socket.timeout:
