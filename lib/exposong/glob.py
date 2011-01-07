@@ -31,19 +31,15 @@ the program. May contain certain variables as well.
 """
 
 
-def get_node_text(node, respect_whitespace=False):
-    'Returns the text of a node (XML DOM Object)'
-    if(isinstance(node, str)):
-        return node
-    rc = []
-    for child in node.childNodes:
-        if child.nodeType == node.TEXT_NODE:
-            rc.append(child.data)
+def get_node_text(element, respect_whitespace=False):
+    'Returns the text of a node (ElementTree.Element Object)'
+    if(isinstance(element, str)):
+        return element
+    if not element.text:
+        return ''
     if respect_whitespace:
-        return "".join(rc).strip()
-    else:
-        return re.sub('\s+', ' ', "".join(rc).strip())
-
+        return element.text.strip()
+    return re.sub('\s+', ' ', element.text.strip())
 
 def title_to_filename(title):
     """

@@ -15,8 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import gtk, gtk.gdk, gobject
-import xml.dom
-import xml.dom.minidom
+
+from xml.etree import cElementTree as etree
 
 import exposong.application
 import exposong._hook
@@ -76,8 +76,8 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
 
         # TODO Separate to new function _process_dom or likewise.
         dom = None
-        if isinstance(dom, xml.dom.Node):
-            ordernode = dom.getElementsByTagName("order")
+        if etree.iselement(dom):
+            ordernode = dom.findall("order")
             if len(ordernode) > 0:
                 self._order = get_node_text(ordernode[0]).split()
                 for o in self._order:

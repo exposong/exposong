@@ -19,9 +19,7 @@
 import gtk
 import gtk.gdk
 import gobject
-import xml.dom
-import xml.dom.minidom
-from xml.parsers.expat import ExpatError
+from xml.etree import cElementTree as etree
 
 from exposong.glob import *
 from exposong import DATA_PATH
@@ -57,9 +55,9 @@ class Presentation:
         text = ''
         def __init__(self, pres, value):
             self.pres = pres
-            if isinstance(value, xml.dom.Node):
+            if etree.iselement(value):
                 self.text = get_node_text(value, True)
-                self.title = value.getAttribute("title")
+                self.title = value.get("title")
             elif isinstance(value, str):
                 self.text = value
                 self.title = ''
@@ -96,13 +94,13 @@ class Presentation:
             'Return a list of renderable theme items.'
             return []
         
-        def to_node(self, document, node):
+        def to_node(self, node):
             'Populate the node element'
             if self.title:
-                node.setAttribute("title", self.title)
+                node.attrib["title"] = self.title
             if self.id:
-                node.setAttribute("id", self.id)
-            node.appendChild( document.createTextNode(self.text) )
+                node.attrib["id"] = self.id
+            node.text = self.text
         
         def set_attributes(self, layout):
             'Set attributes on a pango.Layout object.'
@@ -132,8 +130,8 @@ class Presentation:
             return slide
             
         def _set_id(self, value = None):
-            if isinstance(value, xml.dom.Node):
-                self.id = value.getAttribute("id")
+            if etree.iselement(value):
+                self.id = value.get("id")
             if not self.id:
                 if self.title:
                     self.id = "%s_%s" % (str(self.get_title()).replace(" ","").lower(),
@@ -163,28 +161,25 @@ class Presentation:
             
             dom = None
             try:
-                dom = xml.dom.minidom.parse(filename)
-                root = dom.documentElement
+                dom = etree.parse(filename)
+                root = dom.getroot()
             except IOError, details:
                 exposong.log.error('Could not open presentation "%s": %s',
                                    filename, details)
-            except ExpatError, details:
-                exposong.log.error('Error reading presentation file "%s": %s',
-                                   filename, details)
+            #except ExpatError, details:
+            #    exposong.log.error('Error reading presentation file "%s": %s',
+            #                       filename, details)
             else:
-                self._title = get_node_text(root.getElementsByTagName("title")[0])
-                copyright = root.getElementsByTagName("copyright")
+                self._title = get_node_text(root.findall("title")[0])
+                copyright = root.findall("copyright")
                 if len(copyright):
                     self.copyright = get_node_text(copyright[0])
-                timer = root.getElementsByTagName("timer")
+                timer = root.findall("timer")
                 if len(timer) > 0:
-                    self.timer = int(timer[0].getAttribute("time"))
-                    self.timer_loop = bool(timer[0].getAttribute("loop"))
+                    self.timer = int(timer[0].get("time"))
+                    self.timer_loop = bool(timer[0].get("loop"))
                 
                 self._set_slides(dom)
-            finally:
-                if dom:
-                    dom.unlink()
     
     @classmethod
     def is_type(cls, fl):
@@ -210,7 +205,7 @@ class Presentation:
     
     def _set_slides(self, dom):
         'Set the slides from xml.'
-        slides = dom.getElementsByTagName("slide")
+        slides = dom.findall("slide")
         for sl in slides:
             self.slides.append(self.Slide(self, sl))
     
@@ -358,29 +353,31 @@ class Presentation:
             self.filename = check_filename(self.get_title(),
                                            os.path.join(DATA_PATH, "pres"))
         
-        doc = xml.dom.getDOMImplementation().createDocument(None, None, None)
-        root = doc.createElement("presentation")
-        root.setAttribute("type", self.get_type())
+        root = etree.Element("presentation")
+        root.attrib["type"] = self.get_type()
+        root.text = "\n"
         
-        node = doc.createElement("title")
-        node.appendChild(doc.createTextNode(self.get_title()))
-        root.appendChild(node)
+        node = etree.Element("title")
+        node.text = self.get_title()
+        node.tail = "\n"
+        root.append(node)
         
         if self.timer:
-            node = doc.createElement("timer")
-            node.setAttribute('time', str(self.timer))
+            node = etree.Element("timer")
+            node.attrib['time'] = str(self.timer)
             if self.timer_loop:
-                node.setAttribute('loop', "1")
-            root.appendChild(node)
+                node.attrib['loop'] = "1"
+            node.tail = "\n"
+            root.append(node)
         
         for s in self.slides:
-            sNode = doc.createElement("slide")
-            s.to_node(doc, sNode)
-            root.appendChild(sNode)
-        doc.appendChild(root)
+            node = etree.Element("slide")
+            s.to_node(node)
+            node.tail = '\n'
+            root.append(node)
+        doc = etree.ElementTree(root)
         outfile = open(self.filename, 'w')
-        doc.writexml(outfile)
-        doc.unlink()
+        doc.write(outfile, encoding=u'UTF-8')
     
     def slide_column(self, col, list_):
         'Set the column to use text.'

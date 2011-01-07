@@ -21,10 +21,7 @@ import gtk.gdk
 import gobject
 import pango
 import re
-import string
 import os.path
-import xml.dom
-import xml.dom.minidom
 from datetime import datetime
 
 import exposong.application

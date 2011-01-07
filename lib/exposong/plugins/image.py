@@ -24,8 +24,7 @@ import gtk.gdk
 import pango
 import os.path
 import shutil
-import xml.dom
-import xml.dom.minidom
+from xml.etree import cElementTree as etree
 
 from gtk.gdk import pixbuf_new_from_file_at_size as pixbuf_new_sz
 from gtk.gdk import pixbuf_new_from_file as pixbuf_new
@@ -87,13 +86,15 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             # TODO Make sure the thumb and image don't exist before creating the
             # new image.
             self.pres = pres
+            self.image = ''
+            self.rotate = None
             
-            if(isinstance(value, xml.dom.Node)):
-                self.title = value.getAttribute("title")
-                imgdom = value.getElementsByTagName("img").item(0)
-                if imgdom:
-                    self.image = imgdom.getAttribute("src")
-                    self.rotate = get_rotate_const(imgdom.getAttribute("rotate"))
+            if(etree.iselement(value)):
+                self.title = value.get("title")
+                imgdom = value.findall("img")[0]
+                if imgdom != None:
+                    self.image = imgdom.get("src")
+                    self.rotate = get_rotate_const(imgdom.get("rotate"))
             elif(isinstance(value, str)):
                 self.title = ''
                 self.image = value
@@ -144,19 +145,16 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             self._pixbuf = self._get_cache(self.image, sz, False)
             return self._pixbuf
         
-        def to_node(self, document, node):
+        def to_node(self, node):
             'Populate the node element'
             if(self.title):
-                node.setAttribute("title", self.title)
+                node.attrib["title"] = self.title
             
             # <img src='..' rotate='n|cw|ccw|ud' />
-            img = document.createElement("img")
-            #if os.path.split(self.image)[0] == os.path.join(DATA_PATH,'image'):
-            img.setAttribute("src", os.path.split(self.image)[1])
-            #else:
-            #  img.setAttribute("src", self.image)
-            img.setAttribute("rotate", get_rotate_str(self.rotate))
-            node.appendChild(img)
+            img = etree.Element("img")
+            img.attrib["src"] = os.path.split(self.image)[1]
+            img.attrib["rotate"] = get_rotate_str(self.rotate)
+            node.append(img)
         
         @staticmethod
         def get_version():
@@ -233,7 +231,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
     
     def _set_slides(self, dom):
         'Set the slides from xml.'
-        slides = dom.getElementsByTagName("slide")
+        slides = dom.findall("slide")
         for sl in slides:
             try:
                 self.slides.append(self.Slide(self, sl))
