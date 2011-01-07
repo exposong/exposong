@@ -127,6 +127,18 @@ def append_combo(table, label, options, value, top):
     table.attach(combo, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, _WIDGET_SPACING)
     return combo
 
+def append_combo_entry(table, label, options, value, top):
+    'Adds a combo widget to a table and returns it.'
+    set_label(table, label, top)
+    
+    combo = gtk.combo_box_entry_new_text()
+    for i in range(len(options)):
+        combo.append_text(options[i])
+    if value:
+        combo.child.set_text(value)
+    table.attach(combo, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, _WIDGET_SPACING)
+    return combo
+
 def append_combo2(table, label, options, value, top):
     '''Adds a combo widget to a table and returns it.
     

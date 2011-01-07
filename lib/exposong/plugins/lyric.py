@@ -712,13 +712,19 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
                 dialog.set_title( _('Editing Theme "%s"') % model.get_value(itr,0) )
             theme_value = model.get_value(itr,0)
             lang_value = model.get_value(itr,1)
-        theme = gui.append_entry(table, _('Theme Name:'), theme_value, 0)
+        themes = [thm.name for t in exposong.application.main.library
+                     if t[0].get_type() == "lyric"
+                     for thm in t[0].song.props.themes]
+        themes = sorted(set(themes))
+        theme = gui.append_combo_entry(table, _('Theme Name:'),
+                                          themes, theme_value, 0)
+        #theme = gui.append_entry(table, _('Theme Name:'), theme_value, 0)
         lang = gui.append_language_combo(table, lang_value, 1)
         dialog.vbox.show_all()
         
         while True:
             if dialog.run() == gtk.RESPONSE_ACCEPT:
-                if not theme.get_text():
+                if not theme.get_active_text():
                     info_dialog = gtk.MessageDialog(treeview.get_toplevel(),
                             gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO,
                             gtk.BUTTONS_OK, _("Please enter an Theme Name."))
@@ -726,10 +732,10 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
                     info_dialog.destroy()
                 else:
                     if edit:
-                        model.set_value(itr, 0, theme.get_text())
+                        model.set_value(itr, 0, theme.get_active_text())
                         model.set_value(itr, 1, lang.get_active_text())
                     else:
-                        self._fields['theme'].append( (theme.get_text(),
+                        self._fields['theme'].append( (theme.get_active_text(),
                                 lang.get_active_text(), "") )
                     dialog.hide()
                     return True
@@ -763,13 +769,18 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
                 dialog.set_title( _('Editing Songbook "%s"') % model.get_value(itr,0) )
             songbook_value = model.get_value(itr,0)
             entry_value = model.get_value(itr,1)
-        songbook = gui.append_entry(table, _('Songbook Name:'), songbook_value, 0)
+        songbooks = [sbook.name for t in exposong.application.main.library
+                     if t[0].get_type() == "lyric"
+                     for sbook in t[0].song.props.songbooks]
+        songbooks = sorted(set(songbooks))
+        songbook = gui.append_combo_entry(table, _('Songbook Name:'),
+                                          songbooks, songbook_value, 0)
         entry = gui.append_entry(table, _('Entry:'), entry_value, 1)
         dialog.vbox.show_all()
         
         while True:
             if dialog.run() == gtk.RESPONSE_ACCEPT:
-                if not songbook.get_text():
+                if not songbook.get_active_text():
                     info_dialog = gtk.MessageDialog(treeview.get_toplevel(),
                             gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO,
                             gtk.BUTTONS_OK, _("Please enter a Songbook."))
@@ -777,10 +788,10 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
                     info_dialog.destroy()
                 else:
                     if edit:
-                        model.set_value(itr, 0, songbook.get_text())
+                        model.set_value(itr, 0, songbook.get_active_text())
                         model.set_value(itr, 1, entry.get_text())
                     else:
-                        self._fields['songbook'].append( (songbook.get_text(),
+                        self._fields['songbook'].append( (songbook.get_active_text(),
                                 entry.get_text()) )
                     dialog.hide()
                     return True
