@@ -25,6 +25,7 @@ from exposong import DATA_PATH
 from exposong import SHARED_FILES
 from exposong.config import config
 import exposong.screen
+import exposong.application
 
 '''
 Dialog for changing settings in ExpoSong.
@@ -57,8 +58,14 @@ class PrefsDialog(gtk.Dialog):
         if config.get("general", "title_slide") == "True":
             g_title.set_active(True)
         
-        gui.append_section_title(table, _("Legal"), 2)
+        gui.append_section_title(table, _("Lyrics"), 2)
         g_ccli = gui.append_entry(table, "CCLI #", config.get("general","ccli"), 3)
+        songbooks = [sbook.name for t in exposong.application.main.library
+                     if t[0].get_type() == "lyric"
+                     for sbook in t[0].song.props.songbooks]
+        songbooks = sorted(set(songbooks))
+        g_songbook = gui.append_combo(table, _("Songbook"), songbooks,
+                                      config.get("general","songbook"), 4)
         
         notebook.append_page(table, gtk.Label( _("General") ))
         
@@ -118,6 +125,7 @@ class PrefsDialog(gtk.Dialog):
         self.show_all()
         if self.run() == gtk.RESPONSE_ACCEPT:
             config.set("general", "ccli", g_ccli.get_text())
+            config.set("general", "songbook", g_songbook.get_active_text())
             if config.get("general", "title_slide") != str(g_title.get_active()):
                 config.set("general", "title_slide", str(g_title.get_active()))
                 exposong.preslist.preslist._on_pres_activate()

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# vim: ts=4 sw=4 expandtab ai:
 #
 # Copyright (C) 2008-2010 Exposong.org
 #
@@ -121,11 +122,12 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
             'Return a list of renderable theme items.'
             f = [theme.Text(self.footer_text(), align=theme.CENTER, 
                  valign=theme.MIDDLE, pos=[0.25, 0.0, 0.75, 1.0], margin=5)]
-            if len(self.pres.song.props.songbooks) > 0:
-                s = self.pres.song.props.songbooks[0]
-                f.append(theme.Text("<big>%s</big>\n<small>%s</small>" % \
-                         (s.entry, s.name), pos=[0.0, 0.0, 0.25, 1.0],
-                         align=theme.LEFT, valign=theme.BOTTOM, margin=5))
+            for s in self.pres.song.props.songbooks:
+            	if s.name == config.get("general","songbook"):
+                    f.append(theme.Text("<big>%s</big>\n<small>%s</small>" % \
+                             (s.entry, s.name), pos=[0.0, 0.0, 0.25, 1.0],
+                             align=theme.LEFT, valign=theme.BOTTOM, margin=5))
+                    break
             return f
         
         def footer_text(self):

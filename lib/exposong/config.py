@@ -64,6 +64,7 @@ class Config(ConfigParser.SafeConfigParser):
         
         self.set("general", "ccli", "")
         self.set("general", "title_slide", "True")
+        self.set("general", "songbook", "")
         
         self.set("screen", "bg_type", 'color')
         self.set("screen", "bg_image", "")
