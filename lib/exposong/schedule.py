@@ -20,12 +20,11 @@ import gtk
 import gtk.gdk
 import gobject
 import os.path
-import xml.dom
-from xml.dom import minidom
+from xml.etree import cElementTree as etree
 
-from glob import *
 from exposong import DATA_PATH
 from exposong import preslist
+from exposong.glob import *
 import exposong.plugins._abstract
 
 
@@ -57,14 +56,13 @@ class Schedule(gtk.ListStore):
         'Loads from an xml file.'
         self.clear()
         self.builtin = False
-        self.title = get_node_text(dom.getElementsByTagName("title")[0])
-        for presNode in dom.getElementsByTagName("presentation"):
+        self.title = get_node_text(dom.findall("title")[0])
+        for presNode in dom.findall("presentation"):
             filenm = ""
             comment = ""
             
             try:
-                filenm = os.path.split(get_node_text(
-                        presNode.getElementsByTagName("file")[0]))[1]
+                filenm = os.path.split(get_node_text(presNode.find("file")))[1]
                 hasFile = True
             except IndexError:
                 exposong.log.warning('Missing filename for presentation in schedule "%s"',
@@ -72,7 +70,7 @@ class Schedule(gtk.ListStore):
                 continue
             
             try:
-                comment = get_node_text(presNode.getElementsByTagName("comment")[0])
+                comment = get_node_text(presNode.find("comment"))
             except IndexError:
                 pass
             
@@ -89,33 +87,28 @@ class Schedule(gtk.ListStore):
     def save(self):
         'Write schedule to disk.'
         self.filename = check_filename(self.title, self.filename)
-        try:
-            dom = xml.dom.getDOMImplementation().createDocument(None, None, None)
-            root = dom.createElement("schedule")
-            root.setAttribute("created", "0")
-            root.setAttribute("modified", "0")
-            tNode = dom.createElement("title")
-            tNode.appendChild(dom.createTextNode(self.title))
-            root.appendChild(tNode)
+        root = etree.Element("schedule")
+        root.attrib["created"] = "0"
+        root.attrib["modified"] = "0"
+        node = etree.Element("title")
+        node.text = self.title
+        root.append(node)
+        
+        itr = self.get_iter_first()
+        while itr:
+            item = self.get_value(itr, 0)
             
-            itr = self.get_iter_first()
-            while itr:
-                item = self.get_value(itr, 0)
-                
-                pNode = dom.createElement("presentation")
-                tNode = dom.createElement("file")
-                tNode.appendChild(dom.createTextNode(item.filename))
-                pNode.appendChild(tNode)
-                tNode = dom.createElement("comment")
-                tNode.appendChild(dom.createTextNode(item.comment))
-                pNode.appendChild(tNode)
-                root.appendChild(pNode)
-                itr = self.iter_next(itr)
-            dom.appendChild(root)
-            outfile = open(self.filename, 'w')
-            dom.writexml(outfile)
-        finally:
-            dom.unlink()
+            node = etree.Element("presentation")
+            node2 = etree.Element("file")
+            node2.text = item.filename
+            node.append(node2)
+            node2 = etree.Element("comment")
+            node2.text = item.comment
+            node.append(node2)
+            root.append(node)
+            itr = self.iter_next(itr)
+        dom = etree.ElementTree(root)
+        dom.write(self.filename, encoding=u'UTF-8')
     
     def append(self, pres, comment = ""):
         'Add a presentation to the schedule.'

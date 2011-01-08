@@ -23,7 +23,7 @@ import os
 import os.path
 import webbrowser
 from gtk.gdk import pixbuf_new_from_file as pb_new
-from xml.dom import minidom
+from xml.etree import cElementTree as etree
 
 import exposong.about
 import exposong.plugins
@@ -342,20 +342,20 @@ class Main (gtk.Window):
         dom = None
         sched = None
         try:
-            dom = minidom.parse(filenm)
+            dom = etree.parse(filenm)
         except Exception, details:
+            # Will this raise an error? It's not documented in ElementTree.
             exposong.log.error('Error reading schedule file "%s":\n  %s',
                 os.path.join(filenm), details)
         if dom:
-            if dom.documentElement.tagName == "schedule":
+            root = dom.getroot()
+            if root.tag == "schedule":
                 sched = Schedule(filename=filenm, builtin=False)
-                sched.load(dom.documentElement, self.library)
+                sched.load(root, self.library)
                 schedlist.schedlist.append(schedlist.schedlist.custom_schedules, sched)
             else:
                 exposong.log.error("%s is not a schedule file.",
                                    os.path.join(directory, filenm))
-            dom.unlink()
-            del dom
         return sched
 
     def build_schedule(self):
