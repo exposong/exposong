@@ -31,8 +31,8 @@ import socket
 import sys
 
 import exposong
-# The following has to be imported after ExpoSong is started.
-#import exposong.slidelist
+# Imports from ExpoSong classes are done when they are needed, so that loading
+# is completed in the correct order.
 
 
 TIMEOUT = .07
@@ -44,7 +44,14 @@ class SingleInstance(object):
     Prevent multiple instances of ExpoSong, and send signals to the running instance.
     """
     def __init__(self):
+        pass
+    def open(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    def close(self):
+        self.socket.close()
+    def reopen(self):
+        self.close()
+        self.open()
     
     def serve(self):
         import gobject
@@ -66,14 +73,18 @@ class SingleInstance(object):
             if s == self.socket:
                 client, addr = self.socket.accept()
                 exposong.log.debug('Received connection %d from %s.', client.fileno(), addr)
-                data = client.recv(1024)
-                while data:
-                    self.handle_request(client, data)
+                try:
                     data = client.recv(1024)
+                    while data:
+                        self.handle_request(client, data)
+                        data = client.recv(1024)
+                except socket.error:
+                    pass
                 client.close()
         gobject.timeout_add(int(TIMEOUT*1000), self.listen)
     
     def handle_request(self, conn, data):
+        "Handles received data from listen()."
         if data == 'Is ExpoSong?':
             conn.send('Yes')
         elif data == 'Next':
@@ -97,12 +108,16 @@ class SingleInstance(object):
         elif data == 'Logo':
             import exposong.screen
             exposong.screen.screen.to_logo()
+        elif data.startswith('Import '):
+            import exposong.plugins.export_import
+            filename = data.partition(' ')[2]
+            exposong.plugins.export_import.ExportImport.import_file(filename)
         else:
             import exposong
             exposong.log.debug('Unknown Data on port.')
     
     def _send(self, text, recv=False):
-        ""
+        "Send data to a running instance of ExpoSong"
         self.socket.settimeout(TIMEOUT*3)
         self.socket.connect((HOST, PORT))
         self.socket.send(text)
@@ -111,7 +126,14 @@ class SingleInstance(object):
     
     def remote(self):
         ""
-        import gtk
+        self.open()
+        if exposong.options.import_:
+            try:
+                self._send('Import %s' % exposong.options.import_)
+                return True
+            except socket.timeout:
+                self.reopen()
+        
         try:
             if exposong.options.next:
                 self._send('Next')
@@ -130,6 +152,8 @@ class SingleInstance(object):
             else:
                 return False
         except socket.timeout:
+            self.reopen()
+            import gtk
             msg = _('ExpoSong is not running.')
             dlg = gtk.MessageDialog(type=gtk.MESSAGE_WARNING, buttons=gtk.BUTTONS_OK,
                                     message_format=msg)

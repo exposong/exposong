@@ -24,7 +24,7 @@ import mimetypes
 
 import exposong.application
 import exposong.schedlist
-from exposong import DATA_PATH
+from exposong import DATA_PATH, options
 from exposong.plugins import Plugin
 from exposong.glob import *
 
@@ -186,7 +186,7 @@ class ExportImport(Plugin, exposong._hook.Menu):
         return image_list
     
     @classmethod
-    def import_file(cls, *args):
+    def import_dialog(cls, *args):
         'Import a schedule, backgrounds or library.'
         dlg = gtk.FileChooserDialog(_("Import"), exposong.application.main,
                                     gtk.FILE_CHOOSER_ACTION_OPEN,
@@ -195,84 +195,88 @@ class ExportImport(Plugin, exposong._hook.Menu):
         dlg.add_filter(_FILTER)
         dlg.set_current_folder(os.path.expanduser("~"))
         if dlg.run() == gtk.RESPONSE_ACCEPT:
-            tar = tarfile.open(unicode(dlg.get_filename()), "r:gz")
-            # Make a temporary directory so that no files are overwritten.
-            tmpdir = tempfile.mkdtemp(os.path.split(
-                                      dlg.get_filename())[1].rstrip(".expo"))
-            tar.extractall(tmpdir)
-            tar.close()
-            imgs2rename = []
-            if os.path.isdir(os.path.join(tmpdir, "image")):
-                for nm in os.listdir(os.path.join(tmpdir,"image")):
-                    if not os.path.exists(os.path.join(DATA_PATH, "image", nm)):
-                        shutil.move(os.path.join(tmpdir, "image", nm),
-                                    os.path.join(DATA_PATH, "image", nm))
-                    else:
-                        nm2 = find_freefile(os.path.join(DATA_PATH, "image", nm))
-                        shutil.move(os.path.join(tmpdir, "image", nm), 
-                                    os.path.join(DATA_PATH, "image", nm2))
-                        imgs2rename.append((nm,nm2.rpartition(os.sep)[2]))
-
-            if os.path.isdir(os.path.join(tmpdir, "pres")):
-                pres2rename = []
-                for nm in os.listdir(os.path.join(tmpdir,"pres")):
-                    # Rename Images
-                    if len(imgs2rename) > 0:
-                        infl = open(os.path.join(tmpdir,"pres",nm),"r")
-                        outfl = open(os.path.join(tmpdir,"pres",nm+".1"),"w")
-                        for ln in infl:
-                            for img in imgs2rename:
-                                ln = re.subn(r"\b"+img[0]+r"\b",img[1],ln)[0]
-                            outfl.write(ln)
-                        infl.close()
-                        outfl.close()
-                        shutil.move(os.path.join(tmpdir,"pres",nm+".1"),
-                                    os.path.join(tmpdir,"pres",nm))
-                    if not os.path.exists(os.path.join(DATA_PATH, "pres", nm)):
-                        shutil.move(os.path.join(tmpdir, "pres", nm),
-                                    os.path.join(DATA_PATH, "pres", nm))
-                        exposong.application.main.load_pres(nm)
-                    else:
-                        nm2 = find_freefile(os.path.join(DATA_PATH, "pres", nm))
-                        nm2 = nm2.rpartition(os.sep)[2]
-                        shutil.move(os.path.join(tmpdir, "pres", nm), 
-                                    os.path.join(DATA_PATH, "pres", nm2))
-                        exposong.application.main.load_pres(nm2)
-                        pres2rename.append((nm,nm2))
-
-            if os.path.isdir(os.path.join(tmpdir, "sched")):
-                for nm in os.listdir(os.path.join(tmpdir,"sched")):
-                    # Rename presentations
-                    if len(pres2rename) > 0:
-                        infl = open(os.path.join(tmpdir,"sched",nm),"r")
-                        outfl = open(os.path.join(tmpdir,"sched",nm+".1"),"w")
-                        for ln in infl:
-                            for pres in pres2rename:
-                                ln = re.subn(r"\b"+pres[0]+r"\b",pres[1],ln)[0]
-                            outfl.write(ln)
-                        infl.close()
-                        outfl.close()
-                        shutil.move(os.path.join(tmpdir,"sched",nm+".1"),
-                                    os.path.join(tmpdir,"sched",nm))
-
-                    if not os.path.exists(os.path.join(DATA_PATH, "sched", nm)):
-                        shutil.move(os.path.join(tmpdir, "sched", nm),
-                                    os.path.join(DATA_PATH, "sched", nm))
-                        exposong.application.main.load_sched(nm)
-                    else:
-                        nm2 = find_freefile(os.path.join(DATA_PATH, "sched", nm))
-                        nm2 = nm2.rpartition(os.sep)[2]
-                        shutil.move(os.path.join(tmpdir, "sched", nm),
-                                    os.path.join(DATA_PATH, "sched", nm2))
-                        exposong.application.main.load_sched(nm2)
-
-            if os.path.isdir(os.path.join(tmpdir, "bg")):
-                images = os.listdir(os.path.join(tmpdir, "bg"))
-                for i in range(len(images)):
-                    images[i] = os.path.join(tmpdir, "bg", images[i])
-                exposong.bgselect.bgselect.add_images(images)
-        
+            dlg.hide()
+            cls.import_file(dlg.get_filename())
         dlg.destroy()
+    
+    @classmethod
+    def import_file(cls, filename):
+        tar = tarfile.open(unicode(filename), "r:gz")
+        # Make a temporary directory so that no files are overwritten.
+        tmpdir = tempfile.mkdtemp(os.path.split(filename)[1].rstrip(".expo"))
+        tar.extractall(tmpdir)
+        tar.close()
+        imgs2rename = []
+        if os.path.isdir(os.path.join(tmpdir, "image")):
+            for nm in os.listdir(os.path.join(tmpdir,"image")):
+                if not os.path.exists(os.path.join(DATA_PATH, "image", nm)):
+                    shutil.move(os.path.join(tmpdir, "image", nm),
+                                os.path.join(DATA_PATH, "image", nm))
+                else:
+                    nm2 = find_freefile(os.path.join(DATA_PATH, "image", nm))
+                    shutil.move(os.path.join(tmpdir, "image", nm), 
+                                os.path.join(DATA_PATH, "image", nm2))
+                    imgs2rename.append((nm,nm2.rpartition(os.sep)[2]))
+
+        if os.path.isdir(os.path.join(tmpdir, "pres")):
+            pres2rename = []
+            for nm in os.listdir(os.path.join(tmpdir,"pres")):
+                # Rename Images
+                if len(imgs2rename) > 0:
+                    infl = open(os.path.join(tmpdir,"pres",nm),"r")
+                    outfl = open(os.path.join(tmpdir,"pres",nm+".1"),"w")
+                    for ln in infl:
+                        for img in imgs2rename:
+                            ln = re.subn(r"\b"+img[0]+r"\b",img[1],ln)[0]
+                        outfl.write(ln)
+                    infl.close()
+                    outfl.close()
+                    shutil.move(os.path.join(tmpdir,"pres",nm+".1"),
+                                os.path.join(tmpdir,"pres",nm))
+                if not os.path.exists(os.path.join(DATA_PATH, "pres", nm)):
+                    shutil.move(os.path.join(tmpdir, "pres", nm),
+                                os.path.join(DATA_PATH, "pres", nm))
+                    exposong.application.main.load_pres(nm)
+                else:
+                    nm2 = find_freefile(os.path.join(DATA_PATH, "pres", nm))
+                    nm2 = nm2.rpartition(os.sep)[2]
+                    shutil.move(os.path.join(tmpdir, "pres", nm), 
+                                os.path.join(DATA_PATH, "pres", nm2))
+                    exposong.application.main.load_pres(nm2)
+                    pres2rename.append((nm,nm2))
+
+        if os.path.isdir(os.path.join(tmpdir, "sched")):
+            for nm in os.listdir(os.path.join(tmpdir,"sched")):
+                # Rename presentations
+                if len(pres2rename) > 0:
+                    infl = open(os.path.join(tmpdir,"sched",nm),"r")
+                    outfl = open(os.path.join(tmpdir,"sched",nm+".1"),"w")
+                    for ln in infl:
+                        for pres in pres2rename:
+                            ln = re.subn(r"\b"+pres[0]+r"\b",pres[1],ln)[0]
+                        outfl.write(ln)
+                    infl.close()
+                    outfl.close()
+                    shutil.move(os.path.join(tmpdir,"sched",nm+".1"),
+                                os.path.join(tmpdir,"sched",nm))
+
+                if not os.path.exists(os.path.join(DATA_PATH, "sched", nm)):
+                    shutil.move(os.path.join(tmpdir, "sched", nm),
+                                os.path.join(DATA_PATH, "sched", nm))
+                    exposong.application.main.load_sched(nm)
+                else:
+                    nm2 = find_freefile(os.path.join(DATA_PATH, "sched", nm))
+                    nm2 = nm2.rpartition(os.sep)[2]
+                    shutil.move(os.path.join(tmpdir, "sched", nm),
+                                os.path.join(DATA_PATH, "sched", nm2))
+                    exposong.application.main.load_sched(nm2)
+
+        if os.path.isdir(os.path.join(tmpdir, "bg")):
+            images = os.listdir(os.path.join(tmpdir, "bg"))
+            for i in range(len(images)):
+                images[i] = os.path.join(tmpdir, "bg", images[i])
+            exposong.bgselect.bgselect.add_images(images)
+        
     
     @classmethod
     def merge_menu(cls, uimanager):
@@ -281,7 +285,7 @@ class ExportImport(Plugin, exposong._hook.Menu):
         actiongroup.add_actions([('import-schedule', None,
                         _("_ExpoSong Data (.expo)..."), None,
                         _("Import a schedule, presentations or backgrounds"),
-                        cls.import_file),
+                        cls.import_dialog),
                 ('export-sched', None,
                         _("_Current Schedule with Presentations..."),
                         None, None, cls.export_sched),

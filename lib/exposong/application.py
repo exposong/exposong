@@ -132,7 +132,7 @@ class Main (gtk.Window):
         win_v.pack_start(win_h_mn, True)
         
         ## Status bar
-        exposong.log.debug("Status bar.")
+        exposong.log.debug("Loading the status bar.")
         statusbar.statusbar = statusbar.timedStatusbar()
         win_v.pack_end(statusbar.statusbar, False)
         
@@ -164,6 +164,9 @@ class Main (gtk.Window):
             gtk.main_iteration()
         splash.splash.destroy()
         exposong.log.info('Ready.')
+        if exposong.options.import_:
+            from exposong.plugins import export_import
+            export_import.ExportImport.import_file(exposong.options.import_)
         exampledata.exampledata.check_presentations(self)
         return False
     

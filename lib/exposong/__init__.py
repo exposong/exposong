@@ -42,12 +42,16 @@ if sys.platform == 'win32':
 
 
 # Set up argument handling
+# TODO These cannot currently be translated, due to the required order. Do they
+# need to be?
 parser = OptionParser(version=exposong.version.__version__,
                       description="A presentation software with a focus on Christian worship settings.")
 parser.add_option('-v', '--verbose', dest='debug', action='store_true',
                   help='Print verbose debugging information to the command line')
 parser.add_option('-o', '--log', dest='log', action='store',
                   help='Write the log to a file.')
+parser.add_option('-i', '--import', dest='import_', action='store',
+                  help='Import an ExpoSong data file. Can import for existing program.')
 
 group = OptionGroup(parser, 'Locations')
 group.add_option('-d', '--data-path', dest='data_path', action='store',
@@ -81,7 +85,7 @@ parser.add_option_group(group)
 del group
 
 (options, args) = parser.parse_args()
-del parser, args
+del parser
 
 # Set up logging
 log = logging.getLogger("exposong")
