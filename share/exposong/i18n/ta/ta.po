@@ -1,0 +1,832 @@
+# Tamil translation for exposong
+# Copyright (c) 2010 Rosetta Contributors and Canonical Ltd 2010
+# This file is distributed under the same license as the exposong package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: exposong\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2010-08-28 17:25+0300\n"
+"PO-Revision-Date: 2010-08-28 15:39+0000\n"
+"Last-Translator: Launchpad Translations Administrators "
+"<rosetta@launchpad.net>\n"
+"Language-Team: Tamil <ta@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2010-08-29 04:05+0000\n"
+"X-Generator: Launchpad (build Unknown)\n"
+
+#: share/exposong/lib/exposong/about.py:31
+#, python-format
+msgid "Copyright %s"
+msgstr "பதிப்புரிமை %s"
+
+#: share/exposong/lib/exposong/about.py:34
+#: share/exposong/lib/exposong/about.py:35
+msgid "translator-credits"
+msgstr ""
+"Launchpad Contributions:\n"
+"  Ramesh https://launchpad.net/~rame20002007"
+
+#: share/exposong/lib/exposong/application.py:131
+msgid "Present"
+msgstr "நிகழ்"
+
+#: share/exposong/lib/exposong/application.py:134
+#: share/exposong/lib/exposong/prefs.py:72
+#: share/exposong/lib/exposong/prefs.py:76
+msgid "Background"
+msgstr "பின்னணி"
+
+#: share/exposong/lib/exposong/application.py:138
+#: share/exposong/lib/exposong/prefs.py:70
+msgid "Logo"
+msgstr "சின்னம்"
+
+#: share/exposong/lib/exposong/application.py:141
+msgid "Black Screen"
+msgstr "கறுப்புத் திரை"
+
+#: share/exposong/lib/exposong/application.py:144
+msgid "Hide"
+msgstr "மறை"
+
+#: share/exposong/lib/exposong/application.py:179
+msgid "_File"
+msgstr "கோப்பு (_F)"
+
+#: share/exposong/lib/exposong/application.py:180
+msgid "_Edit"
+msgstr "திருத்து (_E)"
+
+#: share/exposong/lib/exposong/application.py:181
+msgid "_Schedule"
+msgstr ""
+
+#: share/exposong/lib/exposong/application.py:182
+msgid "P_resentation"
+msgstr ""
+
+#: share/exposong/lib/exposong/application.py:183
+msgid "_Help"
+msgstr "உதவி (_H)"
+
+#: share/exposong/lib/exposong/application.py:187
+msgid "_Import"
+msgstr "இறக்குமதி (_I)"
+
+#: share/exposong/lib/exposong/application.py:188
+msgid "Import a .expo package or other format"
+msgstr ""
+
+#: share/exposong/lib/exposong/application.py:189
+msgid "_Export"
+msgstr "ஏற்றுமதி (_E)"
+
+#: share/exposong/lib/exposong/application.py:189
+msgid "Export a .expo package"
+msgstr ""
+
+#: share/exposong/lib/exposong/application.py:190
+msgid "_Print"
+msgstr "அச்சிடு (_P)"
+
+#: share/exposong/lib/exposong/application.py:191
+msgid "Create a new schedule"
+msgstr ""
+
+#: share/exposong/lib/exposong/application.py:193
+msgid "_Rename"
+msgstr "மறுபெயரிடு (_R)"
+
+#: share/exposong/lib/exposong/application.py:194
+msgid "Rename the selected schedule"
+msgstr ""
+
+#: share/exposong/lib/exposong/application.py:196
+msgid "Delete the currently selected schedule"
+msgstr ""
+
+#: share/exposong/lib/exposong/application.py:198
+msgid "Create a new presentation"
+msgstr ""
+
+#: share/exposong/lib/exposong/application.py:200
+msgid "Edit the currently selected presentation"
+msgstr ""
+
+#: share/exposong/lib/exposong/application.py:203
+msgid "_Remove from Schedule"
+msgstr ""
+
+#: share/exposong/lib/exposong/application.py:204
+msgid "Remove the presentation from schedule"
+msgstr ""
+
+#: share/exposong/lib/exposong/application.py:207
+msgid "Delete the presentation"
+msgstr ""
+
+#: share/exposong/lib/exposong/application.py:208
+msgid "Previous Presentation"
+msgstr ""
+
+#: share/exposong/lib/exposong/application.py:210
+msgid "Previous Slide"
+msgstr ""
+
+#: share/exposong/lib/exposong/application.py:212
+msgid "Next Slide"
+msgstr ""
+
+#: share/exposong/lib/exposong/application.py:214
+msgid "Next Presentation"
+msgstr ""
+
+#: share/exposong/lib/exposong/application.py:216
+msgid "_Find Presentation"
+msgstr ""
+
+#: share/exposong/lib/exposong/application.py:217
+msgid "Search for a presentation"
+msgstr ""
+
+#: share/exposong/lib/exposong/application.py:218
+msgid "_Present"
+msgstr ""
+
+#: share/exposong/lib/exposong/application.py:220
+msgid "_Background"
+msgstr "பின்னணி (_B)"
+
+#: share/exposong/lib/exposong/application.py:222
+msgid "Lo_go"
+msgstr ""
+
+#: share/exposong/lib/exposong/application.py:224
+msgid "Blac_k Screen"
+msgstr ""
+
+#: share/exposong/lib/exposong/application.py:226
+msgid "Hi_de"
+msgstr "மறை (_D)"
+
+#: share/exposong/lib/exposong/application.py:354
+msgid "Ready"
+msgstr "தயார்"
+
+#: share/exposong/lib/exposong/application.py:382
+msgid "Library"
+msgstr "நூலகம்"
+
+#: share/exposong/lib/exposong/application.py:405
+msgid "Custom Schedules"
+msgstr ""
+
+#: share/exposong/lib/exposong/bgselect.py:72
+msgid "Add"
+msgstr "சேர்"
+
+#: share/exposong/lib/exposong/bgselect.py:150
+#: share/exposong/lib/exposong/plugins/image.py:259
+msgid "Image Types"
+msgstr ""
+
+#: share/exposong/lib/exposong/bgselect.py:154
+msgid "Add Image"
+msgstr ""
+
+#: share/exposong/lib/exposong/gui.py:61
+msgid "Choose File"
+msgstr "கோப்பினை தெரிவு செய்"
+
+#: share/exposong/lib/exposong/gui.py:74
+msgid "Choose Folder"
+msgstr "அடைவை தேர்வு செய்க"
+
+#: share/exposong/lib/exposong/gui.py:157
+msgid "Language Code"
+msgstr ""
+
+#: share/exposong/lib/exposong/__init__.py:69
+msgid "en"
+msgstr "en"
+
+#: share/exposong/lib/exposong/prefs.py:36
+msgid "Preferences"
+msgstr "விருப்பத்தேர்வுகள்"
+
+#: share/exposong/lib/exposong/prefs.py:49
+msgid "Data folder"
+msgstr ""
+
+#: share/exposong/lib/exposong/prefs.py:50
+msgid ""
+"The place where all your presentations, schedules and background images are "
+"stored."
+msgstr ""
+
+#: share/exposong/lib/exposong/prefs.py:53
+msgid "Legal"
+msgstr ""
+
+#: share/exposong/lib/exposong/prefs.py:56
+msgid "General"
+msgstr "பொதுவான"
+
+#: share/exposong/lib/exposong/prefs.py:61
+msgid "Font"
+msgstr "எழுத்துரு"
+
+#: share/exposong/lib/exposong/prefs.py:62
+msgid "Text Color"
+msgstr "உரை நிறம்:"
+
+#: share/exposong/lib/exposong/prefs.py:64
+msgid "Text Shadow"
+msgstr "உரை நிழல்"
+
+#: share/exposong/lib/exposong/prefs.py:66
+msgid "Max Font Size"
+msgstr ""
+
+#: share/exposong/lib/exposong/prefs.py:71
+msgid "Image"
+msgstr "படிமம்"
+
+#: share/exposong/lib/exposong/prefs.py:75
+msgid "Notify"
+msgstr ""
+
+#: share/exposong/lib/exposong/prefs.py:84
+msgid "Primary"
+msgstr "முதன்மை"
+
+#: share/exposong/lib/exposong/prefs.py:84
+msgid "Primary (Bottom-Right)"
+msgstr ""
+
+#: share/exposong/lib/exposong/prefs.py:85
+msgid "Secondary"
+msgstr ""
+
+#: share/exposong/lib/exposong/prefs.py:85
+msgid "Tertiary"
+msgstr ""
+
+#: share/exposong/lib/exposong/prefs.py:85
+msgid "Monitor 4"
+msgstr ""
+
+#: share/exposong/lib/exposong/prefs.py:104
+msgid "Position"
+msgstr "இடம்"
+
+#: share/exposong/lib/exposong/prefs.py:105
+msgid "Monitor"
+msgstr ""
+
+#: share/exposong/lib/exposong/prefs.py:107
+msgid "Screen"
+msgstr "திரை"
+
+#: share/exposong/lib/exposong/prefs.py:116
+msgid ""
+"You will have to restart ExpoSong so that the new data folder will be used."
+msgstr ""
+
+#: share/exposong/lib/exposong/presfilter.py:68
+msgid "Search"
+msgstr "தேடு"
+
+#: share/exposong/lib/exposong/preslist.py:41
+msgid "Presentation"
+msgstr ""
+
+#: share/exposong/lib/exposong/preslist.py:195
+#, python-format
+msgid "Are you sure you want to delete \"%s\" from your library?"
+msgstr ""
+
+#: share/exposong/lib/exposong/preslist.py:197
+msgid "Delete Presentation?"
+msgstr ""
+
+#: share/exposong/lib/exposong/schedlist.py:47
+msgid "Schedule"
+msgstr ""
+
+#: share/exposong/lib/exposong/schedlist.py:132
+#, python-format
+msgid "Are you sure you want to delete \"%s\"?"
+msgstr ""
+
+#: share/exposong/lib/exposong/schedlist.py:133
+msgid "Delete Schedule?"
+msgstr ""
+
+#: share/exposong/lib/exposong/schedlist.py:169
+#, python-format
+msgid "Added Presentation >%(presentation)s< to Schedule >%(schedule)s<"
+msgstr ""
+
+#: share/exposong/lib/exposong/schedlist.py:174
+msgid "New Schedule"
+msgstr ""
+
+#: share/exposong/lib/exposong/screen.py:138
+msgid "No Logo set. Do you want to choose a Logo now?"
+msgstr ""
+
+#: share/exposong/lib/exposong/screen.py:139
+msgid "Set Logo?"
+msgstr ""
+
+#: share/exposong/lib/exposong/slidelist.py:43
+#: share/exposong/lib/exposong/plugins/text.py:111
+msgid "Slide"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/_abstract.py:230
+msgid "New Presentation"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/_abstract.py:236
+#, python-format
+msgid "Editing \"%s\""
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/_abstract.py:239
+#, python-format
+msgid "New %s Presentation"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/_abstract.py:276
+msgid "Use Timer"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/_abstract.py:286
+msgid "Seconds Per Slide"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/_abstract.py:299
+msgid "Loop Slides"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/_abstract.py:304
+msgid "Timer"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/export_import.py:36
+msgid "Export/Import Functions"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/export_import.py:64
+msgid "Export Current Schedule"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/export_import.py:108
+msgid "Export Library"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/export_import.py:113
+msgid "exposong_library.expo"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/export_import.py:152
+msgid "Export Backgrounds"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/export_import.py:158
+msgid "exposong_backgrounds.expo"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/export_import.py:186
+msgid "Import"
+msgstr "இறக்குமதி செய்"
+
+#: share/exposong/lib/exposong/plugins/export_import.py:276
+msgid "_Schedule or Library ..."
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/export_import.py:277
+msgid "Import a schedule or full library."
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/export_import.py:279
+msgid "_Current Schedule (and belonging presentations) ..."
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/export_import.py:281
+msgid "Whole _Library ..."
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/export_import.py:283
+msgid "_Backgrounds ..."
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/image.py:35
+msgid "Image Presentation"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/image.py:184
+#: share/exposong/lib/exposong/plugins/lyric.py:559
+#: share/exposong/lib/exposong/plugins/text.py:91
+#: share/exposong/lib/exposong/plugins/text.py:371
+msgid "Title:"
+msgstr "தலைப்பு:"
+
+#: share/exposong/lib/exposong/plugins/image.py:219
+#: share/exposong/lib/exposong/plugins/text.py:139
+msgid "Edit"
+msgstr "தொகு"
+
+#: share/exposong/lib/exposong/plugins/image.py:242
+msgid "Please enter a Title"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/image.py:250
+msgid "Add Images"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/image.py:318
+msgid "_Image"
+msgstr "படம் (_I)"
+
+#: share/exposong/lib/exposong/plugins/image.py:344
+msgid "Image Presentations"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:35
+msgid "ExpoSong Lyrics Converter"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:96
+#: share/exposong/lib/exposong/plugins/songselect_convert.py:123
+msgid "Undefined Title"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:115
+msgid "Import ExpoSong Legacy File(s)"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:121
+msgid "ExpoSong Legacy File"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:138
+msgid "_ExpoSong Legacy File(s) ..."
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:139
+msgid "Import a Lyric Presentation from ExpoSong before 0.7"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:45
+msgid "Lyric Presentation"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:55
+msgid "Words"
+msgstr "சொற்கள்"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:56
+msgid "Music"
+msgstr "இசை"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:57
+msgid "Translation"
+msgstr "மொழிபெயர்ப்பு"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:60
+msgid "Verse"
+msgstr "சரணம்"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:61
+msgid "Pre-Chorus"
+msgstr "அனுபல்லவி"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:62
+msgid "Chorus"
+msgstr "பல்லவி"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:63
+msgid "Refrain"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:64
+msgid "Bridge"
+msgstr "பாலம்"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:65
+msgid "Ending"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:138
+msgid "Written By"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:262
+#: share/exposong/lib/exposong/plugins/lyric.py:286
+msgid "Title"
+msgstr "தலைப்பு"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:268
+#: share/exposong/lib/exposong/plugins/lyric.py:326
+#: share/exposong/lib/exposong/plugins/lyric.py:380
+msgid "Language"
+msgstr "மொழி"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:278
+msgid "Variant:"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:281
+msgid "Custom Version:"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:283
+msgid "Release Date:"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:316
+msgid "Author"
+msgstr "நூலாசிரியர்"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:321
+msgid "Type"
+msgstr "வகை"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:335
+msgid "Copyright:"
+msgstr "பதிப்புரிமை:"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:337
+msgid "CCLI Number:"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:339
+msgid "Publisher:"
+msgstr "பதிப்பாளர்:"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:342
+msgid "Ownership"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:374
+#: share/exposong/lib/exposong/plugins/lyric.py:400
+msgid "Theme"
+msgstr "கருப்பொருள்"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:386
+msgid "ID"
+msgstr "ID"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:397
+msgid "Keywords:"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:430
+msgid "Songbook Name"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:436
+msgid "Entry"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:448
+msgid "Transposition:"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:450
+msgid "Tempo:"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:453
+msgid "Tempo Type:"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:454
+msgid "bpm"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:454
+msgid "Text"
+msgstr "உரை"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:457
+msgid "Key:"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:460
+msgid "Music Info"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:464
+msgid "Comments:"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:466
+msgid "Other"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:475
+msgid "Verse Order:"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:477
+msgid "Use the Slide names in brackets to modify the order"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:542
+msgid "New Title"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:554
+#, python-format
+msgid "Editing Title \"%s\""
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:568
+#: share/exposong/lib/exposong/plugins/text.py:163
+#: share/exposong/lib/exposong/plugins/text.py:443
+msgid "Please enter a Title."
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:595
+msgid "New Author"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:607
+#, python-format
+msgid "Editing Author \"%s\""
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:611
+msgid "Author Name:"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:612
+msgid "Author Type:"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:613
+msgid "None"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:626
+msgid "Please enter an Author Name."
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:657
+msgid "New Theme"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:669
+#, python-format
+msgid "Editing Theme \"%s\""
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:672
+msgid "Theme Name:"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:681
+msgid "Please enter an Theme Name."
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:708
+msgid "New songbook"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:720
+#, python-format
+msgid "Editing Songbook \"%s\""
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:723
+msgid "Songbook Name:"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:724
+msgid "Entry:"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:732
+msgid "Please enter a Songbook."
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:759
+msgid "You must enter at least one title."
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:847
+msgid "_Lyric"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:873
+msgid "Lyric Presentations"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:908
+msgid "Name:"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:925
+msgid "Index:"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/opensong_convert.py:32
+msgid "OpenSong Lyrics Converter"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/opensong_convert.py:72
+msgid "Import OpenSong File(s)"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/opensong_convert.py:91
+msgid "_OpenSong File(s) ..."
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/opensong_convert.py:92
+msgid "Import a Lyric Presentation from OpenSong"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/print_support.py:30
+msgid "Print"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/print_support.py:48
+msgid "Please select the presentation you want to print."
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/print_support.py:49
+msgid "Select Presentation"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/print_support.py:95
+msgid "Alphabetical list of Songs"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/print_support.py:114
+msgid "_Current Presentation"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/print_support.py:116
+msgid "_List of all Songs"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/songselect_convert.py:37
+msgid "SongSelect Lyrics Converter"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/songselect_convert.py:142
+msgid "Import SongSelect Lyrics"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/songselect_convert.py:148
+#, python-format
+msgid "SongSelect File (%s)"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/songselect_convert.py:165
+msgid "_SongSelect Lyrics ..."
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/songselect_convert.py:166
+msgid "Converts a SongSelect file to OpenLyrics"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/text.py:31
+msgid "Text Presentation"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/text.py:170
+msgid "The presentation must have at least one slide."
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/text.py:218
+msgid "Are you sure you want to delete this slide? This cannot be undone."
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/text.py:219
+msgid "Delete Slide?"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/text.py:258
+msgid "_Text"
+msgstr "உரை (_T)"
+
+#: share/exposong/lib/exposong/plugins/text.py:284
+msgid "Text Presentations"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/text.py:307
+msgid "Editing Slide"
+msgstr ""
+
+#: share/exposong/lib/exposong/plugins/text.py:414
+msgid "Unsaved Changes exist. Do you really want to continue without saving?"
+msgstr ""
