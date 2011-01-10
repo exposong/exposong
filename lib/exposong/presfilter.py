@@ -157,7 +157,7 @@ class PresFilter(gtk.Entry, exposong._hook.Menu):
         return model.get_value(itr, 0).matches(self.get_text())
 
     def focus(self, *args):
-        'Sets the focus (for an menu action).'
+        'Sets the focus (for a menu action).'
         self.grab_focus()
     
     @classmethod
