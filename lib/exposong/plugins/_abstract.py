@@ -232,8 +232,15 @@ class Presentation:
 
     def matches(self, text):
         'Tests to see if the presentation matches `text`.'
+        # Remove some punctuation marks from title and search text
+        blacklist = ",'?!"
+        title = self.get_title()
+        for char in blacklist:
+            text = text.replace(char, "")
+            title = title.replace(char, "")
+        
         regex = re.compile("\\b"+re.escape(text), re.U|re.I)
-        if regex.search(self.get_title()):
+        if regex.search(title):
             return True
         if self.slides:
             if hasattr(self.slides[0], 'text') and \
