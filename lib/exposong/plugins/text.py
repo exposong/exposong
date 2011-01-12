@@ -50,15 +50,21 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             _abstract.Presentation.Slide.__init__(self, pres, value)
         
         def _edit_window(self, parent):
+            ret = 0
             editor = SlideEdit(parent, self)
             while True:
-                if editor.run() == gtk.RESPONSE_ACCEPT:
+                ans = editor.run()
+                if ans == gtk.RESPONSE_ACCEPT:
                     if editor.changed:
                         self.title = editor.get_slide_title()
                         self.text = editor.get_slide_text()
-                        return True
-                else:
-                    return False
+                        ret = 1
+                elif ans == gtk.RESPONSE_APPLY: #Close and new
+                    if editor.changed:
+                        self.title = editor.get_slide_title()
+                        self.text = editor.get_slide_text()
+                    ret = 2
+                return ret
         
         @staticmethod
         def get_version():
@@ -203,7 +209,8 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         else:
             sl = self.Slide(self, None)
         
-        if sl._edit_window(treeview.get_toplevel()):
+        ans = sl._edit_window(treeview.get_toplevel())
+        if ans:
             if edit:
                 if len(old_title) == 0 or old_title <> sl.title:
                     sl._set_id()
@@ -211,6 +218,8 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             else:
                 sl._set_id()
                 model.append( (sl, sl.get_markup(True)) )
+        if ans == 2:
+            self._slide_dlg(treeview, None, None)
     
     def _on_slide_added(self, model, path, iter):
         self._slide_list.set_cursor(path)
@@ -334,6 +343,11 @@ class SlideEdit(gtk.Dialog):
         
         self._build_menu()
         
+        newbutton = self.add_button(_("Save and New"), gtk.RESPONSE_APPLY)
+        newimg = gtk.Image()
+        newimg.set_from_stock(gtk.STOCK_NEW, gtk.ICON_SIZE_BUTTON)
+        newbutton.set_image(newimg)
+        newbutton.connect("clicked", self._quit_with_save)
         cancelbutton = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
         cancelbutton.connect("clicked", self._quit_without_save)
         okbutton = self.add_button(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)

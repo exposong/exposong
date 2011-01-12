@@ -143,16 +143,19 @@ class Presentation (text.Presentation, Plugin, exposong._hook.Menu,
             return '\n'.join(jn)
         
         def _edit_window(self, parent):
+            ret = False
             editor = SlideEdit(parent, self)
-            editor.run()
+            ans = editor.run()
             if editor.changed:
                 old_title = self.title
                 self.title = editor.get_slide_title()
                 self.verse.name = self.title
                 self._set_lines(editor.get_slide_text())
                 self.pres._rename_order(old_title, self.title)
-                return True
-            return False
+                ret = True
+            if ans == gtk.RESPONSE_APPLY:
+                ret = 2
+            return ret
         
         def copy(self):
             'Create a duplicate of the slide.'
