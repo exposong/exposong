@@ -119,7 +119,7 @@ class Presentation:
             return self.get_text()
         
         def get_theme(self):
-            return NotImplemented
+            return None
         
         def copy(self):
             'Create a duplicate of the slide.'

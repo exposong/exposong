@@ -96,7 +96,7 @@ class Theme(object):
         "Return the name of the theme."
         if 'title' in self.meta:
             return self.meta['title']
-        return os.path.basename(filename).rstrip('.xml').title()
+        return os.path.basename(self.filename).rstrip('.xml').title()
     
     def load(self, tree):
         "Load the theme from an XML file."

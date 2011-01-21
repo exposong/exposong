@@ -199,9 +199,9 @@ class Screen(exposong._hook.Menu):
         
         if slide:
             theme = slide.get_theme()
-        if theme == NotImplemented:
+        if theme is None:
             theme = exposong.themeselect.themeselect.get_active()
-        if not theme:
+        if theme is None:
             # Select the first theme if nothing is set as the default.
             exposong.themeselect.themeselect.set_active(0)
             theme = exposong.themeselect.themeselect.get_active()

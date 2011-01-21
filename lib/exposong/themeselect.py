@@ -65,6 +65,7 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         itr = self.get_active_iter()
         if itr:
             return self.liststore.get_value(itr, 1)
+        return None
     
     def _load_themes(self):
         "Load all the themes from disk."
