@@ -156,7 +156,6 @@ class PrefsDialog(gtk.Dialog):
             config.set('screen','monitor', monitor_value[p_monitor.get_active()])
             exposong.screen.screen.reposition(parent)
             
-            exposong.screen.screen.set_dirty()
             if hasattr(exposong.screen.screen,"_logo_pbuf"):
                 del exposong.screen.screen._logo_pbuf
             exposong.screen.screen.draw()

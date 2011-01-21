@@ -49,8 +49,6 @@ class Screen(exposong._hook.Menu):
     '''
     
     def __init__(self):
-        self.bg_dirty = False
-        self.bg_img = {}
         self.aspect = 4 / 3
         self._size = None
         
@@ -148,10 +146,6 @@ class Screen(exposong._hook.Menu):
     def _expose_preview(self, widget, event):
         'Redraw the preview widget.'
         self._draw(self.preview)
-    
-    def set_dirty(self, dirty=True):
-        'Reload the background image if necessary.'
-        self.bg_dirty = dirty
     
     def is_viewable(self):
         state = self.pres.window and self.pres.window.is_viewable()

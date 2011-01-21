@@ -119,7 +119,6 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
             config.set("screen", "theme", mod.get_value(itr, 0))
             t = os.path.basename(mod.get_value(itr, 0)).rstrip('.xml').title()
             exposong.log.info('Changing theme to "%s".',t)
-            exposong.screen.screen.set_dirty()
             exposong.screen.screen.draw()
     
     def new_theme(self, *args):
@@ -200,7 +199,9 @@ class CellRendererTheme(gtk.GenericCellRenderer):
     def _get_pixmap(self, window, size):
         "Render to an offscreen pixmap."
         global _example_slide
-        fname = os.path.basename(os.path.splitext(self.theme.filename)[0])+'-prev.png'
+        fname = os.path.basename(os.path.splitext(self.theme.filename)[0])
+        fname += '.%s.png' % 'x'.join(map(str, size))
+        print fname
         if fname in self._pm:
             return self._pm[fname]
         
