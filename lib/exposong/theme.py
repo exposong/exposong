@@ -60,9 +60,9 @@ class Theme(object):
     """
     A theme item.
     """
-    def __init__(self, filename=None):
+    def __init__(self, filename=None, builtin=False):
         "Create a theme."
-        self.filename = None
+        self._builtin = builtin
         self.meta = {}
         self.backgrounds = []
         self.body = Section(type_='body', font="Sans 56",
@@ -74,9 +74,8 @@ class Theme(object):
             
             tree = etree.parse(filename)
             self.load(tree)
-        #For Testing
-        if None:
-            self.save()
+        else:
+            self.filename = filename
     
     def get_footer_pos(self):
         "Return the position where the footer begins."
@@ -96,7 +95,14 @@ class Theme(object):
         "Return the name of the theme."
         if 'title' in self.meta:
             return self.meta['title']
-        return os.path.basename(self.filename).rstrip('.xml').title()
+        elif self.filename:
+            return os.path.basename(self.filename).rstrip('.xml').title()
+        else:
+            return ""
+    
+    def is_builtin(self):
+        "Save/Editable only if not builtin."
+        return self._builtin
     
     def load(self, tree):
         "Load the theme from an XML file."
@@ -122,6 +128,8 @@ class Theme(object):
     
     def save(self):
         "Save theme to disk."
+        if self.is_builtin():
+            raise Exception("Builtin themes cannot be saved.")
         root = self.to_xml()
         tree = etree.ElementTree(root)
         # TODO This is saved in the current local directory.
@@ -307,7 +315,7 @@ class GradiantBackground(_Background, _Renderable):
     def __init__(self, angle=0, pos=None):
         ""
         _Renderable.__init__(self, pos)
-        self.angle = None
+        self.angle = angle
         self.stops = []
     
     def parse_xml(self, el):

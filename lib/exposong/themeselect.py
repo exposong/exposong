@@ -24,6 +24,7 @@ import gobject
 import gtk
 import os.path
 import pango
+import re
 from gtk.gdk import pixbuf_new_from_file as pb_new
 
 import exposong.application
@@ -57,6 +58,9 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         self.pack_start(textrend, True)
         self.set_cell_data_func(textrend, self._get_theme_title)
         self.connect("changed", self._on_change)
+        
+        task = self._load_builtin()
+        gobject.idle_add(task.next)
         task = self._load_themes()
         gobject.idle_add(task.next)
     
@@ -66,6 +70,42 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         if itr:
             return self.liststore.get_value(itr, 1)
         return None
+    
+    def _load_builtin(self):
+        "Load some builtin themes."
+        try:
+            active = config.get("screen", "theme")
+        except Exception:
+            active = None
+        
+        yield True
+        
+        themes = {}
+        
+        themes['_builtin_black'] = exposong.theme.Theme(builtin=True)
+        themes['_builtin_black'].meta['title'] = _('White on Black (Builtin)')
+        
+        themes['_builtin_white'] = exposong.theme.Theme(builtin=True)
+        themes['_builtin_white'].meta['title'] = _('Black on White (Builtin)')
+        themes['_builtin_white'].backgrounds.append(exposong.theme.ColorBackground("#fff"))
+        themes['_builtin_white'].body.color = '#000'
+        themes['_builtin_white'].body.shadow_color = '#fff'
+        themes['_builtin_white'].footer.color = '#000'
+        themes['_builtin_white'].footer.shadow_color = '#fff'
+        
+        themes['_builtin_blue_gradiant'] = exposong.theme.Theme(builtin=True)
+        themes['_builtin_blue_gradiant'].meta['title'] = _('Blue Gradiant (Builtin)')
+        bg = exposong.theme.GradiantBackground(45)
+        bg.stops.append(exposong.theme.GradiantStop(0.0, '#034'))
+        bg.stops.append(exposong.theme.GradiantStop(1.0, '#069'))
+        themes['_builtin_blue_gradiant'].backgrounds.append(bg)
+        
+        for k,v in themes.iteritems():
+            itr = self.liststore.append([k, v])
+            if k == active:
+                self.set_active_iter(itr)
+            yield True
+        yield False
     
     def _load_themes(self):
         "Load all the themes from disk."
@@ -106,7 +146,7 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         yield False
     
     def _get_theme_title(self, column, cell, model, titer):
-        "Get the theme name from the filename."
+        "Set the title."
         thm = model.get_value(titer, 1)
         if thm:
             cell.set_property('text', thm.get_title())
@@ -120,13 +160,17 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
             t = os.path.basename(mod.get_value(itr, 0)).rstrip('.xml').title()
             exposong.log.info('Changing theme to "%s".',t)
             exposong.screen.screen.draw()
+        self._set_menu_items_disabled()
     
     def new_theme(self, *args):
         themeeditor.ThemeEditor(exposong.application.main)
         
     def edit_theme(self, *args):
         print self.get_active()
-        themeeditor.ThemeEditor(exposong.application.main, self.get_active().filename)
+        theme = self.get_active()
+        if theme.is_builtin():
+            raise Exception("Builtin themes cannot be modified.")
+        themeeditor.ThemeEditor(exposong.application.main, theme.filename)
     
     def delete_theme(self, *args):
         #TODO
@@ -159,6 +203,12 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
             """)
         # unmerge_menu not implemented, because we will never uninstall this as
         # a module.
+    
+    def _set_menu_items_disabled(self):
+        'Disable buttons if the presentation is not shown.'
+        enabled = not self.get_active().is_builtin()
+        self._actions.get_action("theme-edit").set_sensitive(enabled)
+        self._actions.get_action("theme-delete").set_sensitive(enabled)
     
     @classmethod
     def get_button_bar(cls):
@@ -199,9 +249,11 @@ class CellRendererTheme(gtk.GenericCellRenderer):
     def _get_pixmap(self, window, size):
         "Render to an offscreen pixmap."
         global _example_slide
-        fname = os.path.basename(os.path.splitext(self.theme.filename)[0])
+        if self.theme.is_builtin():
+            fname = '_builtin_' + re.sub('[^a-z]+','_',self.theme.meta['title'].lower()).rstrip('_')
+        else:
+            fname = os.path.basename(os.path.splitext(self.theme.filename)[0])
         fname += '.%s.png' % 'x'.join(map(str, size))
-        print fname
         if fname in self._pm:
             return self._pm[fname]
         

@@ -388,3 +388,4 @@ class Screen(exposong._hook.Menu):
                     self.to_logo()
             else:
                 self.to_background()
+        
