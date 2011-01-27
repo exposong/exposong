@@ -7,16 +7,16 @@
         <copyright>ExpoSong Logo: &#169; 2010 The ExpoSong Team</copyright>
     </meta>
     <background>
-        <gradiant angle='0' x1='0.0' x2='1.0' y1='0.0' y2='0.845'>
+        <gradient angle='0' x1='0.0' x2='1.0' y1='0.0' y2='0.845'>
             <point color='#777' stop='0.0' />
             <point color='#ccc' stop='0.2' />
             <point color='#fff' stop='1.0' />
-        </gradiant>
-        <gradiant angle='90' x1='0.0' x2='1.0' y1='0.0' y2='0.845'>
+        </gradient>
+        <gradient angle='90' x1='0.0' x2='1.0' y1='0.0' y2='0.845'>
             <point color='#ccc' stop='0.0' alpha='0.7' />
             <point color='#fff' stop='0.5' alpha='0.3' />
             <point color='#ccc' stop='1.0' alpha='0.7' />
-        </gradiant>
+        </gradient>
         <solid color='#fa1' x1='0.0' x2='1.0' y1='0.845' y2='1.0' />
         <solid color='#000' x1='0.0' x2='1.0' y1='0.84' y2='0.85' />
         <img src='exposong.png' x1='0.8' x2='0.99' y1='0.86' y2='0.99' aspect='fit' />

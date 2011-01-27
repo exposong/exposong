@@ -23,7 +23,7 @@ The points will be based on percentages (0.0 - 1.0) to be compatible with all
 screen sizes. Colors can be anything parsable by gtk.gdk.color_parse()
 [http://library.gnome.org/devel/pygtk/stable/class-gdkcolor.html#function-gdk--color-parse].
 
-Themes will support a flexible background layout system. Images, gradiants, and
+Themes will support a flexible background layout system. Images, gradients, and
 solid colors can be set for set region. Background images will be stored in
 DATA_PATH/themes/bg.
 
@@ -308,9 +308,9 @@ class ColorBackground(_Background, _Renderable):
         return "solid"
 
 
-class RadialGradiantBackground(_Background, _Renderable):
+class RadialGradientBackground(_Background, _Renderable):
     """
-    A round gradiant background.
+    A round gradient background.
     
     cpos:   Center point of the circle (from 0.0 to 1.0 within the boundaries).
     length: Radius of the circle.
@@ -334,7 +334,7 @@ class RadialGradiantBackground(_Background, _Renderable):
         
         self.stops = []
         for pt in el.getchildren():
-            stop = GradiantStop()
+            stop = GradientStop()
             stop.parse_xml(pt)
             self.stops.append(stop)
     
@@ -379,9 +379,9 @@ class RadialGradiantBackground(_Background, _Renderable):
         return "radial"
 
 
-class GradiantBackground(_Background, _Renderable):
+class GradientBackground(_Background, _Renderable):
     """
-    A gradiant background.
+    A gradient background.
     """
     def __init__(self, angle=0, pos=None):
         ""
@@ -396,7 +396,7 @@ class GradiantBackground(_Background, _Renderable):
         
         self.stops = []
         for pt in el.getchildren():
-            stop = GradiantStop()
+            stop = GradientStop()
             stop.parse_xml(pt)
             self.stops.append(stop)
     
@@ -447,12 +447,12 @@ class GradiantBackground(_Background, _Renderable):
     @staticmethod
     def get_tag():
         "Return the XML tag name."
-        return "gradiant"
+        return "gradient"
 
 
-class GradiantStop(_Element):
+class GradientStop(_Element):
     """
-    A location with a color in a gradiant background.
+    A location with a color in a gradient background.
     """
     def __init__(self, location=None, color=None, alpha=1.0):
         ""

@@ -213,7 +213,7 @@ See <a href='http://code.google.com/p/exposong/wiki/ThemeFormat'>Theme Format</a
             if bg.get_tag() == "solid":
                 self.solidradio.set_active(True)
                 self.bg_solid_color.set_color(gtk.gdk.Color(bg.color))
-            elif bg.get_tag() == "gradiant":
+            elif bg.get_tag() == "gradient":
                 self.gradientradio.set_active(True)
                 self.bg_grad_color1.set_color(gtk.gdk.Color(bg.stops[0].color))
                 self.bg_grad_color2.set_color(gtk.gdk.Color(bg.stops[1].color))

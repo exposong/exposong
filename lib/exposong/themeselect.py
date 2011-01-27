@@ -83,22 +83,22 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         themes = {}
         
         themes['_builtin_black'] = exposong.theme.Theme(builtin=True)
-        themes['_builtin_black'].meta['title'] = _('White on Black (Builtin)')
+        themes['_builtin_black'].meta['title'] = _('Black')
         
         themes['_builtin_white'] = exposong.theme.Theme(builtin=True)
-        themes['_builtin_white'].meta['title'] = _('Black on White (Builtin)')
+        themes['_builtin_white'].meta['title'] = _('White')
         themes['_builtin_white'].backgrounds.append(exposong.theme.ColorBackground("#fff"))
         themes['_builtin_white'].body.color = '#000'
         themes['_builtin_white'].body.shadow_color = '#fff'
         themes['_builtin_white'].footer.color = '#000'
         themes['_builtin_white'].footer.shadow_color = '#fff'
         
-        themes['_builtin_blue_gradiant'] = exposong.theme.Theme(builtin=True)
-        themes['_builtin_blue_gradiant'].meta['title'] = _('Blue Gradiant (Builtin)')
-        bg = exposong.theme.GradiantBackground(45)
-        bg.stops.append(exposong.theme.GradiantStop(0.0, '#034'))
-        bg.stops.append(exposong.theme.GradiantStop(1.0, '#069'))
-        themes['_builtin_blue_gradiant'].backgrounds.append(bg)
+        themes['_builtin_blue_gradient'] = exposong.theme.Theme(builtin=True)
+        themes['_builtin_blue_gradient'].meta['title'] = _('ES Blue')
+        bg = exposong.theme.GradientBackground(45)
+        bg.stops.append(exposong.theme.GradientStop(0.0, '#034'))
+        bg.stops.append(exposong.theme.GradientStop(1.0, '#069'))
+        themes['_builtin_blue_gradient'].backgrounds.append(bg)
         
         for k,v in themes.iteritems():
             itr = self.liststore.append([k, v])
