@@ -27,6 +27,9 @@ Themes will support a flexible background layout system. Images, gradients, and
 solid colors can be set for set region. Background images will be stored in
 DATA_PATH/themes/bg.
 
+Font size is the pixel height if the screen resolution is 1024x768. The font
+will scale up for larger screens.
+
 Shadow offsets are measure in percentage of font height. So an offset of 0.5
 for point 12 font is 6 points.
 
@@ -65,7 +68,7 @@ class Theme(object):
         self._builtin = builtin
         self.meta = {}
         self.backgrounds = []
-        self.body = Section(type_='body', font="Sans 56",
+        self.body = Section(type_='body', font="Sans 48",
                             pos=[0.0, 0.0, 1.0, 0.8])
         self.footer = Section(type_='footer', font="Sans 12",
                               pos=[0.0, 0.8, 1.0, 1.0])
@@ -556,6 +559,11 @@ class Section(_Element):
     A part of the screen with text.
     
     type_:  Can currently be one of "body" or "footer".
+    font:   A description according to the format listed at
+            http://library.gnome.org/devel/pygtk/stable/class-pangofontdescription.html#constructor-pangofontdescription
+            The size will be scaled as if the screen was 1024x768. Larger
+            screens will have larger font sizes for consistency among
+            setups.
     """
     def __init__(self, type_=None, font="Sans 24", color="#fff",
                  shadow_color="#000", shadow_opacity=0.4, shadow_offset=None,
@@ -664,13 +672,15 @@ class Text(_RenderableSection):
     def draw(self, ccontext, bounds, section):
         "Render to a Cairo Context."
         _RenderableSection.draw(self, ccontext, bounds, section)
+        screen_height = (self.rpos[3] + self.margin) / self.pos[3]
         
         layout = ccontext.create_layout()
         layout.set_width(int(self.rpos[2] - self.rpos[0])*pango.SCALE)
         if section.font:
             font_descr = pango.FontDescription(section.font)
         else:
-            font_descr = pango.FontDescription("Sans 24")
+            font_descr = pango.FontDescription("Sans 48")
+        font_descr.set_size(int(font_descr.get_size() * screen_height / 768))
         layout.set_font_description(font_descr)
         if self.align != None:
             layout.set_alignment(self.align)
