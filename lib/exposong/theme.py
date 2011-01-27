@@ -308,6 +308,77 @@ class ColorBackground(_Background, _Renderable):
         return "solid"
 
 
+class RadialGradiantBackground(_Background, _Renderable):
+    """
+    A round gradiant background.
+    
+    cpos:   Center point of the circle (from 0.0 to 1.0 within the boundaries).
+    length: Radius of the circle.
+    """
+    def __init__(self, cpos=None, length=1.0, pos=None):
+        ""
+        _Renderable.__init__(self, pos)
+        if cpos != None:
+            self.cpos = cpos[:]
+        else:
+            self.cpos = [0.0, 0.0]
+        self.length = length
+        self.stops = []
+    
+    def parse_xml(self, el):
+        "Defines variables based on XML values."
+        _Renderable.parse_xml(self, el)
+        self.cpos[0] = float(el.get('cx', 1.0))
+        self.cpos[1] = float(el.get('cy', 1.0))
+        self.length = float(el.get('length', 1.0))
+        
+        self.stops = []
+        for pt in el.getchildren():
+            stop = GradiantStop()
+            stop.parse_xml(pt)
+            self.stops.append(stop)
+    
+    def to_xml(self):
+        "Output to an XML Element."
+        el = etree.Element(self.get_tag())
+        _Renderable.to_xml(self, el)
+        el.attrib['cx'] = str(self.cpos[0])
+        el.attrib['cy'] = str(self.cpos[1])
+        el.attrib['length'] = str(self.length)
+        for s in self.stops:
+            el.append(s.to_xml())
+        return el
+    
+    def draw(self, ccontext, bounds):
+        "Render the background to the context."
+        _Renderable.draw(self, ccontext, bounds)
+        
+        rcpos = [0, 0]
+        h = self.rpos[3] - self.rpos[1]
+        w = self.rpos[2] - self.rpos[0]
+        rcpos[0] = self.rpos[0] + w * self.cpos[0]
+        rcpos[1] = self.rpos[1] + h * self.cpos[1]
+        length = math.sqrt(math.pow(self.rpos[2] - self.rpos[0], 2) +
+                           math.pow(self.rpos[3] - self.rpos[1], 2)) * self.length
+        print rcpos[0], rcpos[1], length
+        gradient = cairo.RadialGradient(rcpos[0], rcpos[1], 0.0,
+                                        rcpos[0], rcpos[1], length)
+        for stop in self.stops:
+            clr = gtk.gdk.color_parse(stop.color)
+            gradient.add_color_stop_rgba(stop.location, clr.red / 65535.0,
+                                        clr.green / 65535.0, clr.blue / 65535.0,
+                                        stop.alpha)
+        ccontext.rectangle(*self.rpos[:2] +
+                           map(_subtract, self.rpos[2:4], self.rpos[:2]))
+        ccontext.set_source(gradient)
+        ccontext.fill()
+    
+    @staticmethod
+    def get_tag():
+        "Return the XML tag name."
+        return "radial"
+
+
 class GradiantBackground(_Background, _Renderable):
     """
     A gradiant background.
