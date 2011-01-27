@@ -565,7 +565,7 @@ class Section(_Element):
             screens will have larger font sizes for consistency among
             setups.
     """
-    def __init__(self, type_=None, font="Sans 24", color="#fff",
+    def __init__(self, type_=None, font="Sans 24", color="#fff", spacing=1.0,
                  shadow_color="#000", shadow_opacity=0.4, shadow_offset=None,
                  pos=None):
         _Element.__init__(self)
@@ -577,6 +577,7 @@ class Section(_Element):
             self.pos = [0.0, 1.0, 0.0, 1.0]
         self.font = font
         self.color = color
+        self.spacing = spacing
         self.shadow_color = shadow_color
         self.shadow_opacity = shadow_opacity
         if shadow_offset:
@@ -589,7 +590,8 @@ class Section(_Element):
         self.type_ = el.tag
         self.pos = [float(el.get('x1', '0.0')), float(el.get('y1', '0.0')),
                     float(el.get('x2', '1.0')), float(el.get('y2', '1.0'))]
-        self.font = el.get('font')
+        self.font = el.get('font', 'Sans 24')
+        self.spacing = float(el.get('spacing', '1.0'))
         el2 = el.find('text')
         if el2 != None:
             self.color = el2.get('color', '#fff')
@@ -603,11 +605,12 @@ class Section(_Element):
     def to_xml(self):
         "Output to an XML Element."
         el = etree.Element(self.type_)
+        el.attrib['font'] = self.font
+        el.attrib['spacing'] = str(self.spacing)
         el.attrib['x1'] = str(self.pos[0])
         el.attrib['y1'] = str(self.pos[1])
         el.attrib['x2'] = str(self.pos[2])
         el.attrib['y2'] = str(self.pos[3])
-        el.attrib['font'] = self.font
         el2 = etree.Element('text')
         el2.attrib['color'] = self.color
         el.append(el2)
@@ -682,12 +685,14 @@ class Text(_RenderableSection):
             font_descr = pango.FontDescription("Sans 48")
         font_descr.set_size(int(font_descr.get_size() * screen_height / 768))
         layout.set_font_description(font_descr)
+        layout.set_spacing(int((section.spacing - 1.0) * font_descr.get_size()))
         if self.align != None:
             layout.set_alignment(self.align)
         layout.set_markup(self.markup)
         
         while layout.get_pixel_size()[1] > self.rpos[3] - self.rpos[1]:
             font_descr.set_size(int(font_descr.get_size()*0.95))
+            layout.set_spacing(int((section.spacing - 1.0) * font_descr.get_size()))
             layout.set_font_description(font_descr)
         if self.valign == TOP:
             top = self.rpos[1]
