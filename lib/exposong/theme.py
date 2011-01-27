@@ -566,7 +566,8 @@ class Section(_Element):
             setups.
     """
     def __init__(self, type_=None, font="Sans 24", color="#fff", spacing=1.0,
-                 shadow_color="#000", shadow_opacity=0.4, shadow_offset=None,
+                 outline_color=None, outline_size=1,
+                 shadow_color=None, shadow_opacity=0.4, shadow_offset=None,
                  pos=None):
         _Element.__init__(self)
         assert type_ in (None, 'body', 'footer')
@@ -578,6 +579,8 @@ class Section(_Element):
         self.font = font
         self.color = color
         self.spacing = spacing
+        self.outline_color = outline_color
+        self.outline_size = outline_size
         self.shadow_color = shadow_color
         self.shadow_opacity = shadow_opacity
         if shadow_offset:
@@ -595,6 +598,10 @@ class Section(_Element):
         el2 = el.find('text')
         if el2 != None:
             self.color = el2.get('color', '#fff')
+        el2 = el.find('outline')
+        if el2 != None:
+            self.outline_color = el2.get('color', None)
+            self.outline_size = float(el2.get('size', 0.1))
         el2 = el.find('shadow')
         if el2 != None:
             self.shadow_color = el2.get('color', '#000')
@@ -614,12 +621,18 @@ class Section(_Element):
         el2 = etree.Element('text')
         el2.attrib['color'] = self.color
         el.append(el2)
-        el2 = etree.Element('shadow')
-        el2.attrib['color'] = self.shadow_color
-        el2.attrib['opacity'] = str(self.shadow_opacity)
-        el2.attrib['offsetx'] = str(self.shadow_offset[0])
-        el2.attrib['offsety'] = str(self.shadow_offset[1])
-        el.append(el2)
+        if self.shadow_color != None:
+            el2 = etree.Element('shadow')
+            el2.attrib['color'] = self.shadow_color
+            el2.attrib['opacity'] = str(self.shadow_opacity)
+            el2.attrib['offsetx'] = str(self.shadow_offset[0])
+            el2.attrib['offsety'] = str(self.shadow_offset[1])
+            el.append(el2)
+        if self.outline_color != None:
+            el2 = etree.Element('outline')
+            el2.attrib['color'] = self.outline_color
+            el2.attrib['size'] = str(self.outline_size)
+            el.append(el2)
         return el
 
 
@@ -708,11 +721,20 @@ class Text(_RenderableSection):
                                      clr.blue / 65535.0,
                                      section.shadow_opacity * 0.05)
             sz = font_descr.get_size() / pango.SCALE
-            shadow_center = [self.rpos[0] + sz * section.shadow_offset[0],
+            center = [self.rpos[0] + sz * section.shadow_offset[0],
                              top + sz * section.shadow_offset[1]]
             for x in range(-2, 3, 1):
                 for y in range(-2, 3, 1):
-                    ccontext.move_to(shadow_center[0]+x, shadow_center[1]+y)
+                    ccontext.move_to(center[0]+x, center[1]+y)
+                    ccontext.show_layout(layout)
+        if section.outline_color:
+            clr = gtk.gdk.color_parse(section.outline_color)
+            ccontext.set_source_rgb(clr.red / 65535.0, clr.green / 65535.0,
+                                    clr.blue / 65535.0)
+            offset = int(section.outline_size)
+            for x in range(-offset, offset + 1, 1):
+                for y in range(-offset, offset + 1, 1):
+                    ccontext.move_to(self.rpos[0]+x, top+y)
                     ccontext.show_layout(layout)
         
         clr = gtk.gdk.color_parse(section.color)

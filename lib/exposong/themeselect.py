@@ -95,6 +95,7 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         
         themes['_builtin_blue_gradient'] = exposong.theme.Theme(builtin=True)
         themes['_builtin_blue_gradient'].meta['title'] = _('ES Blue')
+        themes['_builtin_blue_gradient'].body.outline_color = '#000'
         bg = exposong.theme.GradientBackground(45)
         bg.stops.append(exposong.theme.GradientStop(0.0, '#034'))
         bg.stops.append(exposong.theme.GradientStop(1.0, '#069'))
