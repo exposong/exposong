@@ -258,7 +258,6 @@ class CellRendererTheme(gtk.GenericCellRenderer):
         if fname in self._pm:
             return self._pm[fname]
         
-        exposong.log.info('Generating theme thumbnail "%s".', fname)
         width, height = size
         
         self._pm[fname] = gtk.gdk.Pixmap(window, width, height)
@@ -271,10 +270,12 @@ class CellRendererTheme(gtk.GenericCellRenderer):
         ccontext = self._pm[fname].cairo_create()
         if os.path.exists(cpath):
             # Load the image from memory, or disk if available
+            exposong.log.debug('Loading theme thumbnail "%s".', fname)
             pb = pb_new(cpath)
             ccontext.set_source_pixbuf(pb, 0, 0)
             ccontext.paint()
         else:
+            exposong.log.debug('Generating theme thumbnail "%s".', fname)
             scrsize = exposong.screen.screen.get_size()
             bounds = (0, 0, scrsize[0] / UNSCALE, scrsize[1] / UNSCALE)
             ccontext.scale(float(width) / scrsize[0] * UNSCALE,

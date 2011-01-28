@@ -363,7 +363,6 @@ class RadialGradientBackground(_Background, _Renderable):
         rcpos[1] = self.rpos[1] + h * self.cpos[1]
         length = math.sqrt(math.pow(self.rpos[2] - self.rpos[0], 2) +
                            math.pow(self.rpos[3] - self.rpos[1], 2)) * self.length
-        print rcpos[0], rcpos[1], length
         gradient = cairo.RadialGradient(rcpos[0], rcpos[1], 0.0,
                                         rcpos[0], rcpos[1], length)
         for stop in self.stops:

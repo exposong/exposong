@@ -163,6 +163,18 @@ class Main (gtk.Window):
         while gtk.events_pending():
             gtk.main_iteration()
         splash.splash.destroy()
+        
+        # Log some ExpoSong statistics
+        sch = exposong.schedlist.schedlist
+        info = ["ExpoSong Stats",
+                " * Presentations: %d" % len(self.library),
+                # TODO Make this load each type dynamically.
+                "   * Lyric: %d" % len([p for p in self.library if p[0].get_type() == 'lyric']),
+                " * Custom Schedules: %d" % sch.get_model().iter_n_children(sch.custom_schedules),
+                " * Themes: %d" % len(exposong.themeselect.themeselect.liststore),
+                ]
+        exposong.log.info("\n".join(info))
+        
         exposong.log.info('Ready.')
         if exposong.options.import_:
             from exposong.plugins import export_import
@@ -233,8 +245,6 @@ class Main (gtk.Window):
                 ('file-export', None, _("_Export"), "", _("Export a .expo package")),
                 ('file-print', None, _("_Print"), "", None),
                 ('pres-new', gtk.STOCK_NEW, None, "", _("Create a new presentation")),
-                ('Statistics', None, _("Statistics and System Information"),
-                        None, None, self._on_stats),
                 ('About', gtk.STOCK_ABOUT, None, None, None, self._on_about),
                 ])
         self.main_actions.add_actions([
@@ -282,7 +292,6 @@ class Main (gtk.Window):
                     <menu action="Help">
                         <menuitem action="UsageGuide" />
                         <menuitem action="Contribute" />
-                        <menuitem action="Statistics" />
                         <menuitem action="About" />
                     </menu>
                 </menubar>''')
@@ -400,10 +409,6 @@ class Main (gtk.Window):
         schedmodel = schedlist.schedlist.get_model()
         schedlist.schedlist.collapse_row(schedmodel.get_path(libitr))
         yield False
-    
-    def _on_stats(self, *args):
-        'Shows the statistics dialog.'
-        exposong.about.Statistics(self)
     
     def _on_about(self, *args):
         'Shows the about dialog.'

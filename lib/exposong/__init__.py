@@ -26,6 +26,7 @@ import locale
 import logging
 import os
 import os.path
+import platform
 import pygtk
 import shutil
 import sys
@@ -113,7 +114,7 @@ if options.log:
     _handler.setFormatter(_fmt)
     log.addHandler(_handler)
 
-log.debug("Starting ExpoSong.")
+log.info("Starting ExpoSong.")
 
 # Send exceptoins to our logger.
 def excepthook(type, value, tb):
@@ -122,6 +123,15 @@ def excepthook(type, value, tb):
 sys.excepthook = excepthook
 
 pygtk.require("2.0")
+
+# Log some system information
+info = ["System Information",
+        " * Platform: %s" % platform.system(),]
+if platform.system() == "Linux":
+    info.append(" * Distribution: %s" % " ".join(platform.linux_distribution()))
+elif platform.system() == "Windows":
+    info.append(" * Windows Version: %s" % " ".join(platform.win32_ver()))
+exposong.log.info("\n".join(info))
 
 # Set file locations
 DATA_PATH = None
