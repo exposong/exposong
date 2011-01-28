@@ -6,6 +6,21 @@
 
 = Changelog =
 
+== 0.8 ==
+
+ * Themes have now replaced backgrounds. Three builtin themes are available,
+   or custom themes can created or imported.
+   * Backgrounds can be text, images, gradiants, radial gradiants, or a
+     combination.
+   * A text font family, style, and size can be changed. Shadows and outlines
+     can be added to the text.
+ * Improvements to the main window layout improve usability and appearance.
+ * A title slide is now optional on Lyrics.
+ * Only one instance of ExpoSong is allowed to run at a time.
+ * Control the presentation from the command line.
+ * The users preferred Songbook will be displayed in Lyrics.
+ * User will be notified of a new version.
+
 == 0.7.1 ==
  * Many performance improvements. Caching for images speed up loading the
    program by up to 5 times faster than before.
