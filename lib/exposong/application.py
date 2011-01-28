@@ -166,13 +166,14 @@ class Main (gtk.Window):
         
         # Log some ExpoSong statistics
         sch = exposong.schedlist.schedlist
-        info = ["ExpoSong Stats",
-                " * Presentations: %d" % len(self.library),
-                # TODO Make this load each type dynamically.
-                "   * Lyric: %d" % len([p for p in self.library if p[0].get_type() == 'lyric']),
-                " * Custom Schedules: %d" % sch.get_model().iter_n_children(sch.custom_schedules),
-                " * Themes: %d" % len(exposong.themeselect.themeselect.liststore),
-                ]
+        info = ["ExpoSong Stats"]
+        info.append(" * Presentations: %d" % len(self.library))
+        for ptype in exposong.plugins.get_plugins_by_capability(
+                exposong.plugins._abstract.Presentation):
+            tlist = [p for p in self.library if p[0].get_type() == ptype.get_type()]
+            info.append("   * %s: %d" % (ptype.get_type().title(), len(tlist)))
+        info.append(" * Custom Schedules: %d" % sch.get_model().iter_n_children(sch.custom_schedules))
+        info.append(" * Themes: %d" % len(exposong.themeselect.themeselect.liststore))
         exposong.log.info("\n".join(info))
         
         exposong.log.info('Ready.')

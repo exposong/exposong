@@ -47,7 +47,7 @@ if sys.platform == 'win32':
 # need to be?
 parser = OptionParser(version=exposong.version.__version__,
                       description="A presentation software with a focus on Christian worship settings.")
-parser.add_option('-v', '--verbose', dest='debug', action='store_true',
+parser.add_option('-v', '--verbose', dest='debug', action='count',
                   help='Print verbose debugging information to the command line')
 parser.add_option('-o', '--log', dest='log', action='store',
                   help='Write the log to a file.')
@@ -92,8 +92,10 @@ del parser
 log = logging.getLogger("exposong")
 log.setLevel(logging.DEBUG)
 _handler = logging.StreamHandler()
-if options.debug:
+if options.debug >= 2:
     _handler.setLevel(logging.DEBUG)
+elif options.debug == 1:
+    _handler.setLevel(logging.INFO)
 else:
     _handler.setLevel(logging.WARNING)
 _fmt = logging.Formatter("%(asctime)s:%(levelname)s: %(message)s")
@@ -126,6 +128,7 @@ pygtk.require("2.0")
 
 # Log some system information
 info = ["System Information",
+        " * Python Version: %s" % platform.python_version(),
         " * Platform: %s" % platform.system(),]
 if platform.system() == "Linux":
     info.append(" * Distribution: %s" % " ".join(platform.linux_distribution()))
