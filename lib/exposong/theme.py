@@ -283,14 +283,14 @@ class ColorBackground(_Background, _Renderable):
         "Defines variables based on XML values."
         _Renderable.parse_xml(self, el)
         self.color = el.get('color', "#fff")
-        self.alpha = float(el.get('alpha', 1.0))
+        self.alpha = float(el.get('opacity', 1.0))
     
     def to_xml(self):
         "Output to an XML Element."
         el = etree.Element(self.get_tag())
         _Renderable.to_xml(self, el)
         el.attrib['color'] = self.color
-        el.attrib['alpha'] = str(self.alpha)
+        el.attrib['opacity'] = str(self.alpha)
         return el
     
     def draw(self, ccontext, bounds):
@@ -469,20 +469,25 @@ class GradientStop(_Element):
             self.location = float(el.attrib['stop'])
         if 'color' in el.attrib:
             self.color = el.attrib['color']
-        if 'alpha' in el.attrib:
-            self.alpha = float(el.attrib['alpha'])
+        if 'opacity' in el.attrib:
+            self.alpha = float(el.attrib['opacity'])
     
     def to_xml(self):
         el = etree.Element("stop")
         el.attrib['stop'] = str(self.location)
         el.attrib['color'] = self.color
-        el.attrib['alpha'] = str(self.alpha)
+        el.attrib['opacity'] = str(self.alpha)
         return el
 
 
 class ImageBackground(_Background, _Renderable):
     """
     An image background.
+    
+    src:    The image file location, relative to "DATA_PATH/theme/res/".
+    aspect: If it is set to "fill", the image is cropped and resized so that the
+            rectangle will have no whitespace. If set to "fit", the image will
+            be resized inside the box so that the image is not cropped at all.
     """
     def __init__(self, src=None, pos=None, aspect=ASPECT_FILL):
         ""
@@ -600,7 +605,7 @@ class Section(_Element):
         el2 = el.find('outline')
         if el2 != None:
             self.outline_color = el2.get('color', None)
-            self.outline_size = float(el2.get('size', 0.1))
+            self.outline_size = float(el2.get('size', 1))
         el2 = el.find('shadow')
         if el2 != None:
             self.shadow_color = el2.get('color', '#000')

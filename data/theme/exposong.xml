@@ -13,9 +13,9 @@
             <point color='#fff' stop='1.0' />
         </gradient>
         <gradient angle='90' x1='0.0' x2='1.0' y1='0.0' y2='0.845'>
-            <point color='#ccc' stop='0.0' alpha='0.7' />
-            <point color='#fff' stop='0.5' alpha='0.3' />
-            <point color='#ccc' stop='1.0' alpha='0.7' />
+            <point color='#ccc' stop='0.0' opacity='0.7' />
+            <point color='#fff' stop='0.5' opacity='0.3' />
+            <point color='#ccc' stop='1.0' opacity='0.7' />
         </gradient>
         <solid color='#fa1' x1='0.0' x2='1.0' y1='0.845' y2='1.0' />
         <solid color='#000' x1='0.0' x2='1.0' y1='0.84' y2='0.85' />
