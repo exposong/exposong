@@ -550,7 +550,7 @@ class ImageBackground(_Background, _Renderable):
     @staticmethod
     def get_tag():
         "Return the XML tag name."
-        return "img"
+        return "image"
 
 
 class Section(_Element):

@@ -19,7 +19,7 @@
         </gradient>
         <solid color='#fa1' x1='0.0' x2='1.0' y1='0.845' y2='1.0' />
         <solid color='#000' x1='0.0' x2='1.0' y1='0.84' y2='0.85' />
-        <img src='exposong.png' x1='0.8' x2='0.99' y1='0.86' y2='0.99' aspect='fit' />
+        <image src='exposong.png' x1='0.8' x2='0.99' y1='0.86' y2='0.99' aspect='fit' />
     </background>
     <sections>
         <body font='Verdana 48' x1='0.0' x2='1.0' y1='0.0' y2='0.85'>
