@@ -86,11 +86,11 @@ class Notify(gtk.HBox):
         ccontext.rectangle(w-nbounds[0]-pad*2,
                            h-nbounds[1]-pad*2,
                            w, h)
-        ccontext.set_source_rgb(config.getcolor("screen", "notify_bg")[0],
-                                config.getcolor("screen", "notify_bg")[1],
-                                config.getcolor("screen", "notify_bg")[2])
+        col = exposong.screen.c2dec(config.getcolor("screen", "notify_bg"))
+        ccontext.set_source_rgb(*col)
         ccontext.fill()
-        ccontext.set_source_rgb(1.0, 1.0, 1.0)
+        col = exposong.screen.c2dec(config.getcolor("screen", "notify_color"))
+        ccontext.set_source_rgb(*col)
         ccontext.move_to(w-nbounds[0]-pad, h-nbounds[1]-pad)
         ccontext.show_layout(layout)
     

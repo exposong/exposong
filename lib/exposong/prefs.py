@@ -70,26 +70,18 @@ class PrefsDialog(gtk.Dialog):
         notebook.append_page(table, gtk.Label( _("General") ))
         
         #Screen Page
-        table = gui.Table(15)
+        table = gui.Table(9)
         
-        gui.append_section_title(table, _("Font"), 0)
-        p_txt = gui.append_color(table, _("Text Color"),
-                                 config.getcolor("screen","text_color"), 1)
-        p_shad = gui.append_color(table, _("Text Shadow"),
-                                  config.getcolor("screen","text_shadow"), 2,
-                                  True)
-        p_maxsize = gui.append_spinner(table, _("Max Font Size"),
-                                       gtk.Adjustment(config.getfloat("screen",
-                                       "max_font_size"), 0, 96, 1),3)
-        
-        gui.append_section_title(table, _("Logo"), 5)
-        p_logo = gui.append_file(table, _("Image"), config.get("screen","logo"), 6)
+        gui.append_section_title(table, _("Logo"), 0)
+        p_logo = gui.append_file(table, _("Image"), config.get("screen","logo"), 1)
         p_logo_bg = gui.append_color(table, _("Background"),
-                                     config.getcolor("screen","logo_bg"), 7)
+                                     config.getcolor("screen","logo_bg"), 2)
         
-        gui.append_section_title(table, _("Notify"), 9)
+        gui.append_section_title(table, _("Notify"), 4)
+        p_notify_color = gui.append_color(table, _("Font Color"),
+                                          config.getcolor("screen","notify_color"), 6)
         p_notify_bg = gui.append_color(table, _("Background"),
-                                       config.getcolor("screen","notify_bg"), 10)
+                                       config.getcolor("screen","notify_bg"), 5)
         
         # Monitor Selection
         monitor_name = tuple()
@@ -117,8 +109,8 @@ class PrefsDialog(gtk.Dialog):
         except IndexError:
             pass
         
-        gui.append_section_title(table, _("Position"), 11)
-        p_monitor = gui.append_combo(table, _("Monitor"), monitor_name, sel, 12)
+        gui.append_section_title(table, _("Position"), 7)
+        p_monitor = gui.append_combo(table, _("Monitor"), monitor_name, sel, 8)
         
         notebook.append_page(table, gtk.Label( _("Screen")))
         
@@ -130,7 +122,12 @@ class PrefsDialog(gtk.Dialog):
             if config.get("general", "title_slide") != str(g_title.get_active()):
                 config.set("general", "title_slide", str(g_title.get_active()))
                 exposong.preslist.preslist._on_pres_activate()
-            if g_data.get_current_folder() != config.get("general", "data-path"):
+            
+            if config.has_option("general", "data-path"):
+                curpath = config.get("general", "data-path")
+            else:
+                curpath = DATA_PATH
+            if g_data.get_current_folder() != curpath:
                 config.set("general", "data-path", g_data.get_current_folder())
                 msg = _("You will have to restart ExpoSong so that the new data folder will be used.")
                 dlg = gtk.MessageDialog(self, gtk.DIALOG_DESTROY_WITH_PARENT,
@@ -138,20 +135,14 @@ class PrefsDialog(gtk.Dialog):
                 dlg.run()
                 dlg.destroy()
             
-            txtc = p_txt.get_color()
-            config.setcolor("screen", "text_color", (txtc.red, txtc.green,
-                            txtc.blue))
-            txts = p_shad.get_color()
-            config.setcolor("screen", "text_shadow", (txts.red, txts.green,
-                            txts.blue, p_shad.get_alpha()))
-            config.set("screen", "max_font_size", str(p_maxsize.get_value()))
-            
             if p_logo.get_filename() != None:
                 config.set("screen", "logo", p_logo.get_filename())
             logoc = p_logo_bg.get_color()
             config.setcolor("screen", "logo_bg", (logoc.red, logoc.green, logoc.blue))
-            ntfc = p_notify_bg.get_color()
-            config.setcolor("screen", "notify_bg", (ntfc.red, ntfc.green, ntfc.blue))
+            ntfc = p_notify_color.get_color()
+            config.setcolor("screen", "notify_color", (ntfc.red, ntfc.green, ntfc.blue))
+            ntfb = p_notify_bg.get_color()
+            config.setcolor("screen", "notify_bg", (ntfb.red, ntfb.green, ntfb.blue))
             
             config.set('screen','monitor', monitor_value[p_monitor.get_active()])
             exposong.screen.screen.reposition(parent)

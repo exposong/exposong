@@ -66,17 +66,10 @@ class Config(ConfigParser.SafeConfigParser):
         self.set("general", "title_slide", "True")
         self.set("general", "songbook", "")
         
-        self.set("screen", "bg_type", 'color')
-        self.set("screen", "bg_image", "")
-        self.setcolor("screen", "bg_color_1", (0, 13107, 19660))
-        self.setcolor("screen", "bg_color_2", (0, 26214, 39321))
-        self.set("screen", "bg_angle", u'\u2198')
-        self.set("screen", "max_font_size", "56.0")
-        self.setcolor("screen", "text_color", (65535, 65535, 65535))
-        self.setcolor("screen", "text_shadow", (0, 0, 0, 26214))
         self.set("screen", "logo",
                  os.path.join(SHARED_FILES, "res", "exposong.png"))
         self.setcolor("screen", "logo_bg", (65535, 43690, 4369))
+        self.setcolor("screen", "notify_color", (65535, 65535, 65535))
         self.setcolor("screen", "notify_bg", (65535, 0, 0))
         
         self.configfile = cfile
