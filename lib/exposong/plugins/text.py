@@ -14,8 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import gtk, gtk.gdk, gobject
-
+import gtk
+try:
+    import gtkspell
+except Exception:
+    pass
+import gobject
 from xml.etree import cElementTree as etree
 
 import exposong.application
@@ -379,6 +383,10 @@ class SlideEdit(gtk.Dialog):
         text = gtk.TextView()
         text.set_wrap_mode(gtk.WRAP_NONE)
         text.set_buffer(self._buffer)
+        try:
+            gtkspell.Spell(text)
+        except Exception:
+            pass
         scroll = gtk.ScrolledWindow()
         scroll.add(text)
         scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)

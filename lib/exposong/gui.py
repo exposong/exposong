@@ -18,6 +18,10 @@
 
 import gtk
 import gtk.gdk
+try:
+    import gtkspell
+except Exception:
+    pass
 import gobject
 import os
 
@@ -46,6 +50,10 @@ def append_textview(table, label, value, top):
     set_label(table, label, top)
     
     textview = gtk.TextView()
+    try:
+        gtkspell.Spell(textview)
+    except Exception:
+        pass
     textview.set_size_request(250, 200)
     if value:
         textview.get_buffer().set_text(value)
