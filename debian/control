@@ -11,6 +11,7 @@ Package: exposong
 Architecture: all
 XB-Python-Version: ${python:Versions}
 Depends: ${misc:Depends}, ${python:Depends}, python-gtk2, python-cairo, python-gobject
+Enhances: python-gtkspell
 Description: Worship presentation software
  ExpoSong is a presentation software with a focus on displaying lyrics, 
  text and image slides in a Christian setting.
