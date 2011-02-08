@@ -1,0 +1,15 @@
+<!ELEMENT presentation (title, author*, copyright?, order?, comments?, slide+) >
+<!ELEMENT title CDATA >
+<!ELEMENT copyright CDATA >
+<!ELEMENT order IDREFS >
+<!ELEMENT comments CDATA >
+<!ELEMENT slide (#PCDATA|img) >
+<!ELEMENT img EMPTY >
+
+<!ATTLIST presentation type CDATA "generic" >
+<!ATTLIST presentation created CDATA #REQUIRED >
+<!ATTLIST presentation modified CDATA #REQUIRED >
+<!ATTLIST slide title CDATA #IMPLIED >
+<!ATTLIST slide id ID #REQUIRED >
+<!ATTLIST img src CDATA #REQUIRED >
+<!ATTLIST img rotate (n|ccw|cw|ud) "n" >
