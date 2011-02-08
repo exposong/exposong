@@ -251,7 +251,11 @@ See <a href='http://code.google.com/p/exposong/wiki/ThemeFormat'>Theme Format</a
         self.footer_color_button.set_color(gtk.gdk.Color(footer.color))
         
     def _destroy(self, widget):
-        gtk.main_quit()
+    	global __name__
+        self.hide()
+        self.destroy()
+        if __name__ == "__main__":
+        	gtk.main_quit()
 
 align = {
     pango.ALIGN_LEFT : "Left",
@@ -262,3 +266,4 @@ align = {
 if __name__ == "__main__":
     ThemeEditor()
     gtk.main()
+

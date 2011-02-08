@@ -136,7 +136,8 @@ class Theme(object):
         root = self.to_xml()
         tree = etree.ElementTree(root)
         # TODO This is saved in the current local directory.
-        tree.write(self.filename, encoding='UTF-8')
+        filename = os.path.join(DATA_PATH, "theme", self.filename)
+        tree.write(filename, encoding='UTF-8')
     
     def to_xml(self):
         "Output the theme to a standardized format."

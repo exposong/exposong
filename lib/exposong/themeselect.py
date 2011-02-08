@@ -171,7 +171,8 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         theme = self.get_active()
         if theme.is_builtin():
             raise Exception("Builtin themes cannot be modified.")
-        themeeditor.ThemeEditor(exposong.application.main, theme.filename)
+        filename = os.path.join(DATA_PATH, "theme", theme.filename)
+        themeeditor.ThemeEditor(exposong.application.main, filename)
     
     def delete_theme(self, *args):
         #TODO
