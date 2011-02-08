@@ -142,50 +142,11 @@ class Presentation:
     def __init__(self, filename=''):
         if self.__class__ is Presentation:
             raise NotImplementedError("This class cannot be instantiated.")
-        if filename:
-            self.filename = filename
-        self.slides = []
-        
-        if filename:
-            fl = open(filename, 'r')
-            if not self.is_type(fl):
-                fl.close()
-                raise WrongPresentationType
-            fl.close()
-            
-            dom = None
-            try:
-                dom = etree.parse(filename)
-                root = dom.getroot()
-            except IOError, details:
-                exposong.log.error('Could not open presentation "%s": %s',
-                                   filename, details)
-            #except ExpatError, details:
-            #    exposong.log.error('Error reading presentation file "%s": %s',
-            #                       filename, details)
-            else:
-                self._title = get_node_text(root.findall("title")[0])
-                copyright = root.findall("copyright")
-                if len(copyright):
-                    self.copyright = get_node_text(copyright[0])
-                timer = root.findall("timer")
-                if len(timer) > 0:
-                    self.timer = int(timer[0].get("time"))
-                    self.timer_loop = bool(timer[0].get("loop"))
-                
-                self._set_slides(dom)
     
     @classmethod
     def is_type(cls, fl):
-        match = r'<presentation\b[^>]*\btype=[\'"]%s[\'"]' % cls.get_type()
-        lncnt = 0
-        for ln in fl:
-                if lncnt > 2:
-                    break
-                if re.search(match, ln):
-                        return True
-                lncnt += 1
-        return False
+        "Test to see if this file is the correct type."
+        raise NotImplementedError
     
     @staticmethod
     def get_type():
@@ -196,12 +157,6 @@ class Presentation:
     def get_icon():
         'Return the pixbuf icon.'
         raise NotImplementedError
-    
-    def _set_slides(self, dom):
-        'Set the slides from xml.'
-        slides = dom.findall("slide")
-        for sl in slides:
-            self.slides.append(self.Slide(self, sl))
     
     def get_row(self):
         'Gets the data to add to the presentation list.'
@@ -347,37 +302,7 @@ class Presentation:
     
     def to_xml(self):
         'Save the data to disk.'
-        if self.filename:
-            self.filename = check_filename(self.get_title(), self.filename)
-        else:
-            self.filename = check_filename(self.get_title(),
-                                           os.path.join(DATA_PATH, "pres"))
-        
-        root = etree.Element("presentation")
-        root.attrib["type"] = self.get_type()
-        root.text = "\n"
-        
-        node = etree.Element("title")
-        node.text = self.get_title()
-        node.tail = "\n"
-        root.append(node)
-        
-        if self.timer:
-            node = etree.Element("timer")
-            node.attrib['time'] = str(self.timer)
-            if self.timer_loop:
-                node.attrib['loop'] = "1"
-            node.tail = "\n"
-            root.append(node)
-        
-        for s in self.slides:
-            node = etree.Element("slide")
-            s.to_node(node)
-            node.tail = '\n'
-            root.append(node)
-        doc = etree.ElementTree(root)
-        outfile = open(self.filename, 'w')
-        doc.write(outfile, encoding=u'UTF-8')
+        raise NotImplementedError
     
     def slide_column(self, col, list_):
         'Set the column to use text.'
@@ -425,7 +350,7 @@ class Presentation:
     
     @staticmethod
     def _has_timer():
-        'Returns boolean to show if we want to have timers.'
+        'Returns boolean to show if the presentation has a timer available.'
         return True
     
     def on_delete(self):

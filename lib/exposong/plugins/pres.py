@@ -1,4 +1,6 @@
 #
+# vim: ts=4 sw=4 expandtab ai:
+#
 # Copyright (C) 2008-2010 Exposong.org
 #
 # ExpoSong is free software: you can redistribute it and/or modify
@@ -81,7 +83,38 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             return "A lyric presentation type."
     
     def __init__(self, filename=''):
-        _abstract.Presentation.__init__(self, filename)
+        self.filename = filename
+        self.slides = []
+        
+        if filename:
+            fl = open(filename, 'r')
+            if not self.is_type(fl):
+                fl.close()
+                raise _abstract.WrongPresentationType
+            fl.close()
+            
+            dom = None
+            try:
+                dom = etree.parse(filename)
+                root = dom.getroot()
+            except IOError, details:
+                exposong.log.error('Could not open presentation "%s": %s',
+                                   filename, details)
+            #except ExpatError, details:
+            #    exposong.log.error('Error reading presentation file "%s": %s',
+            #                       filename, details)
+            else:
+                self._title = get_node_text(root.findall("title")[0])
+                copyright = root.findall("copyright")
+                if len(copyright):
+                    self.copyright = get_node_text(copyright[0])
+                timer = root.findall("timer")
+                if len(timer) > 0:
+                    self.timer = int(timer[0].get("time"))
+                    self.timer_loop = bool(timer[0].get("loop"))
+                
+                self._set_slides(dom)
+        
         self._order = []
 
         # TODO Separate to new function _process_dom or likewise.
@@ -93,6 +126,12 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                 for o in self._order:
                     if o.strip() == "":
                         self._order.remove(o)
+    
+    def _set_slides(self, dom):
+        'Set the slides from xml.'
+        slides = dom.findall("slide")
+        for sl in slides:
+            self.slides.append(self.Slide(self, sl))
     
     def _edit_tabs(self, notebook, parent):
         "Tabs for the dialog."
@@ -244,6 +283,40 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         if resp == gtk.RESPONSE_YES:
             model.remove(itr)
 
+    def to_xml(self):
+        'Save the data to disk.'
+        if self.filename:
+            self.filename = check_filename(self.get_title(), self.filename)
+        else:
+            self.filename = check_filename(self.get_title(),
+                                           os.path.join(DATA_PATH, "pres"))
+        
+        root = etree.Element("presentation")
+        root.attrib["type"] = self.get_type()
+        root.text = "\n"
+        
+        node = etree.Element("title")
+        node.text = self.get_title()
+        node.tail = "\n"
+        root.append(node)
+        
+        if self.timer:
+            node = etree.Element("timer")
+            node.attrib['time'] = str(self.timer)
+            if self.timer_loop:
+                node.attrib['loop'] = "1"
+            node.tail = "\n"
+            root.append(node)
+        
+        for s in self.slides:
+            node = etree.Element("slide")
+            s.to_node(node)
+            node.tail = '\n'
+            root.append(node)
+        doc = etree.ElementTree(root)
+        outfile = open(self.filename, 'w')
+        doc.write(outfile, encoding=u'UTF-8')
+    
     def get_order(self):
         "Returns the order in which the slides should be presented."
         if len(self._order) > 0:
@@ -275,6 +348,18 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
     def can_print(self):
         "Return True of printing is available."
         return True
+    
+    @classmethod
+    def is_type(cls, fl):
+        match = r'<presentation\b'
+        lncnt = 0
+        for ln in fl:
+                if lncnt > 2:
+                    break
+                if re.search(match, ln):
+                        return True
+                lncnt += 1
+        return False
     
     @staticmethod
     def get_type():
