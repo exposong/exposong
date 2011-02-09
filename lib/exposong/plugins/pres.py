@@ -139,6 +139,49 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         def get_body(self):
             return self._content
         
+        def to_node(self, node):
+            'Populate the XML element.'
+            node.set('title', self.title)
+            if self._theme:
+                node.set('theme', self._theme)
+            for c in self._content:
+                if isinstance(c, theme.Text):
+                    node2 = etree.fromstring('<text>%s</text>' % c.markup)
+                    #TODO Does this work?
+                elif isinstance(c, theme.Image):
+                    node2 = etree.Element('image')
+                    
+                    node2.set('src', os.path.split(c.src)[1])
+                    if c.aspect is theme.ASPECT_FIT:
+                        node2.set('aspect', 'fit')
+                    elif c.aspect is theme.ASPECT_FILL:
+                        node2.set('aspect', 'fill')
+                else:
+                    continue
+                
+                pos = c.get_pos()
+                node2.set('x1', str(pos[0]))
+                node2.set('y1', str(pos[1]))
+                node2.set('x2', str(pos[2]))
+                node2.set('y2', str(pos[3]))
+                
+                if c.align is theme.LEFT:
+                    node2.set('align', 'left')
+                elif c.align is theme.CENTER:
+                    node2.set('align', 'center')
+                elif c.align is theme.RIGHT:
+                    node2.set('align', 'right')
+                
+                if c.valign is theme.TOP:
+                    node2.set('valign', 'top')
+                elif c.valign is theme.MIDDLE:
+                    node2.set('valign', 'middle')
+                elif c.valign is theme.BOTTOM:
+                    node2.set('valign', 'bottom')
+                node2.set('margin', str(c.margin))
+                
+                node.append(node2)
+        
         @staticmethod
         def get_version():
             "Return the version number of the plugin."
@@ -227,7 +270,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         self._slide_list.connect("row-activated", self._slide_dlg, True)
         col = gtk.TreeViewColumn( _("Slide") )
         col.set_resizable(False)
-        self.slide_column(col, self._fields['slides'])
+        self.slide_column(col)
         self._slide_list.append_column(col)
         
         toolbar = gtk.Toolbar()
@@ -404,13 +447,14 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                                            os.path.join(DATA_PATH, "pres"))
         
         root = etree.Element("presentation")
-        root.attrib["type"] = self.get_type()
         root.text = "\n"
         
+        meta = etree.Element("meta")
+        meta.text = meta.tail = "\n"
         node = etree.Element("title")
         node.text = self.get_title()
         node.tail = "\n"
-        root.append(node)
+        meta.append(node)
         
         if self._timer:
             node = etree.Element("timer")
@@ -418,13 +462,23 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             if self._timer_loop:
                 node.attrib['loop'] = "1"
             node.tail = "\n"
-            root.append(node)
+            meta.append(node)
         
+        for k, v in self._meta.iteritems():
+            node = etree.Element(k)
+            k.text(v)
+            node.tail = "\n"
+            meta.append(node)
+        root.append(meta)
+        
+        slides = etree.Element("slides")
+        slides.text = slides.tail = "\n"
         for s in self.slides:
             node = etree.Element("slide")
             s.to_node(node)
             node.tail = '\n'
-            root.append(node)
+            slides.append(node)
+        root.append(slides)
         doc = etree.ElementTree(root)
         outfile = open(self.filename, 'w')
         doc.write(outfile, encoding=u'UTF-8')

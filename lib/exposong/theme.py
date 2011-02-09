@@ -664,6 +664,12 @@ class _RenderableSection(_Renderable):
         self.pos[2] = section.pos[2] - w * (1.0 - self.pos[2])
         self.pos[3] = section.pos[3] - h * (1.0 - self.pos[3])
     
+    def get_pos(self):
+        try:
+            return self.__old_pos
+        except Exception:
+            return self.pos
+    
     def draw(self, ccontext, bounds, section):
         "Render to a Cairo Context."
         if section:

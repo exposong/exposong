@@ -38,9 +38,7 @@ def element_contents(element):
     '''
     s = u""
     if element.text:
-        s += get_node_text(element)
-    if s == None:
-        s = u""
+        s += re.sub('\s+', ' ', element.text)
     for sub in element.getchildren():
         # Strip the namespace
         if sub.tag.partition("}")[2]:
@@ -55,8 +53,8 @@ def element_contents(element):
         else:
             s += "<%(tag)s />" % {'tag': subtag}
         if sub.tail:
-            s += sub.tail
-    return unicode(s)
+            s += re.sub('\s+', ' ', sub.tail)
+    return unicode(s.strip())
 
 def get_node_text(element, respect_whitespace=False):
     'Returns the text of a node (ElementTree.Element Object)'
@@ -64,7 +62,10 @@ def get_node_text(element, respect_whitespace=False):
         return element
     if not element.text:
         return ''
+    if respect_whitespace == 2:
+        return element.text
     if respect_whitespace:
+        # Leave whitespace in the middle alone.
         return element.text.strip()
     return re.sub('\s+', ' ', element.text.strip())
 
