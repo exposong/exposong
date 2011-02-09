@@ -151,6 +151,13 @@ class Presentation:
         'Return the pixbuf icon.'
         raise NotImplementedError
     
+    def slide_column(self, col):
+        'Sets the column for slidelist.'
+        col.clear()
+        text_cr = gtk.CellRendererText()
+        col.pack_start(text_cr, False)
+        col.add_attribute(text_cr, 'markup', 1)
+    
     def get_row(self):
         'Gets the data to add to the presentation list.'
         return (self, self.get_title())
@@ -248,15 +255,6 @@ class Presentation:
     def to_xml(self):
         'Save the data to disk.'
         raise NotImplementedError
-    
-    def slide_column(self, col, list_):
-        'Sets the column for slidelist.'
-        col.clear()
-        text_cr = gtk.CellRendererText()
-        col.pack_start(text_cr, False)
-        col.add_attribute(text_cr, 'markup', 1)
-        #TODO Should we be setting the model here?
-        list_.set_model(gtk.ListStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING))
     
     def get_slide_list(self, editing=False):
         'Get the slide list.'

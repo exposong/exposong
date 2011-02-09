@@ -53,21 +53,23 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
         'Set the active presentation.'
         self.pres = pres
         slist = self.get_model()
+        slist.clear()
+        
         if pres is None:
-            slist.clear()
-        else:
-            exposong.log.debug('Activating "%s" %s presentation.',
-                               pres.get_title(), pres.get_type())
-            slist.clear()
-            if not hasattr(self, 'pres_type') or self.pres_type is not pres.get_type():
-                self.pres_type = pres.get_type()
-                pres.slide_column(self.column1, exposong.slidelist.slidelist)
-            slist = self.get_model()
-            for slide in pres.get_slide_list_with_title():
-                slist.append(slide)
-            self.slide_order = pres.get_order()
-            self.slide_order_index = -1
-            self.order_entry.set_text(pres.get_order_string())
+            return
+        
+        self.set_model(slist)
+        exposong.log.debug('Activating "%s" %s presentation.',
+                           pres.get_title(), pres.get_type())
+        if not hasattr(self, 'pres_type') or self.pres_type is not pres.get_type():
+            self.pres_type = pres.get_type()
+            pres.slide_column(self.column1)
+        for slide in pres.get_slide_list_with_title():
+            slist.append(slide)
+        self.slide_order = pres.get_order()
+        self.slide_order_index = -1
+        self.order_entry.set_text(pres.get_order_string())
+        
         self.__timer += 1
         men = slist.get_iter_first() is not None
         self._actions.get_action("pres-slide-next").set_sensitive(men)

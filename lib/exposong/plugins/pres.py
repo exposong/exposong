@@ -227,9 +227,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         self._slide_list.connect("row-activated", self._slide_dlg, True)
         col = gtk.TreeViewColumn( _("Slide") )
         col.set_resizable(False)
-        cell = gtk.CellRendererText()
-        col.pack_start(cell, False)
-        col.add_attribute(cell, 'markup', 1)
+        self.slide_column(col, self._fields['slides'])
         self._slide_list.append_column(col)
         
         toolbar = gtk.Toolbar()
@@ -384,7 +382,6 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         
     def _on_slide_delete(self, btn, treeview, parent):
         'Remove the selected slide.'
-        # TODO
         (model, itr) = treeview.get_selection().get_selected()
         if not itr:
             return False
@@ -448,6 +445,8 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             i += 1
         return -1
     
+    ## Timer
+    
     def get_timer(self):
         'Return the time until we skip to the next slide.'
         return self._timer
@@ -455,6 +454,26 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
     def is_timer_looped(self):
         'If this is True, go to the beginning when the timer reaches the end.'
         return self._timer_loop
+    
+    ## Slidelist view
+    
+    def slide_column(self, col):
+        'Sets the column for slidelist.'
+        col.clear()
+        cr = exposong.themeselect.CellRendererTheme()
+        cr.height = 100
+        cr.can_cache = False
+        for thm in exposong.themeselect.themeselect.get_model():
+                if '_builtin_black' == thm[0]:
+                    cr.theme = thm[1]
+        col.pack_start(cr, False)
+        col.add_attribute(cr, 'slide', 0)
+    
+    def get_row(self):
+        'Gets the data to add to the presentation list.'
+        return (self, self.get_title())
+    
+    ## Printing
     
     def get_print_markup(self):
         "Return the presentation markup for printing."

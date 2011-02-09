@@ -36,8 +36,9 @@ from exposong.config import config
 
 themeselect = None
 _example_slide = None
+SCALED_HEIGHT = 600
 CELL_HEIGHT = 65
-UNSCALE = 4
+CELL_ASPECT = 16.0 / 9
 
 
 class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
@@ -51,6 +52,7 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         
         gtk.ComboBox.__init__(self, self.liststore)
         themerend = CellRendererTheme()
+        themerend.slide = _ExampleSlide()
         self.pack_start(themerend, False)
         self.add_attribute(themerend, 'theme', 1)
         textrend = gtk.CellRendererText()
@@ -137,7 +139,7 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
     def _load_theme_thumbs(self):
         "Force loading of theme thumbnails."
         cell = self.get_cells()[0]
-        size = (int(CELL_HEIGHT * exposong.screen.screen.get_aspect()),
+        size = (int(CELL_HEIGHT * CELL_ASPECT),
                   CELL_HEIGHT)
         yield True
         for row in self.liststore:
@@ -237,10 +239,15 @@ class CellRendererTheme(gtk.GenericCellRenderer):
     __gproperties__ = {
                 "theme": (gobject.TYPE_PYOBJECT, "Theme",
                 "Theme", gobject.PARAM_READWRITE),
+                "slide": (gobject.TYPE_PYOBJECT, "Slide",
+                "Slide", gobject.PARAM_READWRITE),
         }
     def __init__(self):
         self.__gobject_init__()
+        self.height = CELL_HEIGHT
         self.theme = None
+        self.slide = None
+        self.can_cache = True
         self.xpad = 2
         self.ypad = 2
         self.xalign = 0.5
@@ -250,11 +257,13 @@ class CellRendererTheme(gtk.GenericCellRenderer):
     
     def _get_pixmap(self, window, size):
         "Render to an offscreen pixmap."
-        global _example_slide
         if self.theme.is_builtin():
             fname = '_builtin_' + re.sub('[^a-z]+','_',self.theme.meta['title'].lower()).rstrip('_')
         else:
             fname = os.path.basename(os.path.splitext(self.theme.filename)[0])
+        if self.slide is None:
+            return None
+        fname += '.%s' % self.slide.id
         fname += '.%s.png' % 'x'.join(map(str, size))
         if fname in self._pm:
             return self._pm[fname]
@@ -269,7 +278,7 @@ class CellRendererTheme(gtk.GenericCellRenderer):
         cpath = os.path.join(cache_dir, fname)
         
         ccontext = self._pm[fname].cairo_create()
-        if os.path.exists(cpath):
+        if self.can_cache and os.path.exists(cpath):
             # Load the image from memory, or disk if available
             exposong.log.debug('Loading theme thumbnail "%s".', fname)
             pb = pb_new(cpath)
@@ -277,27 +286,25 @@ class CellRendererTheme(gtk.GenericCellRenderer):
             ccontext.paint()
         else:
             exposong.log.debug('Generating theme thumbnail "%s".', fname)
-            scrsize = exposong.screen.screen.get_size()
-            bounds = (0, 0, scrsize[0] / UNSCALE, scrsize[1] / UNSCALE)
-            ccontext.scale(float(width) / scrsize[0] * UNSCALE,
-                           float(height) / scrsize[1] * UNSCALE)
-            if _example_slide is None:
-                _example_slide = _ExampleSlide()
-            self.theme.render(ccontext, bounds, _example_slide)
-            # Save the rendered image to cache
-            pb = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, True, 8, width,
-                                height)
-            pb.get_from_drawable(self._pm[fname], self._pm[fname].get_colormap(),
-                                 0, 0, 0, 0, width, height)
-            pb.save(cpath, "png")
+            bounds = (0, 0, SCALED_HEIGHT * CELL_ASPECT, SCALED_HEIGHT)
+            ccontext.scale(float(width) / bounds[2],
+                           float(height) / bounds[3])
+            self.theme.render(ccontext, bounds, self.slide)
+            if self.can_cache:
+                # Save the rendered image to cache
+                pb = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, True, 8, width,
+                                    height)
+                pb.get_from_drawable(self._pm[fname],
+                                     self._pm[fname].get_colormap(), 0, 0, 0, 0,
+                                     width, height)
+                pb.save(cpath, "png")
         return self._pm[fname]
 
     def on_render(self, window, widget, background_area, cell_area, expose_area,
                flags):
         "Display the theme preview."
-        global _example_slide
         if not self.theme:
-            return
+            return False
         
         cell_position = list(self.on_get_size(widget, cell_area))
         cell_position[2] -= self.xpad*2
@@ -307,6 +314,8 @@ class CellRendererTheme(gtk.GenericCellRenderer):
             return
         
         pm = self._get_pixmap(window, cell_position[2:4])
+        if pm is None:
+            return False
         scrsize = exposong.screen.screen.get_size()
         window.draw_drawable(widget.get_style().fg_gc[gtk.STATE_NORMAL],
                              pm, 0, 0, cell_area.x + x_offset,
@@ -314,8 +323,8 @@ class CellRendererTheme(gtk.GenericCellRenderer):
     
     def on_get_size(self, widget, cell_area):
         "Return the widgets size and position."
-        calc_width = self.xpad * 2 + CELL_HEIGHT * exposong.screen.screen.get_aspect()
-        calc_height = self.ypad * 2 + CELL_HEIGHT
+        calc_width = int(self.xpad * 2 + self.height * CELL_ASPECT)
+        calc_height = self.ypad * 2 + self.height
         
         if cell_area:
             x_offset = self.xalign * (cell_area.width - calc_width) + self.xpad
@@ -342,6 +351,7 @@ class _ExampleSlide(object):
     """
     def __init__(self):
         object.__init__(self)
+        self.id = '_example'
         self.body = [
                 exposong.theme.Text('\n'.join([
                     'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
