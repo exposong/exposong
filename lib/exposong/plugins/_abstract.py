@@ -54,12 +54,7 @@ class Presentation:
         title = ''
         text = ''
         def __init__(self, pres, value):
-            self.pres = pres
-            if etree.iselement(value):
-                self.title = value.get("title")
-            elif isinstance(value, str):
-                self.title = ''
-            self._set_id(value)
+            pass
         
         def get_title(self, editing=False):
             'Get the title for the slide'
@@ -113,6 +108,7 @@ class Presentation:
             return self.get_text()
         
         def get_theme(self):
+            'Return the theme for this slide.'
             return None
         
         def copy(self):
@@ -133,13 +129,10 @@ class Presentation:
                 else:
                     self.id = random_string(8)
     
-    _title = ''
-    copyright = ''
-    timer = None
-    timer_loop = False
     filename = None
     
     def __init__(self, filename=''):
+        self._title = ''
         if self.__class__ is Presentation:
             raise NotImplementedError("This class cannot be instantiated.")
     
@@ -238,50 +231,8 @@ class Presentation:
     
     def _edit_tabs(self, notebook, parent):
         'Tabs for the dialog.'
-        #Slide Timer
-        if self._has_timer():
-            timer = gtk.VBox()
-            timer.set_border_width(8)
-            timer.set_spacing(7)
-            
-            # Might be used later if more things get on this tab
-            #label = gtk.Label()
-            #label.set_markup(_("<b>Timer</b>"))
-            #label.set_alignment(0.0, 0.5)
-            #timer.pack_start(label, False)
-            
-            self._fields['timer_on'] = gtk.CheckButton(_("Use Timer"))
-            self._fields['timer_on'].set_active(self.timer is not None)
-            self._fields['timer_on'].connect("toggled",
-                    lambda chk: self._fields['timer'].set_sensitive(chk.get_active()))
-            self._fields['timer_on'].connect("toggled",
-                    lambda chk: self._fields['timer_loop'].set_sensitive(chk.get_active()))
-            self._fields['timer_on'].connect("toggled",
-                    lambda chk: self._fields['timer_seconds'].set_sensitive(chk.get_active()))
-            timer.pack_start(self._fields['timer_on'], False)
-            
-            self._fields['timer_seconds'] = gtk.Label(_("Seconds Per Slide"))
-            self._fields['timer_seconds'].set_sensitive(self.timer is not None)
-            hbox = gtk.HBox()
-            hbox.set_spacing(18)
-            hbox.pack_start(self._fields['timer_seconds'], False, False)
-            
-            adjust = gtk.Adjustment(1, 1, 25, 1, 3, 0)
-            self._fields['timer'] = gtk.SpinButton(adjust, 1, 0)
-            self._fields['timer'].set_sensitive(self.timer is not None)
-            if isinstance(self.timer, (int, float)):
-                self._fields['timer'].set_value(self.timer)
-            hbox.pack_start(self._fields['timer'], False, False)
-            timer.pack_start(hbox, False)
-            
-            self._fields['timer_loop'] = gtk.CheckButton(_("Loop Slides"))
-            self._fields['timer_loop'].set_active(self.timer_loop)
-            self._fields['timer_loop'].set_sensitive(self.timer is not None)
-            timer.pack_start(self._fields['timer_loop'], False, False)
-            
-            notebook.append_page(timer, gtk.Label( _("Timer") ))
-            
-            # TODO: Presentation specific backgrounds.
+        # TODO: Presentation specific backgrounds.
+        pass
     
     def _edit_save(self):
         'Save the fields if the user clicks ok.'
@@ -289,12 +240,6 @@ class Presentation:
         for schedlistrow in exposong.schedlist.schedlist.get_model():
             if schedlistrow[0] and schedlistrow[0].builtin:
                 schedlistrow[0].resort()
-        if self._has_timer():
-            if self._fields['timer_on'].get_active():
-                self.timer = self._fields['timer'].get_value_as_int()
-                self.timer_loop = self._fields['timer_loop'].get_active()
-            else:
-                self.timer = None
     
     def _is_editing_complete(self, parent):
         "Test to see if all fields have been filled which are required."
@@ -305,7 +250,7 @@ class Presentation:
         raise NotImplementedError
     
     def slide_column(self, col, list_):
-        'Set the column to use text.'
+        'Sets the column for slidelist.'
         col.clear()
         text_cr = gtk.CellRendererText()
         col.pack_start(text_cr, False)
@@ -323,6 +268,14 @@ class Presentation:
     
     def get_order_string(self):
         return ""
+    
+    def get_timer(self):
+        'Return the time until we skip to the next slide.'
+        return None
+    
+    def is_timer_looped(self):
+        'If this is True, go to the beginning when the timer reaches the end.'
+        return False
     
     def get_print_markup(self):
         "Return the presentation markup for printing."
@@ -347,11 +300,6 @@ class Presentation:
                 if sched:
                     sched.append(pres)
                 itr = model.iter_next(itr)
-    
-    @staticmethod
-    def _has_timer():
-        'Returns boolean to show if the presentation has a timer available.'
-        return True
     
     def on_delete(self):
         'Called when the presentation is deleted.'

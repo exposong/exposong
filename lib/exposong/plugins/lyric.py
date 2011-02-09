@@ -1059,11 +1059,6 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         'Return the pixbuf icon.'
         return type_icon
     
-    @staticmethod
-    def _has_timer():
-        'Returns boolean to show if we want to have timers.'
-        return False
-    
     @classmethod
     def merge_menu(cls, uimanager):
         'Merge new values with the uimanager.'

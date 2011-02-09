@@ -248,8 +248,7 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
             fl = os.path.join(RESOURCE_PATH, 'timer.png')
             self._timer_icon = gtk.gdk.pixbuf_new_from_file_at_size(fl, 20, 14)
         pres = model.get_value(titer, 0)
-        # TODO Should be a function, not an attribute
-        if pres.timer:
+        if pres.get_timer():
             cell.set_property('pixbuf', self._timer_icon)
         else:
             cell.set_property('pixbuf', None)

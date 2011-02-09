@@ -25,10 +25,12 @@ import gobject
 from xml.etree import cElementTree as etree
 
 import exposong.application
+import exposong.themeselect
 import exposong._hook
 import undobuffer
+from exposong import RESOURCE_PATH, DATA_PATH
+from exposong import theme
 from exposong.glob import *
-from exposong import RESOURCE_PATH
 from exposong.plugins import Plugin, _abstract
 
 """
@@ -53,7 +55,69 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         A text slide.
         """
         def __init__(self, pres, value):
+            self.pres = pres
+            self._content = []
+            self.title = ''
+            self._theme = None
+            if etree.iselement(value):
+                self.title = value.get("title")
+                self._theme = value.get("theme")
+                for el in value:
+                    k = {
+                         'align': theme.CENTER,
+                         'valign': theme.MIDDLE,
+                         }
+                    k['pos'] = [0.0, 0.0, 1.0, 1.0]
+                    for name, val in el.items():
+                        if name is 'x1':
+                            k['pos'][0] = val
+                        elif name is 'y1':
+                            k['pos'][1] = val
+                        elif name is 'x2':
+                            k['pos'][2] = val
+                        elif name is 'y2':
+                            k['pos'][3] = val
+                        elif name is 'align':
+                            if val is 'left':
+                                k['align'] = theme.LEFT
+                            elif val is 'center':
+                                k['align'] = theme.CENTER
+                            elif val is 'right':
+                                k['align'] = theme.RIGHT
+                        elif name is 'valign':
+                            if val is 'top':
+                                k['valign'] = theme.TOP
+                            elif val is 'middle':
+                                k['valign'] = theme.MIDDLE
+                            elif val is 'bottom':
+                                k['valign'] = theme.BOTTOM
+                        elif name is 'margin':
+                            k['margin'] = int(val)
+                    
+                    if el.tag == 'text':
+                        k['markup'] = element_contents(el)
+                        self._content.append(theme.Text(**k))
+                    elif el.tag == 'image':
+                        k['src'] = os.path.join(DATA_PATH, 'image', el.get('src'))
+                        if el.get('aspect') is 'fit':
+                            k['aspect'] = theme.ASPECT_FIT
+                        elif el.get('aspect') is 'fill':
+                            k['aspect'] = theme.ASPECT_FILL
+                        self._content.append(theme.Image(**k))
+            
+            self._set_id(value)
             _abstract.Presentation.Slide.__init__(self, pres, value)
+        
+        def get_theme(self):
+            'Return the theme for this slide.'
+            if self._theme:
+                for thm in exposong.themeselect.themeselect.get_model():
+                    if self._theme == os.path.split(thm[0])[1]:
+                        return thm[1]
+                else:
+                    exposong.log.warning('Custom theme "%s" not found.' % 
+                                         self._theme)
+            return None
         
         def _edit_window(self, parent):
             ret = 0
@@ -72,6 +136,9 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                     ret = 2
                 return ret
         
+        def get_body(self):
+            return self._content
+        
         @staticmethod
         def get_version():
             "Return the version number of the plugin."
@@ -84,7 +151,10 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
     
     def __init__(self, filename=''):
         self.filename = filename
+        self._meta = {}
         self.slides = []
+        self._timer = None
+        self._timer_loop = False
         
         if filename:
             fl = open(filename, 'r')
@@ -104,16 +174,17 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             #    exposong.log.error('Error reading presentation file "%s": %s',
             #                       filename, details)
             else:
-                self._title = get_node_text(root.findall("title")[0])
-                copyright = root.findall("copyright")
-                if len(copyright):
-                    self.copyright = get_node_text(copyright[0])
-                timer = root.findall("timer")
-                if len(timer) > 0:
-                    self.timer = int(timer[0].get("time"))
-                    self.timer_loop = bool(timer[0].get("loop"))
-                
-                self._set_slides(dom)
+                for el in root.find("meta"):
+                    if el.tag == 'title':
+                        self._title = el.text
+                    elif el.tag == 'timer':
+                        self._timer = int(el.get("time"))
+                        self._timer_loop = bool(el.get("loop", False))
+                    else:
+                        self._meta[el.tag] = el.text
+                slides = root.findall("slides/slide")
+                for sl in slides:
+                    self.slides.append(self.Slide(self, sl))
         
         self._order = []
 
@@ -126,12 +197,6 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                 for o in self._order:
                     if o.strip() == "":
                         self._order.remove(o)
-    
-    def _set_slides(self, dom):
-        'Set the slides from xml.'
-        slides = dom.findall("slide")
-        for sl in slides:
-            self.slides.append(self.Slide(self, sl))
     
     def _edit_tabs(self, notebook, parent):
         "Tabs for the dialog."
@@ -197,6 +262,48 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         #vbox = gtk.VBox()
         #notebook.insert_page(vbox, gtk.Label(_("Order")), 1)
         
+        
+        timer = gtk.VBox()
+        timer.set_border_width(8)
+        timer.set_spacing(7)
+        
+        # Might be used later if more things get on this tab
+        #label = gtk.Label()
+        #label.set_markup(_("<b>Timer</b>"))
+        #label.set_alignment(0.0, 0.5)
+        #timer.pack_start(label, False)
+        
+        self._fields['timer_on'] = gtk.CheckButton(_("Use Timer"))
+        self._fields['timer_on'].set_active(self._timer is not None)
+        self._fields['timer_on'].connect("toggled",
+                lambda chk: self._fields['timer'].set_sensitive(chk.get_active()))
+        self._fields['timer_on'].connect("toggled",
+                lambda chk: self._fields['timer_loop'].set_sensitive(chk.get_active()))
+        self._fields['timer_on'].connect("toggled",
+                lambda chk: self._fields['timer_seconds'].set_sensitive(chk.get_active()))
+        timer.pack_start(self._fields['timer_on'], False)
+        
+        self._fields['timer_seconds'] = gtk.Label(_("Seconds Per Slide"))
+        self._fields['timer_seconds'].set_sensitive(self._timer is not None)
+        hbox = gtk.HBox()
+        hbox.set_spacing(18)
+        hbox.pack_start(self._fields['timer_seconds'], False, False)
+        
+        adjust = gtk.Adjustment(1, 1, 25, 1, 3, 0)
+        self._fields['timer'] = gtk.SpinButton(adjust, 1, 0)
+        self._fields['timer'].set_sensitive(self._timer is not None)
+        if isinstance(self._timer, (int, float)):
+            self._fields['timer'].set_value(self._timer)
+        hbox.pack_start(self._fields['timer'], False, False)
+        timer.pack_start(hbox, False)
+        
+        self._fields['timer_loop'] = gtk.CheckButton(_("Loop Slides"))
+        self._fields['timer_loop'].set_active(self._timer_loop)
+        self._fields['timer_loop'].set_sensitive(self._timer is not None)
+        timer.pack_start(self._fields['timer_loop'], False, False)
+        
+        notebook.append_page(timer, gtk.Label( _("Timer") ))
+        
         _abstract.Presentation._edit_tabs(self, notebook, parent)
     
     def _edit_save(self):
@@ -207,6 +314,14 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         while itr:
             self.slides.append(self._fields['slides'].get_value(itr,0))
             itr = self._fields['slides'].iter_next(itr)
+        
+        # Timer
+        if self._fields['timer_on'].get_active():
+            self._timer = self._fields['timer'].get_value_as_int()
+            self._timer_loop = self._fields['timer_loop'].get_active()
+        else:
+            self._timer = None
+        
         _abstract.Presentation._edit_save(self)
     
     def _is_editing_complete(self, parent):
@@ -300,10 +415,10 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         node.tail = "\n"
         root.append(node)
         
-        if self.timer:
+        if self._timer:
             node = etree.Element("timer")
-            node.attrib['time'] = str(self.timer)
-            if self.timer_loop:
+            node.attrib['time'] = str(self._timer)
+            if self._timer_loop:
                 node.attrib['loop'] = "1"
             node.tail = "\n"
             root.append(node)
@@ -332,6 +447,14 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                 return i
             i += 1
         return -1
+    
+    def get_timer(self):
+        'Return the time until we skip to the next slide.'
+        return self._timer
+    
+    def is_timer_looped(self):
+        'If this is True, go to the beginning when the timer reaches the end.'
+        return self._timer_loop
     
     def get_print_markup(self):
         "Return the presentation markup for printing."

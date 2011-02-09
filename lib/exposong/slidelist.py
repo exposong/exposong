@@ -139,8 +139,8 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
     def reset_timer(self):
         'Restart the timer.'
         self.__timer += 1
-        if self.pres and self.pres.timer:
-            gobject.timeout_add(self.pres.timer*1000, self._set_timer,
+        if self.pres and self.pres.get_timer():
+            gobject.timeout_add(self.pres.get_timer()*1000, self._set_timer,
                                 self.__timer)
     
     def _set_timer(self, t):
@@ -149,7 +149,7 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
             return False
         if not exposong.screen.screen.is_running():
             return False
-        if not self.next_slide(None) and self.pres.timer_loop:
+        if not self.next_slide(None) and self.pres.is_timer_looped():
             self.to_start()
         # Return False, because the slide is activated, adding another timeout
         return False

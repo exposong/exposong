@@ -31,6 +31,33 @@ the program. May contain certain variables as well.
 """
 
 
+def element_contents(element):
+    '''
+    Get a string representation of an XML Element, excluding the tag of the
+    element itself.
+    '''
+    s = u""
+    if element.text:
+        s += get_node_text(element)
+    if s == None:
+        s = u""
+    for sub in element.getchildren():
+        # Strip the namespace
+        if sub.tag.partition("}")[2]:
+            tag = sub.tag.partition("}")[2]
+        else:
+            tag = sub.tag
+        subtag = ' '.join((tag,) + tuple('%s="%s"' % i for i in sub.items()))
+        subtext = element_contents(sub)
+        if subtext:
+            s += '<%(tag)s>%(text)s</%(tag)s>' % \
+                    {"tag": subtag, 'text': subtext}
+        else:
+            s += "<%(tag)s />" % {'tag': subtag}
+        if sub.tail:
+            s += sub.tail
+    return unicode(s)
+
 def get_node_text(element, respect_whitespace=False):
     'Returns the text of a node (ElementTree.Element Object)'
     if(isinstance(element, str)):
