@@ -22,6 +22,7 @@ try:
 except Exception:
     pass
 import gobject
+import copy
 from xml.etree import cElementTree as etree
 
 import exposong.application
@@ -29,7 +30,7 @@ import exposong.themeselect
 import exposong._hook
 import undobuffer
 from exposong import RESOURCE_PATH, DATA_PATH
-from exposong import theme
+from exposong import gui, theme
 from exposong.glob import *
 from exposong.plugins import Plugin, _abstract
 
@@ -54,7 +55,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         """
         A text slide.
         """
-        def __init__(self, pres, value):
+        def __init__(self, pres, value=None):
             self.pres = pres
             self._content = []
             self.title = ''
@@ -182,6 +183,13 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                 
                 node.append(node2)
         
+        def copy(self):
+            'Create a duplicate of the slide.'
+            slide = _abstract.Presentation.Slide.copy(self)
+            slide._theme = self._theme
+            slide._content = copy.deepcopy(self._content)
+            return slide
+        
         @staticmethod
         def get_version():
             "Return the version number of the plugin."
@@ -229,17 +237,8 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                 for sl in slides:
                     self.slides.append(self.Slide(self, sl))
         
+        # TODO Order
         self._order = []
-
-        # TODO Separate to new function _process_dom or likewise.
-        dom = None
-        if etree.iselement(dom):
-            ordernode = dom.findall("order")
-            if len(ordernode) > 0:
-                self._order = get_node_text(ordernode[0]).split()
-                for o in self._order:
-                    if o.strip() == "":
-                        self._order.remove(o)
     
     def _edit_tabs(self, notebook, parent):
         "Tabs for the dialog."
@@ -296,13 +295,60 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         
         vbox.show_all()
         notebook.insert_page(vbox, gtk.Label(_("Edit")), 0)
-        
         self._fields['title'].grab_focus()
         
         # TODO Ordering Lists
         #vbox = gtk.VBox()
         #notebook.insert_page(vbox, gtk.Label(_("Order")), 1)
         
+        # Meta information
+        vbox = gtk.VBox()
+        
+        tree = gtk.TreeView()
+        self._fields['meta'] = gtk.ListStore(str, str)
+        for k,v in self._meta.iteritems():
+            self._fields['meta'].append((k,v))
+        tree.set_model(self._fields['meta'])
+        tree.connect('row-activated', self._meta_dlg, True)
+        cell = gtk.CellRendererText()
+        col = gtk.TreeViewColumn( _('Name'))
+        col.pack_start(cell)
+        col.set_resizable(True)
+        col.add_attribute(cell, 'text', 0)
+        tree.append_column(col)
+        cell = gtk.CellRendererText()
+        col = gtk.TreeViewColumn( _('Value'))
+        col.pack_start(cell)
+        col.set_resizable(True)
+        col.add_attribute(cell, 'text', 1)
+        tree.append_column(col)
+        scroll = gtk.ScrolledWindow()
+        scroll.add(tree)
+        scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroll.set_size_request(400, 250)
+        scroll.set_shadow_type(gtk.SHADOW_IN)
+        #Toolbar
+        toolbar = gtk.Toolbar()
+        button = gtk.ToolButton(gtk.STOCK_ADD)
+        button.connect('clicked', gui.edit_treeview_row_btn, tree,
+                       self._meta_dlg)
+        toolbar.insert(button, -1)
+        button = gtk.ToolButton(gtk.STOCK_EDIT)
+        button.connect('clicked', gui.edit_treeview_row_btn, tree,
+                       self._meta_dlg, True)
+        tree.get_selection().connect('changed', gui.treesel_disable_widget,
+                                     button)
+        toolbar.insert(button, -1)
+        button = gtk.ToolButton(gtk.STOCK_DELETE)
+        button.connect('clicked', gui.del_treeview_row, tree)
+        tree.get_selection().connect('changed', gui.treesel_disable_widget,
+                                     button)
+        toolbar.insert(button, -1)
+        vbox.pack_start(toolbar, False, True)
+        tree.get_selection().emit('changed')
+        
+        vbox.pack_start(scroll, True, True)
+        notebook.append_page(vbox, gtk.Label(_('Information')))
         
         timer = gtk.VBox()
         timer.set_border_width(8)
@@ -347,6 +393,50 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         
         _abstract.Presentation._edit_tabs(self, notebook, parent)
     
+    def _meta_dlg(self, treeview, path, col, edit=False):
+        "Add or edit a meta element."
+        dialog = gtk.Dialog(_("Presentation Information"),
+                            treeview.get_toplevel(),
+                            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+                            (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+                            gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        table = gui.Table(3)
+        dialog.vbox.pack_start(table, True, True)
+        
+        model = treeview.get_model()
+        key = val = None
+        if edit:
+            itr = model.get_iter(path)
+            if model.get_value(itr,0):
+                dialog.set_title( _('Editing "%s"') % model.get_value(itr,0) )
+            key = model.get_value(itr,0)
+            val = model.get_value(itr,1)
+        key_entry = gui.append_entry(table, _('Name:'), key, 0)
+        val_entry = gui.append_entry(table, _('Value:'), val, 1)
+        dialog.vbox.show_all()
+        
+        while True:
+            if dialog.run() == gtk.RESPONSE_ACCEPT:
+                if not key_entry.get_text():
+                    info_dialog = gtk.MessageDialog(treeview.get_toplevel(),
+                                                    gtk.DIALOG_DESTROY_WITH_PARENT,
+                                                    gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
+                                                    _("Please enter an Key."))
+                    info_dialog.run()
+                    info_dialog.destroy()
+                else:
+                    if edit:
+                        model.set_value(itr, 0, key_entry.get_text())
+                        model.set_value(itr, 1, val_entry.get_text())
+                    else:
+                        model.append((key_entry.get_text(), val_entry.get_text()))
+                    dialog.hide()
+                    return True
+            else:
+                dialog.hide()
+                return False
+        dialog.destroy()
+    
     def _edit_save(self):
         "Save the fields if the user clicks ok."
         self._title = self._fields['title'].get_text()
@@ -355,6 +445,11 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         while itr:
             self.slides.append(self._fields['slides'].get_value(itr,0))
             itr = self._fields['slides'].iter_next(itr)
+        
+        # Meta
+        self._meta = {}
+        for row in self._fields['meta']:
+            self._meta[row[0]] = row[1]
         
         # Timer
         if self._fields['timer_on'].get_active():
@@ -466,7 +561,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         
         for k, v in self._meta.iteritems():
             node = etree.Element(k)
-            k.text(v)
+            node.text = v
             node.tail = "\n"
             meta.append(node)
         root.append(meta)

@@ -242,3 +242,20 @@ def set_label(table, label, top):
 def treesel_disable_widget(sel, widget):
     'Disable `widget` if a tree selection is empty.'
     widget.set_sensitive(sel.count_selected_rows() > 0)
+
+
+def del_treeview_row(button, treeview):
+    "Remove the selected row from a treeview."
+    (model, itr) = treeview.get_selection().get_selected()
+    if itr:
+        model.remove(itr)
+
+def edit_treeview_row_btn(btn, treeview, func, edit=False):
+    "Add or edit a meta element."
+    path = None
+    col = None
+    if edit:
+        (model, itr) = treeview.get_selection().get_selected()
+        path = model.get_path(itr)
+    func(treeview, path, col, edit)
+

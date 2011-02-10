@@ -263,15 +263,17 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         #Toolbar
         toolbar = gtk.Toolbar()
         button = gtk.ToolButton(gtk.STOCK_ADD)
-        button.connect('clicked', self._title_dlg_btn, title_list)
+        button.connect('clicked', gui.edit_treeview_row_btn, title_list,
+                       self._title_dlg)
         toolbar.insert(button, -1)
         button = gtk.ToolButton(gtk.STOCK_EDIT)
-        button.connect('clicked', self._title_dlg_btn, title_list, True)
+        button.connect('clicked', gui.edit_treeview_row_btn, title_list,
+                       self._title_dlg, True)
         title_list.get_selection().connect('changed',
                                            gui.treesel_disable_widget, button)
         toolbar.insert(button, -1)
         button = gtk.ToolButton(gtk.STOCK_DELETE)
-        button.connect('clicked', self._del_treeview_row, title_list)
+        button.connect('clicked', gui.del_treeview_row, title_list)
         title_list.get_selection().connect('changed',
                                            gui.treesel_disable_widget, button)
         toolbar.insert(button, -1)
@@ -322,15 +324,17 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         #Toolbar
         toolbar = gtk.Toolbar()
         button = gtk.ToolButton(gtk.STOCK_ADD)
-        button.connect('clicked', self._author_dlg_btn, author_list)
+        button.connect('clicked', gui.edit_treeview_row_btn, author_list,
+                       self._author_dlg)
         toolbar.insert(button, -1)
         button = gtk.ToolButton(gtk.STOCK_EDIT)
-        button.connect('clicked', self._author_dlg_btn, author_list, True)
+        button.connect('clicked', gui.edit_treeview_row_btn, author_list,
+                       self._author_dlg, True)
         author_list.get_selection().connect('changed', gui.treesel_disable_widget,
                                             button)
         toolbar.insert(button, -1)
         button = gtk.ToolButton(gtk.STOCK_DELETE)
-        button.connect('clicked', self._del_treeview_row, author_list)
+        button.connect('clicked', gui.del_treeview_row, author_list)
         author_list.get_selection().connect('changed', gui.treesel_disable_widget,
                                             button)
         toolbar.insert(button, -1)
@@ -384,15 +388,17 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         #Toolbar
         toolbar = gtk.Toolbar()
         button = gtk.ToolButton(gtk.STOCK_ADD)
-        button.connect('clicked', self._theme_dlg_btn, theme_list)
+        button.connect('clicked', gui.edit_treeview_row_btn, theme_list,
+                       self._theme_dlg)
         toolbar.insert(button, -1)
         button = gtk.ToolButton(gtk.STOCK_EDIT)
-        button.connect('clicked', self._theme_dlg_btn, theme_list, True)
+        button.connect('clicked', gui.edit_treeview_row_btn, theme_list,
+                       self._theme_dlg, True)
         theme_list.get_selection().connect('changed',
                                            gui.treesel_disable_widget, button)
         toolbar.insert(button, -1)
         button = gtk.ToolButton(gtk.STOCK_DELETE)
-        button.connect('clicked', self._del_treeview_row, theme_list)
+        button.connect('clicked', gui.del_treeview_row, theme_list)
         theme_list.get_selection().connect('changed',
                                            gui.treesel_disable_widget, button)
         toolbar.insert(button, -1)
@@ -441,16 +447,18 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         #Toolbar
         toolbar = gtk.Toolbar()
         button = gtk.ToolButton(gtk.STOCK_ADD)
-        button.connect('clicked', self._songbook_dlg_btn, songbook_list)
+        button.connect('clicked', gui.edit_treeview_row_btn, songbook_list,
+                       self._songbook_dlg)
         toolbar.insert(button, -1)
         button = gtk.ToolButton(gtk.STOCK_EDIT)
-        button.connect('clicked', self._songbook_dlg_btn, songbook_list, True)
+        button.connect('clicked', gui.edit_treeview_row_btn, songbook_list,
+                       self._songbook_dlg, True)
         songbook_list.get_selection().connect('changed',
                                               gui.treesel_disable_widget,
                                               button)
         toolbar.insert(button, -1)
         button = gtk.ToolButton(gtk.STOCK_DELETE)
-        button.connect('clicked', self._del_treeview_row, songbook_list)
+        button.connect('clicked', gui.del_treeview_row, songbook_list)
         songbook_list.get_selection().connect('changed',
                                               gui.treesel_disable_widget,
                                               button)
@@ -538,10 +546,12 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         
         toolbar = gtk.Toolbar()
         btn = gtk.ToolButton(gtk.STOCK_ADD)
-        btn.connect("clicked", self._slide_dlg_btn, self._slide_list)
+        btn.connect("clicked", gui.edit_treeview_row_btn, self._slide_list,
+                       self._slide_dlg)
         toolbar.insert(btn, -1)
         btn = gtk.ToolButton(gtk.STOCK_EDIT)
-        btn.connect("clicked", self._slide_dlg_btn, self._slide_list, True)
+        btn.connect("clicked", gui.edit_treeview_row_btn, self._slide_list,
+                       self._slide_dlg, True)
         toolbar.insert(btn, -1)
         btn = gtk.ToolButton(gtk.STOCK_DELETE)
         btn.connect("clicked", self._on_slide_delete, self._slide_list, parent)
@@ -627,15 +637,6 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             self.song.verses.append(slide.verse)
             itr = self._fields['slides'].iter_next(itr)
     
-    def _slide_dlg_btn(self, btn, treeview, edit=False):
-        "Add or edit a title."
-        path = None
-        col = None
-        if edit:
-            (model, itr) = treeview.get_selection().get_selected()
-            path = model.get_path(itr)
-        self._slide_dlg(treeview, path, col, edit)
-    
     def _slide_dlg(self, treeview, path, col, edit=False):
         "Create a dialog for a new slide."
         model = treeview.get_model()
@@ -679,20 +680,6 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         dialog.hide()
         if resp == gtk.RESPONSE_YES:
             model.remove(itr)
-    
-    def _del_treeview_row(self, button, treeview):
-        (model, itr) = treeview.get_selection().get_selected()
-        if itr:
-            model.remove(itr)
-    
-    def _title_dlg_btn(self, btn, treeview, edit=False):
-        "Add or edit a title."
-        path = None
-        col = None
-        if edit:
-            (model, itr) = treeview.get_selection().get_selected()
-            path = model.get_path(itr)
-        self._title_dlg(treeview, path, col, edit)
     
     def _title_dlg(self, treeview, path, col, edit=False):
         "Add or edit a title."
@@ -739,15 +726,6 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             else:
                 dialog.hide()
                 return False
-    
-    def _author_dlg_btn(self, btn, treeview, edit=False):
-        "Add or edit an author."
-        path = None
-        col = None
-        if edit:
-            (model, itr) = treeview.get_selection().get_selected()
-            path = model.get_path(itr)
-        self._author_dlg(treeview, path, col, edit)
     
     def _author_dlg(self, treeview, path, col, edit=False):
         "Add or edit an author."
@@ -807,15 +785,6 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                 dialog.hide()
                 return False
     
-    def _theme_dlg_btn(self, btn, treeview, edit=False):
-        "Add or edit a theme."
-        path = None
-        col = None
-        if edit:
-            (model, itr) = treeview.get_selection().get_selected()
-            path = model.get_path(itr)
-        self._theme_dlg(treeview, path, col, edit)
-    
     def _theme_dlg(self, treeview, path, col, edit=False):
         "Add or edit a theme."
         dialog = gtk.Dialog(_("New Theme"), treeview.get_toplevel(),\
@@ -863,15 +832,6 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             else:
                 dialog.hide()
                 return False
-    
-    def _songbook_dlg_btn(self, btn, treeview, edit=False):
-        "Add or edit a songbook."
-        path = None
-        col = None
-        if edit:
-            (model, itr) = treeview.get_selection().get_selected()
-            path = model.get_path(itr)
-        self._songbook_dlg(treeview, path, col, edit)
     
     def _songbook_dlg(self, treeview, path, col, edit=False):
         "Add or edit a songbook."

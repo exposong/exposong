@@ -53,7 +53,7 @@ class Presentation:
         id = None
         title = ''
         text = ''
-        def __init__(self, pres, value):
+        def __init__(self, pres, value=None):
             pass
         
         def get_title(self, editing=False):
@@ -113,7 +113,7 @@ class Presentation:
         
         def copy(self):
             'Create a duplicate of the slide.'
-            slide = self.__class__(self.pres, self.text)
+            slide = self.__class__(self.pres)
             slide.text = self.text
             slide.title = self.title
             slide._set_id()
