@@ -59,6 +59,11 @@ BOTTOM = 2
 ASPECT_FIT = 1
 ASPECT_FILL = 2
 
+_POS_MAP = {'x1': 0, 'y1': 1, 'x2': 2, 'y2': 3,
+            0: 'x1', 1: 'y1', 2: 'x2', 3: 'y2',
+            }
+                
+
 class Theme(object):
     """
     A theme item.
@@ -69,7 +74,8 @@ class Theme(object):
         self.meta = {}
         self.backgrounds = []
         self.body = Section(type_='body', font="Sans 48",
-                            pos=[0.0, 0.0, 1.0, 0.8])
+                            pos=[0.0, 0.0, 1.0, 0.8],
+                            expand=['header.y1','footer.y2'])
         self.footer = Section(type_='footer', font="Sans 12",
                               pos=[0.0, 0.8, 1.0, 1.0])
         if filename:
@@ -175,10 +181,18 @@ class Theme(object):
                         self.slide.pos = [0.0, 0.0, 1.0, 1.0]
                         t.draw(ccontext, bounds, self.slide)
             else:
-                for t in slide.get_body():
-                    t.draw(ccontext, bounds, self.body)
-                for t in slide.get_footer():
+                expand = {}
+                foots = slide.get_footer()
+                for t in foots:
                     t.draw(ccontext, bounds, self.footer)
+                if not foots:
+                    for k in self.body.expand:
+                        k2 = k.split(".")
+                        if k2[0] == 'footer':
+                            # Expand over the footer if it doesn't exist.
+                            expand[k2[1]] = self.footer.pos[_POS_MAP[k2[1]]]
+                for t in slide.get_body():
+                    t.draw(ccontext, bounds, self.body, expand)
     
     @classmethod
     def render_color(cls, ccontext, bounds, color):
@@ -573,7 +587,7 @@ class Section(_Element):
     def __init__(self, type_=None, font="Sans 24", color="#fff", spacing=1.0,
                  outline_color=None, outline_size=1,
                  shadow_color=None, shadow_opacity=0.4, shadow_offset=None,
-                 pos=None):
+                 pos=None, expand=None):
         _Element.__init__(self)
         assert type_ in (None, 'body', 'footer')
         self.type_ = type_
@@ -581,11 +595,18 @@ class Section(_Element):
             self.pos = pos
         else:
             self.pos = [0.0, 1.0, 0.0, 1.0]
+        if expand:
+            self.expand = expand
+        else:
+            self.expand = []
+        
         self.font = font
         self.color = color
         self.spacing = spacing
+        
         self.outline_color = outline_color
         self.outline_size = outline_size
+        
         self.shadow_color = shadow_color
         self.shadow_opacity = shadow_opacity
         if shadow_offset:
@@ -598,6 +619,7 @@ class Section(_Element):
         self.type_ = el.tag
         self.pos = [float(el.get('x1', '0.0')), float(el.get('y1', '0.0')),
                     float(el.get('x2', '1.0')), float(el.get('y2', '1.0'))]
+        self.expand = el.get('expand', '').split(',')
         self.font = el.get('font', 'Sans 24')
         self.spacing = float(el.get('spacing', '1.0'))
         el2 = el.find('text')
@@ -623,6 +645,8 @@ class Section(_Element):
         el.attrib['y1'] = str(self.pos[1])
         el.attrib['x2'] = str(self.pos[2])
         el.attrib['y2'] = str(self.pos[3])
+        if self.expand:
+            el.attrib['expand'] = ','.join(self.expand)
         el2 = etree.Element('text')
         el2.attrib['color'] = self.color
         el.append(el2)
@@ -651,29 +675,33 @@ class _RenderableSection(_Renderable):
         self.valign = valign
         self.margin = margin
     
-    def _set_pos(self, section):
+    def _set_pos(self, section, expand={}):
         "Sets the position based on the section and the margin."
         try:
             self.pos = self.__old_pos[:]
         except Exception:
             self.__old_pos = self.pos[:]
-        h = section.pos[3] - section.pos[1]
-        w = section.pos[2] - section.pos[0]
-        self.pos[0] = section.pos[0] + w * self.pos[0]
-        self.pos[1] = section.pos[1] + h * self.pos[1]
-        self.pos[2] = section.pos[2] - w * (1.0 - self.pos[2])
-        self.pos[3] = section.pos[3] - h * (1.0 - self.pos[3])
+        spos = section.pos[:]
+        for k,v in expand.iteritems():
+            spos[_POS_MAP[k]] = v
+        h = spos[3] - spos[1]
+        w = spos[2] - spos[0]
+        self.pos[0] = spos[0] + w * self.pos[0]
+        self.pos[1] = spos[1] + h * self.pos[1]
+        self.pos[2] = spos[2] - w * (1.0 - self.pos[2])
+        self.pos[3] = spos[3] - h * (1.0 - self.pos[3])
     
     def get_pos(self):
+        'Returns the original position.'
         try:
             return self.__old_pos
         except Exception:
             return self.pos
     
-    def draw(self, ccontext, bounds, section):
+    def draw(self, ccontext, bounds, section, expand={}):
         "Render to a Cairo Context."
         if section:
-            self._set_pos(section)
+            self._set_pos(section, expand)
         _Renderable.draw(self, ccontext, bounds)
         self.rpos[0] += self.margin
         self.rpos[1] += self.margin
@@ -696,9 +724,9 @@ class Text(_RenderableSection):
         _RenderableSection.__init__(self, align, valign, margin, pos)
         self.markup = markup
     
-    def draw(self, ccontext, bounds, section):
+    def draw(self, ccontext, bounds, section, expand={}):
         "Render to a Cairo Context."
-        _RenderableSection.draw(self, ccontext, bounds, section)
+        _RenderableSection.draw(self, ccontext, bounds, section, expand)
         screen_height = (self.rpos[3] + self.margin) / self.pos[3]
         
         layout = ccontext.create_layout()
@@ -781,9 +809,9 @@ class Image(_RenderableSection):
             self._cache[skey] = scale_image(self._original, size, self.aspect)
         return self._cache[skey]
     
-    def draw(self, ccontext, bounds, section):
+    def draw(self, ccontext, bounds, section, expand={}):
         "Render to a Cairo Context."
-        _RenderableSection.draw(self, ccontext, bounds, section)
+        _RenderableSection.draw(self, ccontext, bounds, section, expand)
         
         size = map(_subtract, self.rpos[2:4], self.rpos[:2])
         
