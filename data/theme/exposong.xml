@@ -22,11 +22,11 @@
         <image src='exposong.png' x1='0.8' x2='0.99' y1='0.86' y2='0.99' aspect='fit' />
     </background>
     <sections>
-        <body font='Verdana 48' x1='0.0' x2='1.0' y1='0.0' y2='0.85'>
+        <body font='Sans 48' x1='0.0' x2='1.0' y1='0.0' y2='0.85'>
             <text color='#000' />
             <shadow color='#fff' opacity='0.5' offsetx='.1' offsety='.1' />
         </body>
-        <footer font='Arial 10' x1='0.0' x2='1.0' y1='0.85' y2='1.0'>
+        <footer font='Sans 24' x1='0.0' x2='1.0' y1='0.85' y2='1.0'>
             <text color='#fff' />
             <shadow color='#000' opacity='0.8' offsetx='.1' offsety='.1' />
         </footer>
