@@ -43,6 +43,7 @@ FILE_EXT = ".expo"
 _FILTER = gtk.FileFilter()
 _FILTER.set_name("ExpoSong Archive")
 _FILTER.add_pattern("*.expo")
+_FILTER.add_pattern("*.tar.gz")
 
 class ExportImport(Plugin, exposong._hook.Menu):
     '''
