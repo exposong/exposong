@@ -16,13 +16,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import copy
 import gtk
 try:
     import gtkspell
 except Exception:
     pass
 import gobject
-import copy
+import pango
+import re
 from xml.etree import cElementTree as etree
 
 import exposong.application
@@ -68,32 +70,24 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                          'align': theme.CENTER,
                          'valign': theme.MIDDLE,
                          }
-                    k['pos'] = [0.0, 0.0, 1.0, 1.0]
-                    for name, val in el.items():
-                        if name is 'x1':
-                            k['pos'][0] = val
-                        elif name is 'y1':
-                            k['pos'][1] = val
-                        elif name is 'x2':
-                            k['pos'][2] = val
-                        elif name is 'y2':
-                            k['pos'][3] = val
-                        elif name is 'align':
-                            if val is 'left':
-                                k['align'] = theme.LEFT
-                            elif val is 'center':
-                                k['align'] = theme.CENTER
-                            elif val is 'right':
-                                k['align'] = theme.RIGHT
-                        elif name is 'valign':
-                            if val is 'top':
-                                k['valign'] = theme.TOP
-                            elif val is 'middle':
-                                k['valign'] = theme.MIDDLE
-                            elif val is 'bottom':
-                                k['valign'] = theme.BOTTOM
-                        elif name is 'margin':
-                            k['margin'] = int(val)
+                    k['margin'] = int(el.get('margin', 0))
+                    k['pos'] = [0,0,0,0]
+                    k['pos'][0] = float(el.get('x1', 0.0))
+                    k['pos'][1] = float(el.get('y1', 0.0))
+                    k['pos'][2] = float(el.get('x2', 1.0))
+                    k['pos'][3] = float(el.get('y2', 1.0))
+                    if el.get('align', None) is 'left':
+                        k['align'] = theme.LEFT
+                    elif el.get('align', None) is 'center':
+                        k['align'] = theme.CENTER
+                    elif el.get('align', None) is 'right':
+                        k['align'] = theme.RIGHT
+                    if el.get('valign', None) is 'top':
+                        k['align'] = theme.LEFT
+                    elif el.get('valign', None) is 'middle':
+                        k['align'] = theme.CENTER
+                    elif el.get('valign', None) is 'bottom':
+                        k['align'] = theme.RIGHT
                     
                     if el.tag == 'text':
                         k['markup'] = element_contents(el)
@@ -128,12 +122,12 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                 if ans == gtk.RESPONSE_ACCEPT:
                     if editor.changed:
                         self.title = editor.get_slide_title()
-                        self.text = editor.get_slide_text()
+                        #self.text = editor.get_slide_text()
                         ret = 1
                 elif ans == gtk.RESPONSE_APPLY: #Close and new
                     if editor.changed:
                         self.title = editor.get_slide_title()
-                        self.text = editor.get_slide_text()
+                        #self.text = editor.get_slide_text()
                     ret = 2
                 return ret
         
@@ -274,10 +268,12 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         
         toolbar = gtk.Toolbar()
         btn = gtk.ToolButton(gtk.STOCK_ADD)
-        btn.connect("clicked", self._slide_dlg_btn, self._slide_list)
+        btn.connect('clicked', gui.edit_treeview_row_btn, self._slide_list,
+                    self._slide_dlg)
         toolbar.insert(btn, -1)
         btn = gtk.ToolButton(gtk.STOCK_EDIT)
-        btn.connect("clicked", self._slide_dlg_btn, self._slide_list, True)
+        btn.connect('clicked', gui.edit_treeview_row_btn, self._slide_list,
+                    self._slide_dlg, True)
         toolbar.insert(btn, -1)
         btn = gtk.ToolButton(gtk.STOCK_DELETE)
         btn.connect("clicked", self._on_slide_delete, self._slide_list, parent)
@@ -480,15 +476,6 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             info_dialog.destroy()
             return False
         return _abstract.Presentation._is_editing_complete(self, parent)
-    
-    def _slide_dlg_btn(self, btn, treeview, edit=False):
-        "Add or edit a title."
-        path = None
-        col = None
-        if edit:
-            (model, itr) = treeview.get_selection().get_selected()
-            path = model.get_path(itr)
-        self._slide_dlg(treeview, path, col, edit)
     
     def _slide_dlg(self, treeview, path, col, edit=False):
         "Create a dialog for a new slide."
@@ -720,77 +707,65 @@ class SlideEdit(gtk.Dialog):
     def __init__(self, parent, slide):
         gtk.Dialog.__init__(self, _("Editing Slide"), parent,
                             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
+        self._undo_btn = self._redo_btn = self._buffer = None
         
-        self._build_menu()
-        
-        newbutton = self.add_button(_("Save and New"), gtk.RESPONSE_APPLY)
-        newimg = gtk.Image()
-        newimg.set_from_stock(gtk.STOCK_NEW, gtk.ICON_SIZE_BUTTON)
-        newbutton.set_image(newimg)
-        newbutton.connect("clicked", self._quit_with_save)
-        cancelbutton = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
-        cancelbutton.connect("clicked", self._quit_without_save)
-        okbutton = self.add_button(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
-        okbutton.connect("clicked", self._quit_with_save)
+        self.set_border_width(4)
+        self.vbox.set_spacing(7)
+        hbox = gtk.HBox()
+        hbox.set_spacing(7)
+        vbox = gtk.VBox()
+        vbox.set_spacing(7)
         
         self.connect("delete-event", self._quit_without_save)
         
         self.slide_title = slide.title
-        self.slide_text = slide.text
         self.changed = False
-        
-        self.set_border_width(4)
-        self.vbox.set_spacing(7)
+        #Text(markup,                  align=LEFT,   valign=TOP,    margin=0, pos=None):
+        #Image(src, aspect=ASPECT_FIT, align=CENTER, valign=MIDDLE, margin=0, pos=None):
         
         # Title
-        self.vbox.pack_start(self._get_title_box(), False, True)
+        vbox.pack_start(self._get_title_box(), False, True)
         
-        # Toolbar
-        self._toolbar = gtk.Toolbar()
-        self.undo_btn = self._get_toolbar_item(gtk.ToolButton(gtk.STOCK_UNDO),
-                                               self._undo, False)
-        self.redo_btn = self._get_toolbar_item(gtk.ToolButton(gtk.STOCK_REDO),
-                                               self._redo, False)
-        self.vbox.pack_start(self._toolbar, False, True)
+        # Slide Elements
+        lstore = gtk.ListStore(gobject.TYPE_PYOBJECT)
+        for e in slide._content:
+            lstore.append((e,))
+        tree = gtk.TreeView(lstore)
+        col = gtk.TreeViewColumn( _("Slide Element") )
+        text = gtk.CellRendererText()
+        text.set_property("ellipsize", pango.ELLIPSIZE_END)
+        col.pack_start(text, True)
+        col.set_cell_data_func(text, self._set_slide_row_text)
+        tree.append_column(col)
+        tree.set_headers_clickable(False)
         
-        self._buffer = self._get_buffer()
-        self._buffer.connect("changed", self._on_text_changed)
-        
-        text = gtk.TextView()
-        text.set_wrap_mode(gtk.WRAP_NONE)
-        text.set_buffer(self._buffer)
-        try:
-            gtkspell.Spell(text)
-        except Exception:
-            pass
         scroll = gtk.ScrolledWindow()
-        scroll.add(text)
+        scroll.add(tree)
         scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroll.set_size_request(400, 250)
         scroll.set_shadow_type(gtk.SHADOW_IN)
-        self.vbox.pack_start(scroll, True, True)
+        vbox.pack_start(scroll, True, True)
+        hbox.pack_start(vbox, False, True)
         
+        rt_vbox = gtk.VBox()
+        
+        # This will contain an editor for a `theme._RenderableSection`
+        # It will load when an item is selected from the left.
+        self._content_vbox = gtk.VBox()
+        label = gtk.Label(_("Select an item from the left to edit."))
+        label.set_line_wrap(True)
+        self._content_vbox.pack_start(label)
+        
+        rt_vbox.pack_start(self._content_vbox, True, True)
+        
+        # Positional elements that are in all `theme._RenderableSection`s.
+        position = gtk.Expander(_("Position"))
+        # TODO Positioning Settings
+        rt_vbox.pack_start(position, False, False)
+        hbox.pack_start(rt_vbox, True, True)
+        
+        self.vbox.pack_start(hbox)
         self.vbox.show_all()
-        
-    def _build_menu(self):
-        self.uimanager = gtk.UIManager()
-        self.add_accel_group(self.uimanager.get_accel_group())
-        self._actions = gtk.ActionGroup('main')
-        self._actions.add_actions([
-                ('Edit', None, '_Edit' ),
-                ("edit-undo", gtk.STOCK_UNDO, "Undo",
-                    "<Ctrl>z", "Undo the last operation", self._undo),
-                ("edit-redo", gtk.STOCK_REDO, "Redo",
-                    "<Ctrl>y", "Redo the last operation", self._redo)
-                ])
-        self.uimanager.insert_action_group(self._actions, 0)
-        self.uimanager.add_ui_from_string('''
-                <menubar name='MenuBar'>
-                    <menu action='Edit'>
-                        <menuitem action='edit-undo'/>
-                        <menuitem action='edit-redo'/>
-                    </menu>
-                </menubar>''')
     
     def _get_title_box(self):
         hbox = gtk.HBox()
@@ -810,30 +785,49 @@ class SlideEdit(gtk.Dialog):
         self._toolbar.insert(btn, -1)
         return btn
     
-    def _get_buffer(self):
-        buffer = undobuffer.UndoableBuffer()
-        buffer.begin_not_undoable_action()
-        buffer.set_text(self.slide_text)
-        buffer.end_not_undoable_action()
-        buffer.set_modified(False)
-        return buffer
+    def _get_textview(self):
+        vbox = gtk.VBox()
+        # Toolbar
+        _toolbar = gtk.Toolbar()
+        self._undo_btn = self._get_toolbar_item(gtk.ToolButton(gtk.STOCK_UNDO),
+                                               self._undo, False)
+        self._redo_btn = self._get_toolbar_item(gtk.ToolButton(gtk.STOCK_REDO),
+                                               self._redo, False)
+        vbox.pack_start(_toolbar, False, True)
+        
+        text = gtk.TextView()
+        text.set_wrap_mode(gtk.WRAP_NONE)
+        self._buffer = undobuffer.UndoableBuffer()
+        self._buffer.begin_not_undoable_action()
+        #_buffer.set_text(self.slide_text)
+        self._buffer.end_not_undoable_action()
+        self._buffer.set_modified(False)
+        self._buffer.connect("changed", self._on_text_changed)
+        text.set_buffer(self._buffer)
+        
+        try:
+            gtkspell.Spell(text)
+        except Exception:
+            pass
+        scroll = gtk.ScrolledWindow()
+        scroll.add(text)
+        scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroll.set_size_request(400, 250)
+        scroll.set_shadow_type(gtk.SHADOW_IN)
+        vbox.pack_start(scroll, True, True)
+        return vbox
     
     def get_slide_title(self):
         "Returns the title of the edited slide."
         return self.slide_title
     
-    def get_slide_text(self):
-        "Returns the text of the edited slide."
-        return self.slide_text
-    
     def _save(self):
         self.slide_title = self._get_title_value()
-        bounds = self._buffer.get_bounds()
-        self.slide_text = self._buffer.get_text(bounds[0], bounds[1])
+        #bounds = self._buffer.get_bounds()
         self.changed = True
     
     def _ok_to_continue(self):
-        if self._buffer.can_undo or self._get_title_value() != self.slide_title:
+        if self.changed:
             msg = _('Unsaved Changes exist. Do you really want to continue without saving?')
             dlg = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
                     gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, msg)
@@ -845,19 +839,24 @@ class SlideEdit(gtk.Dialog):
         return True
     
     def _on_text_changed(self, event):
-        self.undo_btn.set_sensitive(self._buffer.can_undo)
-        self.redo_btn.set_sensitive(self._buffer.can_redo)
-        if self._buffer.can_undo:
-            if not self.get_title().startswith("*"):
-                self.set_title("*%s"%self.get_title())
-        else:
-            self.set_title(self.get_title().lstrip("*"))
+        if self._buffer:
+            self._undo_btn.set_sensitive(self._buffer.can_undo)
+            self._redo_btn.set_sensitive(self._buffer.can_redo)
+            self._set_changed()
+        
+    def _set_changed(self):
+        ""
+        self.changed = True
+        if not self.get_title().startswith("*"):
+            self.set_title("*%s"%self.get_title())
     
     def _undo(self, event):
-        self._buffer.undo()
+        if self._buffer:
+            self._buffer.undo()
     
     def _redo(self, event):
-        self._buffer.redo()
+        if self._buffer:
+            self._buffer.redo()
         
     def _get_title_value(self):
         return self._title_entry.get_text()
@@ -877,4 +876,11 @@ class SlideEdit(gtk.Dialog):
     def _quit_without_save(self, event, *args):
         if self._ok_to_continue():
             self.destroy()
+    
+    def _set_slide_row_text(self, column, cell, model, titer):
+        'Returns the title of the current presentation.'
+        rend = model.get_value(titer, 0)
+        if isinstance(rend, theme.Text):
+            text = pango.parse_markup(rend.markup)[1]
+            cell.set_property('text', "Text: %s" % re.sub('\s+',' ',text))
 
