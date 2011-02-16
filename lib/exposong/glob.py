@@ -31,14 +31,17 @@ the program. May contain certain variables as well.
 """
 
 
-def element_contents(element):
+def element_contents(element, respect_whitespace=False):
     '''
     Get a string representation of an XML Element, excluding the tag of the
     element itself.
     '''
     s = u""
     if element.text:
-        s += re.sub('\s+', ' ', element.text)
+        if not respect_whitespace:
+            s += re.sub('\s+', ' ', element.text)
+        else:
+            s += element.text
     for sub in element.getchildren():
         # Strip the namespace
         if sub.tag.partition("}")[2]:
@@ -46,14 +49,17 @@ def element_contents(element):
         else:
             tag = sub.tag
         subtag = ' '.join((tag,) + tuple('%s="%s"' % i for i in sub.items()))
-        subtext = element_contents(sub)
+        subtext = element_contents(sub, respect_whitespace)
         if subtext:
             s += '<%(tag)s>%(text)s</%(tag)s>' % \
                     {"tag": subtag, 'text': subtext}
         else:
             s += "<%(tag)s />" % {'tag': subtag}
         if sub.tail:
-            s += re.sub('\s+', ' ', sub.tail)
+            if not respect_whitespace:
+                s += re.sub('\s+', ' ', sub.tail)
+            else:
+                s += sub.tail
     return unicode(s.strip())
 
 def get_node_text(element, respect_whitespace=False):

@@ -23,8 +23,10 @@ try:
 except Exception:
     pass
 import gobject
+import os, os.path
 import pango
 import re
+import shutil
 from xml.etree import cElementTree as etree
 
 import exposong.application
@@ -90,7 +92,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                         k['align'] = theme.RIGHT
                     
                     if el.tag == 'text':
-                        k['markup'] = element_contents(el)
+                        k['markup'] = element_contents(el, True)
                         self._content.append(theme.Text(**k))
                     elif el.tag == 'image':
                         k['src'] = os.path.join(DATA_PATH, 'image', el.get('src'))
@@ -142,11 +144,23 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             for c in self._content:
                 if isinstance(c, theme.Text):
                     node2 = etree.fromstring('<text>%s</text>' % c.markup)
-                    #TODO Does this work?
                 elif isinstance(c, theme.Image):
                     node2 = etree.Element('image')
                     
-                    node2.set('src', os.path.split(c.src)[1])
+                    # TODO make sure moving the file works correctly.
+                    fpath, fname = os.path.split(c.src)
+                    dpath = os.path.join(DATA_PATH, 'pres', 'res')
+                    if not os.path.isdir(dpath):
+                        os.makedirs(dpath)
+                    if not os.path.samefile(dpath, fpath):
+                        newfile = find_freefile(os.path.join(dpath, fname))
+                        try:
+                            shutil.copyfile(c.src, newfile)
+                            c.src = newfile
+                        except IOError:
+                            exposong.log.error("Could not move file to DATA_PATH/theme/res/%s"
+                                               % newfile)
+                    node2.set('src', fname)
                     if c.aspect is theme.ASPECT_FIT:
                         node2.set('aspect', 'fit')
                     elif c.aspect is theme.ASPECT_FILL:
@@ -711,6 +725,17 @@ class SlideEdit(gtk.Dialog):
         
         self.set_border_width(4)
         self.vbox.set_spacing(7)
+        
+        newbutton = self.add_button(_("Save and New"), gtk.RESPONSE_APPLY)
+        newimg = gtk.Image()
+        newimg.set_from_stock(gtk.STOCK_NEW, gtk.ICON_SIZE_BUTTON)
+        newbutton.set_image(newimg)
+        newbutton.connect("clicked", self._quit_with_save)
+        cancelbutton = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
+        cancelbutton.connect("clicked", self._quit_without_save)
+        okbutton = self.add_button(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
+        okbutton.connect("clicked", self._quit_with_save)
+        
         hbox = gtk.HBox()
         hbox.set_spacing(7)
         vbox = gtk.VBox()
@@ -726,23 +751,25 @@ class SlideEdit(gtk.Dialog):
         # Title
         vbox.pack_start(self._get_title_box(), False, True)
         
+        #TODO Toolbar to add, edit, and delete slide elements.
+        
         # Slide Elements
         lstore = gtk.ListStore(gobject.TYPE_PYOBJECT)
         for e in slide._content:
             lstore.append((e,))
-        tree = gtk.TreeView(lstore)
+        self._tree = gtk.TreeView(lstore)
         col = gtk.TreeViewColumn( _("Slide Element") )
         text = gtk.CellRendererText()
         text.set_property("ellipsize", pango.ELLIPSIZE_END)
         col.pack_start(text, True)
         col.set_cell_data_func(text, self._set_slide_row_text)
-        tree.append_column(col)
-        tree.set_headers_clickable(False)
+        self._tree.append_column(col)
+        self._tree.set_headers_clickable(False)
         
-        tree.get_selection().connect("changed", self._element_changed)
+        self._tree.get_selection().connect("changed", self._element_changed)
         
         scroll = gtk.ScrolledWindow()
-        scroll.add(tree)
+        scroll.add(self._tree)
         scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scroll.set_size_request(400, 250)
         scroll.set_shadow_type(gtk.SHADOW_IN)
@@ -758,17 +785,23 @@ class SlideEdit(gtk.Dialog):
         
         rt_vbox.pack_start(self._content_vbox, True, True)
         
-        # Positional elements that are in all `theme._RenderableSection`s.
-        position = gtk.Expander(_("Position"))
-        # TODO Positioning Settings
-        rt_vbox.pack_start(position, False, False)
+        
+        rt_vbox.pack_start(self._get_position(), False, False)
         hbox.pack_start(rt_vbox, True, True)
         
         self.vbox.pack_start(hbox)
         self.vbox.show_all()
-        tree.get_selection().emit("changed")
+        self._tree.get_selection().emit("changed")
+    
+    def get_slide_title(self):
+        "Returns the title of the edited slide."
+        return self.slide_title
+    
+    def _get_title_value(self):
+        return self._title_entry.get_text()
     
     def _get_title_box(self):
+        "Gets the title entry field."
         hbox = gtk.HBox()
         self._title_label = gtk.Label(_('Title:'))
         self._title_label.set_alignment(0.5,0.5)
@@ -779,11 +812,17 @@ class SlideEdit(gtk.Dialog):
         hbox.pack_start(self._title_entry, True, True)
         return hbox
     
+    def _get_position(self):
+        "Return the element positioning settings."
+        position = gtk.Expander(_("Position"))
+        # Positional elements that are in all `theme._RenderableSection`s.
+        # TODO Positioning Settings
+        return position
+    
     def _element_changed(self, sel):
         "Sets the editing area when the selection changes."
         self._content_vbox.foreach(lambda w: self._content_vbox.remove(w))
-        tree = sel.get_tree_view()
-        model, itr = tree.get_selection().get_selected()
+        model, itr = self._tree.get_selection().get_selected()
         if itr is None:
             label = gtk.Label(_("Select or add an item from the left to edit."))
             label.set_line_wrap(True)
@@ -806,10 +845,13 @@ class SlideEdit(gtk.Dialog):
             text = gtk.TextView()
             text.set_wrap_mode(gtk.WRAP_NONE)
             buffer_.begin_not_undoable_action()
-            #_buffer.set_text(self.slide_text)
+            
+            model, itr = self._tree.get_selection().get_selected()
+            txt = model.get_value(itr, 0)
+            buffer_.set_text(txt.markup)
             buffer_.end_not_undoable_action()
             buffer_.set_modified(False)
-            buffer_.connect("changed", self._on_text_changed, undo, redo)
+            buffer_.connect("changed", self._on_text_buffer_changed, undo, redo)
             text.set_buffer(buffer_)
             
             try:
@@ -830,38 +872,34 @@ class SlideEdit(gtk.Dialog):
             
             preview = gtk.Image()
             fc.set_preview_widget(preview)
+            filt = gtk.FileFilter()
+            filt.add_mime_type('image/*')
+            fc.set_filter(filt)
             fc.connect("update-preview", gui.filechooser_preview, preview)
+            fc.connect("file-set", self._on_image_changed)
             
             self._content_vbox.pack_start(fc, False, True)
         self._content_vbox.show_all()
     
-    def get_slide_title(self):
-        "Returns the title of the edited slide."
-        return self.slide_title
+    def _on_text_buffer_changed(self, buffer_, undo, redo):
+        "The TextBuffer changed."
+        undo.set_sensitive(buffer_.can_undo)
+        redo.set_sensitive(buffer_.can_redo)
+        model, itr = self._tree.get_selection().get_selected()
+        # We should always have a selection
+        txt = model.get_value(itr, 0)
+        txt.markup = buffer_.get_text(buffer_.get_start_iter(),
+                                      buffer_.get_end_iter())
+        self._set_changed()
     
-    def _save(self):
-        self.slide_title = self._get_title_value()
-        #bounds = self._buffer.get_bounds()
-        self.changed = True
+    def _on_image_changed(self, filechooser):
+        "The user chose another image."
+        model, itr = self._tree.get_selection().get_selected()
+        # We should always have a selection
+        txt = model.get_value(itr, 0)
+        txt.src = filechooser.get_filename()
+        self._set_changed()
     
-    def _ok_to_continue(self):
-        if self.changed:
-            msg = _('Unsaved Changes exist. Do you really want to continue without saving?')
-            dlg = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
-                    gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, msg)
-            resp = dlg.run()
-            dlg.destroy()
-            if resp == gtk.RESPONSE_NO:
-                return False
-        self.changed = False
-        return True
-    
-    def _on_text_changed(self, buffer_, undo, redo):
-        if buffer_:
-            undo.set_sensitive(buffer_.can_undo)
-            redo.set_sensitive(buffer_.can_redo)
-            self._set_changed()
-        
     def _set_changed(self):
         ""
         self.changed = True
@@ -876,8 +914,18 @@ class SlideEdit(gtk.Dialog):
         if buffer_:
             buffer_.redo()
         
-    def _get_title_value(self):
-        return self._title_entry.get_text()
+    def _set_slide_row_text(self, column, cell, model, titer):
+        'Returns the title of the current presentation.'
+        rend = model.get_value(titer, 0)
+        if isinstance(rend, theme.Text):
+            text = pango.parse_markup(rend.markup)[1]
+            cell.set_property('text', "Text: %s" % re.sub('\s+',' ',text))
+        elif isinstance(rend, theme.Image):
+            if rend.src:
+                text = os.path.split(rend.src)[1]
+            else:
+                text = "No File Set."
+            cell.set_property('text', "Image: %s" % text)
     
     def _quit_with_save(self, event, *args):
         if self._get_title_value() == "":
@@ -895,16 +943,20 @@ class SlideEdit(gtk.Dialog):
         if self._ok_to_continue():
             self.destroy()
     
-    def _set_slide_row_text(self, column, cell, model, titer):
-        'Returns the title of the current presentation.'
-        rend = model.get_value(titer, 0)
-        if isinstance(rend, theme.Text):
-            text = pango.parse_markup(rend.markup)[1]
-            cell.set_property('text', "Text: %s" % re.sub('\s+',' ',text))
-        elif isinstance(rend, theme.Image):
-            if rend.src:
-                text = os.path.split(rend.src)[1]
-            else:
-                text = "No File Set."
-            cell.set_property('text', "Image: %s" % text)
+    def _save(self):
+        self.slide_title = self._get_title_value()
+        #bounds = self._buffer.get_bounds()
+        self.changed = True
+    
+    def _ok_to_continue(self):
+        if self.changed:
+            msg = _('Unsaved Changes exist. Do you really want to continue without saving?')
+            dlg = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
+                    gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, msg)
+            resp = dlg.run()
+            dlg.destroy()
+            if resp == gtk.RESPONSE_NO:
+                return False
+        self.changed = False
+        return True
 
