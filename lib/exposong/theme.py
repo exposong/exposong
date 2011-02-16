@@ -835,6 +835,11 @@ class Image(_RenderableSection):
         if img:
             ccontext.set_source_pixbuf(img, left, top)
             ccontext.paint()
+    
+    def __deepcopy__(self, memo={}):
+        dup = self.__class__(self.src, self.aspect, self.align, self.valign,
+                             self.margin, self.get_pos())
+        return dup
 
 
 ##########################

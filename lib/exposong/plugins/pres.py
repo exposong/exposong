@@ -707,7 +707,7 @@ class SlideEdit(gtk.Dialog):
     def __init__(self, parent, slide):
         gtk.Dialog.__init__(self, _("Editing Slide"), parent,
                             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
-        self._undo_btn = self._redo_btn = self._buffer = None
+        self._undo_btn = self._redo_btn = None
         
         self.set_border_width(4)
         self.vbox.set_spacing(7)
@@ -739,6 +739,8 @@ class SlideEdit(gtk.Dialog):
         tree.append_column(col)
         tree.set_headers_clickable(False)
         
+        tree.get_selection().connect("changed", self._element_changed)
+        
         scroll = gtk.ScrolledWindow()
         scroll.add(tree)
         scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -752,9 +754,7 @@ class SlideEdit(gtk.Dialog):
         # This will contain an editor for a `theme._RenderableSection`
         # It will load when an item is selected from the left.
         self._content_vbox = gtk.VBox()
-        label = gtk.Label(_("Select an item from the left to edit."))
-        label.set_line_wrap(True)
-        self._content_vbox.pack_start(label)
+        
         
         rt_vbox.pack_start(self._content_vbox, True, True)
         
@@ -766,6 +766,7 @@ class SlideEdit(gtk.Dialog):
         
         self.vbox.pack_start(hbox)
         self.vbox.show_all()
+        tree.get_selection().emit("changed")
     
     def _get_title_box(self):
         hbox = gtk.HBox()
@@ -777,45 +778,62 @@ class SlideEdit(gtk.Dialog):
         self._title_entry.set_text(self.slide_title)
         hbox.pack_start(self._title_entry, True, True)
         return hbox
-        
-    def _get_toolbar_item(self, toolbutton, proxy, sensitive=True):
-        btn = toolbutton
-        btn.set_sensitive(sensitive)
-        btn.connect('clicked', proxy)
-        self._toolbar.insert(btn, -1)
-        return btn
     
-    def _get_textview(self):
-        vbox = gtk.VBox()
-        # Toolbar
-        _toolbar = gtk.Toolbar()
-        self._undo_btn = self._get_toolbar_item(gtk.ToolButton(gtk.STOCK_UNDO),
-                                               self._undo, False)
-        self._redo_btn = self._get_toolbar_item(gtk.ToolButton(gtk.STOCK_REDO),
-                                               self._redo, False)
-        vbox.pack_start(_toolbar, False, True)
-        
-        text = gtk.TextView()
-        text.set_wrap_mode(gtk.WRAP_NONE)
-        self._buffer = undobuffer.UndoableBuffer()
-        self._buffer.begin_not_undoable_action()
-        #_buffer.set_text(self.slide_text)
-        self._buffer.end_not_undoable_action()
-        self._buffer.set_modified(False)
-        self._buffer.connect("changed", self._on_text_changed)
-        text.set_buffer(self._buffer)
-        
-        try:
-            gtkspell.Spell(text)
-        except Exception:
-            pass
-        scroll = gtk.ScrolledWindow()
-        scroll.add(text)
-        scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scroll.set_size_request(400, 250)
-        scroll.set_shadow_type(gtk.SHADOW_IN)
-        vbox.pack_start(scroll, True, True)
-        return vbox
+    def _element_changed(self, sel):
+        "Sets the editing area when the selection changes."
+        self._content_vbox.foreach(lambda w: self._content_vbox.remove(w))
+        tree = sel.get_tree_view()
+        model, itr = tree.get_selection().get_selected()
+        if itr is None:
+            label = gtk.Label(_("Select or add an item from the left to edit."))
+            label.set_line_wrap(True)
+            self._content_vbox.pack_start(label)
+        elif isinstance(model.get_value(itr, 0), theme.Text):
+            buffer_ = undobuffer.UndoableBuffer()
+            
+            # Toolbar
+            toolbar = gtk.Toolbar()
+            undo = gtk.ToolButton(gtk.STOCK_UNDO)
+            undo.connect('clicked', self._undo, buffer_)
+            undo.set_sensitive(False)
+            toolbar.insert(undo, -1)
+            redo = gtk.ToolButton(gtk.STOCK_REDO)
+            redo.connect('clicked', self._redo, buffer_)
+            redo.set_sensitive(False)
+            toolbar.insert(redo, -1)
+            self._content_vbox.pack_start(toolbar, False, True)
+            
+            text = gtk.TextView()
+            text.set_wrap_mode(gtk.WRAP_NONE)
+            buffer_.begin_not_undoable_action()
+            #_buffer.set_text(self.slide_text)
+            buffer_.end_not_undoable_action()
+            buffer_.set_modified(False)
+            buffer_.connect("changed", self._on_text_changed, undo, redo)
+            text.set_buffer(buffer_)
+            
+            try:
+                gtkspell.Spell(text)
+            except Exception:
+                pass
+            scroll = gtk.ScrolledWindow()
+            scroll.add(text)
+            scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+            scroll.set_size_request(400, 250)
+            scroll.set_shadow_type(gtk.SHADOW_IN)
+            self._content_vbox.pack_start(scroll, True, True)
+        elif isinstance(model.get_value(itr, 0), theme.Image):
+            fc = gtk.FileChooserButton("Select Image")
+            fc.set_action(gtk.FILE_CHOOSER_ACTION_OPEN)
+            if model.get_value(itr, 0).src:
+                fc.set_filename(model.get_value(itr, 0).src)
+            
+            preview = gtk.Image()
+            fc.set_preview_widget(preview)
+            fc.connect("update-preview", gui.filechooser_preview, preview)
+            
+            self._content_vbox.pack_start(fc, False, True)
+        self._content_vbox.show_all()
     
     def get_slide_title(self):
         "Returns the title of the edited slide."
@@ -838,10 +856,10 @@ class SlideEdit(gtk.Dialog):
         self.changed = False
         return True
     
-    def _on_text_changed(self, event):
-        if self._buffer:
-            self._undo_btn.set_sensitive(self._buffer.can_undo)
-            self._redo_btn.set_sensitive(self._buffer.can_redo)
+    def _on_text_changed(self, buffer_, undo, redo):
+        if buffer_:
+            undo.set_sensitive(buffer_.can_undo)
+            redo.set_sensitive(buffer_.can_redo)
             self._set_changed()
         
     def _set_changed(self):
@@ -850,13 +868,13 @@ class SlideEdit(gtk.Dialog):
         if not self.get_title().startswith("*"):
             self.set_title("*%s"%self.get_title())
     
-    def _undo(self, event):
-        if self._buffer:
-            self._buffer.undo()
+    def _undo(self, button, buffer_):
+        if buffer_:
+            buffer_.undo()
     
-    def _redo(self, event):
-        if self._buffer:
-            self._buffer.redo()
+    def _redo(self, button, buffer_):
+        if buffer_:
+            buffer_.redo()
         
     def _get_title_value(self):
         return self._title_entry.get_text()
@@ -883,4 +901,10 @@ class SlideEdit(gtk.Dialog):
         if isinstance(rend, theme.Text):
             text = pango.parse_markup(rend.markup)[1]
             cell.set_property('text', "Text: %s" % re.sub('\s+',' ',text))
+        elif isinstance(rend, theme.Image):
+            if rend.src:
+                text = os.path.split(rend.src)[1]
+            else:
+                text = "No File Set."
+            cell.set_property('text', "Image: %s" % text)
 

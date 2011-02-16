@@ -27,6 +27,7 @@ import os
 
 _LABEL_SPACING = 12
 _WIDGET_SPACING = 4
+__pb_cache = {}
 
 def Table(rows):
     'Returns a gtk Table.'
@@ -258,4 +259,18 @@ def edit_treeview_row_btn(btn, treeview, func, edit=False):
         (model, itr) = treeview.get_selection().get_selected()
         path = model.get_path(itr)
     func(treeview, path, col, edit)
+
+def filechooser_preview(file_chooser, preview):
+    "Updates `preview` gtk.Image widget with the currently selected file."
+    global __pb_cache
+    filename = file_chooser.get_preview_filename()
+    try:
+        if filename not in __pb_cache:
+            __pb_cache[filename] = gtk.gdk.pixbuf_new_from_file_at_size(filename,
+                                                                        256, 256)
+        preview.set_from_pixbuf(__pb_cache[filename])
+        have_preview = True
+    except:
+        have_preview = False
+    file_chooser.set_preview_widget_active(have_preview)
 
