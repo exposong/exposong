@@ -59,10 +59,17 @@ BOTTOM = 2
 ASPECT_FIT = 1
 ASPECT_FILL = 2
 
-_POS_MAP = {'x1': 0, 'y1': 1, 'x2': 2, 'y2': 3,
+POS_MAP = {'x1': 0, 'y1': 1, 'x2': 2, 'y2': 3,
             0: 'x1', 1: 'y1', 2: 'x2', 3: 'y2',
             }
-                
+ALIGN_MAP = {LEFT: _('Left'),
+             CENTER: _('Center'),
+             RIGHT: _('Right')
+             }
+VALIGN_MAP = {TOP: _('Top'),
+              MIDDLE: _('Middle'),
+              BOTTOM: _('Bottom')
+              }
 
 class Theme(object):
     """
@@ -190,7 +197,7 @@ class Theme(object):
                         k2 = k.split(".")
                         if k2[0] == 'footer':
                             # Expand over the footer if it doesn't exist.
-                            expand[k2[1]] = self.footer.pos[_POS_MAP[k2[1]]]
+                            expand[k2[1]] = self.footer.pos[POS_MAP[k2[1]]]
                 for t in slide.get_body():
                     t.draw(ccontext, bounds, self.body, expand)
     
@@ -238,12 +245,16 @@ class _Renderable(object):
         el.attrib['x2'] = str(self.pos[2])
         el.attrib['y2'] = str(self.pos[3])
     
+    def get_pos(self):
+        "Return the position."
+        return self.pos
+    
     def draw(self, ccontext, bounds):
         "Render the background to the context."
         if len(bounds) == 2:
-            self.rpos = map(_product, bounds*2, self.pos)
+            self.rpos = map(_product, bounds*2, self.get_pos())
         elif len(bounds) == 4:
-            self.rpos = map(_product, bounds[-2:]*2, self.pos)
+            self.rpos = map(_product, bounds[-2:]*2, self.get_pos())
             self.rpos[0] += bounds[0]
             self.rpos[1] += bounds[1]
             self.rpos[2] += bounds[0]
@@ -675,34 +686,26 @@ class _RenderableSection(_Renderable):
         self.valign = valign
         self.margin = margin
     
-    def _set_pos(self, section, expand={}):
-        "Sets the position based on the section and the margin."
-        try:
-            self.pos = self.__old_pos[:]
-        except Exception:
-            self.__old_pos = self.pos[:]
-        spos = section.pos[:]
-        for k,v in expand.iteritems():
-            spos[_POS_MAP[k]] = v
-        h = spos[3] - spos[1]
-        w = spos[2] - spos[0]
-        self.pos[0] = spos[0] + w * self.pos[0]
-        self.pos[1] = spos[1] + h * self.pos[1]
-        self.pos[2] = spos[2] - w * (1.0 - self.pos[2])
-        self.pos[3] = spos[3] - h * (1.0 - self.pos[3])
-    
     def get_pos(self):
-        'Returns the original position.'
-        try:
-            return self.__old_pos
-        except Exception:
-            return self.pos
+        'Returns the position.'
+        pos = self._section.pos[:]
+        for k,v in self._expand.iteritems():
+            pos[POS_MAP[k]] = v
+        h = pos[3] - pos[1]
+        w = pos[2] - pos[0]
+        pos[0] += w * self.pos[0]
+        pos[1] += h * self.pos[1]
+        pos[2] -= w * (1.0 - self.pos[2])
+        pos[3] -= h * (1.0 - self.pos[3])
+        return pos
     
     def draw(self, ccontext, bounds, section, expand={}):
         "Render to a Cairo Context."
-        if section:
-            self._set_pos(section, expand)
+        self._section = section
+        self._expand = expand
         _Renderable.draw(self, ccontext, bounds)
+        self._section = self._expand = None
+        
         self.rpos[0] += self.margin
         self.rpos[1] += self.margin
         self.rpos[2] -= self.margin
@@ -842,7 +845,7 @@ class Image(_RenderableSection):
     
     def __deepcopy__(self, memo={}):
         dup = self.__class__(self.src, self.aspect, self.align, self.valign,
-                             self.margin, self.get_pos())
+                             self.margin, self.pos[:])
         return dup
 
 

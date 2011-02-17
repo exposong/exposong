@@ -747,6 +747,7 @@ class SlideEdit(gtk.Dialog):
         self.connect("delete-event", self._quit_without_save)
         
         self.slide_title = slide.title
+        self.slide_content = slide._content
         self.changed = False
         
         # Title
@@ -825,50 +826,127 @@ class SlideEdit(gtk.Dialog):
         #Image(src, aspect=ASPECT_FIT, align=CENTER, valign=MIDDLE, margin=0, pos=None):
         adjust = gtk.Adjustment(0, 0.0, 1.0, 0.01, 0.10)
         self._p['lf'] = table.attach_spinner(adjust, 0.02, 2, _('Left:'), 0, 0)
+        self._p['lf'].connect('changed', self._change_pos)
         
         adjust = gtk.Adjustment(0, 0.0, 1.0, 0.01, 0.10)
         self._p['rt'] = table.attach_spinner(adjust, 0.02, 2, _('Right:'), 1, 0)
+        self._p['rt'].connect('changed', self._change_pos)
         
         adjust = gtk.Adjustment(0, 0.0, 1.0, 0.01, 0.10)
         self._p['tp'] = table.attach_spinner(adjust, 0.02, 2, _('Top:'), 0, 1)
+        self._p['tp'].connect('changed', self._change_pos)
         
         adjust = gtk.Adjustment(0, 0.0, 1.0, 0.01, 0.10)
         self._p['bt'] = table.attach_spinner(adjust, 0.02, 2, _('Bottom:'), 1, 1)
+        self._p['bt'].connect('changed', self._change_pos)
         
         adjust = gtk.Adjustment(0, 0, 100, 1, 5)
         self._p['mg'] = table.attach_spinner(adjust, 1, 0, _('Margin:'), 0, 2, 2, 1)
+        self._p['mg'].connect('changed', self._change_mg)
         
-        options = (_('Left'), _('Center'), _('Right'))
-        self._p['al'] = table.attach_combo(options, None, _('Alignment:'), 0, 3, 2, 1)
+        self._p['al'] = table.attach_combo(theme.ALIGN_MAP.values(), None,
+                                           _('Alignment:'), 0, 3, 2, 1)
+        self._p['al'].connect('changed', self._change_al)
         
-        options = (_('Top'), _('Middle'), _('Bottom'))
-        self._p['va'] = table.attach_combo(options, None,
+        self._p['va'] = table.attach_combo(theme.VALIGN_MAP.values(), None,
                                            _('Vertical Alignment:'), 0, 4, 2, 1)
+        self._p['va'].connect('changed', self._change_va)
         
         # TODO Make changes to these widgets change the selected element.
         
         position.add(table)
         return position
     
+    def _change_pos(self, editable):
+        "The pos.left was changed."
+        if self.__updating: return
+        el = self.get_selected_element()
+        if el is False: return False
+        try:
+            lf = float(self._p['lf'].get_text())
+            rt = float(self._p['rt'].get_text())
+            tp = float(self._p['tp'].get_text())
+            bt = float(self._p['bt'].get_text())
+            el.pos[0] = lf
+            el.pos[1] = tp
+            if rt > lf:
+                el.pos[2] = rt
+                self._set_style(self._p['rt'], False)
+            else:
+                el.pos[2] = lf + 0.05
+                self._set_style(self._p['rt'], True)
+            if bt > tp:
+                el.pos[3] = bt
+                self._set_style(self._p['bt'], False)
+            else:
+                el.pos[3] = tp + 0.05
+                self._set_style(self._p['bt'], True)
+            
+            self._set_changed()
+        except ValueError:
+            return False
+    
+    def _set_style(self, widget, err):
+        "Set the style on widgets."
+        if err:
+            color = gtk.gdk.Color(65535, 0, 0)
+        else:
+            color = self._p['lf'].get_style().base[gtk.STATE_NORMAL]
+        widget.modify_base(gtk.STATE_NORMAL, color)
+    
+    def _change_mg(self, editable):
+        "The pos.left was changed."
+        if self.__updating: return
+        el = self.get_selected_element()
+        if el is False: return False
+        try:
+            el.margin = float(editable.get_text())
+            self._set_changed()
+        except ValueError:
+            return False
+    
+    def _change_al(self, combobox):
+        "The pos.left was changed."
+        if self.__updating: return
+        el = self.get_selected_element()
+        
+        for k,v in theme.ALIGN_MAP.iteritems():
+            if v == combobox.get_active_text():
+                self._set_changed()
+                el.align = k
+    
+    def _change_va(self, combobox):
+        "The pos.left was changed."
+        if self.__updating: return
+        el = self.get_selected_element()
+        
+        for k,v in theme.VALIGN_MAP.iteritems():
+            if v == combobox.get_active_text():
+                el.valign = k
+                self._set_changed()
+                break
+    
     def _element_changed(self, sel):
         "Sets the editing area when the selection changes."
+        self._set_style(self._p['rt'], False)
+        self._set_style(self._p['bt'], False)
+        self.__updating = True
         self._content_vbox.foreach(lambda w: self._content_vbox.remove(w))
-        model, itr = self._tree.get_selection().get_selected()
-        el = None
+        el = self.get_selected_element()
         
         for nm, e in self._p.iteritems():
-            e.set_sensitive(itr is not None)
-        if itr is not None:
-            el = model.get_value(itr, 0)
+            e.set_sensitive(el <> False)
+        if el is not False:
             self._p['lf'].set_value(el.pos[0])
             self._p['rt'].set_value(el.pos[2])
             self._p['tp'].set_value(el.pos[1])
             self._p['bt'].set_value(el.pos[3])
             self._p['mg'].set_value(el.margin)
-            #self._p['al'].set_value(el.align)
-            #self._p['va'].set_value(el.valign)
+            gui.set_active_text(self._p['al'], theme.ALIGN_MAP[el.align])
+            gui.set_active_text(self._p['va'], theme.VALIGN_MAP[el.valign])
+            
         
-        if itr is None:
+        if el is False:
             label = gtk.Label(_("Select or add an item from the left to edit."))
             label.set_line_wrap(True)
             self._content_vbox.pack_start(label)
@@ -925,25 +1003,29 @@ class SlideEdit(gtk.Dialog):
             
             self._content_vbox.pack_start(fc, False, True)
         self._content_vbox.show_all()
+        self.__updating = False
     
     def _on_text_buffer_changed(self, buffer_, undo, redo):
         "The TextBuffer changed."
         undo.set_sensitive(buffer_.can_undo)
         redo.set_sensitive(buffer_.can_redo)
-        model, itr = self._tree.get_selection().get_selected()
-        # We should always have a selection
-        el = model.get_value(itr, 0)
+        el = self.get_selected_element()
         el.markup = buffer_.get_text(buffer_.get_start_iter(),
                                       buffer_.get_end_iter())
         self._set_changed()
     
     def _on_image_changed(self, filechooser):
         "The user chose another image."
-        model, itr = self._tree.get_selection().get_selected()
-        # We should always have a selection
-        el = model.get_value(itr, 0)
+        el = self.get_selected_element()
         el.src = filechooser.get_filename()
         self._set_changed()
+    
+    def get_selected_element(self):
+        model, itr = self._tree.get_selection().get_selected()
+        if itr:
+            return model.get_value(itr, 0)
+        else:
+            return False
     
     def _set_changed(self):
         ""
@@ -990,7 +1072,7 @@ class SlideEdit(gtk.Dialog):
     
     def _save(self):
         self.slide_title = self._get_title_value()
-        #bounds = self._buffer.get_bounds()
+        #self.slide_content = [row[0] for row in self._tree.get_model()]
         self.changed = True
     
     def _ok_to_continue(self):

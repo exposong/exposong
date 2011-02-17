@@ -70,6 +70,16 @@ class ESTable(gtk.Table):
         label2.set_alignment(1.0, 0.0)
         self.attach(label2, x*2, x*2+w, y, y+h, gtk.FILL, gtk.FILL, WIDGET_SPACING)
 
+def set_active_text(combo, text):
+    "A convenience method to select the value matching the given text."
+    itr = combo.get_model().get_iter_first()
+    while itr:
+        if combo.get_model().get_value(itr, 0) == text:
+            combo.set_active_iter(itr)
+            return True
+        itr = combo.get_model().iter_next(itr)
+    return False
+
 ## Old Methods ##
 
 def Table(rows):
