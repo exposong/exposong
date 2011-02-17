@@ -797,6 +797,8 @@ class Image(_RenderableSection):
     
     def load(self, size):
         "Loads an image based on a requested size [width, height]."
+        if not self.src or not os.path.isfile(self.src):
+            return False
         if not self._original:
             try:
                 self._original = pb_new(self.src)
@@ -816,6 +818,8 @@ class Image(_RenderableSection):
         size = map(_subtract, self.rpos[2:4], self.rpos[:2])
         
         img = self.load(size)
+        if not img:
+            return False
         if self.valign == TOP:
             top = self.rpos[1]
         elif self.valign == MIDDLE:

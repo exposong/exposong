@@ -38,6 +38,8 @@ from exposong import gui, theme
 from exposong.glob import *
 from exposong.plugins import Plugin, _abstract
 
+IMAGE_PATH = os.path.join(DATA_PATH, 'pres', 'res')
+
 """
 Plain text presentations.
 """
@@ -65,8 +67,8 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             self.title = ''
             self._theme = None
             if etree.iselement(value):
-                self.title = value.get("title")
-                self._theme = value.get("theme")
+                self.title = value.get("title", '')
+                self._theme = value.get("theme", '')
                 for el in value:
                     k = {
                          'align': theme.CENTER,
@@ -95,7 +97,10 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                         k['markup'] = element_contents(el, True)
                         self._content.append(theme.Text(**k))
                     elif el.tag == 'image':
-                        k['src'] = os.path.join(DATA_PATH, 'image', el.get('src'))
+                        if el.get('src'):
+                            k['src'] = os.path.join(IMAGE_PATH, el.get('src'))
+                        else:
+                            k['src'] = ''
                         if el.get('aspect') is 'fit':
                             k['aspect'] = theme.ASPECT_FIT
                         elif el.get('aspect') is 'fill':
@@ -138,7 +143,8 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         
         def to_node(self, node):
             'Populate the XML element.'
-            node.set('title', self.title)
+            if self.title:
+                node.set('title', self.title)
             if self._theme:
                 node.set('theme', self._theme)
             for c in self._content:
@@ -149,11 +155,10 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                     
                     # TODO make sure moving the file works correctly.
                     fpath, fname = os.path.split(c.src)
-                    dpath = os.path.join(DATA_PATH, 'pres', 'res')
-                    if not os.path.isdir(dpath):
-                        os.makedirs(dpath)
-                    if not os.path.samefile(dpath, fpath):
-                        newfile = find_freefile(os.path.join(dpath, fname))
+                    if not os.path.isdir(IMAGE_PATH):
+                        os.makedirs(IMAGE_PATH)
+                    if os.path.abspath(IMAGE_PATH) <> os.path.abspath(fpath):
+                        newfile = find_freefile(os.path.join(IMAGE_PATH, fname))
                         try:
                             shutil.copyfile(c.src, newfile)
                             c.src = newfile
@@ -212,6 +217,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         self.filename = filename
         self._meta = {}
         self.slides = []
+        self._title = ''
         self._timer = None
         self._timer_loop = False
         
@@ -229,9 +235,6 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             except IOError, details:
                 exposong.log.error('Could not open presentation "%s": %s',
                                    filename, details)
-            #except ExpatError, details:
-            #    exposong.log.error('Error reading presentation file "%s": %s',
-            #                       filename, details)
             else:
                 for el in root.find("meta"):
                     if el.tag == 'title':
@@ -873,7 +876,9 @@ class SlideEdit(gtk.Dialog):
             preview = gtk.Image()
             fc.set_preview_widget(preview)
             filt = gtk.FileFilter()
-            filt.add_mime_type('image/*')
+            for ext in (x for y in gtk.gdk.pixbuf_get_formats()
+                        for x in y['extensions']):
+                filt.add_pattern('*.%s' % ext)
             fc.set_filter(filt)
             fc.connect("update-preview", gui.filechooser_preview, preview)
             fc.connect("file-set", self._on_image_changed)
