@@ -748,8 +748,6 @@ class SlideEdit(gtk.Dialog):
         
         self.slide_title = slide.title
         self.changed = False
-        #Text(markup,                  align=LEFT,   valign=TOP,    margin=0, pos=None):
-        #Image(src, aspect=ASPECT_FIT, align=CENTER, valign=MIDDLE, margin=0, pos=None):
         
         # Title
         vbox.pack_start(self._get_title_box(), False, True)
@@ -817,20 +815,64 @@ class SlideEdit(gtk.Dialog):
     
     def _get_position(self):
         "Return the element positioning settings."
-        position = gtk.Expander(_("Position"))
+        position = gtk.Expander(_("Element Position"))
         # Positional elements that are in all `theme._RenderableSection`s.
-        # TODO Positioning Settings
+        # X1
+        table = gui.ESTable(5, 2)
+        self._p = {}
+        
+        #Text(markup,                  align=LEFT,   valign=TOP,    margin=0, pos=None):
+        #Image(src, aspect=ASPECT_FIT, align=CENTER, valign=MIDDLE, margin=0, pos=None):
+        adjust = gtk.Adjustment(0, 0.0, 1.0, 0.01, 0.10)
+        self._p['lf'] = table.attach_spinner(adjust, 0.02, 2, _('Left:'), 0, 0)
+        
+        adjust = gtk.Adjustment(0, 0.0, 1.0, 0.01, 0.10)
+        self._p['rt'] = table.attach_spinner(adjust, 0.02, 2, _('Right:'), 1, 0)
+        
+        adjust = gtk.Adjustment(0, 0.0, 1.0, 0.01, 0.10)
+        self._p['tp'] = table.attach_spinner(adjust, 0.02, 2, _('Top:'), 0, 1)
+        
+        adjust = gtk.Adjustment(0, 0.0, 1.0, 0.01, 0.10)
+        self._p['bt'] = table.attach_spinner(adjust, 0.02, 2, _('Bottom:'), 1, 1)
+        
+        adjust = gtk.Adjustment(0, 0, 100, 1, 5)
+        self._p['mg'] = table.attach_spinner(adjust, 1, 0, _('Margin:'), 0, 2, 2, 1)
+        
+        options = (_('Left'), _('Center'), _('Right'))
+        self._p['al'] = table.attach_combo(options, None, _('Alignment:'), 0, 3, 2, 1)
+        
+        options = (_('Top'), _('Middle'), _('Bottom'))
+        self._p['va'] = table.attach_combo(options, None,
+                                           _('Vertical Alignment:'), 0, 4, 2, 1)
+        
+        # TODO Make changes to these widgets change the selected element.
+        
+        position.add(table)
         return position
     
     def _element_changed(self, sel):
         "Sets the editing area when the selection changes."
         self._content_vbox.foreach(lambda w: self._content_vbox.remove(w))
         model, itr = self._tree.get_selection().get_selected()
+        el = None
+        
+        for nm, e in self._p.iteritems():
+            e.set_sensitive(itr is not None)
+        if itr is not None:
+            el = model.get_value(itr, 0)
+            self._p['lf'].set_value(el.pos[0])
+            self._p['rt'].set_value(el.pos[2])
+            self._p['tp'].set_value(el.pos[1])
+            self._p['bt'].set_value(el.pos[3])
+            self._p['mg'].set_value(el.margin)
+            #self._p['al'].set_value(el.align)
+            #self._p['va'].set_value(el.valign)
+        
         if itr is None:
             label = gtk.Label(_("Select or add an item from the left to edit."))
             label.set_line_wrap(True)
             self._content_vbox.pack_start(label)
-        elif isinstance(model.get_value(itr, 0), theme.Text):
+        elif isinstance(el, theme.Text):
             buffer_ = undobuffer.UndoableBuffer()
             
             # Toolbar
@@ -849,9 +891,7 @@ class SlideEdit(gtk.Dialog):
             text.set_wrap_mode(gtk.WRAP_NONE)
             buffer_.begin_not_undoable_action()
             
-            model, itr = self._tree.get_selection().get_selected()
-            txt = model.get_value(itr, 0)
-            buffer_.set_text(txt.markup)
+            buffer_.set_text(el.markup)
             buffer_.end_not_undoable_action()
             buffer_.set_modified(False)
             buffer_.connect("changed", self._on_text_buffer_changed, undo, redo)
@@ -864,14 +904,14 @@ class SlideEdit(gtk.Dialog):
             scroll = gtk.ScrolledWindow()
             scroll.add(text)
             scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-            scroll.set_size_request(400, 250)
+            scroll.set_size_request(220, 100)
             scroll.set_shadow_type(gtk.SHADOW_IN)
             self._content_vbox.pack_start(scroll, True, True)
-        elif isinstance(model.get_value(itr, 0), theme.Image):
+        elif isinstance(el, theme.Image):
             fc = gtk.FileChooserButton("Select Image")
             fc.set_action(gtk.FILE_CHOOSER_ACTION_OPEN)
-            if model.get_value(itr, 0).src:
-                fc.set_filename(model.get_value(itr, 0).src)
+            if el.src:
+                fc.set_filename(el.src)
             
             preview = gtk.Image()
             fc.set_preview_widget(preview)
@@ -892,8 +932,8 @@ class SlideEdit(gtk.Dialog):
         redo.set_sensitive(buffer_.can_redo)
         model, itr = self._tree.get_selection().get_selected()
         # We should always have a selection
-        txt = model.get_value(itr, 0)
-        txt.markup = buffer_.get_text(buffer_.get_start_iter(),
+        el = model.get_value(itr, 0)
+        el.markup = buffer_.get_text(buffer_.get_start_iter(),
                                       buffer_.get_end_iter())
         self._set_changed()
     
@@ -901,8 +941,8 @@ class SlideEdit(gtk.Dialog):
         "The user chose another image."
         model, itr = self._tree.get_selection().get_selected()
         # We should always have a selection
-        txt = model.get_value(itr, 0)
-        txt.src = filechooser.get_filename()
+        el = model.get_value(itr, 0)
+        el.src = filechooser.get_filename()
         self._set_changed()
     
     def _set_changed(self):

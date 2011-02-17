@@ -26,8 +26,51 @@ import gobject
 import os
 
 _LABEL_SPACING = 12
-_WIDGET_SPACING = 4
+WIDGET_SPACING = 4
 __pb_cache = {}
+
+
+## New Class ##
+
+class ESTable(gtk.Table):
+    """
+    This class will assist in laying out widgets in a standardized way.
+    """
+    def __init__(self, rows=1, cols=1):
+        gtk.Table.__init__(self, rows, cols*2)        
+        self.set_row_spacings(8)
+        self.set_border_width(6)
+    
+    def attach_spinner(self, adjust, climb_rate=0.0, digits=0, label=None,
+                       x=0, y=0, w=1, h=1):
+        'Add a spinner widget.'
+        self.attach_label(label, x, y, 1, h)
+        
+        spin = gtk.SpinButton(adjust, climb_rate, digits)
+        self.attach(spin, x*2+1, x*2+w*2, y, y+h, gtk.FILL|gtk.EXPAND, gtk.FILL,
+                    WIDGET_SPACING)
+        return spin
+    
+    def attach_combo(self, options, value, label, x=0, y=0, w=1, h=1):
+        'Adds a combo widget.'
+        self.attach_label(label, x, y, 1, h)
+        
+        combo = gtk.combo_box_new_text()
+        for i in range(len(options)):
+            combo.append_text(options[i])
+            if options[i] == value:
+                combo.set_active(i)
+        self.attach(combo, x*2+1, x*2+w*2, y, y+h, gtk.EXPAND|gtk.FILL,
+                    gtk.FILL, WIDGET_SPACING)
+        return combo
+    
+    def attach_label(self, label, x=0, y=0, w=1, h=1):
+        'Add a label widget.'
+        label2 = gtk.Label(label)
+        label2.set_alignment(1.0, 0.0)
+        self.attach(label2, x*2, x*2+w, y, y+h, gtk.FILL, gtk.FILL, WIDGET_SPACING)
+
+## Old Methods ##
 
 def Table(rows):
     'Returns a gtk Table.'
@@ -43,7 +86,7 @@ def append_entry(table, label, value, top, max_len=0):
     entry = gtk.Entry(max_len)
     if value:
         entry.set_text(value)
-    table.attach(entry, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, _WIDGET_SPACING)
+    table.attach(entry, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, WIDGET_SPACING)
     return entry
 
 def append_textview(table, label, value, top):
@@ -63,7 +106,7 @@ def append_textview(table, label, value, top):
     scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
     scroll.set_shadow_type(gtk.SHADOW_IN)
     table.attach(scroll, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL,
-            gtk.EXPAND|gtk.FILL, _WIDGET_SPACING)
+            gtk.EXPAND|gtk.FILL, WIDGET_SPACING)
     return textview
 
 def append_file(table, label, value, top):
@@ -76,7 +119,7 @@ def append_file(table, label, value, top):
         filech.set_filename(value)
     else:
         filech.set_current_folder(os.path.expanduser('~'))
-    table.attach(filech, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, _WIDGET_SPACING)
+    table.attach(filech, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, WIDGET_SPACING)
     return filech
 
 def append_folder(table, label, value, top):
@@ -90,7 +133,7 @@ def append_folder(table, label, value, top):
         filech.set_current_folder(value)
     else:
         filech.set_current_folder(os.path.expanduser('~'))
-    table.attach(filech, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, _WIDGET_SPACING)
+    table.attach(filech, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, WIDGET_SPACING)
     return filech
 
 def append_color(table, label, value, top, alpha=False):
@@ -102,7 +145,7 @@ def append_color(table, label, value, top, alpha=False):
         cnt = 2
         for v in value:
             button = gtk.ColorButton(gtk.gdk.Color(int(v[0]), int(v[1]), int(v[2])))
-            table.attach(button, cnt, cnt+1, top, top+1, gtk.EXPAND|gtk.FILL, 0, _WIDGET_SPACING)
+            table.attach(button, cnt, cnt+1, top, top+1, gtk.EXPAND|gtk.FILL, 0, WIDGET_SPACING)
             cnt += 1
             buttons.append(button)
         return buttons
@@ -110,7 +153,7 @@ def append_color(table, label, value, top, alpha=False):
         button = gtk.ColorButton(gtk.gdk.Color(int(value[0]), int(value[1]),
                                  int(value[2])))
         table.attach(button, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0,
-                     _WIDGET_SPACING)
+                     WIDGET_SPACING)
         if(alpha):
             button.set_alpha(int(value[3]))
             button.set_use_alpha(True)
@@ -121,7 +164,7 @@ def append_spinner(table, label, adjustment, top):
     set_label(table, label, top)
     
     spinner = gtk.SpinButton(adjustment, 2.0)
-    table.attach(spinner, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, _WIDGET_SPACING)
+    table.attach(spinner, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, WIDGET_SPACING)
     return spinner
 
 def append_combo(table, label, options, value, top):
@@ -133,7 +176,7 @@ def append_combo(table, label, options, value, top):
         combo.append_text(options[i])
         if options[i] == value:
             combo.set_active(i)
-    table.attach(combo, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, _WIDGET_SPACING)
+    table.attach(combo, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, WIDGET_SPACING)
     return combo
 
 def append_combo_entry(table, label, options, value, top):
@@ -145,7 +188,7 @@ def append_combo_entry(table, label, options, value, top):
         combo.append_text(options[i])
     if value:
         combo.child.set_text(value)
-    table.attach(combo, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, _WIDGET_SPACING)
+    table.attach(combo, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, WIDGET_SPACING)
     return combo
 
 def append_combo2(table, label, options, value, top):
@@ -166,7 +209,7 @@ def append_combo2(table, label, options, value, top):
             combo.set_active(i)
     if not value:
         combo.set_active(0)
-    table.attach(combo, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, _WIDGET_SPACING)
+    table.attach(combo, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, WIDGET_SPACING)
     return combo
 
 def append_radio(table, label, active, top, group=None):
@@ -195,25 +238,25 @@ def append_language_combo(table, value, top):
     #cell = gtk.CellRendererText()
     #lang.pack_start(cell, True)
     #lang.add_attribute(cell, 'text', 0)
-    table.attach(lang, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, _WIDGET_SPACING)
+    table.attach(lang, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, WIDGET_SPACING)
     return lang
 
 def append_checkbutton(table, label, buttonlabel, top):
     set_label(table, label, top)
     cb = gtk.CheckButton(buttonlabel)
-    table.attach(cb, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, _WIDGET_SPACING)
+    table.attach(cb, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, WIDGET_SPACING)
     return cb
 
 def append_font_button(table, label, fontname, top):
     set_label(table, label, top)
     fb = gtk.FontButton(fontname)
-    table.attach(fb, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, _WIDGET_SPACING)
+    table.attach(fb, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, WIDGET_SPACING)
     return fb
 
 def append_hbox(table, label, hbox, top):
     'Adds a HBox widget to a table and returns it.'
     set_label(table, label, top)
-    table.attach(hbox, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, _WIDGET_SPACING)
+    table.attach(hbox, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, WIDGET_SPACING)
     return
 
 def append_section_title(table, title, top):
@@ -273,4 +316,3 @@ def filechooser_preview(file_chooser, preview):
     except:
         have_preview = False
     file_chooser.set_preview_widget_active(have_preview)
-
