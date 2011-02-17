@@ -38,37 +38,60 @@ class ESTable(gtk.Table):
     """
     def __init__(self, rows=1, cols=1):
         gtk.Table.__init__(self, rows, cols*2)        
-        self.set_row_spacings(8)
+        self.set_row_spacings(4)
         self.set_border_width(6)
     
+    def _set_options(self, kw={}):
+        'Set default options for attaching.'
+        kw.setdefault('xoptions', gtk.EXPAND|gtk.FILL)
+        kw.setdefault('yoptions', gtk.FILL)
+        kw.setdefault('xpadding', WIDGET_SPACING)
+        kw.setdefault('ypadding', 0)
+    
+    def attach_widget(self, widget, label, x=0, y=0, w=1, h=1, **kw):
+        'Add a widget.'
+        x1 = x*2
+        x2 = x*2+w*2
+        y1 = y
+        y2 = y+h
+        if label:
+            self.attach_label(label, x, y, 1, h, internal=True)
+            x1 += 1
+        
+        self._set_options(kw)
+        self.attach(widget, x1, x2, y1, y2, **kw)
+    
     def attach_spinner(self, adjust, climb_rate=0.0, digits=0, label=None,
-                       x=0, y=0, w=1, h=1):
+                       x=0, y=0, w=1, h=1, **kw):
         'Add a spinner widget.'
-        self.attach_label(label, x, y, 1, h)
-        
-        spin = gtk.SpinButton(adjust, climb_rate, digits)
-        self.attach(spin, x*2+1, x*2+w*2, y, y+h, gtk.FILL|gtk.EXPAND, gtk.FILL,
-                    WIDGET_SPACING)
-        return spin
+        widget = gtk.SpinButton(adjust, climb_rate, digits)
+        self.attach_widget(widget, label, x, y, w, h, **kw)
+        return widget
     
-    def attach_combo(self, options, value, label, x=0, y=0, w=1, h=1):
+    def attach_combo(self, options, value, label, x=0, y=0, w=1, h=1, **kw):
         'Adds a combo widget.'
-        self.attach_label(label, x, y, 1, h)
-        
-        combo = gtk.combo_box_new_text()
+        widget = gtk.combo_box_new_text()
         for i in range(len(options)):
-            combo.append_text(options[i])
+            widget.append_text(options[i])
             if options[i] == value:
-                combo.set_active(i)
-        self.attach(combo, x*2+1, x*2+w*2, y, y+h, gtk.EXPAND|gtk.FILL,
-                    gtk.FILL, WIDGET_SPACING)
-        return combo
+                widget.set_active(i)
+        self.attach_widget(widget, label, x, y, w, h, **kw)
+        return widget
     
-    def attach_label(self, label, x=0, y=0, w=1, h=1):
+    def attach_label(self, label, x=0, y=0, w=1, h=1, **kw):
         'Add a label widget.'
         label2 = gtk.Label(label)
         label2.set_alignment(1.0, 0.0)
-        self.attach(label2, x*2, x*2+w, y, y+h, gtk.FILL, gtk.FILL, WIDGET_SPACING)
+        if 'internal' not in kw:
+            w *= 2
+        else:
+            del kw['internal']
+        kw.setdefault('xoptions', gtk.FILL)
+        kw.setdefault('yoptions', gtk.FILL)
+        kw.setdefault('xpadding', WIDGET_SPACING)
+        kw.setdefault('ypadding', WIDGET_SPACING)
+        self.attach(label2, x*2, x*2+w, y, y+h, **kw)
+        return label2
 
 def set_active_text(combo, text):
     "A convenience method to select the value matching the given text."

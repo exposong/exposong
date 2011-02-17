@@ -62,14 +62,68 @@ ASPECT_FILL = 2
 POS_MAP = {'x1': 0, 'y1': 1, 'x2': 2, 'y2': 3,
             0: 'x1', 1: 'y1', 2: 'x2', 3: 'y2',
             }
-ALIGN_MAP = {LEFT: _('Left'),
-             CENTER: _('Center'),
-             RIGHT: _('Right')
-             }
-VALIGN_MAP = {TOP: _('Top'),
-              MIDDLE: _('Middle'),
-              BOTTOM: _('Bottom')
-              }
+
+def get_align_const(align):
+    "Get the alignment constant."
+    global LEFT, CENTER, RIGHT
+    if align == 'left' or align == _('Left') or align == LEFT:
+        return LEFT
+    elif align == 'center' or align == _('Center') or align == CENTER:
+        return CENTER
+    elif align == 'right' or align == _('Right') or align == RIGHT:
+        return RIGHT
+    return -1
+def get_align_key(align):
+    "Get the alignment XML key."
+    global LEFT, CENTER, RIGHT
+    if align == 'left' or align == _('Left') or align == LEFT:
+        return 'left'
+    elif align == 'center' or align == _('Center') or align == CENTER:
+        return 'center'
+    elif align == 'right' or align == _('Right') or align == RIGHT:
+        return 'right'
+    return ''
+def get_align_text(align):
+    "Get the alignment translated value for the UI."
+    global LEFT, CENTER, RIGHT
+    if align == 'left' or align == _('Left') or align == LEFT:
+        return _('Left')
+    elif align == 'center' or align == _('Center') or align == CENTER:
+        return _('Center')
+    elif align == 'right' or align == _('Right') or align == RIGHT:
+        return _('Right')
+    return ''
+
+def get_valign_const(valign):
+    "Get the vertical alignment constant."
+    global TOP, MIDDLE, BOTTOM
+    if valign == 'top' or valign == _('Top') or valign == TOP:
+        return TOP
+    elif valign == 'middle' or valign == _('Middle') or valign == MIDDLE:
+        return MIDDLE
+    elif valign == 'bottom' or valign == _('Bottom') or valign == BOTTOM:
+        return BOTTOM
+    return -1
+def get_valign_key(valign):
+    "Get the vertical alignment XML key."
+    global TOP, MIDDLE, BOTTOM
+    if valign == 'top' or valign == _('Top') or valign == TOP:
+        return 'top'
+    elif valign == 'middle' or valign == _('Middle') or valign == MIDDLE:
+        return 'middle'
+    elif valign == 'bottom' or valign == _('Bottom') or valign == BOTTOM:
+        return 'bottom'
+    return ''
+def get_valign_text(valign):
+    "Get the alignment translated value for the UI."
+    global TOP, MIDDLE, BOTTOM
+    if valign == 'top' or valign == _('Top') or valign == TOP:
+        return _('Top')
+    elif valign == 'middle' or valign == _('Middle') or valign == MIDDLE:
+        return _('Middle')
+    elif valign == 'bottom' or valign == _('Bottom') or valign == BOTTOM:
+        return _('Bottom')
+    return ''
 
 class Theme(object):
     """
