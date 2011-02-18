@@ -121,12 +121,12 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                 if ans == gtk.RESPONSE_ACCEPT:
                     if editor.changed:
                         self.title = editor.get_slide_title()
-                        #self.text = editor.get_slide_text()
+                        self._content = editor.slide_content
                         ret = 1
                 elif ans == gtk.RESPONSE_APPLY: #Close and new
                     if editor.changed:
                         self.title = editor.get_slide_title()
-                        #self.text = editor.get_slide_text()
+                        self._content = editor.slide_content
                     ret = 2
                 return ret
         
@@ -701,7 +701,19 @@ class SlideEdit(gtk.Dialog):
     def __init__(self, parent, slide):
         gtk.Dialog.__init__(self, _("Editing Slide"), parent,
                             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
-        self._undo_btn = self._redo_btn = None
+        
+        # Slide Elements
+        lstore = gtk.ListStore(gobject.TYPE_PYOBJECT)
+        self._tree = gtk.TreeView(lstore)
+        for e in slide._content:
+            lstore.append((e,))
+        col = gtk.TreeViewColumn( _("Slide Element") )
+        text = gtk.CellRendererText()
+        text.set_property("ellipsize", pango.ELLIPSIZE_END)
+        col.pack_start(text, True)
+        col.set_cell_data_func(text, self._set_slide_row_text)
+        self._tree.append_column(col)
+        self._tree.set_headers_clickable(False)
         
         self.set_border_width(4)
         self.vbox.set_spacing(7)
@@ -730,27 +742,32 @@ class SlideEdit(gtk.Dialog):
         # Title
         vbox.pack_start(self._get_title_box(), False, True)
         
-        #TODO Toolbar to add, edit, and delete slide elements.
+        # Toolbar
+        toolbar = gtk.Toolbar()
+        button = gtk.ToolButton(gtk.STOCK_ADD)
+        button.set_label(_("Add Text"))
+        button.set_is_important(True)
+        button.connect('clicked', self._add_text, self._tree)
+        toolbar.insert(button, -1)
+        button = gtk.ToolButton(gtk.STOCK_ADD)
+        button.set_label(_("Add Image"))
+        button.set_is_important(True)
+        button.connect('clicked', self._add_image, self._tree)
+        toolbar.insert(button, -1)
+        button = gtk.ToolButton(gtk.STOCK_DELETE)
+        button.connect('clicked', self._delete_row, self._tree)
+        self._tree.get_selection().connect('changed',
+                                           gui.treesel_disable_widget, button)
+        toolbar.insert(button, -1)
+        vbox.pack_start(toolbar, False, True)
         
-        # Slide Elements
-        lstore = gtk.ListStore(gobject.TYPE_PYOBJECT)
-        for e in slide._content:
-            lstore.append((e,))
-        self._tree = gtk.TreeView(lstore)
-        col = gtk.TreeViewColumn( _("Slide Element") )
-        text = gtk.CellRendererText()
-        text.set_property("ellipsize", pango.ELLIPSIZE_END)
-        col.pack_start(text, True)
-        col.set_cell_data_func(text, self._set_slide_row_text)
-        self._tree.append_column(col)
-        self._tree.set_headers_clickable(False)
         
         self._tree.get_selection().connect("changed", self._element_changed)
         
         scroll = gtk.ScrolledWindow()
         scroll.add(self._tree)
         scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scroll.set_size_request(200, 250)
+        scroll.set_size_request(300, 250)
         scroll.set_shadow_type(gtk.SHADOW_IN)
         vbox.pack_start(scroll, True, True)
         hbox.pack_start(vbox, False, True)
@@ -834,8 +851,6 @@ class SlideEdit(gtk.Dialog):
                                            None, _('Vertical Alignment:'),
                                            0, 4, 2, 1)
         self._p['va'].connect('changed', self._on_change_va)
-        
-        # TODO Make changes to these widgets change the selected element.
         
         position.add(table)
         return position
@@ -996,7 +1011,6 @@ class SlideEdit(gtk.Dialog):
         if self.__updating: return
         el = self.get_selected_element()
         
-        print combobox.get_active_text(), theme.get_align_key(combobox.get_active_text())
         el.align = theme.get_align_const(combobox.get_active_text())
     
     def _on_change_va(self, combobox):
@@ -1026,6 +1040,24 @@ class SlideEdit(gtk.Dialog):
         if not self.get_title().startswith("*"):
             self.set_title("*%s"%self.get_title())
     
+    def _add_image(self, button, tree):
+        
+        img = theme.Image(None)
+        itr = tree.get_model().append((img,))
+        tree.get_selection().select_iter(itr)
+        self._set_changed()
+    
+    def _add_text(self, button, tree):
+        
+        txt = theme.Text('')
+        itr = tree.get_model().append((txt,))
+        tree.get_selection().select_iter(itr)
+        self._set_changed()
+    
+    def _delete_row(self, button, tree):
+        gui.del_treeview_row(button, tree)
+        self._set_changed()
+    
     def _undo(self, button, buffer_):
         if buffer_:
             buffer_.undo()
@@ -1033,7 +1065,7 @@ class SlideEdit(gtk.Dialog):
     def _redo(self, button, buffer_):
         if buffer_:
             buffer_.redo()
-        
+    
     def _set_slide_row_text(self, column, cell, model, titer):
         'Returns the title of the current presentation.'
         rend = model.get_value(titer, 0)
@@ -1044,7 +1076,7 @@ class SlideEdit(gtk.Dialog):
             if rend.src:
                 text = os.path.split(rend.src)[1]
             else:
-                text = "No File Set."
+                text = "(No File Set)"
             cell.set_property('text', "Image: %s" % text)
     
     def _quit_with_save(self, event, *args):
@@ -1065,7 +1097,7 @@ class SlideEdit(gtk.Dialog):
     
     def _save(self):
         self.slide_title = self._get_title_value()
-        #self.slide_content = [row[0] for row in self._tree.get_model()]
+        self.slide_content = [row[0] for row in self._tree.get_model()]
         self.changed = True
     
     def _ok_to_continue(self):
