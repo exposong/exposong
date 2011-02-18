@@ -202,7 +202,7 @@ class Presentation:
         edit_dialog = gtk.Dialog(_("New Presentation"), exposong.application.main,
                                  gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
                                  (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                                 gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+                                 gtk.STOCK_SAVE, gtk.RESPONSE_ACCEPT))
         edit_dialog.set_default_size(340, 400)
         if(self.get_title()):
             edit_dialog.set_title(_('Editing "%s"') % self.get_title())

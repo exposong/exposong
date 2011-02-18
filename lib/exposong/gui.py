@@ -41,7 +41,7 @@ class ESTable(gtk.Table):
         self.set_row_spacings(4)
         self.set_border_width(6)
     
-    def _set_options(self, kw={}):
+    def _set_options(self, kw):
         'Set default options for attaching.'
         kw.setdefault('xoptions', gtk.EXPAND|gtk.FILL)
         kw.setdefault('yoptions', gtk.FILL)
@@ -85,11 +85,9 @@ class ESTable(gtk.Table):
         if 'internal' not in kw:
             w *= 2
         else:
+            kw.setdefault('xoptions', gtk.FILL)
             del kw['internal']
-        kw.setdefault('xoptions', gtk.FILL)
-        kw.setdefault('yoptions', gtk.FILL)
-        kw.setdefault('xpadding', WIDGET_SPACING)
-        kw.setdefault('ypadding', WIDGET_SPACING)
+        self._set_options(kw)
         self.attach(label2, x*2, x*2+w, y, y+h, **kw)
         return label2
 

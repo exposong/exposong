@@ -63,67 +63,6 @@ POS_MAP = {'x1': 0, 'y1': 1, 'x2': 2, 'y2': 3,
             0: 'x1', 1: 'y1', 2: 'x2', 3: 'y2',
             }
 
-def get_align_const(align):
-    "Get the alignment constant."
-    global LEFT, CENTER, RIGHT
-    if align == 'left' or align == _('Left') or align == LEFT:
-        return LEFT
-    elif align == 'center' or align == _('Center') or align == CENTER:
-        return CENTER
-    elif align == 'right' or align == _('Right') or align == RIGHT:
-        return RIGHT
-    return -1
-def get_align_key(align):
-    "Get the alignment XML key."
-    global LEFT, CENTER, RIGHT
-    if align == 'left' or align == _('Left') or align == LEFT:
-        return 'left'
-    elif align == 'center' or align == _('Center') or align == CENTER:
-        return 'center'
-    elif align == 'right' or align == _('Right') or align == RIGHT:
-        return 'right'
-    return ''
-def get_align_text(align):
-    "Get the alignment translated value for the UI."
-    global LEFT, CENTER, RIGHT
-    if align == 'left' or align == _('Left') or align == LEFT:
-        return _('Left')
-    elif align == 'center' or align == _('Center') or align == CENTER:
-        return _('Center')
-    elif align == 'right' or align == _('Right') or align == RIGHT:
-        return _('Right')
-    return ''
-
-def get_valign_const(valign):
-    "Get the vertical alignment constant."
-    global TOP, MIDDLE, BOTTOM
-    if valign == 'top' or valign == _('Top') or valign == TOP:
-        return TOP
-    elif valign == 'middle' or valign == _('Middle') or valign == MIDDLE:
-        return MIDDLE
-    elif valign == 'bottom' or valign == _('Bottom') or valign == BOTTOM:
-        return BOTTOM
-    return -1
-def get_valign_key(valign):
-    "Get the vertical alignment XML key."
-    global TOP, MIDDLE, BOTTOM
-    if valign == 'top' or valign == _('Top') or valign == TOP:
-        return 'top'
-    elif valign == 'middle' or valign == _('Middle') or valign == MIDDLE:
-        return 'middle'
-    elif valign == 'bottom' or valign == _('Bottom') or valign == BOTTOM:
-        return 'bottom'
-    return ''
-def get_valign_text(valign):
-    "Get the alignment translated value for the UI."
-    global TOP, MIDDLE, BOTTOM
-    if valign == 'top' or valign == _('Top') or valign == TOP:
-        return _('Top')
-    elif valign == 'middle' or valign == _('Middle') or valign == MIDDLE:
-        return _('Middle')
-    elif valign == 'bottom' or valign == _('Bottom') or valign == BOTTOM:
-        return _('Bottom')
-    return ''
 
 class Theme(object):
     """
@@ -581,22 +520,14 @@ class ImageBackground(_Background, _Renderable):
         "Defines variables based on XML values."
         _Renderable.parse_xml(self, el)
         self.src = el.get('src')
-        if el.get('aspect', 'fill') == 'fill':
-            self.aspect = ASPECT_FILL
-        elif el.get('aspect') == 'fit':
-            self.aspect = ASPECT_FIT
-        else:
-            self.aspect = ASPECT_FILL
+        self.aspect = get_aspect_const(el.get('aspect'), ASPECT_FILL)
     
     def to_xml(self):
         "Output to an XML Element."
         el = etree.Element(self.get_tag())
         _Renderable.to_xml(self, el)
         el.attrib['src'] = self.src
-        if self.aspect == ASPECT_FILL:
-            el.attrib['aspect'] = 'fill'
-        elif self.aspect == ASPECT_FIT:
-            el.attrib['aspect'] = 'fit'
+        el.attrib['aspect'] = get_aspect_key(self.aspect == ASPECT_FILL)
         return el
     
     def get_filename(self):
@@ -902,6 +833,98 @@ class Image(_RenderableSection):
                              self.margin, self.pos[:])
         return dup
 
+################################################
+## Public Functions to help with manipulating ##
+## align, valign, and aspect variables.       ##
+################################################
+
+def get_align_const(align, default=None):
+    "Get the alignment constant."
+    global LEFT, CENTER, RIGHT
+    if align in ('left', _('Left'), LEFT):
+        return LEFT
+    elif align in ('center', _('Center'), CENTER):
+        return CENTER
+    elif align in ('right', _('Right'), RIGHT):
+        return RIGHT
+    return default
+def get_align_key(align, default=''):
+    "Get the alignment XML value."
+    global LEFT, CENTER, RIGHT
+    if align in ('left', _('Left'), LEFT):
+        return 'left'
+    elif align in ('center', _('Center'), CENTER):
+        return 'center'
+    elif align in ('right', _('Right'), RIGHT):
+        return 'right'
+    return default
+def get_align_text(align, default=''):
+    "Get the alignment translated value for the UI."
+    global LEFT, CENTER, RIGHT
+    if align in ('left', _('Left'), LEFT):
+        return _('Left')
+    elif align in ('center', _('Center'), CENTER):
+        return _('Center')
+    elif align in ('right', _('Right'), RIGHT):
+        return _('Right')
+    return default
+
+def get_valign_const(valign, default=None):
+    "Get the vertical alignment constant."
+    global TOP, MIDDLE, BOTTOM
+    if valign in ('top', _('Top'), TOP):
+        return TOP
+    elif valign in ('middle', _('Middle'), MIDDLE):
+        return MIDDLE
+    elif valign in ('bottom', _('Bottom'), BOTTOM):
+        return BOTTOM
+    return default
+def get_valign_key(valign, default=''):
+    "Get the vertical alignment XML value."
+    global TOP, MIDDLE, BOTTOM
+    if valign in ('top', _('Top'), TOP):
+        return 'top'
+    elif valign in ('middle', _('Middle'), MIDDLE):
+        return 'middle'
+    elif valign in ('bottom', _('Bottom'), BOTTOM):
+        return 'bottom'
+    return default
+def get_valign_text(valign, default=''):
+    "Get the alignment translated value for the UI."
+    global TOP, MIDDLE, BOTTOM
+    if valign in ('top', _('Top'), TOP):
+        return _('Top')
+    elif valign in ('middle', _('Middle'), MIDDLE):
+        return _('Middle')
+    elif valign in ('bottom', _('Bottom'), BOTTOM):
+        return _('Bottom')
+    return default
+
+def get_aspect_const(aspect, default=None):
+    "Get the image aspect constant."
+    global ASPECT_FIT, ASPECT_FILL
+    if aspect in ('fit', _('Fit'), ASPECT_FIT):
+        return ASPECT_FIT
+    elif aspect in ('fill', _('Fill'), ASPECT_FILL):
+        return ASPECT_FILL
+    return default
+def get_aspect_key(aspect, default=''):
+    "Get the image aspect XML value."
+    global ASPECT_FIT, ASPECT_FILL
+    if aspect in ('fit', _('Fit'), ASPECT_FIT):
+        return 'fit'
+    elif aspect in ('fill', _('Fill'), ASPECT_FILL):
+        return 'fill'
+    return default
+def get_aspect_text(aspect, default=''):
+    "Get the image aspect translated value for UI."
+    global ASPECT_FIT, ASPECT_FILL
+    if aspect in ('fit', _('Fit'), ASPECT_FIT):
+        return _('Fit')
+    elif aspect in ('fill', _('Fill'), ASPECT_FILL):
+        return _('Fill')
+    return default
+
 
 ##########################
 #### Helper functions ####
@@ -980,3 +1003,4 @@ def _subtract(*args):
 def _add(*args):
     "Add all arguments."
     return reduce(operator.add, args[:2])
+
