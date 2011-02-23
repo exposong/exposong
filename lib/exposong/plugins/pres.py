@@ -28,6 +28,7 @@ import pango
 import re
 import shutil
 from xml.etree import cElementTree as etree
+from xml.sax.saxutils import escape, unescape
 
 import exposong.application
 import exposong.themeselect
@@ -44,7 +45,7 @@ IMAGE_PATH = os.path.join(DATA_PATH, 'pres', 'res')
 Plain text presentations.
 """
 information = {
-        'name': _("Text Presentation"),
+        'name': _("ExpoSong Presentation"),
         'description': __doc__,
         'required': False,
 }
@@ -54,7 +55,7 @@ type_icon = gtk.gdk.pixbuf_new_from_file_at_size(
 class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                     _abstract.Schedule):
     """
-    Text presentation type.
+    ExpoSong presentation type.
     """
     
     class Slide (Plugin, _abstract.Presentation.Slide):
@@ -87,7 +88,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                     if valign != -1:
                         k['valign'] = valign
                     if el.tag == 'text':
-                        k['markup'] = element_contents(el, True)
+                        k['markup'] = unescape(element_contents(el, True))
                         self._content.append(theme.Text(**k))
                     elif el.tag == 'image':
                         if el.get('src'):
@@ -141,7 +142,8 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                 node.set('theme', self._theme)
             for c in self._content:
                 if isinstance(c, theme.Text):
-                    node2 = etree.fromstring('<text>%s</text>' % c.markup)
+                    txt = escape(c.markup)
+                    node2 = etree.fromstring('<text>%s</text>' % txt)
                 elif isinstance(c, theme.Image):
                     node2 = etree.Element('image')
                     
@@ -170,8 +172,9 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                 node2.set('align', theme.get_align_key(c.align))
                 node2.set('valign', theme.get_valign_key(c.valign))
                 node2.set('margin', str(c.margin))
-                
+                node2.tail = '\n  '
                 node.append(node2)
+                node.text = '\n  '
         
         def copy(self):
             'Create a duplicate of the slide.'
@@ -623,6 +626,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
     
     @classmethod
     def is_type(cls, fl):
+        "Test to see if this file is the correct type."
         match = r'<presentation\b'
         lncnt = 0
         for ln in fl:
@@ -647,14 +651,14 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
     def merge_menu(cls, uimanager):
         "Merge new values with the uimanager."
         factory = gtk.IconFactory()
-        factory.add('exposong-text',gtk.IconSet(gtk.gdk.pixbuf_new_from_file(
+        factory.add('exposong-pres',gtk.IconSet(gtk.gdk.pixbuf_new_from_file(
                 os.path.join(RESOURCE_PATH,'pres_text.png'))))
         factory.add_default()
-        gtk.stock_add([('exposong-text',_('_Text'), gtk.gdk.MOD1_MASK, 
+        gtk.stock_add([('exposong-pres',_('_ExpoSong Presentation'), gtk.gdk.MOD1_MASK, 
                 0, 'pymserv')])
         
-        actiongroup = gtk.ActionGroup('exposong-text')
-        actiongroup.add_actions([('pres-new-text', 'exposong-text', None, None,
+        actiongroup = gtk.ActionGroup('exposong-pres')
+        actiongroup.add_actions([('pres-new-text', 'exposong-pres', None, None,
                 None, cls._on_pres_new)])
         uimanager.insert_action_group(actiongroup, -1)
         
@@ -676,7 +680,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
     @classmethod
     def schedule_name(cls):
         "Return the string schedule name."
-        return _('Text Presentations')
+        return _('ExpoSong Presentations')
     
     @classmethod
     def schedule_filter(cls, pres):
@@ -794,6 +798,7 @@ class SlideEdit(gtk.Dialog):
         return self.slide_title
     
     def _get_title_value(self):
+        "Returns the title value in the entry field."
         return self._title_entry.get_text()
     
     def _get_title_box(self):
@@ -814,6 +819,11 @@ class SlideEdit(gtk.Dialog):
         # Positional elements that are in all `theme._RenderableSection`s.
         table = gui.ESTable(5, 2)
         self._p = {}
+        
+        help = gtk.image_new_from_stock(gtk.STOCK_HELP, gtk.ICON_SIZE_BUTTON)
+        helppos = _("Positions are relative, with values between 0 and 1. A value of 0 is on the far left or top, and a value of 1 is on the far right or bottom.")
+        help.set_tooltip_text(helppos)
+        table.attach_widget(help, None, 2, 0)
         
         adjust = gtk.Adjustment(0, 0.0, 1.0, 0.01, 0.10)
         self._p['lf'] = table.attach_spinner(adjust, 0.02, 2, _('Left:'), 0, 0)
@@ -1000,11 +1010,8 @@ class SlideEdit(gtk.Dialog):
         if self.__updating: return
         el = self.get_selected_element()
         if el is False: return False
-        try:
-            el.margin = int(editable.get_text())
-            self._set_changed()
-        except ValueError:
-            return False
+        el.margin = int(editable.get_value())
+        self._set_changed()
     
     def _on_change_al(self, combobox):
         "Update the alignment on change."
@@ -1012,6 +1019,7 @@ class SlideEdit(gtk.Dialog):
         el = self.get_selected_element()
         
         el.align = theme.get_align_const(combobox.get_active_text())
+        self._set_changed()
     
     def _on_change_va(self, combobox):
         "Update the vertical alignment on change."
@@ -1019,15 +1027,18 @@ class SlideEdit(gtk.Dialog):
         el = self.get_selected_element()
         
         el.valign = theme.get_valign_const(combobox.get_active_text())
+        self._set_changed()
     
     def _on_change_aspect(self, combobox):
-        "Update the image aspect on change."
+        "Update the image's resize setting on change."
         if self.__updating: return
         el = self.get_selected_element()
         
         el.aspect = theme.get_aspect_const(combobox.get_active_text())
+        self._set_changed()
     
     def get_selected_element(self):
+        "Get the selected item in the list."
         model, itr = self._tree.get_selection().get_selected()
         if itr:
             return model.get_value(itr, 0)
@@ -1035,39 +1046,42 @@ class SlideEdit(gtk.Dialog):
             return False
     
     def _set_changed(self):
-        ""
+        "Set the slide to changed."
         self.changed = True
         if not self.get_title().startswith("*"):
             self.set_title("*%s"%self.get_title())
     
     def _add_image(self, button, tree):
-        
+        "Add an image element to the slide."
         img = theme.Image(None)
         itr = tree.get_model().append((img,))
         tree.get_selection().select_iter(itr)
         self._set_changed()
     
     def _add_text(self, button, tree):
-        
+        "Add a text element to the slide."
         txt = theme.Text('')
         itr = tree.get_model().append((txt,))
         tree.get_selection().select_iter(itr)
         self._set_changed()
     
     def _delete_row(self, button, tree):
+        "Remove the selected element."
         gui.del_treeview_row(button, tree)
         self._set_changed()
     
     def _undo(self, button, buffer_):
+        "Undo a text buffer change."
         if buffer_:
             buffer_.undo()
     
     def _redo(self, button, buffer_):
+        "Redo a text buffer change."
         if buffer_:
             buffer_.redo()
     
     def _set_slide_row_text(self, column, cell, model, titer):
-        'Returns the title of the current presentation.'
+        "Returns the title of the current presentation."
         rend = model.get_value(titer, 0)
         if isinstance(rend, theme.Text):
             text = pango.parse_markup(rend.markup)[1]
@@ -1080,27 +1094,49 @@ class SlideEdit(gtk.Dialog):
             cell.set_property('text', "Image: %s" % text)
     
     def _quit_with_save(self, event, *args):
+        "The user chose to save the slide."
         if self._get_title_value() == "":
             info_dialog = gtk.MessageDialog(self,
-                    gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO,
+                    gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR,
                     gtk.BUTTONS_OK, _("Please enter a Title."))
             info_dialog.run()
             info_dialog.destroy()
             self._title_entry.grab_focus()
             return False
+        for itm in self._tree.get_model():
+            itr = itm.iter
+            if isinstance(itm[0], theme.Image) and not itm[0].src:
+                info_dialog = gtk.MessageDialog(self,
+                        gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR,
+                        gtk.BUTTONS_OK, _("The image's source was not set."))
+                info_dialog.run()
+                info_dialog.destroy()
+                self._tree.get_selection().select_iter(itr)
+                return False
+            if isinstance(itm[0], theme.Text) and not itm[0].markup:
+                info_dialog = gtk.MessageDialog(self,
+                        gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR,
+                        gtk.BUTTONS_OK, _("The text must have a value."))
+                info_dialog.run()
+                info_dialog.destroy()
+                self._tree.get_selection().select_iter(itr)
+                return False
         self._save()
         self.destroy()
     
     def _quit_without_save(self, event, *args):
+        "The user chose not to save the slide."
         if self._ok_to_continue():
             self.destroy()
     
     def _save(self):
+        "Save the slide elements."
         self.slide_title = self._get_title_value()
         self.slide_content = [row[0] for row in self._tree.get_model()]
         self.changed = True
     
     def _ok_to_continue(self):
+        "Let the user know that there are changes."
         if self.changed:
             msg = _('Unsaved Changes exist. Do you really want to continue without saving?')
             dlg = gtk.MessageDialog(self, gtk.DIALOG_MODAL,

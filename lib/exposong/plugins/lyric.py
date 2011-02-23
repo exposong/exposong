@@ -1000,6 +1000,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
     
     @classmethod
     def is_type(cls, fl):
+        "Test to see if this file is the correct type."
         match = r'<song\b'
         lncnt = 0
         for ln in fl:
