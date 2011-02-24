@@ -707,7 +707,7 @@ class Text(_RenderableSection):
     The text can be formatted according to the Pango Markup Language
     (http://www.pygtk.org/docs/pygtk/pango-markup-language.html).
     """
-    def __init__(self, markup, align=LEFT, valign=TOP, margin=0,
+    def __init__(self, markup, align=CENTER, valign=MIDDLE, margin=0,
                  pos=None):
         _RenderableSection.__init__(self, align, valign, margin, pos)
         self.markup = markup

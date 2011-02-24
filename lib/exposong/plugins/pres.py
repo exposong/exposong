@@ -231,6 +231,53 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         # TODO Order
         self._order = []
     
+    def to_xml(self):
+        'Save the data to disk.'
+        if self.filename:
+            self.filename = check_filename(self.get_title(), self.filename)
+        else:
+            self.filename = check_filename(self.get_title(),
+                                           os.path.join(DATA_PATH, "pres"))
+        
+        root = etree.Element("presentation")
+        root.text = "\n"
+        
+        meta = etree.Element("meta")
+        meta.text = meta.tail = "\n"
+        node = etree.Element("title")
+        node.text = self.get_title()
+        node.tail = "\n"
+        meta.append(node)
+        
+        if self._timer:
+            node = etree.Element("timer")
+            node.attrib['time'] = str(self._timer)
+            if self._timer_loop:
+                node.attrib['loop'] = "1"
+            node.tail = "\n"
+            meta.append(node)
+        
+        for k, v in self._meta.iteritems():
+            node = etree.Element(k)
+            node.text = v
+            node.tail = "\n"
+            meta.append(node)
+        root.append(meta)
+        
+        slides = etree.Element("slides")
+        slides.text = slides.tail = "\n"
+        for s in self.slides:
+            node = etree.Element("slide")
+            s.to_node(node)
+            node.tail = '\n'
+            slides.append(node)
+        root.append(slides)
+        doc = etree.ElementTree(root)
+        outfile = open(self.filename, 'w')
+        doc.write(outfile, encoding=u'UTF-8')
+    
+    # GUI
+    
     def _edit_tabs(self, notebook, parent):
         "Tabs for the dialog."
         vbox = gtk.VBox()
@@ -264,9 +311,11 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         self._slide_list.append_column(col)
         
         toolbar = gtk.Toolbar()
-        btn = gtk.ToolButton(gtk.STOCK_ADD)
+        btn = gtk.MenuToolButton(gtk.STOCK_ADD)
         btn.connect('clicked', gui.edit_treeview_row_btn, self._slide_list,
                     self._slide_dlg)
+        # Template types
+        btn.set_menu(self._get_predefined_slides_menu())
         toolbar.insert(btn, -1)
         btn = gtk.ToolButton(gtk.STOCK_EDIT)
         btn.connect('clicked', gui.edit_treeview_row_btn, self._slide_list,
@@ -517,50 +566,68 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         if resp == gtk.RESPONSE_YES:
             model.remove(itr)
 
-    def to_xml(self):
-        'Save the data to disk.'
-        if self.filename:
-            self.filename = check_filename(self.get_title(), self.filename)
-        else:
-            self.filename = check_filename(self.get_title(),
-                                           os.path.join(DATA_PATH, "pres"))
+    ## Predefined Slide Types
+    
+    def _get_predefined_slides_menu(self):
+        "Returns a menu of predefined slide types."
+        menu = gtk.Menu()
         
-        root = etree.Element("presentation")
-        root.text = "\n"
+        action = gtk.Action('add-text-slide', _('Text Slide'),
+                            _('Create a slide with text only.'), None)
+        action.connect('activate', self._on_add_text_slide)
+        menu.append(action.create_menu_item())
         
-        meta = etree.Element("meta")
-        meta.text = meta.tail = "\n"
-        node = etree.Element("title")
-        node.text = self.get_title()
-        node.tail = "\n"
-        meta.append(node)
+        action = gtk.Action('add-image-slide', _('Image Slide'),
+                            _('Create a slide with an image only.'), None)
+        action.connect('activate', self._on_add_image_slide)
+        menu.append(action.create_menu_item())
         
-        if self._timer:
-            node = etree.Element("timer")
-            node.attrib['time'] = str(self._timer)
-            if self._timer_loop:
-                node.attrib['loop'] = "1"
-            node.tail = "\n"
-            meta.append(node)
+        action = gtk.Action('add-image-caption-slide',
+                            _('Image Slide With Caption'),
+                            _('Create an image slide with a caption.'), None)
+        action.connect('activate', self._on_add_image_caption_slide)
+        menu.append(action.create_menu_item())
         
-        for k, v in self._meta.iteritems():
-            node = etree.Element(k)
-            node.text = v
-            node.tail = "\n"
-            meta.append(node)
-        root.append(meta)
+        return menu
+    
+    def _on_add_text_slide(self, action):
+        "Add a simple text slide."
+        sl = self.Slide(self, None)
+        sl._content = [theme.Text("")]
         
-        slides = etree.Element("slides")
-        slides.text = slides.tail = "\n"
-        for s in self.slides:
-            node = etree.Element("slide")
-            s.to_node(node)
-            node.tail = '\n'
-            slides.append(node)
-        root.append(slides)
-        doc = etree.ElementTree(root)
-        outfile = open(self.filename, 'w')
-        doc.write(outfile, encoding=u'UTF-8')
+        ans = sl._edit_window(self._fields['title'].get_toplevel())
+        if ans:
+            sl._set_id()
+            self._fields['slides'].append( (sl, sl.get_markup(True)) )
+        if ans == 2:
+            self._on_add_text_slide(action)
+    
+    def _on_add_image_slide(self, action):
+        "Add a single image slide."
+        sl = self.Slide(self, None)
+        sl._content = [theme.Image(None)]
+        
+        ans = sl._edit_window(self._fields['title'].get_toplevel())
+        if ans:
+            sl._set_id()
+            self._fields['slides'].append( (sl, sl.get_markup(True)) )
+        if ans == 2:
+            self._on_add_text_slide(action)
+    
+    def _on_add_image_caption_slide(self, action):
+        "Add an image slide with a caption."
+        sl = self.Slide(self, None)
+        sl._content = [theme.Image(None, pos=[0.0, 0.0, 1.0, 0.85]),
+                       theme.Text('', pos=[0.0, 0.85, 1.0, 1.0])]
+        
+        ans = sl._edit_window(self._fields['title'].get_toplevel())
+        if ans:
+            sl._set_id()
+            self._fields['slides'].append( (sl, sl.get_markup(True)) )
+        if ans == 2:
+            self._on_add_text_slide(action)
+    
+    ## Order
     
     def get_order(self):
         "Returns the order in which the slides should be presented."
@@ -718,6 +785,7 @@ class SlideEdit(gtk.Dialog):
         col.set_cell_data_func(text, self._set_slide_row_text)
         self._tree.append_column(col)
         self._tree.set_headers_clickable(False)
+        self._tree.get_selection().select_path((0,))
         
         self.set_border_width(4)
         self.vbox.set_spacing(7)
@@ -771,7 +839,7 @@ class SlideEdit(gtk.Dialog):
         scroll = gtk.ScrolledWindow()
         scroll.add(self._tree)
         scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scroll.set_size_request(300, 250)
+        scroll.set_size_request(280, 250)
         scroll.set_shadow_type(gtk.SHADOW_IN)
         vbox.pack_start(scroll, True, True)
         hbox.pack_start(vbox, False, True)
@@ -782,14 +850,9 @@ class SlideEdit(gtk.Dialog):
         # It will load when an item is selected from the left.
         self._ctbl = gui.ESTable(4,1)
         
+        hbox.pack_start(self._ctbl, True, True)
         
-        rt_vbox.pack_start(self._ctbl, True, True)
-        
-        
-        rt_vbox.pack_start(self._get_position(), False, False)
-        hbox.pack_start(rt_vbox, True, True)
-        
-        self.vbox.pack_start(hbox)
+        self.vbox.pack_start(hbox, True, True)
         self.vbox.show_all()
         self._tree.get_selection().emit("changed")
     
@@ -815,6 +878,10 @@ class SlideEdit(gtk.Dialog):
     
     def _get_position(self):
         "Return the element positioning settings."
+        el = self.get_selected_element()
+        if el is False:
+            return
+        
         position = gtk.Expander(_("Element Position"))
         # Positional elements that are in all `theme._RenderableSection`s.
         table = gui.ESTable(5, 2)
@@ -825,27 +892,27 @@ class SlideEdit(gtk.Dialog):
         help.set_tooltip_text(helppos)
         table.attach_widget(help, None, 2, 0)
         
-        adjust = gtk.Adjustment(0, 0.0, 1.0, 0.01, 0.10)
+        adjust = gtk.Adjustment(el.pos[0], 0.0, 1.0, 0.01, 0.10)
         self._p['lf'] = table.attach_spinner(adjust, 0.02, 2, _('Left:'), 0, 0)
         self._p['lf'].set_numeric(True)
         self._p['lf'].connect('changed', self._on_change_pos)
         
-        adjust = gtk.Adjustment(0, 0.0, 1.0, 0.01, 0.10)
+        adjust = gtk.Adjustment(el.pos[2], 0.0, 1.0, 0.01, 0.10)
         self._p['rt'] = table.attach_spinner(adjust, 0.02, 2, _('Right:'), 1, 0)
         self._p['rt'].set_numeric(True)
         self._p['rt'].connect('changed', self._on_change_pos)
         
-        adjust = gtk.Adjustment(0, 0.0, 1.0, 0.01, 0.10)
+        adjust = gtk.Adjustment(el.pos[1], 0.0, 1.0, 0.01, 0.10)
         self._p['tp'] = table.attach_spinner(adjust, 0.02, 2, _('Top:'), 0, 1)
         self._p['tp'].set_numeric(True)
         self._p['tp'].connect('changed', self._on_change_pos)
         
-        adjust = gtk.Adjustment(0, 0.0, 1.0, 0.01, 0.10)
+        adjust = gtk.Adjustment(el.pos[3], 0.0, 1.0, 0.01, 0.10)
         self._p['bt'] = table.attach_spinner(adjust, 0.02, 2, _('Bottom:'), 1, 1)
         self._p['bt'].set_numeric(True)
         self._p['bt'].connect('changed', self._on_change_pos)
         
-        adjust = gtk.Adjustment(0, 0, 100, 1, 5)
+        adjust = gtk.Adjustment(el.margin, 0, 40, 1, 5)
         self._p['mg'] = table.attach_spinner(adjust, 1, 0, _('Margin:'),
                                              0, 2, 2, 1)
         self._p['mg'].set_numeric(True)
@@ -854,12 +921,14 @@ class SlideEdit(gtk.Dialog):
         self._p['al'] = table.attach_combo(map(theme.get_align_text, (theme.LEFT,
                                            theme.CENTER, theme.RIGHT)),
                                            None, _('Alignment:'), 0, 3, 2, 1)
+        gui.set_active_text(self._p['al'], theme.get_align_text(el.align))
         self._p['al'].connect('changed', self._on_change_al)
         
         self._p['va'] = table.attach_combo(map(theme.get_valign_text, (theme.TOP,
                                            theme.MIDDLE, theme.BOTTOM)),
                                            None, _('Vertical Alignment:'),
                                            0, 4, 2, 1)
+        gui.set_active_text(self._p['va'], theme.get_valign_text(el.valign))
         self._p['va'].connect('changed', self._on_change_va)
         
         position.add(table)
@@ -870,18 +939,6 @@ class SlideEdit(gtk.Dialog):
         self.__updating = True
         self._ctbl.foreach(lambda w: self._ctbl.remove(w))
         el = self.get_selected_element()
-        
-        for nm, e in self._p.iteritems():
-            e.set_sensitive(el <> False)
-        if el is not False:
-            self._p['lf'].set_value(el.pos[0])
-            self._p['rt'].set_value(el.pos[2])
-            self._p['tp'].set_value(el.pos[1])
-            self._p['bt'].set_value(el.pos[3])
-            self._p['mg'].set_value(el.margin)
-            gui.set_active_text(self._p['al'], theme.get_align_text(el.align))
-            gui.set_active_text(self._p['va'], theme.get_valign_text(el.valign))
-            
         
         if el is False:
             st = _("Select or add an item from the left to edit.")
@@ -923,12 +980,13 @@ class SlideEdit(gtk.Dialog):
             scroll = gtk.ScrolledWindow()
             scroll.add(text)
             scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-            scroll.set_size_request(220, 100)
+            scroll.set_size_request(250, -1)
             scroll.set_shadow_type(gtk.SHADOW_IN)
             self._ctbl.attach_widget(scroll, None, 0, 1, 2, 4,
                                      yoptions=gtk.FILL|gtk.EXPAND)
         elif isinstance(el, theme.Image):
             fc = gtk.FileChooserButton("Select Image")
+            fc.set_size_request(250, -1)
             fc.set_action(gtk.FILE_CHOOSER_ACTION_OPEN)
             if el.src:
                 fc.set_filename(el.src)
@@ -950,7 +1008,10 @@ class SlideEdit(gtk.Dialog):
                                              0, 1, 2, 1)
             gui.set_active_text(aspect, theme.get_aspect_text(el.aspect))
             aspect.connect('changed', self._on_change_aspect)
-            
+        
+        if el is not False:
+            self._ctbl.attach_widget(self._get_position(), None, 0, 6, 2, 1)
+            # TODO Custom Theme
         self._ctbl.show_all()
         self.__updating = False
     
