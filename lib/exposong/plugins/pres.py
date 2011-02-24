@@ -612,7 +612,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             sl._set_id()
             self._fields['slides'].append( (sl, sl.get_markup(True)) )
         if ans == 2:
-            self._on_add_text_slide(action)
+            self._on_add_image_slide(action)
     
     def _on_add_image_caption_slide(self, action):
         "Add an image slide with a caption."
@@ -625,7 +625,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             sl._set_id()
             self._fields['slides'].append( (sl, sl.get_markup(True)) )
         if ans == 2:
-            self._on_add_text_slide(action)
+            self._on_add_image_caption_slide(action)
     
     ## Order
     
