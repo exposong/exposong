@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# vim: ts=4 sw=4 expandtab:
 #
 # Copyright (C) 2008-2010 Exposong.org
 #
@@ -17,31 +18,31 @@
 
 import gtk
 import gtk.gdk
+import shutil
 from xml.etree import cElementTree as etree
 
 import exposong.application
 import exposong.slidelist
 import exposong._hook
+import exposong.plugins.pres
 from exposong.glob import *
-from exposong import RESOURCE_PATH, DATA_PATH
+from exposong import RESOURCE_PATH, DATA_PATH, theme
 from exposong.plugins import Plugin, _abstract
 from exposong.prefs import config
 from openlyrics import openlyrics
 
-# TODO Possible, there is also a text format...
-
 """
-A converter from ExpoSong (< 0.7) Lyrics type.
+A converter from an old ExpoSong (< 0.8) format.
 """
 information = {
-        'name': _("ExpoSong Lyrics Converter"),
+        'name': _("ExpoSong Converter"),
         'description': __doc__,
         'required': False,
         }
 
-class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
+class LegacyConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
     """
-    Convert from ExpoSong (<= 0.6.2) Lyrics type to OpenLyrics.
+    Convert from an old ExpoSong format (< 0.8) to a new format.
     """
     
     @staticmethod
@@ -50,26 +51,49 @@ class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
         Should return True if this file should be converted.
         """
         fl = open(filename, 'r')
-        match = r'<presentation\b[^>]*\btype=[\'"]lyric[\'"]'
+        match = r'<presentation\b[^>]*\btype=[\'"]([^"\']*)[\'"]'
         lncnt = 0
         for ln in fl:
             if lncnt > 2:
                 break
-            if re.search(match, ln):
+            result = re.search(match, ln)
+            if result and result.group(1) in ('lyric', 'text', 'image'):
                 fl.close()
                 return True
             lncnt += 1
         fl.close()
         return False
     
-    @staticmethod
-    def convert(filename, newfile=False):
+    @classmethod
+    def convert(cls, filename, newfile=False):
         """
         Converts the file.
         
         filename   The name of the file for input.
         newfile    Set to True if the file is not to be overwritten.
         """
+        fl = open(filename, 'r')
+        flnm = False
+        match = r'<presentation\b[^>]*\btype=[\'"]([^"\']*)[\'"]'
+        lncnt = 0
+        for ln in fl:
+            if lncnt > 2:
+                break
+            result = re.search(match, ln)
+            if result:
+                fl.close()
+                if result.group(1) == 'lyric':
+                    flnm = cls._convert_lyric(filename, newfile)
+                if result.group(1) in ('text', 'image'):
+                    flnm = cls._convert_pres(filename, result.group(1), newfile)
+                break
+            lncnt += 1
+        fl.close()
+        return flnm
+    
+    @classmethod
+    def _convert_lyric(cls, filename, newfile=False):
+        "Convert a lyric file to openlyrics."
         tree = etree.parse(filename)
         if isinstance(tree, etree.ElementTree):
             root = tree.getroot()
@@ -115,22 +139,59 @@ class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
         return outfile
     
     @classmethod
+    def _convert_pres(cls, filename, type_, newfile=False):
+        "Convert a text or image presentation to the new ExpoSong format."
+        tree = etree.parse(filename)
+        if isinstance(tree, etree.ElementTree):
+            root = tree.getroot()
+        else:
+            root = tree
+        
+        pres = exposong.plugins.pres.Presentation()
+        elems = root.findall("title")
+        if len(elems):
+            pres._title = elems[0].text
+        elems = root.findall("copyright")
+        if len(elems):
+            pres._meta['copyright'] = elems[0].text
+        elems = root.findall("timer")
+        if len(elems):
+            pres._timer = int(elems[0].get("time"))
+            pres._timer_loop = bool(elems[0].get("loop"))
+        elems = root.findall("slide")
+        for sl in elems:
+            slide = exposong.plugins.pres.Presentation.Slide(pres)
+            slide.title = sl.get("title")
+            if type_ == 'text':
+                slide._content.append(theme.Text(sl.text))
+            if type_ == 'image':
+                osrc = sl.findall("img")[0].get("src")
+                src = find_freefile(os.path.join(DATA_PATH, 'pres', 'res', osrc))
+                shutil.move(os.path.join(DATA_PATH, 'image', osrc), src)
+                slide._content.append(theme.Image(src))
+            pres.slides.append(slide)
+        if not newfile:
+            pres.filename = filename
+        pres.to_xml()
+        return pres.filename
+    
+    @classmethod
     def import_dialog(cls, action):
         dlg = gtk.FileChooserDialog(_("Import ExpoSong Legacy File(s)"),
                 exposong.application.main, gtk.FILE_CHOOSER_ACTION_OPEN,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK,
                 gtk.RESPONSE_ACCEPT))
         dlg.set_select_multiple(True)
-        filter = gtk.FileFilter()
-        filter.set_name(_("ExpoSong Legacy File"))
-        filter.add_pattern("*.xml")
-        dlg.add_filter(filter)
+        filt = gtk.FileFilter()
+        filt.set_name(_("ExpoSong Legacy File"))
+        filt.add_pattern("*.xml")
+        dlg.add_filter(filt)
         dlg.set_current_folder(config.get("dialogs", "exposong_legacy-import-dir"))
         if dlg.run() == gtk.RESPONSE_ACCEPT:
             dlg.hide()
             files = dlg.get_filenames()
-            for file in files:
-                filename = cls.convert(unicode(file), True)
+            for fl in files:
+                filename = cls.convert(unicode(fl), True)
                 exposong.application.main.load_pres(filename)
             config.set("dialogs", "exposong_legacy-import-dir", os.path.dirname(file))
         dlg.destroy()
@@ -159,3 +220,5 @@ class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
     def unmerge_menu(cls, uimanager):
         'Remove merged items from the menu.'
         uimanager.remove_ui(cls.menu_merge_id)
+
+

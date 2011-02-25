@@ -329,8 +329,8 @@ class Main (gtk.Window):
             except exposong.plugins._abstract.WrongPresentationType, details:
                 continue
             except Exception, details:
-                exposong.log.error('Error in file "%s":\n  %s', filenm, details)
-                raise
+                exposong.log.error('Could not load presentation "%s":\n  %s',
+                                   filenm, details)
         else:
             exposong.log.warning('"%s" is not a presentation file.', filenm)
         
