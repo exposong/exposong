@@ -865,7 +865,7 @@ msgstr "Text"
 
 #: lib/exposong/plugins/lyric.py:57
 msgid "Music"
-msgstr "Melodie"
+msgstr "Musik"
 
 #: lib/exposong/plugins/lyric.py:58
 msgid "Translation"
@@ -1000,7 +1000,7 @@ msgstr "Schlüssel"
 
 #: lib/exposong/plugins/lyric.py:502
 msgid "Music Info"
-msgstr "Melodie"
+msgstr "Musik-Info"
 
 #: lib/exposong/plugins/lyric.py:507
 msgid "Comments:"

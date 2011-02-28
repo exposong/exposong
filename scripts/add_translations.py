@@ -26,25 +26,29 @@ import shutil
 import sys
 
 # i18n folder in translations-export branch from launchpad
-
+PO_FILES = None
 if len(sys.argv)>1 and os.path.isdir(sys.argv[1]):
   PO_FILES = sys.argv[1]
 else:
   print "Please pass the i18n folder in translation-export branch from"+\
-        "Launchpad as a command line argument"
-  sys.exit(0)
+        "Launchpad as a command line argument if you want it to be imported."
 EXPOSONG_TRANSLATIONS = "../share/exposong/i18n"
 
 # Copy po files
-for file in os.listdir(PO_FILES):
-    if not os.path.isfile(os.path.join(PO_FILES, file)):
-        continue
-    path = os.path.join(EXPOSONG_TRANSLATIONS, file.rstrip(".po"))
-    if not os.path.exists(path):
-        os.mkdir(path)
-    shutil.copy(os.path.join(PO_FILES, file), os.path.join(path, file))
+if PO_FILES:
+  cnt = 0
+  for file in os.listdir(PO_FILES):
+      if not os.path.isfile(os.path.join(PO_FILES, file)):
+          continue
+      path = os.path.join(EXPOSONG_TRANSLATIONS, file.rstrip(".po"))
+      if not os.path.exists(path):
+          os.mkdir(path)
+      shutil.copy(os.path.join(PO_FILES, file), os.path.join(path, file))
+      cnt += 1
+  print "Copied %i po-files."%cnt
   
 # Generate mo-files
+cnt = 0
 for folder in os.listdir(EXPOSONG_TRANSLATIONS):
     if not os.path.isdir(os.path.join(EXPOSONG_TRANSLATIONS, folder))\
             or folder.startswith("."):
@@ -56,3 +60,5 @@ for folder in os.listdir(EXPOSONG_TRANSLATIONS):
         os.mkdir(mo_dir)
     po_file = os.path.join(path, folder+".po")
     os.system("msgfmt -o %(mo)s %(po)s"%{"mo":mo_file,"po":po_file})
+    cnt += 1
+print "Generated %i mo-Files."%cnt

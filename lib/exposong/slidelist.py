@@ -28,7 +28,7 @@ slide_scroll = None
 
 class SlideList(gtk.TreeView, exposong._hook.Menu):
     '''
-    Class to manipulate the text_area in the presentation program.
+    An instance of gtk.TreeView showing the slides of a presentation.
     '''
     def __init__(self):
         self.pres = None

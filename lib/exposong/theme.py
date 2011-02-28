@@ -143,6 +143,7 @@ class Theme(object):
         tree = etree.ElementTree(root)
         # TODO This is saved in the current local directory.
         filename = os.path.join(DATA_PATH, "theme", self.filename)
+        print filename
         tree.write(filename, encoding='UTF-8')
     
     def to_xml(self):
@@ -286,21 +287,38 @@ class _Background(_Element):
     """
     A background object in the theme.
     """
-    pass
+    def __init__(self, name=_("Background")):
+        self.name = name
+    
+    def parse_xml(self, el):
+        "Defines variables based on XML values."
+        #self.name = el.get('name')
+        pass
+    
+    def to_xml(self, el):
+        "Output to an XML Element."
+        el.attrib['name'] = self.name
+    
+    def get_name(self):
+        if self.name != None:
+            return self.name
+        return "haha"
 
 class ColorBackground(_Background, _Renderable):
     """
     A solid color background.
     """
-    def __init__(self, color="#fff", alpha=1.0, pos=None):
+    def __init__(self, color="#fff", alpha=1.0, pos=None, name=_("Color")):
         ""
         _Renderable.__init__(self, pos)
+        _Background.__init__(self, name)
         self.color = color
         self.alpha = alpha
     
     def parse_xml(self, el):
         "Defines variables based on XML values."
         _Renderable.parse_xml(self, el)
+        _Background.parse_xml(self, el)
         self.color = el.get('color', "#fff")
         self.alpha = float(el.get('opacity', 1.0))
     
@@ -308,6 +326,7 @@ class ColorBackground(_Background, _Renderable):
         "Output to an XML Element."
         el = etree.Element(self.get_tag())
         _Renderable.to_xml(self, el)
+        _Background.to_xml(self, el)
         el.attrib['color'] = self.color
         el.attrib['opacity'] = str(self.alpha)
         return el
@@ -337,9 +356,10 @@ class RadialGradientBackground(_Background, _Renderable):
     cpos:   Center point of the circle (from 0.0 to 1.0 within the boundaries).
     length: Radius of the circle.
     """
-    def __init__(self, cpos=None, length=1.0, pos=None):
+    def __init__(self, cpos=None, length=1.0, pos=None, name=_("Radial Gradient")):
         ""
         _Renderable.__init__(self, pos)
+        _Background.__init__(self, name)
         if cpos != None:
             self.cpos = cpos[:]
         else:
@@ -350,6 +370,7 @@ class RadialGradientBackground(_Background, _Renderable):
     def parse_xml(self, el):
         "Defines variables based on XML values."
         _Renderable.parse_xml(self, el)
+        _Background.parse_xml(self, el)
         self.cpos[0] = float(el.get('cx', 1.0))
         self.cpos[1] = float(el.get('cy', 1.0))
         self.length = float(el.get('length', 1.0))
@@ -364,6 +385,7 @@ class RadialGradientBackground(_Background, _Renderable):
         "Output to an XML Element."
         el = etree.Element(self.get_tag())
         _Renderable.to_xml(self, el)
+        _Background.to_xml(self, el)
         el.attrib['cx'] = str(self.cpos[0])
         el.attrib['cy'] = str(self.cpos[1])
         el.attrib['length'] = str(self.length)
@@ -404,15 +426,17 @@ class GradientBackground(_Background, _Renderable):
     """
     A gradient background.
     """
-    def __init__(self, angle=0, pos=None):
+    def __init__(self, angle=0, pos=None, name=_("Gradient")):
         ""
         _Renderable.__init__(self, pos)
+        _Background.__init__(self, name)
         self.angle = angle
         self.stops = []
     
     def parse_xml(self, el):
         "Defines variables based on XML values."
         _Renderable.parse_xml(self, el)
+        _Background.parse_xml(self, el)
         self.angle = float(el.get('angle', 0))
         
         self.stops = []
@@ -425,6 +449,7 @@ class GradientBackground(_Background, _Renderable):
         "Output to an XML Element."
         el = etree.Element(self.get_tag())
         _Renderable.to_xml(self, el)
+        _Background.to_xml(self, el)
         el.attrib['angle'] = str(self.angle)
         for s in self.stops:
             el.append(s.to_xml())
@@ -508,9 +533,10 @@ class ImageBackground(_Background, _Renderable):
             rectangle will have no whitespace. If set to "fit", the image will
             be resized inside the box so that the image is not cropped at all.
     """
-    def __init__(self, src=None, pos=None, aspect=ASPECT_FILL):
+    def __init__(self, src=None, pos=None, aspect=ASPECT_FILL, name=_("Image")):
         ""
         _Renderable.__init__(self, pos)
+        _Background.__init__(self, name)
         self.src = src
         self.aspect = aspect
         self._original = None
@@ -519,6 +545,7 @@ class ImageBackground(_Background, _Renderable):
     def parse_xml(self, el):
         "Defines variables based on XML values."
         _Renderable.parse_xml(self, el)
+        _Background.parse_xml(self, el)
         self.src = el.get('src')
         self.aspect = get_aspect_const(el.get('aspect'), ASPECT_FILL)
     
@@ -526,6 +553,7 @@ class ImageBackground(_Background, _Renderable):
         "Output to an XML Element."
         el = etree.Element(self.get_tag())
         _Renderable.to_xml(self, el)
+        _Background.to_xml(self, el)
         el.attrib['src'] = self.src
         el.attrib['aspect'] = get_aspect_key(self.aspect == ASPECT_FILL)
         return el

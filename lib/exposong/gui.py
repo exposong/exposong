@@ -30,6 +30,7 @@ WIDGET_SPACING = 4
 __pb_cache = {}
 
 
+
 ## New Class ##
 
 class ESTable(gtk.Table):
@@ -102,7 +103,6 @@ def set_active_text(combo, text):
     return False
 
 ## Old Methods ##
-
 def Table(rows):
     'Returns a gtk Table.'
     table = gtk.Table(rows, 4)
@@ -176,6 +176,8 @@ def append_color(table, label, value, top, alpha=False):
         cnt = 2
         for v in value:
             button = gtk.ColorButton(gtk.gdk.Color(int(v[0]), int(v[1]), int(v[2])))
+            if(alpha):
+                button.set_use_alpha(True)
             table.attach(button, cnt, cnt+1, top, top+1, gtk.EXPAND|gtk.FILL, 0, WIDGET_SPACING)
             cnt += 1
             buttons.append(button)
@@ -186,8 +188,8 @@ def append_color(table, label, value, top, alpha=False):
         table.attach(button, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0,
                      WIDGET_SPACING)
         if(alpha):
-            button.set_alpha(int(value[3]))
             button.set_use_alpha(True)
+            #button.set_alpha(int(value[3]))
         return button
 
 def append_spinner(table, label, adjustment, top):
@@ -284,11 +286,22 @@ def append_font_button(table, label, fontname, top):
     table.attach(fb, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, WIDGET_SPACING)
     return fb
 
+def append_hscale(table, label, adjustment, top):
+    set_label(table, label, top)
+    s = gtk.HScale(adjustment)
+    table.attach(s, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, WIDGET_SPACING)
+    return s
+
 def append_hbox(table, label, hbox, top):
     'Adds a HBox widget to a table and returns it.'
     set_label(table, label, top)
     table.attach(hbox, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, WIDGET_SPACING)
-    return
+    return hbox
+
+def append_widget(table, label, widget, top):
+    'Adds any gtk.Widget to a table and returns it'
+    set_label(table, label, top)
+    table.attach(widget, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, WIDGET_SPACING)
 
 def append_section_title(table, title, top):
     'Adds a title for the current section.'
@@ -300,8 +313,9 @@ def append_section_title(table, title, top):
 def append_comment(table, title, top):
     label = gtk.Label()
     label.set_markup("<i><small>"+title+"</small></i>")
+    label.set_line_wrap(True)
     label.set_alignment(0.0, 1.0)
-    table.attach(label, 0, 4, top, top+1, gtk.FILL, 0, 0)
+    table.attach(label, 0, 4, top, top+1, gtk.EXPAND, 0, 0)
 
 def append_separator(table, top):
     table.attach(gtk.HSeparator(), 0, 4, top, top+1, gtk.FILL, 0, 0)
