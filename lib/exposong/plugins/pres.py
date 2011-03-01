@@ -572,11 +572,15 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         "Returns a menu of predefined slide types."
         menu = gtk.Menu()
         
+        #Text Types
         action = gtk.Action('add-text-slide', _('Text Slide'),
                             _('Create a slide with text only.'), None)
         action.connect('activate', self._on_add_text_slide)
         menu.append(action.create_menu_item())
         
+        menu.append(gtk.SeparatorMenuItem())
+        
+        #Image Types
         action = gtk.Action('add-image-slide', _('Image Slide'),
                             _('Create a slide with an image only.'), None)
         action.connect('activate', self._on_add_image_slide)
@@ -586,6 +590,14 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                             _('Image Slide With Caption'),
                             _('Create an image slide with a caption.'), None)
         action.connect('activate', self._on_add_image_caption_slide)
+        menu.append(action.create_menu_item())
+        
+        menu.append(gtk.SeparatorMenuItem())
+        
+        action = gtk.Action('bulk-add-image-slide', _('Multiple Image Slides'),
+                            _('Add multiple image slides from image files.'),
+                            None)
+        action.connect('activate', self._on_add_bulk_image_slide)
         menu.append(action.create_menu_item())
         
         return menu
@@ -626,6 +638,42 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             self._fields['slides'].append( (sl, sl.get_markup(True)) )
         if ans == 2:
             self._on_add_image_caption_slide(action)
+    
+    def _on_add_bulk_image_slide(self, action):
+        "Add multiple images from the filesystem."
+        fchooser = gtk.FileChooserDialog( _("Add Images"),
+                self._fields['title'].get_toplevel(),
+                gtk.FILE_CHOOSER_ACTION_OPEN,
+                (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+                gtk.STOCK_ADD, gtk.RESPONSE_ACCEPT) )
+        fchooser.set_current_folder(os.path.expanduser("~"))
+        fchooser.set_select_multiple(True)
+        progress = gtk.ProgressBar()
+        fchooser.set_extra_widget(progress)
+        
+        filt = gtk.FileFilter()
+        filt.set_name( _("Image Types") )
+        filt.add_pixbuf_formats()
+        fchooser.add_filter(filt)
+        preview = gtk.Image()
+        fchooser.set_preview_widget(preview)
+        fchooser.connect("update-preview", gui.filechooser_preview, preview)
+        if fchooser.run() == gtk.RESPONSE_ACCEPT:
+            files = fchooser.get_filenames()
+            for fl in files:
+                sl = self.Slide(self)
+                sl.title = _("Image: %s" % os.path.split(fl)[1])
+                sl._content = [theme.Image(fl)]
+                sl._set_id()
+                self._fields['slides'].append( (sl, sl.get_markup(True)) )
+                progress.set_fraction(progress.get_fraction() + 1.0/len(files))
+                #It may be better to use generator statements here.
+                #http://faq.pygtk.org/index.py?req=show&file=faq23.020.htp
+                #This makes the progressbar change.
+                while gtk.events_pending():
+                    gtk.main_iteration()
+            
+        fchooser.destroy()
     
     ## Order
     
@@ -991,13 +1039,12 @@ class SlideEdit(gtk.Dialog):
             if el.src:
                 fc.set_filename(el.src)
             
+            filt = gtk.FileFilter()
+            filt.add_pixbuf_formats()
+            fc.set_filter(filt)
+            
             preview = gtk.Image()
             fc.set_preview_widget(preview)
-            filt = gtk.FileFilter()
-            for ext in (x for y in gtk.gdk.pixbuf_get_formats()
-                        for x in y['extensions']):
-                filt.add_pattern('*.%s' % ext)
-            fc.set_filter(filt)
             fc.connect("update-preview", gui.filechooser_preview, preview)
             fc.connect("file-set", self._on_image_changed)
             
