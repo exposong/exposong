@@ -361,3 +361,16 @@ def filechooser_preview(file_chooser, preview):
     except:
         have_preview = False
     file_chooser.set_preview_widget_active(have_preview)
+
+def update_image_preview(preview, filename):
+    "Updates `preview` gtk.Image widget with the currently selected file."
+    global __pb_cache
+    if not filename:
+        return False
+    try:
+        if filename not in __pb_cache:
+            __pb_cache[filename] = gtk.gdk.pixbuf_new_from_file_at_size(filename,
+                                                                        256, 256)
+        preview.set_from_pixbuf(__pb_cache[filename])
+    except:
+        pass

@@ -1047,12 +1047,16 @@ class SlideEdit(gtk.Dialog):
             fc.set_preview_widget(preview)
             fc.connect("update-preview", gui.filechooser_preview, preview)
             fc.connect("file-set", self._on_image_changed)
-            
             self._ctbl.attach_widget(fc, None, 0, 0, 2, 1)
+            
+            self._image_preview = gtk.Image()
+            self._ctbl.attach_widget(self._image_preview, None, 0, 1, 2, 1)
+            gui.update_image_preview(self._image_preview, el.src)
+            
             options = map(theme.get_aspect_text,
                           (theme.ASPECT_FIT, theme.ASPECT_FILL))
             aspect = self._ctbl.attach_combo(options, None, _('Resize to:'),
-                                             0, 1, 2, 1)
+                                             0, 2, 2, 1)
             gui.set_active_text(aspect, theme.get_aspect_text(el.aspect))
             aspect.connect('changed', self._on_change_aspect)
         
@@ -1075,6 +1079,7 @@ class SlideEdit(gtk.Dialog):
         "The user chose another image."
         el = self.get_selected_element()
         el.src = filechooser.get_filename()
+        gui.update_image_preview(self._image_preview, el.src)
         self._set_changed()
     
     def _on_change_pos(self, editable):
