@@ -292,8 +292,8 @@ class _Background(_Element):
     
     def parse_xml(self, el):
         "Defines variables based on XML values."
-        #self.name = el.get('name')
-        pass
+        if el.get('name'):
+            self.name = el.get('name')
     
     def to_xml(self, el):
         "Output to an XML Element."
