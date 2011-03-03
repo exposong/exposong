@@ -701,6 +701,8 @@ class _RenderableSection(_Renderable):
     
     def get_pos(self):
         'Returns the position.'
+        if self._section is None:
+            return self.pos
         pos = self._section.pos[:]
         for k,v in self._expand.iteritems():
             pos[POS_MAP[k]] = v

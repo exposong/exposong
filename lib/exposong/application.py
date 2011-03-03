@@ -71,6 +71,7 @@ class Main (gtk.Window):
         
         ##  GUI
         win_v = gtk.VBox()
+        self._create_icons()
         
         #These have to be initialized for the menus to render properly
         exposong.log.debug("Loading the presentation screen.")
@@ -182,6 +183,16 @@ class Main (gtk.Window):
             export_import.ExportImport.import_file(exposong.options.import_)
         exampledata.exampledata.check_presentations(self)
         return False
+    
+    def _create_icons(self):
+        'Load custom application icons.'
+        factory = gtk.IconFactory()
+        for fl in os.listdir(os.path.join(RESOURCE_PATH, 'icons')):
+            nm = os.path.splitext(fl)[0]
+            pb = pb_new(os.path.join(RESOURCE_PATH, 'icons', fl))
+            ico = gtk.IconSet(pb)
+            factory.add(nm, ico)
+        factory.add_default()
     
     def _pane_right(self):
         "Render the right pane with the preview screen and other settings."

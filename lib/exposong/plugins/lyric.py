@@ -50,7 +50,7 @@ information = {
         'required': False,
         }
 type_icon = gtk.gdk.pixbuf_new_from_file_at_size(
-        os.path.join(RESOURCE_PATH,'pres_lyric.png'), 20, 14)
+        os.path.join(RESOURCE_PATH, 'icons', 'pres-lyric.png'), 20, 14)
 
 # TODO These do not remain in order, so when creating the pull-down, the items
 # are in arbitrary order.
@@ -1023,15 +1023,11 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
     @classmethod
     def merge_menu(cls, uimanager):
         'Merge new values with the uimanager.'
-        factory = gtk.IconFactory()
-        factory.add('exposong-lyric',gtk.IconSet(gtk.gdk.pixbuf_new_from_file(
-                    os.path.join(RESOURCE_PATH,'pres_lyric.png'))))
-        factory.add_default()
-        gtk.stock_add([("exposong-lyric",_("_Lyric"), gtk.gdk.MOD1_MASK, 0,
-                      "pymserv")])
+        gtk.stock_add([("pres-lyric",_("_Lyric"), gtk.gdk.MOD1_MASK, 0,
+                        "pymserv")])
         
         actiongroup = gtk.ActionGroup('exposong-lyric')
-        actiongroup.add_actions([("pres-new-lyric", 'exposong-lyric', None, None,
+        actiongroup.add_actions([("pres-new-lyric", 'pres-lyric', None, None,
                                 None, cls._on_pres_new)])
         uimanager.insert_action_group(actiongroup, -1)
         

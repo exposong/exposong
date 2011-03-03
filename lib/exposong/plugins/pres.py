@@ -50,7 +50,7 @@ information = {
         'required': False,
 }
 type_icon = gtk.gdk.pixbuf_new_from_file_at_size(
-        os.path.join(RESOURCE_PATH,'pres_text.png'), 20, 14)
+        os.path.join(RESOURCE_PATH, 'icons', 'pres-exposong.png'), 20, 14)
 
 class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                     _abstract.Schedule):
@@ -765,15 +765,11 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
     @classmethod
     def merge_menu(cls, uimanager):
         "Merge new values with the uimanager."
-        factory = gtk.IconFactory()
-        factory.add('exposong-pres',gtk.IconSet(gtk.gdk.pixbuf_new_from_file(
-                os.path.join(RESOURCE_PATH,'pres_text.png'))))
-        factory.add_default()
-        gtk.stock_add([('exposong-pres',_('_ExpoSong Presentation'), gtk.gdk.MOD1_MASK, 
-                0, 'pymserv')])
+        gtk.stock_add([('pres-exposong',_('_ExpoSong Presentation'),
+                        gtk.gdk.MOD1_MASK, 0, 'pymserv')])
         
         actiongroup = gtk.ActionGroup('exposong-pres')
-        actiongroup.add_actions([('pres-new-text', 'exposong-pres', None, None,
+        actiongroup.add_actions([('pres-new-text', 'pres-exposong', None, None,
                 None, cls._on_pres_new)])
         uimanager.insert_action_group(actiongroup, -1)
         
@@ -863,15 +859,17 @@ class SlideEdit(gtk.Dialog):
         vbox.pack_start(self._get_title_box(), False, True)
         
         # Toolbar
+        gtk.stock_add([('add-text',_('Add Text'), gtk.gdk.MOD1_MASK, 0,
+                        'pymserv'),
+                       ("add-image",_('Add Image'), gtk.gdk.MOD1_MASK, 0,
+                        'pymserv')])
         toolbar = gtk.Toolbar()
-        button = gtk.ToolButton(gtk.STOCK_ADD)
-        button.set_label(_("Add Text"))
-        button.set_is_important(True)
+        button = gtk.ToolButton(gtk.stock_lookup('add-text')[0])
+        button.set_tooltip_markup(_('Add a new text element.'))
         button.connect('clicked', self._add_text, self._tree)
         toolbar.insert(button, -1)
-        button = gtk.ToolButton(gtk.STOCK_ADD)
-        button.set_label(_("Add Image"))
-        button.set_is_important(True)
+        button = gtk.ToolButton(gtk.stock_lookup('add-image')[0])
+        button.set_tooltip_markup(_('Add a new image element.'))
         button.connect('clicked', self._add_image, self._tree)
         toolbar.insert(button, -1)
         button = gtk.ToolButton(gtk.STOCK_DELETE)

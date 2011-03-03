@@ -235,16 +235,6 @@ class Screen(exposong._hook.Menu):
     def merge_menu(cls, uimanager):
         'Merge new values with the uimanager.'
         global screen
-        factory = gtk.IconFactory()
-        factory.add('screen-bg',gtk.IconSet(pb_new(
-                    os.path.join(RESOURCE_PATH,'screen-bg.png'))))
-        factory.add('screen-black',gtk.IconSet(pb_new(
-                    os.path.join(RESOURCE_PATH,'screen-black.png'))))
-        factory.add('screen-freeze',gtk.IconSet(pb_new(
-                    os.path.join(RESOURCE_PATH,'screen-freeze.png'))))
-        factory.add('screen-logo',gtk.IconSet(pb_new(
-                    os.path.join(RESOURCE_PATH,'screen-logo.png'))))
-        factory.add_default()
         gtk.stock_add([
             ("screen-black",_("_Black"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
             ("screen-bg",_("Bac_kground"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
