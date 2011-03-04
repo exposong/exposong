@@ -188,10 +188,14 @@ class Main (gtk.Window):
         'Load custom application icons.'
         factory = gtk.IconFactory()
         for fl in os.listdir(os.path.join(RESOURCE_PATH, 'icons')):
-            nm = os.path.splitext(fl)[0]
-            pb = pb_new(os.path.join(RESOURCE_PATH, 'icons', fl))
-            ico = gtk.IconSet(pb)
-            factory.add(nm, ico)
+            try:
+                # SVG doesn't work on Windows
+                nm = os.path.splitext(fl)[0]
+                pb = pb_new(os.path.join(RESOURCE_PATH, 'icons', fl))
+                ico = gtk.IconSet(pb)
+                factory.add(nm, ico)
+            except:
+                pass
         factory.add_default()
     
     def _pane_right(self):
