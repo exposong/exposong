@@ -286,9 +286,10 @@ def append_font_button(table, label, fontname, top):
     table.attach(fb, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, WIDGET_SPACING)
     return fb
 
-def append_hscale(table, label, adjustment, top):
+def append_hscale(table, label, adjustment, top, digits=0):
     set_label(table, label, top)
     s = gtk.HScale(adjustment)
+    s.set_digits(digits)
     table.attach(s, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, WIDGET_SPACING)
     return s
 
@@ -302,6 +303,7 @@ def append_widget(table, label, widget, top):
     'Adds any gtk.Widget to a table and returns it'
     set_label(table, label, top)
     table.attach(widget, 2, 4, top, top+1, gtk.EXPAND|gtk.FILL, 0, WIDGET_SPACING)
+    return widget
 
 def append_section_title(table, title, top):
     'Adds a title for the current section.'
@@ -309,6 +311,7 @@ def append_section_title(table, title, top):
     label.set_markup("<b>"+title+"</b>")
     label.set_alignment(0.0, 1.0)
     table.attach(label, 0, 4, top, top+1, gtk.FILL, 0, 0)
+    return label
 
 def append_comment(table, title, top):
     label = gtk.Label()
@@ -316,9 +319,12 @@ def append_comment(table, title, top):
     label.set_line_wrap(True)
     label.set_alignment(0.0, 1.0)
     table.attach(label, 0, 4, top, top+1, gtk.EXPAND, 0, 0)
+    return label
 
 def append_separator(table, top):
-    table.attach(gtk.HSeparator(), 0, 4, top, top+1, gtk.FILL, 0, 0)
+    sep = gtk.HSeparator()
+    table.attach(sep, 0, 4, top, top+1, gtk.FILL, 0, 0)
+    return sep
 
 def set_label(table, label, top):
     'Returns a label for a widget.'

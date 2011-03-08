@@ -463,7 +463,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                     info_dialog = gtk.MessageDialog(treeview.get_toplevel(),
                                                     gtk.DIALOG_DESTROY_WITH_PARENT,
                                                     gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
-                                                    _("Please enter an Key."))
+                                                    _("Please enter a Key."))
                     info_dialog.run()
                     info_dialog.destroy()
                 else:

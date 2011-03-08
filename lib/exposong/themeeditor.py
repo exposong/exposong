@@ -22,8 +22,8 @@ import gobject
 
 import gui
 import theme
-#import themeselect
-#import screen
+
+from exposong import DATA_PATH
 
 BACKGROUND_TYPES = [_("Image"),  _("Color"), _("Gradient"), _("Radial Gradient")]
 
@@ -41,7 +41,7 @@ class ThemeEditor(gtk.Window):
         
         self.__updating = False
         
-        filename = "/home/sam/exposong/data/theme/exposong.xml"
+        filename = os.path.join(DATA_PATH, 'theme', 'exposong.xml')
         if filename:
             self._load_theme(filename)
         
@@ -90,14 +90,33 @@ class ThemeEditor(gtk.Window):
         self.treeview_bgs = gtk.TreeView()
         self.treeview_bgs.set_reorderable(True)
         
+        gtk.stock_add([('add-background-gradient',_('Add Gradient'), gtk.gdk.MOD1_MASK, 0,
+                'pymserv'),
+                ('add-background-solid',_('Add Solid Color'), gtk.gdk.MOD1_MASK, 0,
+                'pymserv'),
+                ('add-background-radial',_('Add Radial Gradient'), gtk.gdk.MOD1_MASK, 0,
+                'pymserv'),
+               ("add-background-image",_('Add Image'), gtk.gdk.MOD1_MASK, 0,
+                'pymserv')])
+        
         toolbar = gtk.Toolbar()
-        button = gtk.ToolButton(gtk.STOCK_ADD)
-        #button.connect('clicked', self._on_solid_bg)
-        toolbar.insert(button, -1)
-        button = gtk.ToolButton(gtk.STOCK_EDIT)
-        #button.connect('clicked', self._on_edit_bg)
+        btn = gtk.ToolButton(gtk.stock_lookup('add-background-image')[0])
+        btn.set_tooltip_markup(_("Add a new Image Background"))
+        btn.connect('clicked', self._on_add_bg_image)
+        toolbar.insert(btn, -1)
+        btn = gtk.ToolButton(gtk.stock_lookup('add-background-solid')[0])
+        btn.set_tooltip_markup(_("Add a new Solid Color Background"))
+        btn.connect('clicked', self._on_add_bg_solid)
         #title_list.get_selection().connect('changed', self._on_delete_bg)
-        toolbar.insert(button, -1)
+        toolbar.insert(btn, -1)
+        btn = gtk.ToolButton(gtk.stock_lookup('add-background-gradient')[0])
+        btn.set_tooltip_markup(_("Add a new gradient Background"))
+        btn.connect('clicked', self._on_add_bg_gradient)
+        toolbar.insert(btn, -1)
+        btn = gtk.ToolButton(gtk.stock_lookup('add-background-radial')[0])
+        btn.set_tooltip_markup(_("Add a new Radial Gradient Background"))
+        btn.connect('clicked', self._on_add_bg_radial_gradient)
+        toolbar.insert(btn, -1)
         button = gtk.ToolButton(gtk.STOCK_DELETE)
         button.connect('clicked', self._on_delete_bg)
         #title_list.get_selection().connect('changed',
@@ -114,6 +133,7 @@ class ThemeEditor(gtk.Window):
         self.treeview_bgs.set_model(self.bg_model)
         self.bg_model.connect("rows-reordered", self._on_bgs_reordered)
         self.bg_model.connect("row-changed", self._on_bgs_reordered)
+        self.treeview_bgs.get_selection().connect("changed", self._on_bg_changed)
         
         bg_left = gui.Table(10)
         gui.append_comment(bg_left, _("Backgrounds will be drawn starting with the first element in this list moving to the last one."), 0)
@@ -121,15 +141,15 @@ class ThemeEditor(gtk.Window):
         bg_left.attach(self.treeview_bgs, 1, 2, 2, 2+1, gtk.EXPAND|gtk.FILL, 0, gui.WIDGET_SPACING)
         
         bg_right = gtk.VBox()
-        bg_right_top = gui.Table(1)
-        self.bg_type_combo = gui.append_combo(bg_right_top, _("Type"), BACKGROUND_TYPES, BACKGROUND_TYPES[0], 0)
-        self.bg_type_combo.connect('changed', self._on_bg_type_changed)
+        #bg_right_top = gui.Table(1)
+        #self.bg_type_combo = gui.append_combo(bg_right_top, _("Type"), BACKGROUND_TYPES, BACKGROUND_TYPES[0], 0)
+        #self.bg_type_combo.connect('changed', self._on_bg_type_changed)
         self.bg_right_type_area = gui.Table(15)
-        bg_right.pack_start(bg_right_top)
+        #bg_right.pack_start(bg_right_top)
         bg_right.pack_start(self.bg_right_type_area)
         bg_right.pack_start(self._get_position())
         
-        self._on_bg_type_changed(self.bg_type_combo)
+        #self._on_bg_type_changed(self.bg_type_combo)
         
         
         bgbox = gtk.HBox()
@@ -222,59 +242,131 @@ class ThemeEditor(gtk.Window):
         self.theme.render(ccontext, bounds, _example_slide)
         return True
     
+    #######################
+    # Loading Backgrounds #
+    #######################
+    def _on_add_bg_image(self, widget=None):
+        table = self.bg_right_type_area
+        table.resize(4,4)
+        table.foreach(lambda w: table.remove(w))
+        gui.append_section_title(table, _("Image Background"),0)
+        self.bg_image_filech = gui.append_file(table, _("File"), None, 1)
+        
+        self.bg_image_radio_mode_fill = gtk.RadioButton(None, "Fill Screen")
+        self.bg_image_radio_mode_fit = gtk.RadioButton(self.bg_image_radio_mode_fill, "Fit to Screen Size")
+        table.attach(self.bg_image_radio_mode_fill, 1, 4, 2, 2+1, gtk.EXPAND|gtk.FILL, 0, gui.WIDGET_SPACING)
+        table.attach(self.bg_image_radio_mode_fit, 1, 4, 3, 3+1, gtk.EXPAND|gtk.FILL, 0, gui.WIDGET_SPACING)
+        table.show_all()
+        
+    def _load_bg_image(self):
+        bg = self._get_active_bg()
+        self.bg_image_filech.set_filename(
+                os.path.join(DATA_PATH, 'theme', 'res', bg.src))
+        if bg.aspect == theme.ASPECT_FILL:
+            self.bg_image_radio_mode_fill.set_active(True)
+        else:
+            self.bg_image_radio_mode_fit.set_active(True)
+        
+    def _on_add_bg_solid(self, widget=None):
+        table = self.bg_right_type_area
+        table.resize(1,4)
+        table.foreach(lambda w: table.remove(w))
+        self.bg_solid_color_btn = gui.append_color(table, _("Color"), (0,0,0), 0, alpha=True)
+        self.bg_solid_color_btn.connect('color-set', self._on_solid_bg_changed)
+        self.bg_solid_color_btn.show()
+        #table.show_all()
+    
+    def _load_bg_solid(self):
+        bg = self._get_active_bg()
+        self.bg_solid_color_btn.set_color(gtk.gdk.color_parse(bg.color))
+        self.bg_solid_color_btn.set_alpha(int(bg.alpha*65535))
+        
+    def _on_add_bg_gradient(self, widget=None):
+        table = self.bg_right_type_area
+        table.resize(6,4)
+        table.foreach(lambda w: table.remove(w))
+        #gui.append_section_title(table, "Color 1", 1)
+        self.bg_gradient_color1 = gui.append_color(table, "Color 1", (255,0,0,255), 1, alpha=True)
+        self.bg_gradient_length1 = gui.append_hscale(table, "Length", gtk.Adjustment(value=50,
+                lower=0, upper=100, step_incr=1, page_incr=10, page_size=0), 2)
+        #gui.append_section_title(table, "Color 2", 4)
+        self.bg_gradient_color2 = gui.append_color(table, "Color 2", (255,0,0,255), 3, alpha=True)
+        self.bg_gradient_length2 = gui.append_hscale(table, "Length", gtk.Adjustment(value=50,
+                lower=0, upper=100, step_incr=1, page_incr=10, page_size=0), 4)
+        
+        self.bg_gradient_angle = gui.append_hscale(table, "Angle", gtk.Adjustment(value=0, lower=0,
+                        upper=360, step_incr=1, page_incr=10, page_size=0), 5)
+        table.show_all()
+    
+    def _load_bg_gradient(self):
+        bg = self._get_active_bg()
+        if len(bg.stops) > 2:
+            pass #TODO: Dialog
+        
+        self.bg_gradient_color1.set_color(gtk.gdk.color_parse(bg.stops[0].color))
+        self.bg_gradient_color1.set_alpha(int(bg.stops[0].alpha*65535))
+        self.bg_gradient_length1.set_value(bg.stops[0].location*100)
+        self.bg_gradient_color2.set_color(gtk.gdk.color_parse(bg.stops[1].color))
+        self.bg_gradient_color2.set_alpha(int(bg.stops[1].alpha*65535))
+        self.bg_gradient_length2.set_value(bg.stops[1].location*100)
+        self.bg_gradient_angle.set_value(bg.angle)
+    
+    def _on_add_bg_radial_gradient(self, widget=None):
+        table = self.bg_right_type_area
+        table.resize(8,4)
+        table.foreach(lambda w: table.remove(w))
+        self._bg_radial_color1 = gui.append_color(table, "Color 1", (255,0,0,255), 1,True)
+        self._bg_radial_length1 = gui.append_hscale(table, "Length", gtk.Adjustment(value=50,
+                lower=0, upper=100, step_incr=1, page_incr=10, page_size=0), 2)
+        #gui.append_section_title(table, "Color 2", 4)
+        self._bg_radial_color2 = gui.append_color(table, "Color 2", (255,0,0,255), 3, True)
+        self._bg_radial_length2 = gui.append_hscale(table, "Length", gtk.Adjustment(value=50,
+                lower=0, upper=100, step_incr=1, page_incr=10, page_size=0), 4)
+        #scale = gtk.HScale(gtk.Adjustment(value=0, lower=0, upper=360, step_incr=1, page_incr=10, page_size=0))
+        gui.append_hscale(table, "Overall Length", gtk.Adjustment(value=0, lower=0, upper=100, step_incr=1, page_incr=10, page_size=0), 5)
+        gui.append_spinner(table, "Horizontal Position", gtk.Adjustment(value=0, lower=0, upper=100, step_incr=1, page_incr=10, page_size=0),6)
+        gui.append_spinner(table, "Vertical Position", gtk.Adjustment(value=0, lower=0, upper=100, step_incr=1, page_incr=10, page_size=0),7)
+        table.show_all()
+    
+    def _load_bg_radial_gradient(self):
+        pass
+    
+    def _load_bg_position(self):
+        bg = self._get_active_bg()
+        self._p['lf'].set_value(bg.pos[0])
+        self._p['rt'].set_value(bg.pos[1])
+        self._p['tp'].set_value(bg.pos[2])
+        self._p['bt'].set_value(bg.pos[3])
+    
+    def _get_active_bg(self):
+        (model, iter) = self.treeview_bgs.get_selection().get_selected()
+        if iter:
+            return model.get_value(iter, 0)
+        return None
+    
     def _on_bgs_reordered(self, model, path, iter=None, new_order=None):
         self.theme.backgrounds = []
         for bg in model:
             self.theme.backgrounds.append(bg[0])
         self.draw()
-        
-    def _on_bg_type_changed(self, widget):
-        table = self.bg_right_type_area
-        table.foreach(lambda w: table.remove(w))
-        active = widget.get_active_text()
-        if active == BACKGROUND_TYPES[0]: #Image
-            self.bg_image_filech = gui.append_file(table,
-                    _("Image File"), None, 0)
-            h = gtk.HBox()
-            self.radio_mode_fill = gtk.RadioButton(None, "Fill Screen")
-            self.radio_mode_fit = gtk.RadioButton(self.radio_mode_fill, "Fit to Screen Size")
-            h.pack_start(self.radio_mode_fill)
-            h.pack_start(self.radio_mode_fit)
-            gui.append_hbox(table, "Image Mode", h, 1)
-            
-        elif active == BACKGROUND_TYPES[1]: #Color
-            self.bg_single_color_btn = gui.append_color(table, _("Color"), (0,0,0), 0)
-            self.bg_single_color_btn.connect('color-set', self._on_solid_bg_changed)
-            
-        elif active == BACKGROUND_TYPES[2]: #Gradient
-            #gui.append_section_title(table, "Color 1", 1)
-            gui.append_color(table, "Color 1", (255,0,0), 1)
-            gui.append_hscale(table, "Length", gtk.Adjustment(value=50,
-                    lower=0, upper=100, step_incr=1, page_incr=10, page_size=0), 2)
-            #gui.append_section_title(table, "Color 2", 4)
-            gui.append_color(table, "Color 2", (255,0,0), 3)
-            gui.append_hscale(table, "Length", gtk.Adjustment(value=50,
-                    lower=0, upper=100, step_incr=1, page_incr=10, page_size=0), 4)
-            
-            gui.append_hscale(table, "Angle", gtk.Adjustment(value=0, lower=0, upper=360, step_incr=1, page_incr=10, page_size=0), 5)
-            
-        elif active == BACKGROUND_TYPES[3]: #Radial Gradient
-            gui.append_color(table, "Color 1", (255,0,0,255), 1,True)
-            gui.append_hscale(table, "Length", gtk.Adjustment(value=50,
-                    lower=0, upper=100, step_incr=1, page_incr=10, page_size=0), 2)
-            #gui.append_section_title(table, "Color 2", 4)
-            gui.append_color(table, "Color 2", (255,0,0,255), 3, True)
-            gui.append_hscale(table, "Length", gtk.Adjustment(value=50,
-                    lower=0, upper=100, step_incr=1, page_incr=10, page_size=0), 4)
-            scale = gtk.HScale(gtk.Adjustment(value=0, lower=0, upper=360, step_incr=1, page_incr=10, page_size=0))
-            gui.append_hscale(table, "Overall Length", gtk.Adjustment(value=0, lower=0, upper=100, step_incr=1, page_incr=10, page_size=0), 5)
-            gui.append_spinner(table, "Horizontal Position", gtk.Adjustment(value=0, lower=0, upper=100, step_incr=1, page_incr=10, page_size=0),6)
-            gui.append_spinner(table, "Vertical Position", gtk.Adjustment(value=0, lower=0, upper=100, step_incr=1, page_incr=10, page_size=0),7)
-
-        table.show_all()
     
-    def _gradient_points(self):
-        pass
+    def _on_bg_changed(self, widget):
+        bg = self._get_active_bg()
+        if not bg:
+            return
+        if isinstance(bg, theme.ImageBackground):
+            self._on_add_bg_image()
+            self._load_bg_image()
+        elif isinstance(bg, theme.ColorBackground):
+            self._on_add_bg_solid()
+            self._load_bg_solid()
+        elif isinstance(bg, theme.GradientBackground):
+            self._on_add_bg_gradient()
+            self._load_bg_gradient()
+        elif isinstance(bg, theme.RadialGradientBackground):
+            self._on_add_bg_radial_gradient()
+            self._load_bg_radial_gradient()
+        self._load_bg_position()
     
     def _on_solid_bg_changed(self, btn, *args):
         #color = btn.get_color()
@@ -289,36 +381,6 @@ class ThemeEditor(gtk.Window):
     def _bg_get_row_text(self, column, cell, model, titer):
         bg = model.get_value(titer, 0)
         cell.set_property('text', bg.get_name())
-        #if isinstance(bg, theme.ColorBackground):
-        #    cell.set_property('text', _("Color"))
-        #elif isinstance(bg, theme.GradientBackground):
-        #    cell.set_property('text', _("Gradiant"))
-        #elif isinstance(bg, theme.RadialGradientBackground):
-        #    cell.set_property('text', _("Radial Gradient"))
-        #elif isinstance(bg, theme.ImageBackground):
-        #    cell.set_property('text', _("Image"))
-    
-    def _on_gradientradio(self, radio):
-        'Gradient was selected as background type'
-        if radio.get_active():
-            self._clear_bg_table()
-            hbox = gtk.HBox()
-            #self.grad1 = gtk.ColorButton()
-            #self.grad2 = gtk.ColorButton()
-            #hbox.pack_start(self.grad1, True, True)
-            #hbox.pack_start(self.grad2, True, True)
-            graddirlist = [u'\u2192', u'\u2198', u'\u2193', u'\u2199']
-            (self.bg_grad_color1, self.bg_grad_color2) = gui.append_color(
-                    self.bg_main_table, "Colors", ((0,0,0),(0,255,255)), 0)
-            gui.append_combo(self.bg_main_table, "", graddirlist, graddirlist[1], 1)
-            self.show_all()
-    
-    def _on_solidradio(self, radio):
-        'Solid was selected as background type'
-        if radio.get_active():
-            self._clear_bg_table()
-            self.bg_solid_color = gui.append_color(self.bg_main_table, "Color", (0,0,0), 0)
-            self.show_all()
     
     def _get_position(self):
         "Return the element positioning settings."
@@ -355,12 +417,11 @@ class ThemeEditor(gtk.Window):
         
         `pos.right` will be updated to be larger than `pos.left`. Same for
         top and bottom."""
-        print self.__updating
         if self.__updating:
             return
         
         self.__updating = True
-        el = self.get_selected_element()
+        el = self._get_active_bg()
         if el is False:
             self.__updating = False
             return False
@@ -391,13 +452,6 @@ class ThemeEditor(gtk.Window):
         self.__updating = False
         self._set_changed()
     
-    def get_selected_element(self):
-        model, itr = self.treeview_bgs.get_selection().get_selected()
-        if itr:
-            return model.get_value(itr, 0)
-        else:
-            return False
-    
     def _set_changed(self):
         self.changed = True
         if not self.get_title().startswith("*"):
@@ -410,42 +464,12 @@ class ThemeEditor(gtk.Window):
         
         #################
         # Backgrounds   #
-        #################
         if len(self.theme.backgrounds)>0:
             for bg in self.theme.backgrounds:
                 self.bg_model.append((bg,))
-            
-#        if len(self.theme.backgrounds)>1:
-#            print "Only one background can be set with this editor"
-#            self.imageradio.set_sensitive(False)
-#            self.solidradio.set_sensitive(False)
-#            self.gradientradio.set_sensitive(False)
-#            self._clear_bg_table()
-#            gui.append_section_title(self.bg_main_table, "This theme uses\
-#multiple backgrounds which cannot be edited with this editor.\n\
-#If you need to change the background, you can edit the theme by hand.\n\
-#See <a href='http://code.google.com/p/exposong/wiki/ThemeFormat'>Theme Format</a>", 0)
-#        
-#        elif len(self.theme.backgrounds) == 1:
-#            bg = self.theme.backgrounds[0]
-#            if bg.get_tag() == "solid":
-#                self.solidradio.set_active(True)
-#                self.bg_solid_color.set_color(gtk.gdk.Color(bg.color))
-#            elif bg.get_tag() == "gradient":
-#                self.gradientradio.set_active(True)
-#                self.bg_grad_color1.set_color(gtk.gdk.Color(bg.stops[0].color))
-#                self.bg_grad_color2.set_color(gtk.gdk.Color(bg.stops[1].color))
-#            elif bg.get_tag() == "img":
-#                self.imageradio.set_active(True)
-#                self.bg_image_filech.set_filename(bg.get_filename())
-#                if bg.aspect == theme.ASPECT_FILL:
-#                    self.self.radio_mode_fill.set_active()
-#                elif bg.aspect == theme.ASPECT_FIT:
-#                    self.radio_mode_fit.set_active(True)
         
         ##################
         # Sections: Body #
-        ##################
         body = self.theme.get_body()
         self.body_font_button.set_font_name(body.font)
         self.body_color_button.set_color(gtk.gdk.Color(body.color))
@@ -463,7 +487,6 @@ class ThemeEditor(gtk.Window):
         
         ####################
         # Sections: Footer #
-        ####################
         footer = self.theme.get_footer()
         self.footer_font_button.set_font_name(footer.font)
         self.footer_color_button.set_color(gtk.gdk.Color(footer.color))
