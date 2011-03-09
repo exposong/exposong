@@ -30,7 +30,8 @@ import exposong.plugins._abstract
 
 class Schedule(gtk.ListStore):
     '''
-    Schedule of presentations.'
+    Schedule of presentations.
+    Can be built-in (ES Presentations, Lyric Presentations) or user-defined.
     '''
     def __init__(self, title="", filename = None, builtin = True, filter_func = None):
         gtk.ListStore.__init__(self, *preslist.PresList.get_model_args())

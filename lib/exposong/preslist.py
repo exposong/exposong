@@ -208,7 +208,7 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
                                    msg % item.get_title())
         dialog.set_title( _("Delete Presentation?") )
         resp = dialog.run()
-        dialog.hide()
+        dialog.destroy()
         if resp == gtk.RESPONSE_YES:
             item.on_delete()
             schmod = exposong.schedlist.schedlist.get_model()

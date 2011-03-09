@@ -143,7 +143,6 @@ class Theme(object):
         tree = etree.ElementTree(root)
         # TODO This is saved in the current local directory.
         filename = os.path.join(DATA_PATH, "theme", self.filename)
-        print filename
         tree.write(filename, encoding='UTF-8')
     
     def to_xml(self):

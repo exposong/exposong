@@ -102,20 +102,20 @@ class ThemeEditor(gtk.Window):
         toolbar = gtk.Toolbar()
         btn = gtk.ToolButton(gtk.stock_lookup('add-background-image')[0])
         btn.set_tooltip_markup(_("Add a new Image Background"))
-        btn.connect('clicked', self._on_add_bg_image)
+        btn.connect('clicked', self._on_bg_image)
         toolbar.insert(btn, -1)
         btn = gtk.ToolButton(gtk.stock_lookup('add-background-solid')[0])
         btn.set_tooltip_markup(_("Add a new Solid Color Background"))
-        btn.connect('clicked', self._on_add_bg_solid)
+        btn.connect('clicked', self._on_bg_solid)
         #title_list.get_selection().connect('changed', self._on_delete_bg)
         toolbar.insert(btn, -1)
         btn = gtk.ToolButton(gtk.stock_lookup('add-background-gradient')[0])
         btn.set_tooltip_markup(_("Add a new gradient Background"))
-        btn.connect('clicked', self._on_add_bg_gradient)
+        btn.connect('clicked', self._on_bg_gradient)
         toolbar.insert(btn, -1)
         btn = gtk.ToolButton(gtk.stock_lookup('add-background-radial')[0])
         btn.set_tooltip_markup(_("Add a new Radial Gradient Background"))
-        btn.connect('clicked', self._on_add_bg_radial_gradient)
+        btn.connect('clicked', self._on_bg_radial_gradient)
         toolbar.insert(btn, -1)
         button = gtk.ToolButton(gtk.STOCK_DELETE)
         button.connect('clicked', self._on_delete_bg)
@@ -129,7 +129,7 @@ class ThemeEditor(gtk.Window):
         column_bgs.pack_start(textrend)
         column_bgs.set_cell_data_func(textrend, self._bg_get_row_text)
         self.treeview_bgs.append_column(column_bgs)
-        self.treeview_bgs.set_size_request(100,200)
+        self.treeview_bgs.set_size_request(90,200)
         self.treeview_bgs.set_model(self.bg_model)
         self.bg_model.connect("rows-reordered", self._on_bgs_reordered)
         self.bg_model.connect("row-changed", self._on_bgs_reordered)
@@ -216,6 +216,10 @@ class ThemeEditor(gtk.Window):
         notebook.append_page(footer_table_left, gtk.Label("Footer Text"))
         
         main_h.pack_start(main_v)
+        
+        ###############
+        ### Preview ###
+        ###############
         table_right = gui.Table(10)
         gui.append_checkbutton(table_right, "", "Display Example Slide",0)
         
@@ -226,7 +230,7 @@ class ThemeEditor(gtk.Window):
         
         gui.append_widget(table_right, "", self.preview, 1)
         
-        main_h.pack_start(table_right)
+        main_h.pack_end(table_right)
         self.add(main_h)
         self.show_all()
     
@@ -245,7 +249,7 @@ class ThemeEditor(gtk.Window):
     #######################
     # Loading Backgrounds #
     #######################
-    def _on_add_bg_image(self, widget=None):
+    def _on_bg_image(self, widget=None):
         table = self.bg_right_type_area
         table.resize(4,4)
         table.foreach(lambda w: table.remove(w))
@@ -267,7 +271,7 @@ class ThemeEditor(gtk.Window):
         else:
             self.bg_image_radio_mode_fit.set_active(True)
         
-    def _on_add_bg_solid(self, widget=None):
+    def _on_bg_solid(self, widget=None):
         table = self.bg_right_type_area
         table.resize(1,4)
         table.foreach(lambda w: table.remove(w))
@@ -281,7 +285,7 @@ class ThemeEditor(gtk.Window):
         self.bg_solid_color_btn.set_color(gtk.gdk.color_parse(bg.color))
         self.bg_solid_color_btn.set_alpha(int(bg.alpha*65535))
         
-    def _on_add_bg_gradient(self, widget=None):
+    def _on_bg_gradient(self, widget=None):
         table = self.bg_right_type_area
         table.resize(6,4)
         table.foreach(lambda w: table.remove(w))
@@ -311,7 +315,7 @@ class ThemeEditor(gtk.Window):
         self.bg_gradient_length2.set_value(bg.stops[1].location*100)
         self.bg_gradient_angle.set_value(bg.angle)
     
-    def _on_add_bg_radial_gradient(self, widget=None):
+    def _on_bg_radial_gradient(self, widget=None):
         table = self.bg_right_type_area
         table.resize(8,4)
         table.foreach(lambda w: table.remove(w))
@@ -334,8 +338,8 @@ class ThemeEditor(gtk.Window):
     def _load_bg_position(self):
         bg = self._get_active_bg()
         self._p['lf'].set_value(bg.pos[0])
-        self._p['rt'].set_value(bg.pos[1])
-        self._p['tp'].set_value(bg.pos[2])
+        self._p['rt'].set_value(bg.pos[2])
+        self._p['tp'].set_value(bg.pos[1])
         self._p['bt'].set_value(bg.pos[3])
     
     def _get_active_bg(self):
@@ -345,26 +349,29 @@ class ThemeEditor(gtk.Window):
         return None
     
     def _on_bgs_reordered(self, model, path, iter=None, new_order=None):
-        self.theme.backgrounds = []
-        for bg in model:
-            self.theme.backgrounds.append(bg[0])
+        self._update_bg_list_from_model()
         self.draw()
+    
+    def _update_bg_list_from_model(self):
+        self.theme.backgrounds = []
+        for bg in self.bg_model:
+            self.theme.backgrounds.append(bg[0])
     
     def _on_bg_changed(self, widget):
         bg = self._get_active_bg()
         if not bg:
             return
         if isinstance(bg, theme.ImageBackground):
-            self._on_add_bg_image()
+            self._on_bg_image()
             self._load_bg_image()
         elif isinstance(bg, theme.ColorBackground):
-            self._on_add_bg_solid()
+            self._on_bg_solid()
             self._load_bg_solid()
         elif isinstance(bg, theme.GradientBackground):
-            self._on_add_bg_gradient()
+            self._on_bg_gradient()
             self._load_bg_gradient()
         elif isinstance(bg, theme.RadialGradientBackground):
-            self._on_add_bg_radial_gradient()
+            self._on_bg_radial_gradient()
             self._load_bg_radial_gradient()
         self._load_bg_position()
     
@@ -376,7 +383,20 @@ class ThemeEditor(gtk.Window):
         self.theme.save()
     
     def _on_delete_bg(self, *args):
-        pass
+        (model, itr) = self.treeview_bgs.get_selection().get_selected()
+        if not itr:
+            return False
+        msg = _("Are you sure you want to delete this background?")
+        dialog = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
+                                   gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO,
+                                   msg)
+        dialog.set_title( _('Delete Background?') )
+        resp = dialog.run()
+        dialog.hide()
+        if resp == gtk.RESPONSE_YES:
+            model.remove(itr)
+            self._update_bg_list_from_model()
+            self.draw()
     
     def _bg_get_row_text(self, column, cell, model, titer):
         bg = model.get_value(titer, 0)
@@ -430,7 +450,7 @@ class ThemeEditor(gtk.Window):
         rt = self._p['rt'].get_value()
         tp = self._p['tp'].get_value()
         bt = self._p['bt'].get_value()
-            
+        
         if rt <= lf:
             if editable == self._p['rt']:
                 lf = rt - 0.01
@@ -460,13 +480,12 @@ class ThemeEditor(gtk.Window):
     def _load_theme(self, filenm):
         'Loads a theme from a file into the Theme Editor'
         self.theme = theme.Theme(filenm)
-        self.title_entry.set_text(os.path.basename(self.theme.filename))
+        self.title_entry.set_text(self.theme.get_title())
         
         #################
         # Backgrounds   #
-        if len(self.theme.backgrounds)>0:
-            for bg in self.theme.backgrounds:
-                self.bg_model.append((bg,))
+        for bg in self.theme.backgrounds:
+            self.bg_model.append((bg,))
         
         ##################
         # Sections: Body #
