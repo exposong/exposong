@@ -148,44 +148,53 @@ class ThemeEditor(gtk.Window):
         #bg_right.pack_start(bg_right_top)
         bg_right.pack_start(self.bg_right_type_area)
         bg_right.pack_start(self._get_position())
-        
-        #self._on_bg_type_changed(self.bg_type_combo)
-        
-        
+
         bgbox = gtk.HBox()
         bgbox.pack_start(bg_left)
         bgbox.pack_start(gtk.VSeparator())
         bgbox.pack_start(bg_right)
         notebook.append_page(bgbox, gtk.Label(_("Background")))
         
-        
         ######################
         # Page 2: Body Text  #
         ######################
         body_h = gtk.HBox()
         body_table_left = gui.Table(5)
-        self.body_font_button = gui.append_font_button(body_table_left, _("Font"), "Sans Bold", 0)
-        gui.append_comment(body_table_left, _("Font size might be scaled down if it doesn't fit."),1)
-        self.body_color_button = gui.append_color(body_table_left, "Color", (255,255,255), 2)
-        #self.body_max_font_spinner = gui.append_spinner(body_table_left, "Max. Font Size",
-        #        gtk.Adjustment(32, 1, 120, 1, 10, 0), 2)
-        self.body_shadow_cb = gui.append_checkbutton(body_table_left, _("Text Shadow"), _("Display Shadow"), 3)
-        self.body_shadow_cb.set_active(True)
-        self.body_shadow_color = gui.append_color(body_table_left, "", (50,10,100), 4)
-        self.body_shadow_cb.connect("toggled", lambda cb:\
-                self.body_shadow_color.set_sensitive(self.body_shadow_cb.get_active()))
-        body_h.pack_start(body_table_left)
-        body_h.pack_start(gtk.VSeparator())
+        ## Font
+        gui.append_section_title(body_table_left, _("Font"), 0)
+        self._body_font_button = gui.append_font_button(body_table_left, _("Type and Size"), "", 1)
+        gui.append_comment(body_table_left, _("Note that the font size might be scaled down if it doesn't fit."),2)
+        self._body_color_button = gui.append_color(body_table_left, _("Color"), (255,255,255), 3)
+        ## Alignment, line spacing
+        gui.append_section_title(body_table_left, _("Alignment"), 4)
+        self._body_text_align = gui.append_combo(body_table_left, _("Text Align"),
+                (_("Center"), _("Left"), _("Right")), _("Center"), 5)
+        # Order for horizontal align must be the same as theme.TOP, theme.MIDDLE, theme.BOTTOM
+        self._body_vertical_align = gui.append_combo(body_table_left, "Text Vertical Align",
+                (_("Top"), _("Middle"), _("Bottom")), _("Middle"), 6)
+        self._body_line_spacing = gui.append_spinner(body_table_left, _("Line Spacing"),
+                gtk.Adjustment(1.0, 1.0, 3.0, 0.1, 1, 0), 7)
+        self._body_line_spacing.set_digits(1)
         
         body_table_right = gui.Table(3)
-        self.body_line_distance = gui.append_spinner(body_table_right, _("Line Distance"),
-                gtk.Adjustment(1, 1, 10, 1, 5, 0), 0)
-        self.body_text_align = gui.append_combo(body_table_right, _("Text Align"),
-                (_("Center"), _("Left"), _("Right")), _("Center"), 1)
-        # Order for horizontal align must be the same as theme.TOP, theme.MIDDLE, theme.BOTTOM
-        self.body_hor_align = gui.append_combo(body_table_right, "Text Vertical Align",
-                (_("Top"), _("Middle"), _("Bottom")), _("Middle"), 2)
+        ## Text Shadow
+        gui.append_section_title(body_table_right, _("Text Shadow"), 1)
+        self._body_shadow_color = gui.append_color(body_table_right, _("Color"), (50,10,100, 255), 2, alpha=True)
+        self._body_shadow_offset_x = gui.append_spinner(body_table_right, _("x-Offset"), gtk.Adjustment(0.5, -1.0, 1.0, 0.1, 0.5, 0), 3)
+        self._body_shadow_offset_x.set_digits(1)
+        self._body_shadow_offset_y = gui.append_spinner(body_table_right, _("y-Offset"), gtk.Adjustment(0.5, -1.0, 1.0, 0.1, 0.5, 0), 4)
+        self._body_shadow_offset_y.set_digits(1)
+        gui.append_comment(body_table_right, _("Shadow offsets are measure " +
+                "in percentage of font height. So an offset of 0.5 " +
+                "for point 12 font is 6 points."), 5)
+        ## Text Outline
+        gui.append_section_title(body_table_right, _("Text Outline"), 6)
+        self._body_text_outline_size = gui.append_spinner(body_table_right, _("Size (Pixel)"), gtk.Adjustment(1.0, 0.0, 3.0, 0.1, 1.0, 0), 7)
+        self._body_text_outline_size.set_digits(1)
+        self._body_text_outline_color = gui.append_color(body_table_right, _("Color"), (0,0,0,0), 8, alpha=True)
         
+        body_h.pack_start(body_table_left)
+        body_h.pack_start(gtk.VSeparator())
         body_h.pack_start(body_table_right)
         notebook.append_page(body_h, gtk.Label(_("Body Text")))
        
@@ -490,19 +499,20 @@ class ThemeEditor(gtk.Window):
         ##################
         # Sections: Body #
         body = self.theme.get_body()
-        self.body_font_button.set_font_name(body.font)
-        self.body_color_button.set_color(gtk.gdk.Color(body.color))
-        #TODO: No way to enable/disable shadow
-        self.body_shadow_color.set_color(gtk.gdk.Color(body.shadow_color))
-        #TODO: Line distance, to be implemented in theme
+        self._body_font_button.set_font_name(body.font)
+        self._body_color_button.set_color(gtk.gdk.Color(body.color))
+        #TODO: Text Horizontal and Vertical align
+        #for i in range(len(align)):
+        #    if align[i] == align[t.align]:
+        #        self._body_text_align.set_active(i)
+        self._body_line_spacing.set_value(body.spacing)
         
-        t = theme.Text("This is an example text")
-        # Horizontal Alignment
-        for i in range(len(align)):
-            if align[i] == align[t.align]:
-                self.body_text_align.set_active(i)
-        # Vertical Alignment
-        self.body_hor_align.set_active(t.valign)
+        self._body_shadow_color.set_color(gtk.gdk.Color(body.shadow_color))
+        self._body_shadow_offset_x.set_value(body.shadow_offset[0])
+        self._body_shadow_offset_y.set_value(body.shadow_offset[1])
+        
+        self._body_text_outline_size.set_value(body.outline_size)
+        self._body_text_outline_color.set_color(gtk.gdk.Color(body.outline_color))
         
         ####################
         # Sections: Footer #
