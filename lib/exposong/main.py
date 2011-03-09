@@ -138,7 +138,7 @@ class Main (gtk.Window):
         win_v.pack_end(statusbar.statusbar, False)
         
         gtk.settings_get_default().set_long_property('gtk-button-images', True,
-                                                     'application:__init__')
+                                                     'main:__init__')
         task = self.build_schedule()
         gobject.idle_add(task.next)
         

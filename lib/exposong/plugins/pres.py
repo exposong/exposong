@@ -30,7 +30,7 @@ import shutil
 from xml.etree import cElementTree as etree
 from xml.sax.saxutils import escape, unescape
 
-import exposong.application
+import exposong.main
 import exposong.themeselect
 import exposong._hook
 import undobuffer
@@ -557,7 +557,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         if not itr:
             return False
         msg = _('Are you sure you want to delete this slide? This cannot be undone.')
-        dialog = gtk.MessageDialog(exposong.application.main, gtk.DIALOG_MODAL,
+        dialog = gtk.MessageDialog(exposong.main.main, gtk.DIALOG_MODAL,
                                    gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
                                    msg)
         dialog.set_title( _('Delete Slide?') )

@@ -21,7 +21,7 @@ import gtk.gdk
 import shutil
 from xml.etree import cElementTree as etree
 
-import exposong.application
+import exposong.main
 import exposong.slidelist
 import exposong._hook
 import exposong.plugins.pres
@@ -178,7 +178,7 @@ class LegacyConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
     @classmethod
     def import_dialog(cls, action):
         dlg = gtk.FileChooserDialog(_("Import ExpoSong Legacy File(s)"),
-                exposong.application.main, gtk.FILE_CHOOSER_ACTION_OPEN,
+                exposong.main.main, gtk.FILE_CHOOSER_ACTION_OPEN,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK,
                 gtk.RESPONSE_ACCEPT))
         dlg.set_select_multiple(True)
@@ -192,7 +192,7 @@ class LegacyConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
             files = dlg.get_filenames()
             for fl in files:
                 filename = cls.convert(unicode(fl), True)
-                exposong.application.main.load_pres(filename)
+                exposong.main.main.load_pres(filename)
             config.set("dialogs", "exposong_legacy-import-dir", os.path.dirname(file))
         dlg.destroy()
     

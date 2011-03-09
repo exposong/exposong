@@ -54,6 +54,7 @@ class SingleInstance(object):
         self.open()
     
     def serve(self):
+        "Open the port, and listen for commands."
         import gobject
         try:
             self.socket.bind((HOST, PORT))

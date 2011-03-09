@@ -20,7 +20,7 @@ import os
 
 from openlyrics.tools.opensong2openlyrics import OpenLyricsConverter
 
-import exposong.application
+import exposong.main
 import exposong._hook
 from exposong.glob import *
 from exposong import DATA_PATH
@@ -72,7 +72,7 @@ class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
     @classmethod
     def import_dialog(cls, action):
         dlg = gtk.FileChooserDialog(_("Import OpenSong File(s)"),
-                exposong.application.main, gtk.FILE_CHOOSER_ACTION_OPEN,
+                exposong.main.main, gtk.FILE_CHOOSER_ACTION_OPEN,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK,
                 gtk.RESPONSE_ACCEPT))
         dlg.set_select_multiple(True)
@@ -82,7 +82,7 @@ class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
             files = dlg.get_filenames()
             for file in files:
                 filename = cls.convert(unicode(file))
-                exposong.application.main.load_pres(filename)
+                exposong.main.main.load_pres(filename)
             config.set("dialogs", "opensong-import-dir", os.path.dirname(file))
         dlg.destroy()
     

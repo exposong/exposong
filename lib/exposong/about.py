@@ -21,7 +21,7 @@ import gtk.gdk
 import webbrowser
 import os.path
 
-import exposong.application
+import exposong.main
 import exposong.schedlist
 import exposong.version
 from exposong import RESOURCE_PATH

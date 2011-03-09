@@ -19,12 +19,21 @@
 import gtk
 import pango
 
-import exposong.application
+import exposong.main
 import exposong.screen
 from exposong.config import config
 
+"""
+The Notify class will give the user a GUI to alert the audience of any
+necessary news/events. An example of usage is for nursury alerts.
+"""
+
 class Notify(gtk.HBox):
+    """
+    A GUI that will allow the user to alert the audience.
+    """
     def __init__(self):
+        "Initialize the notification interface."
         gtk.HBox.__init__(self)
         self._text = ""
         
@@ -35,9 +44,9 @@ class Notify(gtk.HBox):
         self.notify.set_tooltip_text("Notification Text")
         self.notify.connect("activate", self._on_activate)
         self.notify.connect("focus-in-event",
-                            exposong.application.main.disable_shortcuts)
+                            exposong.main.main.disable_shortcuts)
         self.notify.connect("focus-out-event",
-                            exposong.application.main.enable_shortcuts)
+                            exposong.main.main.enable_shortcuts)
         self.notify.connect("key-press-event", self._on_key_pressed)
         self.pack_start(self.notify, True, True, 0)
         
@@ -68,6 +77,7 @@ class Notify(gtk.HBox):
             self.pack_start(notify_save, False, True, 0)
     
     def draw(self, ccontext, bounds):
+        "Draw the notification to the screen if available."
         if not self._text:
             return
         layout = ccontext.create_layout()
@@ -97,7 +107,7 @@ class Notify(gtk.HBox):
     def _on_icon_pressed(self, widget, icon, mouse_button):
         """
         Emit the terms-changed signal without any time out when the clear
-        button was clicked
+        button was clicked.
         """
         if icon == gtk.ENTRY_ICON_SECONDARY:
             self._on_clear(None)
@@ -105,32 +115,31 @@ class Notify(gtk.HBox):
             self._on_save(None)
     
     def _on_changed(self, widget):
-        "Show the clear icon"
+        "Show the clear icon."
         self._check_style()
 
     def _on_key_pressed(self, widget, event):
+        "Detect a keypress in the text box. Clear the text on 'Escape'."
         if event.keyval == gtk.keysyms.Escape:
             self.clear_with_no_signal()
             self.emit("terms-changed", "")
 
     def _on_save(self, *args):
-        'The user clicked save.'
+        "Apply the text to the screen."
         exposong.log.info('Setting notification to "%s".',
                           self.notify.get_text())
         self._text = self.notify.get_text()
         exposong.screen.screen.draw()
     
     def _on_clear(self, *args):
-        'The user clicked clear.'
+        "Remove the text from the screen."
         exposong.log.info('Clearing notification.')
         self.notify.set_text("")
         self._text = ""
         exposong.screen.screen.draw()
     
     def _check_style(self):
-        """
-        Use a different background colour if a search is active
-        """
+        "Use a different background color if a search is active."
         # show/hide icon
         if self._button_icons:
             if self.notify.get_text() != "":
@@ -151,7 +160,7 @@ class Notify(gtk.HBox):
             self.notify.modify_text(gtk.STATE_NORMAL, black)
             
     def _on_activate(self, *args):
-        'The user clicked enter on the entry.'
+        "The user clicked enter on the entry."
         self._on_save()
 
 #notify = Notify()

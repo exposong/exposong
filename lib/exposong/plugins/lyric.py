@@ -28,7 +28,7 @@ import re
 import os.path
 from datetime import datetime
 
-import exposong.application
+import exposong.main
 import exposong.slidelist
 import exposong._hook
 import undobuffer
@@ -672,7 +672,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         if not itr:
             return False
         msg = _('Are you sure you want to delete this slide? This cannot be undone.')
-        dialog = gtk.MessageDialog(exposong.application.main, gtk.DIALOG_MODAL,
+        dialog = gtk.MessageDialog(exposong.main.main, gtk.DIALOG_MODAL,
                                    gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
                                    msg)
         dialog.set_title( _('Delete Slide?') )
@@ -802,7 +802,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                 dialog.set_title( _('Editing Theme "%s"') % model.get_value(itr,0) )
             theme_value = model.get_value(itr,0)
             lang_value = model.get_value(itr,1)
-        themes = [thm.name for t in exposong.application.main.library
+        themes = [thm.name for t in exposong.main.main.library
                      if t[0].get_type() == "lyric"
                      for thm in t[0].song.props.themes]
         themes = sorted(set(themes))
@@ -850,7 +850,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                 dialog.set_title( _('Editing Songbook "%s"') % model.get_value(itr,0) )
             songbook_value = model.get_value(itr,0)
             entry_value = model.get_value(itr,1)
-        songbooks = [sbook.name for t in exposong.application.main.library
+        songbooks = [sbook.name for t in exposong.main.main.library
                      if t[0].get_type() == "lyric"
                      for sbook in t[0].song.props.songbooks]
         songbooks = sorted(set(songbooks))

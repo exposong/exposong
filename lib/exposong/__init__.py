@@ -16,6 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+Starts up the application. This module sets up the command line, starts logging,
+initializes translations, sets up path variables, and initializes the data
+directory if it is needed.
+"""
+
 import __builtin__
 import exposong.version
 import gettext
@@ -202,4 +208,4 @@ for folder in ('bg', 'pres', 'sched', 'image', 'theme'):
         os.mkdir(join(DATA_PATH, folder))
 
 # Import this last.
-from exposong.application import run
+from exposong.main import run

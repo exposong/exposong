@@ -21,6 +21,7 @@ import gtk
 import webbrowser
 import urllib
 
+import exposong.main
 import exposong.version
 import exposong._hook
 from exposong import RESOURCE_PATH, DATA_PATH
@@ -76,15 +77,15 @@ class Help(exposong._hook.Menu, object):
             fl.close()
         
         if err:
-            dlg = gtk.MessageDialog(exposong.application.main, 0,
+            dlg = gtk.MessageDialog(exposong.main.main, 0,
                                     gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE, msg)
             dlg.set_title(_("An Error Occurred"))
         elif new_version:
-            dlg = gtk.MessageDialog(exposong.application.main, 0,
-                                    gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO, msg)
+            dlg = gtk.MessageDialog(exposong.main.main, 0, gtk.MESSAGE_WARNING,
+                                    gtk.BUTTONS_YES_NO, msg)
             dlg.set_title(_("A New Version is Available"))
         else:
-            dlg = gtk.MessageDialog(exposong.application.main, 0,
+            dlg = gtk.MessageDialog(exposong.main.main, 0,
                                     gtk.MESSAGE_INFO, gtk.BUTTONS_OK, msg)
             dlg.set_title(_("ExpoSong is Up to Date"))
         if dlg.run() == gtk.RESPONSE_YES:

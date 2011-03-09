@@ -16,6 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+Manages the presentations from the current schedule.
+"""
+
 import os
 import gtk
 import gtk.gdk
@@ -25,17 +29,18 @@ import pango
 import exposong._hook
 import exposong.slidelist
 import exposong.schedlist
-import exposong.application
+import exposong.main
 from exposong import DATA_PATH, RESOURCE_PATH
 
 # Will hold the PresList instance
 preslist = None
 
 class PresList(gtk.TreeView, exposong._hook.Menu):
-    '''
-    Manage the presentation list.
-    '''
+    """
+    Manage the presentation list from the currently selected schedule.
+    """
     def __init__(self):
+        "Create the presentation interface."
         gtk.TreeView.__init__(self)
         self.set_size_request(-1, 250)
         self.prev_selection = None
@@ -65,10 +70,11 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
                 gtk.gdk.ACTION_DEFAULT | gtk.gdk.ACTION_MOVE)
         
     def _on_pres_added(self, model, path, iter):
+        "Select the recently added schedule."
         self.set_cursor(path)
     
     def get_active_item(self):
-        'Return the presentation of the currently selected item.'
+        "Return the presentation of the currently selected item."
         (model, s_iter) = self.get_selection().get_selected()
         if s_iter:
             return model.get_value(s_iter, 0)
@@ -92,13 +98,14 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         return bool(self.get_selection().count_selected_rows())
     
     def get_model(self):
+        "Get the model (schedule) that contains the items."
         model = gtk.TreeView.get_model(self)
         if isinstance(model, (gtk.TreeModelFilter, gtk.TreeModelSort)):
             return model.get_model()
         return model
     
     def get_filter_model(self):
-        'Return the filtered model if filter is active, else the unfiltered model'
+        'Return the filtered model if filter is active, else the unfiltered model.'
         return gtk.TreeView.get_model(self)
     
     def next_pres(self, *args):
@@ -203,7 +210,7 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         if not item:
             return False
         msg = _('Are you sure you want to delete "%s" from your library?')
-        dialog = gtk.MessageDialog(exposong.application.main, gtk.DIALOG_MODAL,
+        dialog = gtk.MessageDialog(exposong.main.main, gtk.DIALOG_MODAL,
                                    gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
                                    msg % item.get_title())
         dialog.set_title( _("Delete Presentation?") )
@@ -231,7 +238,7 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
             self._on_pres_activate()
 
     def _on_pres_remove_from_schedule(self, *args):
-        'Remove the schedule from the current schedule.'
+        'Remove the presentation from the current schedule.'
         sched, itr = self.get_selection().get_selected()
         if not itr or sched.builtin:
             return False
@@ -243,7 +250,7 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         cell.set_property('pixbuf', pres.get_icon())
     
     def _get_timer_icon(self, column, cell, model, titer):
-        'Returns the icon of the current presentation.'
+        'Returns a timer icon if the timer is set.'
         if not hasattr(self, "_timer_icon"):
             fl = os.path.join(RESOURCE_PATH, 'timer.png')
             self._timer_icon = gtk.gdk.pixbuf_new_from_file_at_size(fl, 20, 14)
@@ -259,7 +266,7 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         cell.set_property('text', pres.get_title())
     
     def _on_pres_rt_click(self, widget, event):
-        'The user right clicked in the presentation list area.'
+        'Display the context menu on right click.'
         if event.button != 3:
             return
         actions = self._actions
@@ -281,12 +288,12 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
     
     @staticmethod
     def get_model_args():
-        'Get the arguments to pass to `gtk.ListStore`.'
+        "Get the arguments for the model."
         return (gobject.TYPE_PYOBJECT,)
     
     @classmethod
     def merge_menu(cls, uimanager):
-        'Merge new values with the uimanager.'
+        "Create menu items."
         global preslist
         cls._actions = gtk.ActionGroup('preslist')
         cls._actions.add_actions([

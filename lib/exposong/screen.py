@@ -16,6 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+The Screen class provides the presentation screen for ExpoSong. This will
+initialize the window and set up a few things, but most of the rendering is
+done by the theme.
+"""
+
 import gtk
 import pango
 import cairo
@@ -25,7 +31,7 @@ import os
 from gtk.gdk import pixbuf_new_from_file as pb_new
 from gtk.gdk import pixbuf_new_from_file_at_size as pb_new_at_size
 
-import exposong.application
+import exposong.main
 import exposong.prefs
 import exposong.slidelist
 import exposong.theme
@@ -35,20 +41,29 @@ import exposong.notify
 
 
 def c2dec(color):
+    """Convert the GTK color to decimal (Values of 0.0 to 1.0).
+    
+    color: A tuple or list representing the color. It will normally look like
+           [Red, Green, Blue], or [Red, Green, Blue, Opacity].
+    """
     if isinstance(color, (tuple, list)):
         return tuple(c2dec(x) for x in color)
     else:
         return color / 65535.0
 
-screen = None # will be the instance variable for Screen once Main runs
+screen = None 
+"This will be the instance variable for Screen once Main runs."
+
 PREV_HEIGHT = 145
+"This static value determines the height of the preview screen."
 
 class Screen(exposong._hook.Menu):
     '''
-    Manage the window for presentation.
+    The presentation screen for ExpoSong.
     '''
     
     def __init__(self):
+        "Create the screen's GUI."
         self.aspect = 4 / 3
         self._size = None
         
@@ -110,11 +125,14 @@ class Screen(exposong._hook.Menu):
         return self._size
     
     def get_aspect(self):
+        "Returns the current aspect ratio (width / height)."
         return self.aspect
     
     def draw(self):
-        '''Redraw the presentation and preview screens.
-           Draw preview only when freeze is active'''
+        '''
+        Redraw the presentation and preview screens.
+        Draw preview only when freeze is active.
+        '''
         if self._actions.get_action('Freeze').get_active() or not self.is_viewable():
             self.preview.queue_draw()
         else:
@@ -148,6 +166,7 @@ class Screen(exposong._hook.Menu):
         self._draw(self.preview)
     
     def is_viewable(self):
+        "Return true if the screen is currently visible."
         state = self.pres.window and self.pres.window.is_viewable()
         if state is None:
             return False
@@ -155,12 +174,11 @@ class Screen(exposong._hook.Menu):
     
     def is_running(self):
         'The presentation is visible and running (not black or background).'
-        # TODO ?
         return self.is_viewable() and not (
-                self._actions.get_action('Black Screen').get_active() or
-                self._actions.get_action('Logo').get_active() or
-                self._actions.get_action('Background').get_active() or
-                self._actions.get_action('Freeze').get_active())
+               self._actions.get_action('Black Screen').get_active() or
+               self._actions.get_action('Logo').get_active() or
+               self._actions.get_action('Background').get_active() or
+               self._actions.get_action('Freeze').get_active())
     
     def _draw(self, widget):
         'Render `widget`.'
@@ -212,7 +230,6 @@ class Screen(exposong._hook.Menu):
                 exposong.theme.Theme.render_color(ccontext, bounds, logoclr.to_string())
                 self.__logo_img.draw(ccontext, bounds, None)
             elif self._actions.get_action('Background').get_active():
-                #When there's no text to render, just draw the background
                 theme.render(ccontext, bounds, None)
             else:
                 theme.render(ccontext, bounds, slide)
@@ -233,7 +250,7 @@ class Screen(exposong._hook.Menu):
     
     @classmethod
     def merge_menu(cls, uimanager):
-        'Merge new values with the uimanager.'
+        'Create menu items.'
         global screen
         gtk.stock_add([
             ("screen-black",_("_Black"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
@@ -303,7 +320,7 @@ class Screen(exposong._hook.Menu):
     
     @classmethod
     def get_button_bar_secondary(cls):
-        "Return the presentation button widget."
+        "Return the presentation display widget."
         tb = gtk.Toolbar()
         # FIXME It would be nice to get rid of the shadow on the toolbars, but
         # they are read-only style properties.
@@ -368,14 +385,14 @@ class Screen(exposong._hook.Menu):
         else:
             self._secondary_button_toggle(None)
             msg = _('No Logo set. Do you want to choose a Logo now?')
-            dialog = gtk.MessageDialog(exposong.application.main, gtk.DIALOG_MODAL,
+            dialog = gtk.MessageDialog(exposong.main.main, gtk.DIALOG_MODAL,
                                        gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
                                        msg)
             dialog.set_title( _("Set Logo?") )
             resp = dialog.run()
             dialog.destroy()
             if resp == gtk.RESPONSE_YES:
-                exposong.prefs.PrefsDialog(exposong.application.main)
+                exposong.prefs.PrefsDialog(exposong.main.main)
                 if os.path.isfile(config.get("screen", "logo")):
                     self.to_logo()
             else:

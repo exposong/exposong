@@ -25,7 +25,7 @@ from exposong import DATA_PATH
 from exposong import SHARED_FILES
 from exposong.config import config
 import exposong.screen
-import exposong.application
+import exposong.main
 
 '''
 Dialog for changing settings in ExpoSong.
@@ -36,6 +36,11 @@ class PrefsDialog(gtk.Dialog):
     Dialog to configure user preferences.
     '''
     def __init__(self, parent):
+        """
+        Create the preferences GUI dialog.
+        
+        parent: the primary window that the dialog will be centered on.
+        """
         gtk.Dialog.__init__(self, _("Preferences"), parent, 0,
                             (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                             gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
@@ -60,7 +65,7 @@ class PrefsDialog(gtk.Dialog):
         
         gui.append_section_title(table, _("Lyrics"), 2)
         g_ccli = gui.append_entry(table, "CCLI #", config.get("general","ccli"), 3)
-        songbooks = [sbook.name for t in exposong.application.main.library
+        songbooks = [sbook.name for t in exposong.main.main.library
                      if t[0].get_type() == "lyric"
                      for sbook in t[0].song.props.songbooks]
         songbooks = sorted(set(songbooks))

@@ -21,7 +21,7 @@ import gtk.gdk
 from openlyrics import openlyrics
 from xml.etree import cElementTree as etree
 
-import exposong.application
+import exposong.main
 import exposong.slidelist
 import exposong._hook
 from exposong.glob import *
@@ -162,10 +162,10 @@ class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
     @classmethod
     def import_dialog(cls, action):
         dlg = gtk.FileChooserDialog(_("Import SongSelect Lyrics"),
-                                    exposong.application.main,
+                                    exposong.main.main,
                                     gtk.FILE_CHOOSER_ACTION_OPEN,
                                     (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                                        gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+                                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         dlg.set_select_multiple(True)
         filter = gtk.FileFilter()
         filter.set_name(_("SongSelect File (%s)") % ".usr")
@@ -177,7 +177,7 @@ class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
             files = dlg.get_filenames()
             for file in files:
                 filename = cls.convert(unicode(file), True)
-                exposong.application.main.load_pres(filename)
+                exposong.main.main.load_pres(filename)
             config.set("dialogs", "songselect-import-dir", os.path.dirname(file))
         dlg.destroy()
     

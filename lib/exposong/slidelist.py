@@ -16,6 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+The SlideList class displays the slides for the currently select presentation.
+"""
+
 import gtk
 import gobject
 import pango
@@ -28,9 +32,10 @@ slide_scroll = None
 
 class SlideList(gtk.TreeView, exposong._hook.Menu):
     '''
-    An instance of gtk.TreeView showing the slides of a presentation.
+    The slides of a presentation.
     '''
     def __init__(self):
+        "Create the interface."
         self.pres = None
         self.slide_order = ()
         self.slide_order_index = -1

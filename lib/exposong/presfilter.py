@@ -24,15 +24,26 @@
 # this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 # Place, Suite 330, Boston, MA 02111-1307 USA
 
+"""
+The PresFilter class will allow the user to search the presentations by text.
+"""
+
 import gtk
 import gobject
 
-import exposong.application
+import exposong.main
 import exposong.preslist
 
 presfilter = None #will hold PresFilter instance
 
 class PresFilter(gtk.Entry, exposong._hook.Menu):
+    """
+    This provides an interface that will allow the user to search the
+    presentations by text.
+    
+    It creates an enhanced IconEntry that supports a timeout when typing
+    and uses a different background colour when the search is active.    
+    """
 
     __gsignals__ = {'terms-changed':(gobject.SIGNAL_RUN_FIRST,
                                     gobject.TYPE_NONE,
@@ -41,20 +52,15 @@ class PresFilter(gtk.Entry, exposong._hook.Menu):
     SEARCH_TIMEOUT = 200
 
     def __init__(self):
-        """
-        Creates an enhanced IconEntry that supports a timeout when typing
-        and uses a different background colour when the search is active
-        """
+        "Initialize the PresFilter."
         gtk.Entry.__init__(self)
         
         self._handler_changed = self.connect_after("changed",
                                                    self._on_changed)
         
         self.connect("key-press-event", self._on_key_pressed)
-        self.connect("focus-in-event",
-                     exposong.application.main.disable_shortcuts)
-        self.connect("focus-out-event",
-                     exposong.application.main.enable_shortcuts)
+        self.connect("focus-in-event", exposong.main.main.disable_shortcuts)
+        self.connect("focus-out-event", exposong.main.main.enable_shortcuts)
         self.connect("terms-changed", self._filter)
         
         # Make sure icons are supported by GTK version
@@ -91,16 +97,18 @@ class PresFilter(gtk.Entry, exposong._hook.Menu):
             self.grab_focus()
 
     def _on_key_pressed(self, widget, event):
+        "Detect a keypress in the text box. Clear the text on 'Escape'."
         if event.keyval == gtk.keysyms.Escape:
             self.clear_with_no_signal()
             self.emit("terms-changed", "")
 
     def clear(self):
+        "Removes the text from the entry."
         self.set_text("")
         self._check_style()
 
     def clear_with_no_signal(self):
-        """Clear and do not send a term-changed signal"""
+        "Clear and do not send a term-changed signal."
         self.handler_block(self._handler_changed)
         self.clear()
         self.handler_unblock(self._handler_changed)
@@ -121,9 +129,7 @@ class PresFilter(gtk.Entry, exposong._hook.Menu):
                                                  self._emit_terms_changed)
 
     def _check_style(self):
-        """
-        Use a different background colour if a search is active
-        """
+        "Use a different background color if a search is active."
         # show/hide icon
         if self.use_icons:
             if self.get_text() != "":

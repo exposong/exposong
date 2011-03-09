@@ -22,7 +22,7 @@ import tempfile
 import tarfile
 import mimetypes
 
-import exposong.application
+import exposong.main
 import exposong.schedlist
 from exposong import DATA_PATH, options
 from exposong.plugins import Plugin
@@ -64,7 +64,7 @@ class ExportImport(Plugin, exposong._hook.Menu):
         if not sched:
             return False
         dlg = gtk.FileChooserDialog(_("Export Current Schedule"),
-                                    exposong.application.main,
+                                    exposong.main.main,
                                     gtk.FILE_CHOOSER_ACTION_SAVE,
                                     (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                     gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
@@ -87,7 +87,7 @@ class ExportImport(Plugin, exposong._hook.Menu):
     @classmethod
     def _get_sched_list(cls, *args):
         'Returns a list with a single schedule and belonging presentations'
-        exposong.application.main._save_schedules()
+        exposong.main.main._save_schedules()
         sched = exposong.schedlist.schedlist.get_active_item()
         sched_list = []
         sched_list.append((os.path.join(DATA_PATH, "sched", sched.filename),
@@ -109,7 +109,7 @@ class ExportImport(Plugin, exposong._hook.Menu):
     @classmethod
     def export_lib(cls, *args):
         'Export the full library to tar-compressed file.'
-        dlg = gtk.FileChooserDialog(_("Export Library"), exposong.application.main,
+        dlg = gtk.FileChooserDialog(_("Export Library"), exposong.main.main,
                                     gtk.FILE_CHOOSER_ACTION_SAVE,
                                     (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                     gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
@@ -131,8 +131,8 @@ class ExportImport(Plugin, exposong._hook.Menu):
     def _get_library_list(cls, *args):
         'Returns a list with all items in pres, image and sched folder'
         #Make sure schedules are up to date.
-        exposong.application.main._save_schedules() 
-        library = exposong.application.main.library
+        exposong.main.main._save_schedules() 
+        library = exposong.main.main.library
         itr = library.get_iter_first()
         lib_list = []
         while itr:
@@ -154,7 +154,7 @@ class ExportImport(Plugin, exposong._hook.Menu):
     @classmethod
     def export_backgrounds(cls, *args):
         'Export the backgrounds to tar-compressed file'
-        dlg = gtk.FileChooserDialog(_("Export Backgrounds"), exposong.application.main,
+        dlg = gtk.FileChooserDialog(_("Export Backgrounds"), exposong.main.main,
                                     gtk.FILE_CHOOSER_ACTION_SAVE,
                                     (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                     gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
@@ -189,7 +189,7 @@ class ExportImport(Plugin, exposong._hook.Menu):
     @classmethod
     def import_dialog(cls, *args):
         'Import a schedule, backgrounds or library.'
-        dlg = gtk.FileChooserDialog(_("Import"), exposong.application.main,
+        dlg = gtk.FileChooserDialog(_("Import"), exposong.main.main,
                                     gtk.FILE_CHOOSER_ACTION_OPEN,
                                     (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                     gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
@@ -237,13 +237,13 @@ class ExportImport(Plugin, exposong._hook.Menu):
                 if not os.path.exists(os.path.join(DATA_PATH, "pres", nm)):
                     shutil.move(os.path.join(tmpdir, "pres", nm),
                                 os.path.join(DATA_PATH, "pres", nm))
-                    exposong.application.main.load_pres(nm)
+                    exposong.main.main.load_pres(nm)
                 else:
                     nm2 = find_freefile(os.path.join(DATA_PATH, "pres", nm))
                     nm2 = nm2.rpartition(os.sep)[2]
                     shutil.move(os.path.join(tmpdir, "pres", nm), 
                                 os.path.join(DATA_PATH, "pres", nm2))
-                    exposong.application.main.load_pres(nm2)
+                    exposong.main.main.load_pres(nm2)
                     pres2rename.append((nm,nm2))
 
         if os.path.isdir(os.path.join(tmpdir, "sched")):
@@ -264,13 +264,13 @@ class ExportImport(Plugin, exposong._hook.Menu):
                 if not os.path.exists(os.path.join(DATA_PATH, "sched", nm)):
                     shutil.move(os.path.join(tmpdir, "sched", nm),
                                 os.path.join(DATA_PATH, "sched", nm))
-                    exposong.application.main.load_sched(nm)
+                    exposong.main.main.load_sched(nm)
                 else:
                     nm2 = find_freefile(os.path.join(DATA_PATH, "sched", nm))
                     nm2 = nm2.rpartition(os.sep)[2]
                     shutil.move(os.path.join(tmpdir, "sched", nm),
                                 os.path.join(DATA_PATH, "sched", nm2))
-                    exposong.application.main.load_sched(nm2)
+                    exposong.main.main.load_sched(nm2)
 
         if os.path.isdir(os.path.join(tmpdir, "bg")):
             images = os.listdir(os.path.join(tmpdir, "bg"))

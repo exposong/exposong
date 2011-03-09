@@ -27,7 +27,7 @@ import pango
 import re
 from gtk.gdk import pixbuf_new_from_file as pb_new
 
-import exposong.application
+import exposong.main
 import exposong.screen
 import exposong.theme
 from exposong import themeeditor
@@ -166,7 +166,7 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         self._set_menu_items_disabled()
     
     def new_theme(self, *args):
-        themeeditor.ThemeEditor(exposong.application.main)
+        themeeditor.ThemeEditor(exposong.main.main)
         
     def edit_theme(self, *args):
         print self.get_active()
@@ -174,7 +174,7 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         if theme.is_builtin():
             raise Exception("Builtin themes cannot be modified.")
         filename = os.path.join(DATA_PATH, "theme", theme.filename)
-        themeeditor.ThemeEditor(exposong.application.main, filename)
+        themeeditor.ThemeEditor(exposong.main.main, filename)
     
     def delete_theme(self, *args):
         #TODO

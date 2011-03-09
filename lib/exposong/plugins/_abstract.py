@@ -24,7 +24,7 @@ from xml.etree import cElementTree as etree
 from exposong.glob import *
 from exposong import DATA_PATH
 from exposong import theme
-import exposong.application
+import exposong.main
 import exposong.schedlist
 
 '''
@@ -199,7 +199,7 @@ class Presentation:
     def edit(self):
         'Run the edit edit_dialog for the presentation.'
         # TODO Slides need to be deep copied so that "Cancel" actually works.
-        edit_dialog = gtk.Dialog(_("New Presentation"), exposong.application.main,
+        edit_dialog = gtk.Dialog(_("New Presentation"), exposong.main.main,
                                  gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
                                  (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                  gtk.STOCK_SAVE, gtk.RESPONSE_ACCEPT))

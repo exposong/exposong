@@ -20,7 +20,7 @@ import locale
 import pango
 
 import exposong.preslist
-import exposong.application
+import exposong.main
 import exposong._hook
 from exposong import gui
 from exposong.plugins import _abstract, Plugin
@@ -101,7 +101,7 @@ class Print(Plugin, exposong._hook.Menu):
     
     def _songlist_markup(self, operation=None, context=None, page_nr=None):
         'Create the page layout for the songlist'
-        library = exposong.application.main.library
+        library = exposong.main.main.library
         songs = ""
         for item in library:
             if item[0].get_type() == "lyric":

@@ -16,12 +16,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+The ScheduleList class provides a list of builtin and custom schedules that the
+user can select.
+"""
+
 import gtk
 import gtk.gdk
 import gobject
 import xml.dom
 
-import exposong.application
+import exposong.main
 import exposong._hook
 import exposong.preslist
 import exposong.schedule
@@ -37,6 +42,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu):
     A TreeView of presentation schedules.
     '''
     def __init__(self):
+        "Initialize the interface of the schedule."
         gtk.TreeView.__init__(self)
         self.set_size_request(200, 80)
         #Columns: Schedule, Name
@@ -51,10 +57,10 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu):
         column = gtk.TreeViewColumn( _("Schedules"), sched_rend, text=1)
         
         sched_rend.connect("editing-started",
-                exposong.application.main.disable_shortcuts)
+                exposong.main.main.disable_shortcuts)
         sched_rend.connect("editing-canceled",
-                exposong.application.main.enable_shortcuts)
-        sched_rend.connect("edited", exposong.application.main.enable_shortcuts)
+                exposong.main.main.enable_shortcuts)
+        sched_rend.connect("edited", exposong.main.main.enable_shortcuts)
         sched_rend.connect("edited", self._rename_schedule)
         column.set_resizable(False)
         column.set_cell_data_func(sched_rend, self._cell_data_func)
@@ -253,7 +259,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu):
             scheds.append((model.get_value(itr, 0), model.get_value(itr, 1)))
             itr = model.iter_next(itr)
         
-        uimanager = exposong.application.main.uimanager
+        uimanager = exposong.main.main.uimanager
         
         if hasattr(self,'_sched_actiongroup'):
             uimanager.remove_action_group(self._sched_actiongroup)
@@ -279,7 +285,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu):
     
     @classmethod
     def merge_menu(cls, uimanager):
-        'Merge new values with the uimanager.'
+        "Create menu items."
         global schedlist
         cls._actions = gtk.ActionGroup('schedlist')
         cls._actions.add_actions([
