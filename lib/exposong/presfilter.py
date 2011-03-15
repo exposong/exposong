@@ -160,7 +160,10 @@ class PresFilter(gtk.Entry, exposong._hook.Menu):
 
     def _visible_func(self, model, itr):
         'Tests the row for visibility.'
-        return model.get_value(itr, 0).matches(self.get_text())
+        pres = model.get_value(itr, 0)
+        if pres is not None:
+            return pres.matches(self.get_text())
+        return False
 
     def focus(self, *args):
         'Sets the focus (for a menu action).'

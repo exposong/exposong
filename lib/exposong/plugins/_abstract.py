@@ -182,7 +182,7 @@ class Presentation:
     def matches(self, text):
         'Tests to see if the presentation matches `text`.'
         # Remove some punctuation marks from title and search text
-        blacklist = ",'?!"
+        blacklist = ".,'?!"
         title = self.get_title()
         for char in blacklist:
             text = text.replace(char, "")

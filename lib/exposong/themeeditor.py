@@ -189,8 +189,7 @@ class ThemeEditor(gtk.Window):
                 "for point 12 font is 6 points."), 5)
         ## Text Outline
         gui.append_section_title(body_table_right, _("Text Outline"), 6)
-        self._body_text_outline_size = gui.append_spinner(body_table_right, _("Size (Pixel)"), gtk.Adjustment(1.0, 0.0, 3.0, 0.1, 1.0, 0), 7)
-        self._body_text_outline_size.set_digits(1)
+        self._body_text_outline_size = gui.append_spinner(body_table_right, _("Size (Pixel)"), gtk.Adjustment(1.0, 0.0, 3.0, 1.0, 1.0, 0), 7)
         self._body_text_outline_color = gui.append_color(body_table_right, _("Color"), (0,0,0,0), 8, alpha=True)
         
         body_h.pack_start(body_table_left)

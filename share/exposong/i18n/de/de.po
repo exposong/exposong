@@ -1090,7 +1090,7 @@ msgstr "Bitte geben Sie ein Liederbuch ein."
 
 #: lib/exposong/plugins/lyric.py:815
 msgid "You must enter at least one title."
-msgstr "Sie müssen wenigstens einen Title eingeben."
+msgstr "Sie müssen wenigstens einen Titel eingeben."
 
 #: lib/exposong/plugins/lyric.py:905
 msgid "Order:"
