@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="388"
+   height="149"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.45.1"
+   version="1.0"
+   sodipodi:docbase="/home/brad/exposong/share/exposong/res"
+   sodipodi:docname="exposong.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <defs
+     id="defs4">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient2443">
+      <stop
+         style="stop-color:#005599;stop-opacity:1"
+         offset="0"
+         id="stop2445" />
+      <stop
+         style="stop-color:#0071c8;stop-opacity:1"
+         offset="1"
+         id="stop2447" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient2443"
+       id="linearGradient2449"
+       x1="441"
+       y1="15.5"
+       x2="298"
+       y2="144"
+       gradientUnits="userSpaceOnUse" />
+    <mask
+       maskUnits="userSpaceOnUse"
+       id="mask2453">
+      <path
+         style="fill:#ffffff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="M 299.81328,11.557828 L 323.1478,153.68629 L 420.02143,154.3934 L 441.94174,10.143615 L 299.81328,11.557828 z "
+         id="path2455" />
+    </mask>
+    <filter
+       inkscape:collect="always"
+       x="-0.044338204"
+       width="1.0886765"
+       y="-0.19142917"
+       height="1.3828583"
+       id="filter3490">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="6.0759619"
+         id="feGaussianBlur3492" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="217.56286"
+     inkscape:cy="132.76331"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     width="388px"
+     height="149px"
+     showborder="true"
+     borderlayer="false"
+     inkscape:showpageshadow="true"
+     inkscape:window-width="963"
+     inkscape:window-height="627"
+     inkscape:window-x="5"
+     inkscape:window-y="49" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:url(#linearGradient2449);fill-opacity:1;stroke-width:3.79999995;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect2390"
+       width="148"
+       height="134"
+       x="295"
+       y="13"
+       mask="url(#mask2453)"
+       transform="matrix(1.038222,0,0,0.9050155,-87.459252,2.3058657)" />
+    <text
+       id="text2457"
+       y="98.839104"
+       x="17.558388"
+       style="font-size:12px;font-style:normal;font-weight:normal;opacity:0.4;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3490);font-family:Bitstream Vera Sans"
+       xml:space="preserve"><tspan
+         style="font-size:72px;fill:#ffffff;font-family:Aubrey"
+         y="98.839104"
+         x="17.558388"
+         id="tspan2459"
+         sodipodi:role="line">ExpoSong</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="17.558388"
+       y="98.839104"
+       id="text2386"><tspan
+         sodipodi:role="line"
+         id="tspan2388"
+         x="17.558388"
+         y="98.839104"
+         style="font-size:72px;font-family:Aubrey">ExpoSong</tspan></text>
+  </g>
+</svg>
