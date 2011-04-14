@@ -27,6 +27,7 @@ import pango
 import re
 import os.path
 from datetime import datetime
+from xml.sax.saxutils import escape, unescape
 
 import exposong.main
 import exposong.slidelist
@@ -139,9 +140,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             'Draw text on the footer.'
             jn = ['"%s"' % self.pres.title]
             # TODO List only translators for the current translation.
-            author = '; '.join(u'%s: %s' %
-                               (auth_types.get(a.type, _("Written By")), str(a))
-                               for a in self.pres.song.props.authors )
+            author = self.pres._get_authors_string()
             if len(author) > 0:
                 jn.append(author)
             if len(self.pres.song.props.copyright):
@@ -959,6 +958,22 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             return ((slide, slide.get_markup()),) + _abstract.Presentation.get_slide_list(self)
         else:
             return self.get_slide_list()
+
+    def _get_authors_string(self):
+        """"Returns a string with the authors of the song.
+        Replaces multiple occurences with '&'"""
+        authlist = []
+        for a in self.song.props.authors:
+            auth_type = auth_types.get(a.type, _("Written By"))
+            same = False
+            for auth in authlist:
+                if auth[1] == str(a):
+                    auth[0] = "%s &amp; %s" %(auth[0], auth_type)
+                    same = True
+            if not same:
+                authlist.append([auth_type, str(a)])
+        s = "; ".join(u'%s: %s'%(a[0], a[1]) for a in authlist)
+        return s
     
     def get_print_markup(self):
         "Return the presentation markup for printing."
@@ -966,9 +981,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                  % self.get_title()
         info = []
         if self.song.props.authors:
-            info.append('; '.join(u'%s: %s' %
-                        (auth_types.get(a.type, _("Written By")), str(a))
-                        for a in self.song.props.authors))
+            info.append(self._get_authors_string())
         if self.song.props.copyright:
             info.append(u"Copyright \xA9 %s" % self.song.props.copyright)
         if config.get("general", "ccli"):
@@ -985,7 +998,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                 verses += ","
             verses = verses.strip(",") #remove last comma
             info.append(verses)
-        markup += "<span face='sans' weight='bold' size='x-small'>%s</span>\n"\
+        markup += "<span face='sans' style='italic' size='x-small'>%s</span>\n"\
                  % "\n".join(info)
         markup += "\n\n"
         # Should this print the slides in order, or just the order list?
@@ -993,10 +1006,13 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         for slide in self.get_slide_list():
             markup += "<span weight='bold' face='sans' size='%%(fontsize)d'>%s</span>\n"\
                       % slide[0].get_title()
-            markup += "<span face='serif' size='%%(fontsize)d'>%s</span>\n\n"\
+            markup += "<span face='sans' size='%%(fontsize)d'>%s</span>\n\n"\
                       % slide[0].get_text()
-        
         return markup
+    
+    def can_print(self):
+        "Return True if printing is available."
+        return True
     
     @classmethod
     def is_type(cls, fl):
@@ -1087,8 +1103,9 @@ class SlideEdit(gtk.Dialog):
         
         self.connect("delete-event", self._quit_without_save)
         
-        self.slide_title = slide.title
-        self.slide_text = slide.get_text()
+        #TODO: unescape() temporarily until HTML Editor
+        self.slide_title = unescape(slide.title)
+        self.slide_text = unescape(slide.get_text())
         self.changed = False
         
         self.set_border_width(4)
@@ -1203,9 +1220,10 @@ class SlideEdit(gtk.Dialog):
         return self.slide_text
     
     def _save(self):
-        self.slide_title = self._get_title_value()
+        #TODO: escape() temporarily until HTML Editor
+        self.slide_title = escape(self._get_title_value())
         bounds = self._buffer.get_bounds()
-        self.slide_text = self._buffer.get_text(bounds[0], bounds[1])
+        self.slide_text = escape(self._buffer.get_text(bounds[0], bounds[1]))
         self.changed = True
     
     def _ok_to_continue(self):

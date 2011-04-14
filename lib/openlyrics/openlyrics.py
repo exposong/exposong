@@ -31,6 +31,7 @@ import re
 from datetime import datetime
 from xml.etree import cElementTree as etree
 from StringIO import StringIO
+from xml.sax.saxutils import escape, unescape
 
 
 OLYR_NS = u'http://openlyrics.info/namespace/2009/song'
@@ -59,13 +60,13 @@ def fromstring(text):
 def tostring(song, pretty_print=True, update_metadata=True):
     'Convert to a file.'
     tree = song._to_xml(pretty_print, update_metadata)
-    text = etree.tostring(tree.getroot(), encoding='UTF-8')
+    text = etree.tostring(tree.getroot(), encoding='UTF-8', method='html')
     return unicode(text, 'UTF-8') # convert to unicode string
 
 
 def parse(filename):
     'Read from the file.'
-    tree = etree.parse(filename)
+    tree = etree.parse(filename, method='html')
     song = Song(tree)
     return song
 
@@ -601,7 +602,7 @@ class Lines(object):
         if self.part:
             lines_elem.set('part', self.part)
         for line in self.lines:
-            line = u'<line>%s</line>' % line.markup
+            line = u'<line>%s</line>' %line.markup
             try:
                 line_elem = etree.fromstring(line.encode('UTF-8'))
             except SyntaxError:

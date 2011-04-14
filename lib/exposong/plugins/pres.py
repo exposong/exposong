@@ -736,7 +736,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         return markup
     
     def can_print(self):
-        "Return True of printing is available."
+        "Return True if printing is available."
         return True
     
     @classmethod

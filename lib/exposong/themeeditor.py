@@ -184,9 +184,8 @@ class ThemeEditor(gtk.Window):
         self._body_shadow_offset_x.set_digits(1)
         self._body_shadow_offset_y = gui.append_spinner(body_table_right, _("y-Offset"), gtk.Adjustment(0.5, -1.0, 1.0, 0.1, 0.5, 0), 4)
         self._body_shadow_offset_y.set_digits(1)
-        gui.append_comment(body_table_right, _("Shadow offsets are measure " +
-                "in percentage of font height. So an offset of 0.5 " +
-                "for point 12 font is 6 points."), 5)
+        gui.append_comment(body_table_right, _("Shadow offsets are measured \
+in percentage of font height. So an offset of 0.5 for point 12 font is 6 points."), 5)
         ## Text Outline
         gui.append_section_title(body_table_right, _("Text Outline"), 6)
         self._body_text_outline_size = gui.append_spinner(body_table_right, _("Size (Pixel)"), gtk.Adjustment(1.0, 0.0, 3.0, 1.0, 1.0, 0), 7)
