@@ -37,10 +37,13 @@ class ESTable(gtk.Table):
     """
     This class will assist in laying out widgets in a standardized way.
     """
-    def __init__(self, rows=1, cols=1):
-        gtk.Table.__init__(self, rows, cols*2)        
-        self.set_row_spacings(4)
+    def __init__(self, rows=1, cols=1, row_spacing=4, auto_inc_y=False):
+        gtk.Table.__init__(self, rows, cols*2)
+        self.set_row_spacings(row_spacing)
         self.set_border_width(6)
+        self.auto_inc = auto_inc_y
+        if self.auto_inc:
+            self.y = 0
     
     def _set_options(self, kw):
         'Set default options for attaching.'
@@ -53,6 +56,8 @@ class ESTable(gtk.Table):
         'Add a widget.'
         x1 = x*2
         x2 = x*2+w*2
+        if self.auto_inc:
+            y = self.y
         y1 = y
         y2 = y+h
         if label:
@@ -61,6 +66,9 @@ class ESTable(gtk.Table):
         
         self._set_options(kw)
         self.attach(widget, x1, x2, y1, y2, **kw)
+        if self.auto_inc:
+            self.y +=1
+        return widget
     
     def attach_spinner(self, adjust, climb_rate=0.0, digits=0, label=None,
                        x=0, y=0, w=1, h=1, **kw):
@@ -79,10 +87,43 @@ class ESTable(gtk.Table):
         self.attach_widget(widget, label, x, y, w, h, **kw)
         return widget
     
+    def attach_filechooser(self, label, value=None, x=0, y=0, w=1, h=1, **kw):
+        'Adds a file widget to a table and returns it.'
+        filech = gtk.FileChooserButton( _("Choose File") )
+        filech.set_width_chars(15)
+        if value:
+            filech.set_filename(value)
+        else:
+            filech.set_current_folder(os.path.expanduser('~'))
+        self.attach_widget(filech, label, x, y, w, h, **kw)
+        return filech
+    
+    def attach_section_title(self, title, x=0, y=0, w=1, h=1, **kw):
+        'Adds a title for the current section.'
+        label = gtk.Label()
+        label.set_markup("<b>"+title+"</b>")
+        label.set_alignment(0.0, 1.0)
+        kw.setdefault('ypadding', 8)
+        self.attach_widget(label, x, x, y, y+1, **kw)
+        return label
+    
+    def attach_comment(self, title, x=0, y=0, w=1, h=1, **kw):
+        label = gtk.Label()
+        label.set_markup("<i><small>"+title+"</small></i>")
+        label.set_line_wrap(True)
+        label.set_alignment(0.0, 1.0)
+        self.attach_widget(label, x, x, y, y+h, **kw)
+        return label
+    
+    def attach_hseparator(self, x=0, y=0, w=1, h=1, **kw):
+        s = gtk.HSeparator()
+        self.attach_widget(s, x, x, y, y+h, **kw)
+        return s
+    
     def attach_label(self, label, x=0, y=0, w=1, h=1, **kw):
         'Add a label widget.'
         label2 = gtk.Label(label)
-        label2.set_alignment(1.0, 0.0)
+        label2.set_alignment(0.0, 0.5)
         if 'internal' not in kw:
             w *= 2
         else:

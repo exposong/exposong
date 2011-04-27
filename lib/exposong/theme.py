@@ -107,7 +107,7 @@ class Theme(object):
         elif self.filename:
             return os.path.basename(self.filename).rstrip('.xml').title()
         else:
-            return ""
+            return _("Unnamed Theme")
     
     def is_builtin(self):
         "Save/Editable only if not builtin."
@@ -499,7 +499,7 @@ class GradientStop(_Element):
     """
     A location with a color in a gradient background.
     """
-    def __init__(self, location=None, color=None, alpha=1.0):
+    def __init__(self, location=0.5, color='#fff', alpha=1.0):
         ""
         self.location = location
         self.color = color
@@ -608,7 +608,7 @@ class Section(_Element):
             setups.
     """
     def __init__(self, type_=None, font="Sans 24", color="#fff", align=CENTER,
-                 valign=MIDDLE, spacing=1.0, outline_color=None, outline_size=1,
+                 valign=MIDDLE, spacing=1.0, outline_color=None, outline_size=0,
                  shadow_color=None, shadow_opacity=0.4, shadow_offset=None,
                  pos=None, expand=None):
         _Element.__init__(self)

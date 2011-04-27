@@ -169,7 +169,6 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         themeeditor.ThemeEditor(exposong.main.main)
         
     def edit_theme(self, *args):
-        print self.get_active()
         theme = self.get_active()
         if theme.is_builtin():
             raise Exception("Builtin themes cannot be modified.")
