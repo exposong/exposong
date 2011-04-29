@@ -54,7 +54,7 @@ class ThemeEditor(gtk.Window):
         # Title entry
         title_table = gui.Table(1)
         self._title_entry = gui.append_entry(title_table, _("Theme Name"), _("New Theme"), 0)
-        main_v.pack_start(title_table)
+        main_v.pack_start(title_table, False, False)
         
         notebook = gtk.Notebook()
         main_v.pack_start(notebook, True, True, 5)
@@ -110,10 +110,13 @@ class ThemeEditor(gtk.Window):
         self._bg_model.connect("row-changed", self._on_bgs_reordered)
         self._treeview_bgs.get_selection().connect("changed", self._on_bg_changed)
         
-        bg_left = gui.Table(10)
+        bg_left = gtk.VBox()
         gui.append_comment(bg_left, _("Backgrounds will be drawn starting with the first element in this list moving to the last one."), 0)
-        bg_left.attach(toolbar, 1, 2, 1, 1+1, gtk.EXPAND|gtk.FILL, 0, gui.WIDGET_SPACING)
-        bg_left.attach(self._treeview_bgs, 1, 2, 2, 2+1, gtk.EXPAND|gtk.FILL, 0, gui.WIDGET_SPACING)
+        bg_left.pack_start(toolbar, False, True, gui.WIDGET_SPACING)
+        scroll = gtk.ScrolledWindow()
+        scroll.add(self._treeview_bgs)
+        scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        bg_left.pack_start(scroll, True, True, gui.WIDGET_SPACING)
         
         bg_right = gtk.VBox()
         self._bg_edit_table = gui.ESTable(15, row_spacing=10, auto_inc_y=True)
@@ -122,13 +125,13 @@ class ThemeEditor(gtk.Window):
         #scroll_bg_edit.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         #scroll_bg_edit.add_with_viewport(bg_right)
         #bg_right.pack_start(bg_right_top)
-        bg_right.pack_start(self._bg_edit_table)
-        bg_right.pack_start(self._get_position())
+        bg_right.pack_start(self._bg_edit_table, True, True, gui.WIDGET_SPACING)
+        bg_right.pack_start(self._get_position(), False, False, gui.WIDGET_SPACING)
 
         bgbox = gtk.HBox()
-        bgbox.pack_start(bg_left)
-        bgbox.pack_start(gtk.VSeparator())
-        bgbox.pack_start(bg_right)
+        bgbox.pack_start(bg_left, False, True, 0)
+        bgbox.pack_start(gtk.VSeparator(), False, False, 15)
+        bgbox.pack_start(bg_right, True, True, 0)
         notebook.append_page(bgbox, gtk.Label(_("Background")))
         
 

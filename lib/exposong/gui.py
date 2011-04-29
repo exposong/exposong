@@ -359,7 +359,12 @@ def append_comment(table, title, top):
     label.set_markup("<i><small>"+title+"</small></i>")
     label.set_line_wrap(True)
     label.set_alignment(0.0, 1.0)
-    table.attach(label, 0, 4, top, top+1, gtk.EXPAND, 0, 0)
+    if isinstance(table, gtk.Table):
+        table.attach(label, 0, 4, top, top+1, gtk.EXPAND, 0, 0)
+    elif isinstance(table, gtk.Box):
+        table.pack_start(label, False, True, 0)
+    else:
+        raise Exception("Not a valid gtk container: %s" % type(table))
     return label
 
 def append_separator(table, top):
