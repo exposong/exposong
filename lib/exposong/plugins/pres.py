@@ -439,7 +439,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                             gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
                             (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                             gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
-        table = gui.Table(3)
+        table = gui.ESTable(2, auto_inc_y=True)
         dialog.vbox.pack_start(table, True, True)
         
         model = treeview.get_model()
@@ -450,8 +450,8 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                 dialog.set_title( _('Editing "%s"') % model.get_value(itr,0) )
             key = model.get_value(itr,0)
             val = model.get_value(itr,1)
-        key_entry = gui.append_entry(table, _('Name:'), key, 0)
-        val_entry = gui.append_entry(table, _('Value:'), val, 1)
+        key_entry = table.append_entry(key, 0, _('Name:'))
+        val_entry = table.append_entry(val, 0, _('Value:'))
         dialog.vbox.show_all()
         
         while True:

@@ -70,6 +70,14 @@ class ESTable(gtk.Table):
             self.y +=1
         return widget
     
+    def append_entry(self, value, max_len, label, x=0, y=0, w=1, h=1, **kw):
+        'Adds a text entry widget.'
+        widget = gtk.Entry(max_len)
+        if value:
+            widget.set_text(value)
+        self.attach_widget(widget, label, x, y, w, h, **kw)
+        return widget
+    
     def attach_spinner(self, adjust, climb_rate=0.0, digits=0, label=None,
                        x=0, y=0, w=1, h=1, **kw):
         'Add a spinner widget.'
