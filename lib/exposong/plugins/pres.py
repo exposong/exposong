@@ -450,8 +450,8 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                 dialog.set_title( _('Editing "%s"') % model.get_value(itr,0) )
             key = model.get_value(itr,0)
             val = model.get_value(itr,1)
-        key_entry = table.attach_entry(key, 0, _('Name:'))
-        val_entry = table.attach_entry(val, 0, _('Value:'))
+        key_entry = table.attach_entry(key, label=_('Name:'))
+        val_entry = table.attach_entry(val, label=_('Value:'))
         dialog.vbox.show_all()
         
         while True:
@@ -933,44 +933,44 @@ class SlideEdit(gtk.Dialog):
         help = gtk.image_new_from_stock(gtk.STOCK_HELP, gtk.ICON_SIZE_BUTTON)
         helppos = _("Positions are relative, with values between 0 and 1. A value of 0 is on the far left or top, and a value of 1 is on the far right or bottom.")
         help.set_tooltip_text(helppos)
-        table.attach_widget(help, None, 2, 0)
+        table.attach_widget(help, None, x=2, y=0)
         
         adjust = gtk.Adjustment(el.pos[0], 0.0, 1.0, 0.01, 0.10)
-        self._p['lf'] = table.attach_spinner(adjust, 0.02, 2, _('Left:'), 0, 0)
+        self._p['lf'] = table.attach_spinner(adjust, 0.02, 2, label=_('Left:'))
         self._p['lf'].set_numeric(True)
         self._p['lf'].connect('changed', self._on_change_pos)
         
         adjust = gtk.Adjustment(el.pos[2], 0.0, 1.0, 0.01, 0.10)
-        self._p['rt'] = table.attach_spinner(adjust, 0.02, 2, _('Right:'), 1, 0)
+        self._p['rt'] = table.attach_spinner(adjust, 0.02, 2, label=_('Right:'), x=1)
         self._p['rt'].set_numeric(True)
         self._p['rt'].connect('changed', self._on_change_pos)
         
         adjust = gtk.Adjustment(el.pos[1], 0.0, 1.0, 0.01, 0.10)
-        self._p['tp'] = table.attach_spinner(adjust, 0.02, 2, _('Top:'), 0, 1)
+        self._p['tp'] = table.attach_spinner(adjust, 0.02, 2, label=_('Top:'), y=1)
         self._p['tp'].set_numeric(True)
         self._p['tp'].connect('changed', self._on_change_pos)
         
         adjust = gtk.Adjustment(el.pos[3], 0.0, 1.0, 0.01, 0.10)
-        self._p['bt'] = table.attach_spinner(adjust, 0.02, 2, _('Bottom:'), 1, 1)
+        self._p['bt'] = table.attach_spinner(adjust, 0.02, 2, label=_('Bottom:'), x=1, y=1)
         self._p['bt'].set_numeric(True)
         self._p['bt'].connect('changed', self._on_change_pos)
         
         adjust = gtk.Adjustment(el.margin, 0, 40, 1, 5)
-        self._p['mg'] = table.attach_spinner(adjust, 1, 0, _('Margin:'),
-                                             0, 2, 2, 1)
+        self._p['mg'] = table.attach_spinner(adjust, 1, 0, label=_('Margin:'),
+                                             y=2, w=2)
         self._p['mg'].set_numeric(True)
         self._p['mg'].connect('changed', self._on_change_mg)
         
         self._p['al'] = table.attach_combo(map(theme.get_align_text, (theme.LEFT,
                                            theme.CENTER, theme.RIGHT)),
-                                           None, _('Alignment:'), 0, 3, 2, 1)
+                                           None, label=_('Alignment:'), y=3, w=2)
         gui.set_active_text(self._p['al'], theme.get_align_text(el.align))
         self._p['al'].connect('changed', self._on_change_al)
         
         self._p['va'] = table.attach_combo(map(theme.get_valign_text, (theme.TOP,
                                            theme.MIDDLE, theme.BOTTOM)),
-                                           None, _('Vertical Alignment:'),
-                                           0, 4, 2, 1)
+                                           None, label=_('Vertical Alignment:'),
+                                           y=4, w=2)
         gui.set_active_text(self._p['va'], theme.get_valign_text(el.valign))
         self._p['va'].connect('changed', self._on_change_va)
         
@@ -985,7 +985,7 @@ class SlideEdit(gtk.Dialog):
         
         if el is False:
             st = _("Select or add an item from the left to edit.")
-            label = self._ctbl.attach_label(st, 0, 0, 1, 4,
+            label = self._ctbl.attach_label(st, h=4,
                                             xoptions=gtk.EXPAND|gtk.FILL,
                                             yoptions=gtk.EXPAND|gtk.FILL)
             label.set_line_wrap(True)
@@ -1003,7 +1003,7 @@ class SlideEdit(gtk.Dialog):
             redo.connect('clicked', self._redo, buffer_)
             redo.set_sensitive(False)
             toolbar.insert(redo, -1)
-            self._ctbl.attach_widget(toolbar, None, 0, 0, 2, 1,
+            self._ctbl.attach_widget(toolbar,
                                      yoptions=gtk.FILL)
             
             text = gtk.TextView()
@@ -1025,7 +1025,7 @@ class SlideEdit(gtk.Dialog):
             scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
             scroll.set_size_request(250, -1)
             scroll.set_shadow_type(gtk.SHADOW_IN)
-            self._ctbl.attach_widget(scroll, None, 0, 1, 2, 4,
+            self._ctbl.attach_widget(scroll, y=1, h=3,
                                      yoptions=gtk.FILL|gtk.EXPAND)
         elif isinstance(el, theme.Image):
             fc = gtk.FileChooserButton("Select Image")
@@ -1042,21 +1042,21 @@ class SlideEdit(gtk.Dialog):
             fc.set_preview_widget(preview)
             fc.connect("update-preview", gui.filechooser_preview, preview)
             fc.connect("file-set", self._on_image_changed)
-            self._ctbl.attach_widget(fc, None, 0, 0, 2, 1)
+            self._ctbl.attach_widget(fc)
             
             self._image_preview = gtk.Image()
-            self._ctbl.attach_widget(self._image_preview, None, 0, 1, 2, 1)
+            self._ctbl.attach_widget(self._image_preview, y=1)
             gui.update_image_preview(self._image_preview, el.src)
             
             options = map(theme.get_aspect_text,
                           (theme.ASPECT_FIT, theme.ASPECT_FILL))
-            aspect = self._ctbl.attach_combo(options, None, _('Resize to:'),
-                                             0, 2, 2, 1)
+            aspect = self._ctbl.attach_combo(options, None, y=2,
+                                             label=_('Resize to:'))
             gui.set_active_text(aspect, theme.get_aspect_text(el.aspect))
             aspect.connect('changed', self._on_change_aspect)
         
         if el is not False:
-            self._ctbl.attach_widget(self._get_position(), None, 0, 6, 2, 1)
+            self._ctbl.attach_widget(self._get_position(), y=6)
             # TODO Custom Theme
         self._ctbl.show_all()
         self.__updating = False

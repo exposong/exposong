@@ -36,10 +36,16 @@ __pb_cache = {}
 class ESTable(gtk.Table):
     """
     This class will assist in laying out widgets in a standardized way.
+    
+    All attach_ functions can be passed keyword arguments to assist with
+    changing options. `label` can be a one or two word description of the
+    control. `x`, `y`, `w`, and `h`, control the position in the table. Look at
+    attach_widget for further information.
     """
-    def __init__(self, rows=1, cols=1, row_spacing=4, auto_inc_y=False):
+    def __init__(self, rows=1, cols=1, row_spacing=6, auto_inc_y=False):
         gtk.Table.__init__(self, rows, cols*2)
         self.set_row_spacings(row_spacing)
+        self.set_col_spacings(6)
         self.set_border_width(6)
         self.auto_inc = auto_inc_y
         if self.auto_inc:
@@ -49,10 +55,8 @@ class ESTable(gtk.Table):
         'Set default options for attaching.'
         kw.setdefault('xoptions', gtk.EXPAND|gtk.FILL)
         kw.setdefault('yoptions', gtk.FILL)
-        kw.setdefault('xpadding', WIDGET_SPACING)
-        kw.setdefault('ypadding', 0)
     
-    def attach_widget(self, widget, label, x=0, y=0, w=1, h=1, **kw):
+    def attach_widget(self, widget, label=None, x=0, y=0, w=1, h=1, **kw):
         'Add a widget.'
         x1 = x*2
         x2 = x*2+w*2
@@ -70,39 +74,38 @@ class ESTable(gtk.Table):
             self.y +=1
         return widget
     
-    def attach_entry(self, value, max_len, label, x=0, y=0, w=1, h=1, **kw):
+    def attach_entry(self, value, max_len=0, **kw):
         'Adds a text entry widget.'
         widget = gtk.Entry(max_len)
         if value:
             widget.set_text(value)
-        self.attach_widget(widget, label, x, y, w, h, **kw)
+        self.attach_widget(widget, **kw)
         return widget
     
-    def attach_spinner(self, adjust, climb_rate=0.0, digits=0, label=None,
-                       x=0, y=0, w=1, h=1, **kw):
+    def attach_spinner(self, adjust, climb_rate=0.0, digits=0, **kw):
         'Add a spinner widget.'
         widget = gtk.SpinButton(adjust, climb_rate, digits)
-        self.attach_widget(widget, label, x, y, w, h, **kw)
+        self.attach_widget(widget, **kw)
         return widget
     
-    def attach_combo(self, options, value, label, x=0, y=0, w=1, h=1, **kw):
+    def attach_combo(self, options, value, **kw):
         'Adds a combo widget.'
         widget = gtk.combo_box_new_text()
         for i in range(len(options)):
             widget.append_text(options[i])
             if options[i] == value:
                 widget.set_active(i)
-        self.attach_widget(widget, label, x, y, w, h, **kw)
+        self.attach_widget(widget, **kw)
         return widget
     
-    def attach_checkbutton(self, label, buttonlabel, checked=False,
-                           x=0, y=0, w=1, h=1, **kw):
+    def attach_checkbutton(self, buttonlabel, checked=False, **kw):
         widget = gtk.CheckButton(buttonlabel)
-        self.attach_widget(widget, label, x, y, w, h, **kw)
+        self.attach_widget(widget, **kw)
         return widget
     
-    def attach_color(self, label, value, alpha=False, x=0, y=0, w=1, h=1, **kw):
+    def attach_color(self, value, alpha=False, **kw):
         'Adds a color widget to a table and returns it.'
+        # TODO Do we need a count, instead of inferring widget count from value?
         if isinstance(value[0], tuple):
             buttons = []
             hbox = gtk.HBox()
@@ -113,18 +116,17 @@ class ESTable(gtk.Table):
                     button.set_alpha(int(v[3]))
                 hbox.pack_start(button)
                 buttons.append(button)
-            self.attach_widget(hbox, label, x, y, w, h, **kw)
+            self.attach_widget(hbox, **kw)
             return buttons
         else:
-            print map(int, value[:3])
             button = gtk.ColorButton(gtk.gdk.Color(*map(int, value[:3])))
             if(alpha):
                 button.set_use_alpha(True)
                 button.set_alpha(int(value[3]))
-            self.attach_widget(button, label, x, y, w, h, **kw)
+            self.attach_widget(button, **kw)
             return button
     
-    def attach_filechooser(self, label, value=None, x=0, y=0, w=1, h=1, **kw):
+    def attach_filechooser(self, value=None, **kw):
         'Adds a file widget to a table and returns it.'
         widget = gtk.FileChooserButton( _("Choose File") )
         widget.set_width_chars(15)
@@ -132,10 +134,10 @@ class ESTable(gtk.Table):
             widget.set_filename(value)
         else:
             widget.set_current_folder(os.path.expanduser('~'))
-        self.attach_widget(widget, label, x, y, w, h, **kw)
+        self.attach_widget(widget, **kw)
         return widget
     
-    def attach_folderchooser(self, label, value=None, x=0, y=0, w=1, h=1, **kw):
+    def attach_folderchooser(self, value=None, **kw):
         'Adds a file widget for folders to a table and returns it.'
         widget = gtk.FileChooserButton( _("Choose File") )
         widget.set_width_chars(15)
@@ -144,31 +146,31 @@ class ESTable(gtk.Table):
             widget.set_current_folder(value)
         else:
             widget.set_current_folder(os.path.expanduser('~'))
-        self.attach_widget(widget, label, x, y, w, h, **kw)
+        self.attach_widget(widget, **kw)
         return widget
 
     
-    def attach_section_title(self, title, x=0, y=0, w=1, h=1, **kw):
+    def attach_section_title(self, title, **kw):
         'Adds a title for the current section.'
         label = gtk.Label()
         label.set_markup("<b>"+title+"</b>")
         label.set_alignment(0.0, 1.0)
         kw.setdefault('ypadding', 8)
-        self.attach_widget(label, x, x, y, y+1, **kw)
+        self.attach_widget(label, **kw)
         return label
     
-    def attach_comment(self, title, x=0, y=0, w=1, h=1, **kw):
+    def attach_comment(self, title, **kw):
         label = gtk.Label()
         label.set_markup("<i><small>"+title+"</small></i>")
         label.set_line_wrap(True)
         label.set_alignment(0.0, 1.0)
-        self.attach_widget(label, x, x, y, y+h, **kw)
+        self.attach_widget(label, **kw)
         return label
     
-    def attach_hseparator(self, x=0, y=0, w=1, h=1, **kw):
+    def attach_hseparator(self, **kw):
         s = gtk.HSeparator()
         kw.setdefault('xoptions', gtk.FILL)
-        self.attach_widget(s, x, x, y, y+h, **kw)
+        self.attach_widget(s, **kw)
         return s
     
     def attach_label(self, label, x=0, y=0, w=1, h=1, **kw):

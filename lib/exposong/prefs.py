@@ -55,23 +55,25 @@ class PrefsDialog(gtk.Dialog):
             folder = config.get("general", "data-path")
         else:
             folder = DATA_PATH
-        g_data = table.attach_folderchooser(_("Data folder"), folder)
+        g_data = table.attach_folderchooser(folder, label=_("Data folder"))
         msg = _("The place where all your presentations, schedules and background images are stored.")
         g_data.set_tooltip_text(msg)
         
-        g_title = table.attach_checkbutton(_("Slides"), _("Insert title slide"))
+        g_title = table.attach_checkbutton(_("Insert title slide"),
+                                           label=_("Slides"))
         if config.get("general", "title_slide") == "True":
             g_title.set_active(True)
         
         table.attach_section_title(_("Lyrics"))
-        g_ccli = table.attach_entry(config.get("general","ccli"), 0, "CCLI #")
+        g_ccli = table.attach_entry(config.get("general","ccli"),
+                                    label="CCLI #")
         songbooks = [sbook.name for t in exposong.main.main.library
                      if t[0].get_type() == "lyric"
                      for sbook in t[0].song.props.songbooks]
         songbooks = sorted(set(songbooks))
         g_songbook = table.attach_combo(songbooks,
                                         config.get("general","songbook"),
-                                        _("Songbook"))
+                                        label=_("Songbook"))
         table.attach_comment(_("Songbooks in Lyrics are automatically added to this list."))
         
         notebook.append_page(table, gtk.Label( _("General") ))
@@ -80,15 +82,16 @@ class PrefsDialog(gtk.Dialog):
         table = gui.ESTable(9, auto_inc_y=True)
         
         table.attach_section_title(_("Logo"))
-        p_logo = table.attach_filechooser(_("Image"), config.get("screen","logo"))
-        p_logo_bg = table.attach_color(_("Background"),
-                                       config.getcolor("screen","logo_bg"))
+        p_logo = table.attach_filechooser(config.get("screen","logo"),
+                                          label=_("Image"))
+        p_logo_bg = table.attach_color(config.getcolor("screen","logo_bg"),
+                                       label=_("Background"))
         
         table.attach_section_title(_("Notify"))
-        p_notify_color = table.attach_color(_("Font Color"),
-                                            config.getcolor("screen","notify_color"))
-        p_notify_bg = table.attach_color(_("Background"),
-                                         config.getcolor("screen","notify_bg"))
+        p_notify_color = table.attach_color(config.getcolor("screen","notify_color"),
+                                            label=_("Font Color"))
+        p_notify_bg = table.attach_color(config.getcolor("screen","notify_bg"),
+                                         label=_("Background"))
         
         # Monitor Selection
         monitor_name = tuple()
@@ -117,9 +120,9 @@ class PrefsDialog(gtk.Dialog):
             pass
         
         table.attach_section_title(_("Position"))
-        p_monitor = table.attach_combo(monitor_name, sel, _("Monitor"))
+        p_monitor = table.attach_combo(monitor_name, sel, label=_("Monitor"))
         
-        notebook.append_page(table, gtk.Label( _("Screen")))
+        notebook.append_page(table, gtk.Label(_("Screen")))
         
         self.show_all()
         if self.run() == gtk.RESPONSE_ACCEPT:
