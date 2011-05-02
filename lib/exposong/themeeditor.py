@@ -221,21 +221,11 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         body = self.theme.get_body()
         body.font = self.body_widgets['font_button'].get_font_name()
         body.color = self.body_widgets['font_color'].get_color().to_string()
-        a = self.body_widgets['alignment_horizontal'].get_active()
-        if a == 0:
-            body.align = theme.CENTER
-        elif a == 1:
-            body.align = theme.LEFT
-        elif a == 2:
-            body.align = theme.RIGHT
+        a = self.body_widgets['alignment_horizontal'].get_active_text()
+        body.align = theme.get_align_const(a)
         
-        a = self.body_widgets['alignment_vertical'].get_active()
-        if a == 0:
-            body.valign = theme.MIDDLE
-        elif a == 1:
-            body.valign = theme.TOP
-        elif a == 2:
-            body.valign = theme.BOTTOM
+        a = self.body_widgets['alignment_vertical'].get_active_text()
+        body.valign = theme.get_valign_const(a)
         
         body.spacing = self.body_widgets['line_spacing'].get_value()
         body.shadow_color = self.body_widgets['shadow_color'].get_color().to_string()
@@ -253,20 +243,10 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         footer.font = self.footer_widgets['font_button'].get_font_name()
         footer.color = self.footer_widgets['font_color'].get_color().to_string()
         a = self.footer_widgets['alignment_horizontal'].get_active()
-        if a == 0:
-            footer.align = theme.CENTER
-        elif a == 1:
-            footer.align = theme.LEFT
-        elif a == 2:
-            footer.align = theme.RIGHT
+        footer.align = theme.get_align_const(a)
         
         a = self.footer_widgets['alignment_vertical'].get_active()
-        if a == 0:
-            footer.valign = theme.MIDDLE
-        elif a == 1:
-            footer.valign = theme.TOP
-        elif a == 2:
-            footer.valign = theme.BOTTOM
+        body.valign = theme.get_valign_const(a)
         
         footer.spacing = self.footer_widgets['line_spacing'].get_value()
         footer.shadow_color = self.footer_widgets['shadow_color'].get_color().to_string()
@@ -731,8 +711,7 @@ class _ExampleSlide(object):
                         'That saved a wretch like me! ',
                         'I once was lost, but now I am found, ',
                         'Was blind, but now I see.']),
-                    pos=[0.0, 0.0, 1.0, 1.0], margin=10,
-                    align=theme.CENTER, valign=theme.MIDDLE),
+                    pos=[0.0, 0.0, 1.0, 1.0], margin=10),
                 ]
         self.foot = [theme.Text('\n'.join([
                         '"Amazing Grace"',

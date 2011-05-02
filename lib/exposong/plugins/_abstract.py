@@ -80,8 +80,7 @@ class Presentation:
         
         def get_body(self):
             'Return a list of renderable theme items.'
-            return [theme.Text(self.get_text(), align=theme.CENTER, 
-                    valign=theme.MIDDLE)]
+            return [theme.Text(self.get_text())]
         
         def get_footer(self):
             'Return a list of renderable theme items.'
