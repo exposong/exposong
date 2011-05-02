@@ -70,7 +70,7 @@ class ESTable(gtk.Table):
             self.y +=1
         return widget
     
-    def append_entry(self, value, max_len, label, x=0, y=0, w=1, h=1, **kw):
+    def attach_entry(self, value, max_len, label, x=0, y=0, w=1, h=1, **kw):
         'Adds a text entry widget.'
         widget = gtk.Entry(max_len)
         if value:
@@ -95,16 +95,58 @@ class ESTable(gtk.Table):
         self.attach_widget(widget, label, x, y, w, h, **kw)
         return widget
     
+    def attach_checkbutton(self, label, buttonlabel, checked=False,
+                           x=0, y=0, w=1, h=1, **kw):
+        widget = gtk.CheckButton(buttonlabel)
+        self.attach_widget(widget, label, x, y, w, h, **kw)
+        return widget
+    
+    def attach_color(self, label, value, alpha=False, x=0, y=0, w=1, h=1, **kw):
+        'Adds a color widget to a table and returns it.'
+        if isinstance(value[0], tuple):
+            buttons = []
+            hbox = gtk.HBox()
+            for v in value:
+                button = gtk.ColorButton(gtk.gdk.Color(*map(int, v[:3])))
+                if(alpha):
+                    button.set_use_alpha(True)
+                    button.set_alpha(int(v[3]))
+                hbox.pack_start(button)
+                buttons.append(button)
+            self.attach_widget(hbox, label, x, y, w, h, **kw)
+            return buttons
+        else:
+            print map(int, value[:3])
+            button = gtk.ColorButton(gtk.gdk.Color(*map(int, value[:3])))
+            if(alpha):
+                button.set_use_alpha(True)
+                button.set_alpha(int(value[3]))
+            self.attach_widget(button, label, x, y, w, h, **kw)
+            return button
+    
     def attach_filechooser(self, label, value=None, x=0, y=0, w=1, h=1, **kw):
         'Adds a file widget to a table and returns it.'
-        filech = gtk.FileChooserButton( _("Choose File") )
-        filech.set_width_chars(15)
+        widget = gtk.FileChooserButton( _("Choose File") )
+        widget.set_width_chars(15)
         if value:
-            filech.set_filename(value)
+            widget.set_filename(value)
         else:
-            filech.set_current_folder(os.path.expanduser('~'))
-        self.attach_widget(filech, label, x, y, w, h, **kw)
-        return filech
+            widget.set_current_folder(os.path.expanduser('~'))
+        self.attach_widget(widget, label, x, y, w, h, **kw)
+        return widget
+    
+    def attach_folderchooser(self, label, value=None, x=0, y=0, w=1, h=1, **kw):
+        'Adds a file widget for folders to a table and returns it.'
+        widget = gtk.FileChooserButton( _("Choose File") )
+        widget.set_width_chars(15)
+        widget.set_action(gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
+        if value:
+            widget.set_current_folder(value)
+        else:
+            widget.set_current_folder(os.path.expanduser('~'))
+        self.attach_widget(widget, label, x, y, w, h, **kw)
+        return widget
+
     
     def attach_section_title(self, title, x=0, y=0, w=1, h=1, **kw):
         'Adds a title for the current section.'
@@ -125,6 +167,7 @@ class ESTable(gtk.Table):
     
     def attach_hseparator(self, x=0, y=0, w=1, h=1, **kw):
         s = gtk.HSeparator()
+        kw.setdefault('xoptions', gtk.FILL)
         self.attach_widget(s, x, x, y, y+h, **kw)
         return s
     

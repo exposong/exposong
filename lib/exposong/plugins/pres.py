@@ -450,8 +450,8 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                 dialog.set_title( _('Editing "%s"') % model.get_value(itr,0) )
             key = model.get_value(itr,0)
             val = model.get_value(itr,1)
-        key_entry = table.append_entry(key, 0, _('Name:'))
-        val_entry = table.append_entry(val, 0, _('Value:'))
+        key_entry = table.attach_entry(key, 0, _('Name:'))
+        val_entry = table.attach_entry(val, 0, _('Value:'))
         dialog.vbox.show_all()
         
         while True:

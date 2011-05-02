@@ -49,44 +49,46 @@ class PrefsDialog(gtk.Dialog):
         self.vbox.pack_start(notebook, True, True, 5)
         
         #General Page
-        table = gui.Table(10)
+        table = gui.ESTable(10, auto_inc_y=True)
         
         if config.has_option("general", "data-path"):
             folder = config.get("general", "data-path")
         else:
             folder = DATA_PATH
-        g_data = gui.append_folder(table, _("Data folder"), folder, 0)
+        g_data = table.attach_folderchooser(_("Data folder"), folder)
         msg = _("The place where all your presentations, schedules and background images are stored.")
         g_data.set_tooltip_text(msg)
         
-        g_title = gui.append_checkbutton(table, _("Slides"), _("Insert title slide"), 1)
+        g_title = table.attach_checkbutton(_("Slides"), _("Insert title slide"))
         if config.get("general", "title_slide") == "True":
             g_title.set_active(True)
         
-        gui.append_section_title(table, _("Lyrics"), 2)
-        g_ccli = gui.append_entry(table, "CCLI #", config.get("general","ccli"), 3)
+        table.attach_section_title(_("Lyrics"))
+        g_ccli = table.attach_entry(config.get("general","ccli"), 0, "CCLI #")
         songbooks = [sbook.name for t in exposong.main.main.library
                      if t[0].get_type() == "lyric"
                      for sbook in t[0].song.props.songbooks]
         songbooks = sorted(set(songbooks))
-        g_songbook = gui.append_combo(table, _("Songbook"), songbooks,
-                                      config.get("general","songbook"), 4)
+        g_songbook = table.attach_combo(songbooks,
+                                        config.get("general","songbook"),
+                                        _("Songbook"))
+        table.attach_comment(_("Songbooks in Lyrics are automatically added to this list."))
         
         notebook.append_page(table, gtk.Label( _("General") ))
         
         #Screen Page
-        table = gui.Table(9)
+        table = gui.ESTable(9, auto_inc_y=True)
         
-        gui.append_section_title(table, _("Logo"), 0)
-        p_logo = gui.append_file(table, _("Image"), config.get("screen","logo"), 1)
-        p_logo_bg = gui.append_color(table, _("Background"),
-                                     config.getcolor("screen","logo_bg"), 2)
+        table.attach_section_title(_("Logo"))
+        p_logo = table.attach_filechooser(_("Image"), config.get("screen","logo"))
+        p_logo_bg = table.attach_color(_("Background"),
+                                       config.getcolor("screen","logo_bg"))
         
-        gui.append_section_title(table, _("Notify"), 4)
-        p_notify_color = gui.append_color(table, _("Font Color"),
-                                          config.getcolor("screen","notify_color"), 6)
-        p_notify_bg = gui.append_color(table, _("Background"),
-                                       config.getcolor("screen","notify_bg"), 5)
+        table.attach_section_title(_("Notify"))
+        p_notify_color = table.attach_color(_("Font Color"),
+                                            config.getcolor("screen","notify_color"))
+        p_notify_bg = table.attach_color(_("Background"),
+                                         config.getcolor("screen","notify_bg"))
         
         # Monitor Selection
         monitor_name = tuple()
@@ -114,8 +116,8 @@ class PrefsDialog(gtk.Dialog):
         except IndexError:
             pass
         
-        gui.append_section_title(table, _("Position"), 7)
-        p_monitor = gui.append_combo(table, _("Monitor"), monitor_name, sel, 8)
+        table.attach_section_title(_("Position"))
+        p_monitor = table.attach_combo(monitor_name, sel, _("Monitor"))
         
         notebook.append_page(table, gtk.Label( _("Screen")))
         
