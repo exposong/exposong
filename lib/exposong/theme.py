@@ -560,6 +560,10 @@ class ImageBackground(_Background, _Renderable):
     def get_filename(self):
         return os.path.join(DATA_PATH, 'theme', 'res', self.src)
     
+    def reset_cache(self):
+        self._original = None
+        self._cache = {}
+    
     def load(self, size):
         ""
         if not self._original:

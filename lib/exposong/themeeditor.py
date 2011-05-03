@@ -162,6 +162,7 @@ class ThemeEditor(gtk.Window):
         main_h.pack_end(table_right)
         self.add(main_h)
         self.show_all()
+        self._set_changed(False)
     
     def draw(self, *args):
         self._preview.queue_draw()
@@ -290,6 +291,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         table.y = 0
         table.attach_section_title(_("Image Background"))
         self._bg_image_filech = table.attach_filechooser(label=_("Image"))
+        self._bg_image_filech.connect("file-set", self._on_bg_image_changed)
         self._bg_image_radio_mode_fit = gtk.RadioButton(None, _("Fit"))
         self._bg_image_radio_mode_fit.connect('toggled', self._on_bg_image_changed)
         self._bg_image_radio_mode_fill = gtk.RadioButton(self._bg_image_radio_mode_fit, _("Fill"))
@@ -313,6 +315,13 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
     def _on_bg_image_changed(self, widget):
         self._set_changed()
         bg = self._get_active_bg()
+        if isinstance(widget, gtk.FileChooserButton): #New image
+            img = widget.get_filename()
+            newpath = os.path.join(DATA_PATH, 'theme', 'res', os.path.basename(img))
+            if newpath != img:
+                shutil.copy(img, newpath)
+            bg.src = os.path.basename(img)
+            bg.reset_cache()
         if self._bg_image_radio_mode_fill.get_active():
             bg.aspect = theme.ASPECT_FILL
         else:
