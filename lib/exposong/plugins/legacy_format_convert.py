@@ -167,8 +167,9 @@ class LegacyConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
             if type_ == 'image':
                 osrc = sl.findall("img")[0].get("src")
                 src = find_freefile(os.path.join(DATA_PATH, 'pres', 'res', osrc))
-                shutil.move(os.path.join(DATA_PATH, 'image', osrc), src)
-                slide._content.append(theme.Image(src))
+                if os.path.exists(src):
+                    shutil.move(os.path.join(DATA_PATH, 'image', osrc), src)
+                    slide._content.append(theme.Image(src))
             pres.slides.append(slide)
         if not newfile:
             pres.filename = filename

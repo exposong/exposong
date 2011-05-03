@@ -960,16 +960,24 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             return self.get_slide_list()
 
     def _get_authors_string(self):
-        """"Returns a string with the authors of the song.
-        Replaces multiple occurences with '&'"""
+        """"
+        Returns a string with the authors of the song.
+        Summarizes multiple occurrences
+        e.g.: Text & Music: Author A   OR   Text: Author A / Author B
+        """
         authlist = []
         for a in self.song.props.authors:
             auth_type = auth_types.get(a.type, _("Written By"))
             same = False
             for auth in authlist:
-                if auth[1] == str(a):
-                    auth[0] = "%s &amp; %s" %(auth[0], auth_type)
-                    same = True
+                    if auth[0] == auth_type:
+                        auth[1] = "%s / %s" %(auth[1], str(a))
+                        same = True
+            if not same:
+                for auth in authlist:
+                    if auth[1] == str(a):
+                        auth[0] = "%s &amp; %s" %(auth[0], auth_type)
+                        same = True
             if not same:
                 authlist.append([auth_type, str(a)])
         s = "; ".join(u'%s: %s'%(a[0], a[1]) for a in authlist)
@@ -1091,13 +1099,13 @@ class SlideEdit(gtk.Dialog):
         
         self._build_menu()
         
+        cancelbutton = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
+        cancelbutton.connect("clicked", self._quit_without_save)
         newbutton = self.add_button(_("Save and New"), gtk.RESPONSE_APPLY)
         newimg = gtk.Image()
         newimg.set_from_stock(gtk.STOCK_NEW, gtk.ICON_SIZE_BUTTON)
         newbutton.set_image(newimg)
         newbutton.connect("clicked", self._quit_with_save)
-        cancelbutton = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
-        cancelbutton.connect("clicked", self._quit_without_save)
         okbutton = self.add_button(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
         okbutton.connect("clicked", self._quit_with_save)
         

@@ -831,13 +831,13 @@ class SlideEdit(gtk.Dialog):
         self.set_border_width(4)
         self.vbox.set_spacing(7)
         
+        cancelbutton = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
+        cancelbutton.connect("clicked", self._quit_without_save)
         newbutton = self.add_button(_("Save and New"), gtk.RESPONSE_APPLY)
         newimg = gtk.Image()
         newimg.set_from_stock(gtk.STOCK_NEW, gtk.ICON_SIZE_BUTTON)
         newbutton.set_image(newimg)
         newbutton.connect("clicked", self._quit_with_save)
-        cancelbutton = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
-        cancelbutton.connect("clicked", self._quit_without_save)
         okbutton = self.add_button(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
         okbutton.connect("clicked", self._quit_with_save)
         
