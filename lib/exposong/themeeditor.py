@@ -56,8 +56,9 @@ class ThemeEditor(gtk.Window):
         self._title_entry = title_table.attach_entry(_("New Theme"), label=_("Theme Name"))
         main_v.pack_start(title_table, False, False)
         
-        notebook = gtk.Notebook()
-        main_v.pack_start(notebook, True, True, 5)
+        self._notebook = gtk.Notebook()
+        self._notebook.connect('switch-page', self._nb_page_changed)
+        main_v.pack_start(self._notebook, True, True, 5)
         
         ######################
         # Page 1: Background #
@@ -118,21 +119,16 @@ class ThemeEditor(gtk.Window):
         scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         bg_left.pack_start(scroll, True, True, gui.WIDGET_SPACING)
         
-        bg_right = gtk.VBox()
         self._bg_edit_table = gui.ESTable(15, row_spacing=10, auto_inc_y=True)
-        #TODO: Pack this in a scrollbar - this didn't work very nice.
-        #scroll_bg_edit = gtk.ScrolledWindow()
-        #scroll_bg_edit.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        #scroll_bg_edit.add_with_viewport(bg_right)
-        #bg_right.pack_start(bg_right_top)
-        bg_right.pack_start(self._bg_edit_table, True, True, gui.WIDGET_SPACING)
-        bg_right.pack_start(self._get_position(), False, False, gui.WIDGET_SPACING)
+        scroll_bg_edit = gtk.ScrolledWindow()
+        scroll_bg_edit.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroll_bg_edit.add_with_viewport(self._bg_edit_table)
 
         bgbox = gtk.HBox()
         bgbox.pack_start(bg_left, False, True, 0)
         bgbox.pack_start(gtk.VSeparator(), False, False, 15)
-        bgbox.pack_start(bg_right, True, True, 0)
-        notebook.append_page(bgbox, gtk.Label(_("Background")))
+        bgbox.pack_start(scroll_bg_edit)
+        self._notebook.append_page(bgbox, gtk.Label(_("Background")))
         
 
         ########### Notebook Page 2: Body Text #################################
@@ -141,7 +137,7 @@ class ThemeEditor(gtk.Window):
         body_h.pack_start(self._get_section_left(self._on_body_changed, self.body_widgets))
         body_h.pack_start(gtk.VSeparator())
         body_h.pack_start(self._get_section_right(self._on_body_changed, self.body_widgets))
-        notebook.append_page(body_h, gtk.Label(_("Body Text")))
+        self._notebook.append_page(body_h, gtk.Label(_("Body Text")))
        
         ############ Notebook Page 3: Footer Text ##############################
         self.footer_widgets = {}
@@ -149,7 +145,7 @@ class ThemeEditor(gtk.Window):
         footer_h.pack_start(self._get_section_left(self._on_footer_changed, self.footer_widgets))
         footer_h.pack_start(gtk.VSeparator())
         footer_h.pack_start(self._get_section_right(self._on_footer_changed, self.footer_widgets))
-        notebook.append_page(footer_h, gtk.Label(_("Footer Text")))
+        self._notebook.append_page(footer_h, gtk.Label(_("Footer Text")))
         
         main_h.pack_start(main_v)
         
@@ -160,6 +156,8 @@ class ThemeEditor(gtk.Window):
         self._preview.set_size_request(300, int(300*0.75))
         self._preview.connect('expose-event', self._expose)
         table_right.attach_widget(self._preview)
+        self._pos_expander = table_right.attach_widget(self._get_position())
+        self._pos_expander.set_sensitive(False)
 
         main_h.pack_end(table_right)
         self.add(main_h)
@@ -210,7 +208,7 @@ class ThemeEditor(gtk.Window):
         widgets['shadow_comment'] = table.attach_comment(_("Shadow offsets are measured \
 in percentage of font height. So an offset of 0.5 for point 12 font is 6 points."))
         widgets['outline_title'] = table.attach_section_title(_("Text Outline"))
-        widgets['outline_size'] = table.attach_spinner(gtk.Adjustment(1.0, 0.0, 3.0, 1.0, 1.0, 0), label=_("Size (Pixel)"))
+        widgets['outline_size'] = table.attach_spinner(gtk.Adjustment(0.0, 0.0, 3.0, 1.0, 1.0, 0), label=_("Size (Pixel)"))
         widgets['outline_size'].connect('value-changed', cb)
         widgets['outline_color'] = table.attach_widget(gtk.ColorButton(gtk.gdk.Color(0,0,0)), label=_("Color"))
         widgets['outline_color'].connect('color-set', cb)
@@ -490,15 +488,6 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self._bg_radial_pos_v.set_value(bg.cpos[1]*100)
         self.draw()
     
-    def _load_bg_position(self):
-        bg = self._get_active_bg()
-        self.__updating = True
-        self._p['lf'].set_value(bg.pos[0])
-        self._p['tp'].set_value(bg.pos[1])
-        self._p['rt'].set_value(bg.pos[2])
-        self._p['bt'].set_value(bg.pos[3])
-        self.__updating = False
-    
     def _get_active_bg(self):
         (model, iter) = self._treeview_bgs.get_selection().get_selected()
         if iter:
@@ -519,6 +508,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
     def _on_bg_changed(self, widget):
         bg = self._get_active_bg()
         if not bg:
+            self._pos_expander.set_sensitive(False)
             return
         if isinstance(bg, theme.ImageBackground):
             self._on_bg_image()
@@ -549,6 +539,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
     def _bg_get_row_text(self, column, cell, model, titer):
         bg = model.get_value(titer, 0)
         cell.set_property('text', bg.get_name())
+    
     
     ###########################
     #    Position Expander    #
@@ -592,7 +583,14 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
             return
         
         self.__updating = True
-        el = self._get_active_bg()
+        el = False
+        if self._notebook.get_current_page() == 0:
+            el = self._get_active_bg()
+        elif self._notebook.get_current_page() == 1:
+            el = self.theme.get_body()
+        elif self._notebook.get_current_page() == 2:
+            el = self.theme.get_footer()
+        
         if el is False:
             self.__updating = False
             return False
@@ -624,10 +622,60 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self._set_changed()
         self.draw()
     
-    def _set_changed(self):
-        self.changed = True
-        if not self.get_title().startswith("*"):
-            self.set_title("*%s"%self.get_title())
+    def _nb_page_changed(self, notebook, page, page_num):
+        if not hasattr(self, '_pos_expander'):
+            return
+        if page_num == 0:
+            self._pos_expander.set_label(_("Selected Background Position"))
+            if self._get_active_bg():
+                self._load_bg_position()
+            else:
+                self._pos_expander.set_sensitive(False)
+        elif page_num == 1:
+            self._pos_expander.set_label(_("Body Section Position"))
+            self._pos_expander.set_sensitive(True)
+            self._load_body_position()
+        elif page_num == 2:
+            self._pos_expander.set_label(_("Footer Section Position"))
+            self._pos_expander.set_sensitive(True)
+            self._load_footer_position()
+    
+    def _load_bg_position(self):
+        bg = self._get_active_bg()
+        self._pos_expander.set_sensitive(True)
+        self.__updating = True
+        self._p['lf'].set_value(bg.pos[0])
+        self._p['tp'].set_value(bg.pos[1])
+        self._p['rt'].set_value(bg.pos[2])
+        self._p['bt'].set_value(bg.pos[3])
+        self.__updating = False
+    
+    def _load_body_position(self, ):
+        body = self.theme.get_body()
+        self.__updating = True
+        self._p['lf'].set_value(body.pos[0])
+        self._p['tp'].set_value(body.pos[1])
+        self._p['rt'].set_value(body.pos[2])
+        self._p['bt'].set_value(body.pos[3])
+        self.__updating = False
+    
+    def _load_footer_position(self, ):
+        body = self.theme.get_footer()
+        self.__updating = True
+        self._p['lf'].set_value(body.pos[0])
+        self._p['tp'].set_value(body.pos[1])
+        self._p['rt'].set_value(body.pos[2])
+        self._p['bt'].set_value(body.pos[3])
+        self.__updating = False
+    
+    def _set_changed(self, changed=True):
+        self._changed = changed
+        if changed:
+            if not self.get_title().startswith("*"):
+                self.set_title("*%s"%self.get_title())
+        else:
+            if self.get_title().startswith("*"):
+                self.set_title(self.get_title()[1:])
     
     def _load_theme(self, filenm=None):
         'Loads a theme into the Theme Editor'
@@ -690,6 +738,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self.footer_widgets['shadow_y_offset'].set_value(footer.shadow_offset[1])
         self.footer_widgets['outline_size'].set_value(footer.outline_size)
         self.footer_widgets['outline_color'].set_color(gtk.gdk.Color(footer.outline_color))
+        self._set_changed(False)
         
     def _destroy(self, widget):
         #self.theme.save()
