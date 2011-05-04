@@ -99,7 +99,7 @@ def check_filename(title, filepath):
     If filepath is a directory, it will return the complete filepath
     '''
     title_filename = title_to_filename(title)
-
+    
     if title_filename == os.path.basename(filepath):
         return filepath
     elif os.path.isdir(filepath):

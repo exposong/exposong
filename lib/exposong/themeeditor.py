@@ -29,7 +29,7 @@ import gui
 import theme
 
 from exposong import DATA_PATH, RESOURCE_PATH
-from exposong.glob import title_to_filename
+from exposong.glob import title_to_filename, find_freefile, check_filename
 
 BACKGROUND_TYPES = [_("Image"),  _("Color"), _("Gradient"), _("Radial Gradient")]
 
@@ -49,6 +49,7 @@ class ThemeEditor(gtk.Window):
         self.show_all()
     
     def _do_layout(self):
+        'Builds the GUI'
         main_h = gtk.HBox()
         main_v = gtk.VBox()
         
@@ -175,9 +176,11 @@ class ThemeEditor(gtk.Window):
         self._set_changed(False)
     
     def draw(self, *args):
+        'Called to update the preview widget'
         self._preview.queue_draw()
     
     def _expose(self, widget, event):
+        'Renders the preview widget the first time'
         ccontext = widget.window.cairo_create()
         bounds = widget.get_size_request()
         #ccontext.scale(float(400)/bounds[0],
@@ -226,6 +229,10 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         return table
     
     def _on_body_changed(self, *args):
+        """
+        Called when any part of the body section was changed to update
+        the theme and the preview
+        """
         self._set_changed()
         body = self.theme.get_body()
         
@@ -247,6 +254,10 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self.draw()
     
     def _on_footer_changed(self, *args):
+        """
+        Called when any part of the footer section was changed to update
+        the theme and the preview
+        """
         self._set_changed()
         footer = self.theme.get_footer()
         
@@ -270,11 +281,13 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
     #    Backgrounds      #
     #######################
     def _activate_bg(self, itr):
+        'Activates a background item in the list'
         selection = self._treeview_bgs.get_selection()
         selection.select_iter(itr)
         self._treeview_bgs.scroll_to_cell(self._bg_model.get_path(itr))
     
     def _on_bg_image_new(self, widget=None):
+        'Add a new background image'
         self._set_changed()
         fchooser = gtk.FileChooserDialog( _("Add Images"), self,
                 gtk.FILE_CHOOSER_ACTION_OPEN,
@@ -297,6 +310,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self.draw()
 
     def _on_bg_image(self, widget=None):
+        'Create the widgets for editing image backgrounds'
         table = self._bg_edit_table
         table.foreach(lambda w: table.remove(w))
         table.y = 0
@@ -314,6 +328,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self._load_bg_image()
         
     def _load_bg_image(self):
+        'Loads image background settings from the theme'
         bg = self._get_active_bg()
         self._bg_image_filech.set_filename(
                 os.path.join(DATA_PATH, 'theme', 'res', bg.src))
@@ -324,6 +339,10 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self.draw()
     
     def _on_bg_image_changed(self, widget):
+        """
+        Called when any part of the image background widgets changed to
+        update the background and the preview
+        """
         self._set_changed()
         bg = self._get_active_bg()
         if isinstance(widget, gtk.FileChooserButton): #New image
@@ -340,11 +359,13 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self.draw()
     
     def _on_bg_solid_new(self, widget=None):
+        'Add a new solid color background'
         self._set_changed()
         itr = self._bg_model.append((theme.ColorBackground(),))
         self._activate_bg(itr)
     
     def _on_bg_solid(self, widget=None):
+        'Create the widgets for editing solid backgrounds'
         table = self._bg_edit_table
         table.y = 0
         table.foreach(lambda w: table.remove(w))
@@ -357,22 +378,29 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self._load_bg_solid()
     
     def _on_bg_solid_changed(self, *args):
+        """
+        Called when any part of the solid background widgets changed to
+        update the background and the preview
+        """
         self._set_changed()
         self._get_active_bg().color = self._bg_solid_color_button.get_color().to_string()
         self._get_active_bg().alpha = self._bg_solid_color_button.get_alpha()/65535.0
         self.draw()
     
     def _load_bg_solid(self):
+        'Loads solid background settings from the theme'
         bg = self._get_active_bg()
         self._bg_solid_color_button.set_color(gtk.gdk.color_parse(bg.color))
         self._bg_solid_color_button.set_alpha(int(bg.alpha*65535))
     
     def _on_bg_gradient_new(self, widget=None):
+        'Add a new gradient background'
         self._set_changed()
         itr = self._bg_model.append((theme.GradientBackground(),))
         self._activate_bg(itr)
     
     def _on_bg_gradient(self, widget=None):
+        'Create the widgets for editing gradient backgrounds'
         table = self._bg_edit_table
         table.y = 0
         table.foreach(lambda w: table.remove(w))
@@ -384,7 +412,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         loc = 0.1
         if len(bg.stops) == 0:
             for i in range(2):
-                self._bg_gradient_add_stop(update=False)
+                self._bg_gradient_add_point(update=False)
         for i in range(len(bg.stops)):
             self._bg_gradient_colors.append(table.attach_widget(gtk.ColorButton(), label=_("Color %d"%i)))
             self._bg_gradient_colors[i].set_use_alpha(True)
@@ -394,7 +422,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
             self._bg_gradient_lengths[i].connect('change-value', self._on_bg_gradient_changed)
             table.attach_hseparator()
         add = table.attach_widget(gtk.Button(_("Add Stop"), gtk.STOCK_ADD))
-        add.connect('clicked', self._bg_gradient_add_stop)
+        add.connect('clicked', self._bg_gradient_add_point)
         
         # TODO Move HScale as helper function to ESTable
         self._bg_gradient_angle = table.attach_widget(gtk.HScale(gtk.Adjustment(0,0,360,1,10,0)), label=_("Angle"))
@@ -403,7 +431,8 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         table.show_all()
         self._load_bg_gradient()
     
-    def _bg_gradient_add_stop(self, widget=None, update=True, *args):
+    def _bg_gradient_add_point(self, widget=None, update=True, *args):
+        'Adds a new point to the current background'
         self._set_changed()
         bg = self._get_active_bg()
         if len(bg.stops)>0:
@@ -428,6 +457,10 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
                 self._on_bg_radial()
     
     def _on_bg_gradient_changed(self, *args):
+        """
+        Called when any part of the gradient background widgets changed to
+        update the background and the preview
+        """
         self._set_changed()
         bg = self._get_active_bg()
         for i in range(len(bg.stops)):
@@ -438,6 +471,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self.draw()
     
     def _load_bg_gradient(self, widget=None):
+        'Loads the gradient background settings from the theme'
         bg = self._get_active_bg()
         for i in range(len(bg.stops)):
             self._bg_gradient_colors[i].set_color(gtk.gdk.color_parse(bg.stops[i].color))
@@ -448,11 +482,13 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self.draw()
     
     def _on_bg_radial_new(self, widget=None):
+        'Adds a new radial background'
         self._set_changed()
         itr = self._bg_model.append((theme.RadialGradientBackground(),))
         self._activate_bg(itr)
     
     def _on_bg_radial(self, widget=None):
+        'Create the widgets for editing radial backgrounds'
         table = self._bg_edit_table
         table.y = 0
         table.foreach(lambda w: table.remove(w))
@@ -464,7 +500,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         loc = 0.1
         if len(bg.stops) == 0:
             for i in range(2):
-                self._bg_gradient_add_stop(update=False)
+                self._bg_gradient_add_point(update=False)
         for i in range(len(bg.stops)):
             self._bg_radial_colors.append(table.attach_widget(gtk.ColorButton(), label=_("Color %d"%i)))
             self._bg_radial_colors[i].set_use_alpha(True)
@@ -474,7 +510,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
             self._bg_radial_lengths[i].connect('change-value', self._on_bg_radial_changed)
             table.attach_hseparator()
         add = table.attach_widget(gtk.Button(_("Add Stop"), gtk.STOCK_ADD), "")
-        add.connect('clicked', self._bg_gradient_add_stop)
+        add.connect('clicked', self._bg_gradient_add_point)
         
         self._bg_radial_length = table.attach_widget(gtk.HScale(gtk.Adjustment(1,1,100,1,10,0)), label=_("Overall Length"))
         self._bg_radial_length.set_digits(0)
@@ -490,6 +526,10 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self._load_bg_radial()
     
     def _on_bg_radial_changed(self, *args):
+        """
+        Called when any part of the radial background widgets changed to
+        update the background and the preview
+        """
         self._set_changed()
         bg = self._get_active_bg()
         for i in range(len(bg.stops)):
@@ -502,6 +542,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self.draw()
     
     def _load_bg_radial(self):
+        'Loads the radial background settings from the theme'
         bg = self._get_active_bg()
         for i in range(len(bg.stops)):
             self._bg_radial_colors[i].set_color(gtk.gdk.color_parse(bg.stops[i].color))
@@ -514,23 +555,27 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self.draw()
     
     def _get_active_bg(self):
+        'Returns the background of the currently selected item'
         (model, iter) = self._treeview_bgs.get_selection().get_selected()
         if iter:
             return model.get_value(iter, 0)
         return None
     
     def _on_bgs_reordered(self, model, path, iter=None, new_order=None):
+        'Called when a background in the list is being dragged to another position'
         #TODO: This doesnt't work. Need to get the order from the treeview.
         self._update_bg_list_from_model()
         self.draw()
     
     def _update_bg_list_from_model(self):
+        'Updates the theme background list according to the model'
         #self._bg_model.reorder()
         self.theme.backgrounds = []
         for bg in self._bg_model:
             self.theme.backgrounds.append(bg[0])
     
     def _on_bg_changed(self, widget):
+        'Sets the background edit area to the appropriate widgets'
         bg = self._get_active_bg()
         if not bg:
             self._pos_expander.set_sensitive(False)
@@ -546,6 +591,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self._load_bg_position()
     
     def _on_delete_bg(self, *args):
+        'Delete a background from the list'
         (model, itr) = self._treeview_bgs.get_selection().get_selected()
         if not itr:
             return False
@@ -562,6 +608,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
             self.draw()
     
     def _bg_get_row_text(self, column, cell, model, titer):
+        'Sets the row to the background name'
         bg = model.get_value(titer, 0)
         cell.set_property('text', bg.get_name())
     
@@ -648,6 +695,10 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self.draw()
     
     def _nb_page_changed(self, notebook, page, page_num):
+        """
+        Loads the appropriate values in the position expander
+        when the user switches between the notebook tabs
+        """
         if not hasattr(self, '_pos_expander'):
             return
         if page_num == 0:
@@ -666,6 +717,10 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
             self._load_footer_position()
     
     def _load_bg_position(self):
+        """
+        Sets the values in the position widgets to the position of
+        the current background
+        """
         bg = self._get_active_bg()
         self._pos_expander.set_sensitive(True)
         self.__updating = True
@@ -675,7 +730,11 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self._p['bt'].set_value(bg.pos[3])
         self.__updating = False
     
-    def _load_body_position(self, ):
+    def _load_body_position(self):
+        """
+        Sets the values in the position widgets to the position
+        of the body section
+        """
         body = self.theme.get_body()
         self.__updating = True
         self._p['lf'].set_value(body.pos[0])
@@ -684,7 +743,11 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self._p['bt'].set_value(body.pos[3])
         self.__updating = False
     
-    def _load_footer_position(self, ):
+    def _load_footer_position(self):
+        """
+        Sets the values in the position widgets to the position
+        of the footer section
+        """
         body = self.theme.get_footer()
         self.__updating = True
         self._p['lf'].set_value(body.pos[0])
@@ -694,6 +757,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self.__updating = False
     
     def _set_changed(self, changed=True):
+        'Displays a star (*) in the window title if something has changed'
         self._changed = changed
         if changed:
             if not self.get_title().startswith("*"):
@@ -756,17 +820,27 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self._set_changed(False)
     
     def _revert_changes(self, *args):
+        'Reverts all unsaved changes'
         self._load_theme(self.theme.filename)
         
     def _save_changes(self, *args):
+        """
+        Saves the theme to a new file if it didn't exist,
+        updates the file according to the theme name if it existed before.
+        """
         name = self._title_entry.get_text()
         self.theme.meta['title'] = name
         if not self.theme.filename:
-            self.theme.filename = os.path.join(DATA_PATH, 'theme', title_to_filename(name)+'.xml')
+            self.theme.filename = find_freefile(os.path.join(
+                    DATA_PATH, 'theme', title_to_filename(name)+'.xml'))
+        else:
+            self.theme.filename = check_filename(name, os.path.join(
+                    DATA_PATH, 'theme', self.theme.filename))
         self.theme.save()
         self._set_changed(False)
     
     def _close(self, widget, *args):
+        'Checks for unsaved changes and closes the Editor'
         if self._changed:
             msg = _("Unsaved Changes will be lost if you close the Editor. \
 Do you want to save?")
@@ -795,7 +869,7 @@ Do you want to save?")
 
 class _ExampleSlide(object):
     """
-    A slide to draw as an example for the theme selection widget.
+    A slide to draw as an example for the preview widget.
     """
     def __init__(self):
         object.__init__(self)
