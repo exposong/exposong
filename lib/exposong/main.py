@@ -67,7 +67,7 @@ class Main (gtk.Window):
         self.set_title("ExpoSong")
         self.connect("configure_event", self._on_configure_event)
         self.connect("window_state_event", self._on_window_state_event)
-        self.connect("destroy", self._quit)
+        self.connect("delete-event", self._quit)
         
         ##  GUI
         win_v = gtk.VBox()

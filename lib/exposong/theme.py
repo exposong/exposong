@@ -516,7 +516,7 @@ class GradientStop(_Element):
             self.alpha = float(el.attrib['opacity'])
     
     def to_xml(self):
-        el = etree.Element("stop")
+        el = etree.Element("point")
         el.attrib['stop'] = str(self.location)
         el.attrib['color'] = self.color
         el.attrib['opacity'] = str(self.alpha)

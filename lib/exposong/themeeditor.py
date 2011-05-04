@@ -29,6 +29,7 @@ import gui
 import theme
 
 from exposong import DATA_PATH, RESOURCE_PATH
+from exposong.glob import title_to_filename
 
 BACKGROUND_TYPES = [_("Image"),  _("Color"), _("Gradient"), _("Radial Gradient")]
 
@@ -38,10 +39,10 @@ class ThemeEditor(gtk.Window):
     """
     def __init__(self, parent=None, filename=None):
         gtk.Window.__init__(self)
-        self.connect("destroy", self._destroy)
+        self.connect("delete_event", self._close)
         self.set_transient_for(parent)
         self.set_title(_("ExpoSong Theme Editor"))
-
+        
         self.__updating = False
         self._do_layout()        
         self._load_theme(filename)
@@ -158,6 +159,15 @@ class ThemeEditor(gtk.Window):
         table_right.attach_widget(self._preview)
         self._pos_expander = table_right.attach_widget(self._get_position())
         self._pos_expander.set_sensitive(False)
+        h = gtk.HBox()
+        btn_revert = gtk.Button("", gtk.STOCK_REVERT_TO_SAVED)
+        btn_revert.connect('clicked', self._revert_changes)
+        btn_save = gtk.Button("", gtk.STOCK_SAVE)
+        btn_save.connect('clicked', self._save_changes)
+        h.pack_start(btn_revert)
+        h.pack_start(btn_save)
+        table_right.attach_hseparator()
+        table_right.attach_widget(h)
 
         main_h.pack_end(table_right)
         self.add(main_h)
@@ -265,6 +275,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self._treeview_bgs.scroll_to_cell(self._bg_model.get_path(itr))
     
     def _on_bg_image_new(self, widget=None):
+        self._set_changed()
         fchooser = gtk.FileChooserDialog( _("Add Images"), self,
                 gtk.FILE_CHOOSER_ACTION_OPEN,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
@@ -329,6 +340,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self.draw()
     
     def _on_bg_solid_new(self, widget=None):
+        self._set_changed()
         itr = self._bg_model.append((theme.ColorBackground(),))
         self._activate_bg(itr)
     
@@ -356,6 +368,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self._bg_solid_color_button.set_alpha(int(bg.alpha*65535))
     
     def _on_bg_gradient_new(self, widget=None):
+        self._set_changed()
         itr = self._bg_model.append((theme.GradientBackground(),))
         self._activate_bg(itr)
     
@@ -391,6 +404,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self._load_bg_gradient()
     
     def _bg_gradient_add_stop(self, widget=None, update=True, *args):
+        self._set_changed()
         bg = self._get_active_bg()
         if len(bg.stops)>0:
             loc = bg.stops[len(bg.stops)-1].location
@@ -405,6 +419,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
             loc -= random.uniform(0.1, 0.5)
         else:
             loc += random.uniform(0.1, 0.5)
+        loc = round(loc, 2)
         bg.stops.append(theme.GradientStop(location=loc, color=col))
         if update:
             if type(bg) == theme.GradientBackground:
@@ -433,6 +448,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self.draw()
     
     def _on_bg_radial_new(self, widget=None):
+        self._set_changed()
         itr = self._bg_model.append((theme.RadialGradientBackground(),))
         self._activate_bg(itr)
     
@@ -748,12 +764,41 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self.footer_widgets['outline_size'].set_value(footer.outline_size)
         self.footer_widgets['outline_color'].set_color(gtk.gdk.Color(footer.outline_color))
         self._set_changed(False)
+    
+    def _revert_changes(self, *args):
+        self._load_theme(self.theme.filename)
         
-    def _destroy(self, widget):
-        #self.theme.save()
-        global __name__
-        self.hide()
+    def _save_changes(self, *args):
+        name = self._title_entry.get_text()
+        self.theme.meta['title'] = name
+        if not self.theme.filename:
+            self.theme.filename = os.path.join(DATA_PATH, 'theme', title_to_filename(name)+'.xml')
+        self.theme.save()
+        self._set_changed(False)
+    
+    def _close(self, widget, *args):
+        if self._changed:
+            msg = _("Unsaved Changes will be lost if you close the Editor. \
+Do you want to save?")
+            dialog = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
+                                       gtk.MESSAGE_QUESTION, gtk.BUTTONS_NONE,
+                                       msg)
+            dialog.set_title( _("Unsaved changes") )
+            dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
+            dialog.add_button(gtk.STOCK_NO, gtk.RESPONSE_NO)
+            dialog.add_button(gtk.STOCK_SAVE, gtk.RESPONSE_OK)
+            dialog.show_all()
+            resp = dialog.run()
+            if resp == gtk.RESPONSE_NO:
+                pass
+            elif resp == gtk.RESPONSE_CANCEL:
+                dialog.destroy()
+                return True
+            elif resp == gtk.RESPONSE_OK:
+                self._save_changes()
+            dialog.destroy()
         self.destroy()
+        global __name__
         if __name__ == "__main__":
             gtk.main_quit()
 
