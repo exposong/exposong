@@ -196,7 +196,7 @@ class ThemeEditor(gtk.Window):
         widgets['font_color'] = table.attach_widget(gtk.ColorButton(gtk.gdk.Color(0,0,0)), label=_("Color"))
         widgets['font_color'].connect('color-set', cb)
         widgets['alignment_title'] = table.attach_section_title(_("Alignment"))
-        widgets['alignment_horizontal'] = table.attach_combo((_("Center"), _("Left"), _("Right")), _("Center"), label=_("Text Alignment"))
+        widgets['alignment_horizontal'] = table.attach_combo((_("Left"), _("Center"), _("Right")), _("Center"), label=_("Text Alignment"))
         widgets['alignment_horizontal'].connect('changed', cb)
         ## Order for vertical align must be the same as theme.TOP, theme.MIDDLE, theme.BOTTOM
         widgets['alignment_vertical'] = table.attach_combo((_("Top"), _("Middle"), _("Bottom")), _("Middle"), label=_("Vertical Text Alignment"))
@@ -228,11 +228,11 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
     def _on_body_changed(self, *args):
         self._set_changed()
         body = self.theme.get_body()
+        
         body.font = self.body_widgets['font_button'].get_font_name()
         body.color = self.body_widgets['font_color'].get_color().to_string()
         a = self.body_widgets['alignment_horizontal'].get_active_text()
         body.align = theme.get_align_const(a)
-        
         a = self.body_widgets['alignment_vertical'].get_active_text()
         body.valign = theme.get_valign_const(a)
         
@@ -249,11 +249,11 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
     def _on_footer_changed(self, *args):
         self._set_changed()
         footer = self.theme.get_footer()
+        
         footer.font = self.footer_widgets['font_button'].get_font_name()
         footer.color = self.footer_widgets['font_color'].get_color().to_string()
         a = self.footer_widgets['alignment_horizontal'].get_active()
         footer.align = theme.get_align_const(a)
-        
         a = self.footer_widgets['alignment_vertical'].get_active()
         footer.valign = theme.get_valign_const(a)
         
@@ -716,19 +716,14 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         body = self.theme.get_body()
         self.body_widgets['font_button'].set_font_name(body.font)
         self.body_widgets['font_color'].set_color(gtk.gdk.Color(body.color))
-        if body.align == theme.CENTER:
+        if body.align == theme.LEFT:
             self.body_widgets['alignment_horizontal'].set_active(0)
-        elif body.align == theme.LEFT:
+        elif body.align == theme.CENTER:
             self.body_widgets['alignment_horizontal'].set_active(1)
         elif body.align == theme.RIGHT:
             self.body_widgets['alignment_horizontal'].set_active(2)
-        
-        if body.valign == theme.MIDDLE:
-            self.body_widgets['alignment_vertical'].set_active(0)
-        elif body.valign == theme.TOP:
-            self.body_widgets['alignment_vertical'].set_active(1)
-        elif body.valign == theme.BOTTOM:
-            self.body_widgets['alignment_vertical'].set_active(2)
+        if body.valign:
+            self.body_widgets['alignment_vertical'].set_active(body.valign)
         
         self.body_widgets['line_spacing'].set_value(body.spacing)
         self.body_widgets['shadow_color'].set_color(gtk.gdk.Color(body.shadow_color))
@@ -742,19 +737,14 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         footer = self.theme.get_footer()
         self.footer_widgets['font_button'].set_font_name(footer.font)
         self.footer_widgets['font_color'].set_color(gtk.gdk.Color(footer.color))
-        if footer.align == theme.CENTER:
+        if footer.align == theme.LEFT:
             self.footer_widgets['alignment_horizontal'].set_active(0)
-        elif footer.align == theme.LEFT:
+        elif footer.align == theme.CENTER:
             self.footer_widgets['alignment_horizontal'].set_active(1)
         elif footer.align == theme.RIGHT:
             self.footer_widgets['alignment_horizontal'].set_active(2)
-        
-        if footer.valign == theme.MIDDLE:
-            self.footer_widgets['alignment_vertical'].set_active(0)
-        elif footer.valign == theme.TOP:
-            self.footer_widgets['alignment_vertical'].set_active(1)
-        elif footer.valign == theme.BOTTOM:
-            self.footer_widgets['alignment_vertical'].set_active(2)
+        if footer.valign:
+            self.footer_widgets['alignment_vertical'].set_active(footer.valign)
         
         self.footer_widgets['line_spacing'].set_value(footer.spacing)
         self.footer_widgets['shadow_color'].set_color(gtk.gdk.Color(footer.shadow_color))
