@@ -149,6 +149,14 @@ class ThemeEditor(gtk.Window):
         footer_h.pack_start(self._get_section_right(self._on_footer_changed, self.footer_widgets))
         self._notebook.append_page(footer_h, gtk.Label(_("Footer Text")))
         
+        table_meta = gui.ESTable(4, auto_inc_y=True)
+        self._meta = {} #Key names must comply with the keys in the <meta> tag in the theme file
+        self._meta['author'] = table_meta.attach_entry("", label=_("Author"))
+        self._meta['themeurl'] = table_meta.attach_entry("", label=_("Theme URL"))
+        self._meta['copyright'] = table_meta.attach_entry("", label=_("Copyright"))
+        self._meta['description'] = table_meta.attach_entry("", label=_("Description"))
+        self._notebook.append_page(table_meta, gtk.Label(_("Metadata")))
+        
         main_h.pack_start(main_v)
         
         ############  Preview  ########################
@@ -817,6 +825,12 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self.footer_widgets['shadow_y_offset'].set_value(footer.shadow_offset[1])
         self.footer_widgets['outline_size'].set_value(footer.outline_size)
         self.footer_widgets['outline_color'].set_color(gtk.gdk.Color(footer.outline_color))
+        
+        ##################### Metadata ########################################
+        for key, value in self.theme.meta.iteritems():
+            if key in self._meta:
+                self._meta[key].set_text(value)
+        
         self._set_changed(False)
     
     def _revert_changes(self, *args):
@@ -828,6 +842,10 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         Saves the theme to a new file if it didn't exist,
         updates the file according to the theme name if it existed before.
         """
+        #Metadata
+        for key, value in self._meta.iteritems():
+            if value.get_text() != "":
+                self.theme.meta[key] = value.get_text()
         name = self._title_entry.get_text()
         self.theme.meta['title'] = name
         if not self.theme.filename:

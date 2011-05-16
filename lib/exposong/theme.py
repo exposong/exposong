@@ -47,6 +47,7 @@ import pango
 from gtk.gdk import pixbuf_new_from_file as pb_new
 from xml.etree import cElementTree as etree
 
+import exposong.main
 from exposong import DATA_PATH
 
 LEFT = pango.ALIGN_LEFT
@@ -80,9 +81,11 @@ class Theme(object):
                               pos=[0.0, 0.8, 1.0, 1.0])
         if filename:
             self.filename = os.path.split(filename)[1]
-            
-            tree = etree.parse(filename)
-            self.load(tree)
+            try:
+                tree = etree.parse(filename)
+                self.load(tree)
+            except etree.ParseError:
+                exposong.log.error("Could not load theme %s."%filename)
         else:
             self.filename = filename
     
