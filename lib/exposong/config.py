@@ -56,6 +56,7 @@ class Config(ConfigParser.SafeConfigParser):
         self.add_section("dialogs")
         self.add_section("general")
         self.add_section("screen")
+        self.add_section("updates")
         
         
         self.set("dialogs", "songselect-import-dir", os.path.expanduser("~"))
@@ -71,6 +72,9 @@ class Config(ConfigParser.SafeConfigParser):
         self.setcolor("screen", "logo_bg", (65535, 43690, 4369))
         self.setcolor("screen", "notify_color", (65535, 65535, 65535))
         self.setcolor("screen", "notify_bg", (65535, 0, 0))
+        
+        self.set("updates", "check_for_updates", "True")
+        self.set("updates", "last_check", "")
         
         self.configfile = cfile
         self.read(self.configfile)

@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import time
 import gtk
 import webbrowser
 import urllib
@@ -25,7 +26,7 @@ import exposong.main
 import exposong.version
 import exposong._hook
 from exposong import RESOURCE_PATH, DATA_PATH
-from exposong import statusbar
+from exposong import statusbar, config
 
 class Help(exposong._hook.Menu, object):
     
@@ -51,10 +52,41 @@ class Help(exposong._hook.Menu, object):
         webbrowser.open("http://exposong.org/contribute")
         exposong.log.info("Contribute page opened in Web Browser.")
     
-    def _check_for_update(self, *args):
+    def _check_for_update(self, *args, **kw):
         "Let the user know if a new version is out."
+        statusbar.statusbar.output(_("Checking for updates ..."))
+        
+        (new_version, msg, err) = self._update_available()
+        
+        if err:
+            statusbar.statusbar.output(msg)
+            dlg = gtk.MessageDialog(exposong.main.main, 0,
+                                    gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE, msg)
+            dlg.set_title(_("An Error Occurred"))
+        elif new_version:
+            dlg = gtk.MessageDialog(exposong.main.main, 0, gtk.MESSAGE_WARNING,
+                                    gtk.BUTTONS_YES_NO, msg)
+            dlg.set_title(_("A New Version is Available"))
+        else:
+            dlg = gtk.MessageDialog(exposong.main.main, 0,
+                                    gtk.MESSAGE_INFO, gtk.BUTTONS_OK, msg)
+            dlg.set_title(_("ExpoSong is Up to Date"))
+        
+        if not err:
+            config.config.set("updates", "last_check", str(int(time.time())) )
+        
+        #Do not show errors when checking automatically
+        if 'auto_check' in kw and not new_version:
+            return
+        
+        if dlg.run() == gtk.RESPONSE_YES:
+            webbrowser.open("http://exposong.org/download/")
+        dlg.destroy()
+    
+    def _update_available(self):
         msg = ""
         err = new_version = False
+        fl = None
         try:
             fl = urllib.urlopen("http://exposong.org/_current-version/")
             if fl.getcode() <> 200:
@@ -74,24 +106,11 @@ class Help(exposong._hook.Menu, object):
             err = True
             msg = _("Could not connect to %s.") % "exposong.org"
         finally:
-            fl.close()
+            if fl:
+                fl.close()
+        return (new_version, msg, err)
         
-        if err:
-            dlg = gtk.MessageDialog(exposong.main.main, 0,
-                                    gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE, msg)
-            dlg.set_title(_("An Error Occurred"))
-        elif new_version:
-            dlg = gtk.MessageDialog(exposong.main.main, 0, gtk.MESSAGE_WARNING,
-                                    gtk.BUTTONS_YES_NO, msg)
-            dlg.set_title(_("A New Version is Available"))
-        else:
-            dlg = gtk.MessageDialog(exposong.main.main, 0,
-                                    gtk.MESSAGE_INFO, gtk.BUTTONS_OK, msg)
-            dlg.set_title(_("ExpoSong is Up to Date"))
-        if dlg.run() == gtk.RESPONSE_YES:
-            webbrowser.open("http://exposong.org/download/")
-        dlg.destroy()
-
+        
     def delete_help_file(self):
         'Delete the generated help file'
         if os.path.exists(self.helpfile):

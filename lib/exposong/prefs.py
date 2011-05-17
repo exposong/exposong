@@ -58,13 +58,16 @@ class PrefsDialog(gtk.Dialog):
         g_data = table.attach_folderchooser(folder, label=_("Data folder"))
         msg = _("The place where all your presentations, schedules and background images are stored.")
         g_data.set_tooltip_text(msg)
-        
-        g_title = table.attach_checkbutton(_("Insert title slide"),
-                                           label=_("Slides"))
-        if config.get("general", "title_slide") == "True":
-            g_title.set_active(True)
+        table.attach_section_title(_("Updates"))
+        g_update = table.attach_checkbutton(
+            _("Automatically check for updates"))
+        if config.get("updates", "check_for_updates") == "True":
+            g_update.set_active(True)
         
         table.attach_section_title(_("Lyrics"))
+        g_title = table.attach_checkbutton(_("Insert title slide"))
+        if config.get("general", "title_slide") == "True":
+            g_title.set_active(True)
         g_ccli = table.attach_entry(config.get("general","ccli"),
                                     label="CCLI #")
         songbooks = [sbook.name for t in exposong.main.main.library
@@ -129,6 +132,7 @@ class PrefsDialog(gtk.Dialog):
             config.set("general", "ccli", g_ccli.get_text())
             if g_songbook.get_active_text():
                 config.set("general", "songbook", g_songbook.get_active_text())
+            config.set("updates", "check_for_updates", str(g_update.get_active()))
             if config.get("general", "title_slide") != str(g_title.get_active()):
                 config.set("general", "title_slide", str(g_title.get_active()))
                 exposong.preslist.preslist._on_pres_activate()

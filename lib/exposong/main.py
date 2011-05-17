@@ -19,9 +19,11 @@
 import gtk
 import gtk.gdk
 import gobject
+import thread
 import os
 import os.path
 import webbrowser
+import time
 from gtk.gdk import pixbuf_new_from_file as pb_new
 from xml.etree import cElementTree as etree
 
@@ -158,6 +160,7 @@ class Main (gtk.Window):
     def _ready(self):
         "Called when ExpoSong is fully loaded."
         self.show_all()
+        self._auto_check_for_update()
         # Prepares all button visibility by hiding the screen.
         screen.screen.hide()
         statusbar.statusbar.output(_("Ready"))
@@ -451,6 +454,15 @@ class Main (gtk.Window):
         'Enables keyboard shortcuts after disabling.'
         for k in keys_to_disable:
             screen.screen._actions.get_action(k).connect_accelerator()
+    
+    def _auto_check_for_update(self):
+        'Checks for available updates at startup once in a month'
+        if not config.config.get("updates", "check_for_updates") == "True":
+            return
+        if config.config.get("updates", "last_check") == "" or\
+                int(config.config.get("updates", "last_check"))+2678400 < time.time():
+            exposong.log.info("Checking for updates")
+            exposong.help.help._check_for_update(auto_check=True)
     
     def _on_configure_event(self, widget, *args):
         'Sets the size and position in the config (matters, if not maximized)'
