@@ -55,7 +55,8 @@ class ThemeEditor(gtk.Window):
         
         # Title entry
         title_table = gui.ESTable(1)
-        self._title_entry = title_table.attach_entry(_("New Theme"), label=_("Theme Name"))
+        self._title_entry = title_table.attach_entry(_("New Theme"),
+                                                     label=_("Theme Name"))
         main_v.pack_start(title_table, False, False)
         
         self._notebook = gtk.Notebook()
@@ -114,7 +115,8 @@ class ThemeEditor(gtk.Window):
         self._treeview_bgs.get_selection().connect("changed", self._on_bg_changed)
         
         bg_left = gtk.VBox()
-        gui.append_comment(bg_left, _("Backgrounds will be drawn starting with the first element in this list moving to the last one."), 0)
+        gui.append_comment(bg_left, _("Backgrounds will be drawn starting with \
+the first element in this list moving to the last one."), 0)
         bg_left.pack_start(toolbar, False, True, gui.WIDGET_SPACING)
         scroll = gtk.ScrolledWindow()
         scroll.add(self._treeview_bgs)
@@ -136,17 +138,21 @@ class ThemeEditor(gtk.Window):
         ########### Notebook Page 2: Body Text #################################
         self.body_widgets = {}
         body_h = gtk.HBox()
-        body_h.pack_start(self._get_section_left(self._on_body_changed, self.body_widgets))
+        body_h.pack_start(self._get_section_left(self._on_body_changed,
+                                                 self.body_widgets))
         body_h.pack_start(gtk.VSeparator())
-        body_h.pack_start(self._get_section_right(self._on_body_changed, self.body_widgets))
+        body_h.pack_start(self._get_section_right(self._on_body_changed,
+                                                  self.body_widgets))
         self._notebook.append_page(body_h, gtk.Label(_("Body Text")))
        
         ############ Notebook Page 3: Footer Text ##############################
         self.footer_widgets = {}
         footer_h = gtk.HBox()
-        footer_h.pack_start(self._get_section_left(self._on_footer_changed, self.footer_widgets))
+        footer_h.pack_start(self._get_section_left(self._on_footer_changed,
+                                                   self.footer_widgets))
         footer_h.pack_start(gtk.VSeparator())
-        footer_h.pack_start(self._get_section_right(self._on_footer_changed, self.footer_widgets))
+        footer_h.pack_start(self._get_section_right(self._on_footer_changed,
+                                                    self.footer_widgets))
         self._notebook.append_page(footer_h, gtk.Label(_("Footer Text")))
         
         table_meta = gui.ESTable(4, auto_inc_y=True)
@@ -155,6 +161,8 @@ class ThemeEditor(gtk.Window):
         self._meta['themeurl'] = table_meta.attach_entry("", label=_("Theme URL"))
         self._meta['copyright'] = table_meta.attach_entry("", label=_("Copyright"))
         self._meta['description'] = table_meta.attach_entry("", label=_("Description"))
+        self._meta['tags'] = table_meta.attach_entry("", label=_("Tags"))
+        table_meta.attach_comment(_("Separate tags with commas"))
         self._notebook.append_page(table_meta, gtk.Label(_("Metadata")))
         
         main_h.pack_start(main_v)
@@ -201,18 +209,24 @@ class ThemeEditor(gtk.Window):
         "Returns a table with the left part of the section edit controls"
         table = gui.ESTable(8, row_spacing=10, auto_inc_y=True)
         widgets['font_title'] = table.attach_section_title(_("Font"))
-        widgets['font_button'] = table.attach_widget(gtk.FontButton(), label=_("Type and Size"))
+        widgets['font_button'] = table.attach_widget(gtk.FontButton(),
+                                                     label=_("Type and Size"))
         widgets['font_button'].connect('font-set', cb)
-        widgets['font_comment'] = table.attach_comment(_("Note that the font size might be scaled down if it doesn't fit."))
-        widgets['font_color'] = table.attach_widget(gtk.ColorButton(gtk.gdk.Color(0,0,0)), label=_("Color"))
+        widgets['font_comment'] = table.attach_comment(
+            _("Note that the font size might be scaled down if it doesn't fit."))
+        widgets['font_color'] = table.attach_widget(gtk.ColorButton(
+                gtk.gdk.Color(0,0,0)), label=_("Color"))
         widgets['font_color'].connect('color-set', cb)
         widgets['alignment_title'] = table.attach_section_title(_("Alignment"))
-        widgets['alignment_horizontal'] = table.attach_combo((_("Left"), _("Center"), _("Right")), _("Center"), label=_("Text Alignment"))
+        widgets['alignment_horizontal'] = table.attach_combo((_("Left"),
+                _("Center"), _("Right")), _("Center"), label=_("Text Alignment"))
         widgets['alignment_horizontal'].connect('changed', cb)
-        ## Order for vertical align must be the same as theme.TOP, theme.MIDDLE, theme.BOTTOM
-        widgets['alignment_vertical'] = table.attach_combo((_("Top"), _("Middle"), _("Bottom")), _("Middle"), label=_("Vertical Text Alignment"))
+        ## Order for vertical align must be theme.TOP, theme.MIDDLE, theme.BOTTOM
+        widgets['alignment_vertical'] = table.attach_combo((_("Top"), _("Middle"),
+                _("Bottom")), _("Middle"), label=_("Vertical Text Alignment"))
         widgets['alignment_vertical'].connect('changed', cb)
-        widgets['line_spacing'] = table.attach_spinner(gtk.Adjustment(1.0, 1.0, 3.0, 0.1, 1, 0), 0.0, 1, label=_("Line Spacing"))
+        widgets['line_spacing'] = table.attach_spinner(
+            gtk.Adjustment(1.0, 1.0, 3.0, 0.1, 1, 0), 0.0, 1, label=_("Line Spacing"))
         widgets['line_spacing'].connect('value-changed', cb)
         return table
     
@@ -220,19 +234,24 @@ class ThemeEditor(gtk.Window):
         "Returns a table with the right part of the section edit controls"
         table = gui.ESTable(8, 1, row_spacing=10, auto_inc_y=True)
         widgets['shadow_title'] = table.attach_section_title(_("Text Shadow"))
-        widgets['shadow_color'] = table.attach_widget(gtk.ColorButton(gtk.gdk.Color(0,0,0)), label=_("Color"))
+        widgets['shadow_color'] = table.attach_widget(
+                gtk.ColorButton(gtk.gdk.Color(0,0,0)), label=_("Color"))
         widgets['shadow_color'].set_use_alpha(True)
         widgets['shadow_color'].connect('color-set', cb)
-        widgets['shadow_x_offset'] = table.attach_spinner(gtk.Adjustment(0.5, -1.0, 1.0, 0.1, 0.5, 0), 0.0, 1, label=_("x-Offset"))
+        widgets['shadow_x_offset'] = table.attach_spinner(
+                gtk.Adjustment(0.5, -1.0, 1.0, 0.1, 0.5, 0), 0.0, 1, label=_("x-Offset"))
         widgets['shadow_x_offset'].connect('value-changed', cb)
-        widgets['shadow_y_offset'] = table.attach_spinner(gtk.Adjustment(0.5, -1.0, 1.0, 0.1, 0.5, 0), 0.0, 1, label=_("y-Offset"))
+        widgets['shadow_y_offset'] = table.attach_spinner(
+                gtk.Adjustment(0.5, -1.0, 1.0, 0.1, 0.5, 0), 0.0, 1, label=_("y-Offset"))
         widgets['shadow_y_offset'].connect('value-changed', cb)
         widgets['shadow_comment'] = table.attach_comment(_("Shadow offsets are measured \
 in percentage of font height. So an offset of 0.5 for point 12 font is 6 points."))
         widgets['outline_title'] = table.attach_section_title(_("Text Outline"))
-        widgets['outline_size'] = table.attach_spinner(gtk.Adjustment(0.0, 0.0, 3.0, 1.0, 1.0, 0), label=_("Size (Pixel)"))
+        widgets['outline_size'] = table.attach_spinner(
+                gtk.Adjustment(0.0, 0.0, 3.0, 1.0, 1.0, 0), label=_("Size (Pixel)"))
         widgets['outline_size'].connect('value-changed', cb)
-        widgets['outline_color'] = table.attach_widget(gtk.ColorButton(gtk.gdk.Color(0,0,0)), label=_("Color"))
+        widgets['outline_color'] = table.attach_widget(
+                gtk.ColorButton(gtk.gdk.Color(0,0,0)), label=_("Color"))
         widgets['outline_color'].connect('color-set', cb)
         return table
     
@@ -312,7 +331,8 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
             newpath = os.path.join(DATA_PATH, 'theme', 'res', os.path.basename(img))
             if newpath != img:
                 shutil.copy(img, newpath)
-            itr = self._bg_model.append((theme.ImageBackground(src=os.path.basename(img)),))
+            itr = self._bg_model.append(
+                (theme.ImageBackground(src=os.path.basename(img)),))
             self._activate_bg(itr)
         fchooser.destroy()
         self.draw()
@@ -327,7 +347,8 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self._bg_image_filech.connect("file-set", self._on_bg_image_changed)
         self._bg_image_radio_mode_fit = gtk.RadioButton(None, _("Fit"))
         self._bg_image_radio_mode_fit.connect('toggled', self._on_bg_image_changed)
-        self._bg_image_radio_mode_fill = gtk.RadioButton(self._bg_image_radio_mode_fit, _("Fill"))
+        self._bg_image_radio_mode_fill = gtk.RadioButton(
+                self._bg_image_radio_mode_fit, _("Fill"))
         h = gtk.HBox()
         h.pack_start(self._bg_image_radio_mode_fill)
         h.pack_start(self._bg_image_radio_mode_fit)
@@ -379,7 +400,8 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         table.foreach(lambda w: table.remove(w))
         
         table.attach_section_title(_("Color Background"))
-        self._bg_solid_color_button = table.attach_widget(gtk.ColorButton(), label=_("Color"))
+        self._bg_solid_color_button = table.attach_widget(
+                gtk.ColorButton(), label=_("Color"))
         self._bg_solid_color_button.set_use_alpha(True)
         self._bg_solid_color_button.connect('color-set', self._on_bg_solid_changed)
         table.show_all()
@@ -422,18 +444,23 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
             for i in range(2):
                 self._bg_gradient_add_point(update=False)
         for i in range(len(bg.stops)):
-            self._bg_gradient_colors.append(table.attach_widget(gtk.ColorButton(), label=_("Color %d"%i)))
+            self._bg_gradient_colors.append(table.attach_widget(
+                    gtk.ColorButton(), label=_("Color %d"%i)))
             self._bg_gradient_colors[i].set_use_alpha(True)
-            self._bg_gradient_colors[i].connect('color-set', self._on_bg_gradient_changed)
-            self._bg_gradient_lengths.append(table.attach_widget(gtk.HScale(gtk.Adjustment(50,0,100,1,10,0)), label=_("Length")))
+            self._bg_gradient_colors[i].connect('color-set',
+                                                self._on_bg_gradient_changed)
+            self._bg_gradient_lengths.append(table.attach_widget(
+                    gtk.HScale(gtk.Adjustment(50,0,100,1,10,0)), label=_("Length")))
             self._bg_gradient_lengths[i].set_digits(0)
-            self._bg_gradient_lengths[i].connect('change-value', self._on_bg_gradient_changed)
+            self._bg_gradient_lengths[i].connect('change-value',
+                                                 self._on_bg_gradient_changed)
             table.attach_hseparator()
         add = table.attach_widget(gtk.Button(_("Add Stop"), gtk.STOCK_ADD))
         add.connect('clicked', self._bg_gradient_add_point)
         
         # TODO Move HScale as helper function to ESTable
-        self._bg_gradient_angle = table.attach_widget(gtk.HScale(gtk.Adjustment(0,0,360,1,10,0)), label=_("Angle"))
+        self._bg_gradient_angle = table.attach_widget(gtk.HScale(
+                gtk.Adjustment(0,0,360,1,10,0)), label=_("Angle"))
         self._bg_gradient_angle.set_digits(0)
         self._bg_gradient_angle.connect('change-value', self._on_bg_gradient_changed)
         table.show_all()
@@ -510,23 +537,28 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
             for i in range(2):
                 self._bg_gradient_add_point(update=False)
         for i in range(len(bg.stops)):
-            self._bg_radial_colors.append(table.attach_widget(gtk.ColorButton(), label=_("Color %d"%i)))
+            self._bg_radial_colors.append(table.attach_widget(
+                    gtk.ColorButton(), label=_("Color %d"%i)))
             self._bg_radial_colors[i].set_use_alpha(True)
             self._bg_radial_colors[i].connect('color-set', self._on_bg_radial_changed)
-            self._bg_radial_lengths.append(table.attach_widget(gtk.HScale(gtk.Adjustment(50,0,100,1,10,0)), label=_("Length")))
+            self._bg_radial_lengths.append(table.attach_widget(
+                    gtk.HScale(gtk.Adjustment(50,0,100,1,10,0)), label=_("Length")))
             self._bg_radial_lengths[i].set_digits(0)
             self._bg_radial_lengths[i].connect('change-value', self._on_bg_radial_changed)
             table.attach_hseparator()
         add = table.attach_widget(gtk.Button(_("Add Stop"), gtk.STOCK_ADD), "")
         add.connect('clicked', self._bg_gradient_add_point)
         
-        self._bg_radial_length = table.attach_widget(gtk.HScale(gtk.Adjustment(1,1,100,1,10,0)), label=_("Overall Length"))
+        self._bg_radial_length = table.attach_widget(
+                gtk.HScale(gtk.Adjustment(1,1,100,1,10,0)), label=_("Overall Length"))
         self._bg_radial_length.set_digits(0)
         self._bg_radial_length.connect('change-value', self._on_bg_radial_changed)
-        self._bg_radial_pos_h = table.attach_widget(gtk.HScale(gtk.Adjustment(0,0,100,1,10,0)), label=_("Horizontal Position"))
+        self._bg_radial_pos_h = table.attach_widget(
+                gtk.HScale(gtk.Adjustment(0,0,100,1,10,0)), label=_("Horizontal Position"))
         self._bg_radial_pos_h.set_digits(0)
         self._bg_radial_pos_h.connect('change-value', self._on_bg_radial_changed)
-        self._bg_radial_pos_v = table.attach_widget(gtk.HScale(gtk.Adjustment(0,0,100,1,10,0)), label=_("Vertical Position"))
+        self._bg_radial_pos_v = table.attach_widget(
+                gtk.HScale(gtk.Adjustment(0,0,100,1,10,0)), label=_("Vertical Position"))
         self._bg_radial_pos_v.set_digits(0)
         self._bg_radial_pos_v.connect('change-value', self._on_bg_radial_changed)
         
