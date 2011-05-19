@@ -92,7 +92,7 @@ class Main (gtk.Window):
         menu = self._create_menu()
         win_v.pack_start(menu, False)
         
-        exposong.log.debug("Laying out the schedlist and preslist.")
+        exposong.log.debug("Laying out the toolbar, schedlist and preslist.")
         ## Main Window Area
         win_h_mn = gtk.HBox()
         self.win_h = gtk.HPaned()
@@ -100,10 +100,14 @@ class Main (gtk.Window):
         left_vbox = gtk.VBox()
         self.win_lft = gtk.VPaned()
         #### Schedule
+        sched_v = gtk.VBox()
+        sched_v.pack_start(self._create_toolbar())
+        sched_v.pack_start(gtk.HSeparator())
         schedule_scroll = gtk.ScrolledWindow()
         schedule_scroll.add(schedlist.schedlist)
         schedule_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        self.win_lft.pack1(schedule_scroll, False, False)
+        sched_v.pack_start(schedule_scroll)
+        self.win_lft.pack1(sched_v, False, False)
         
         #### Presentation List
         preslist_scroll = gtk.ScrolledWindow()
@@ -320,6 +324,21 @@ class Main (gtk.Window):
         
         menu = self.uimanager.get_widget('/MenuBar')
         return menu
+    
+    def _create_toolbar(self):
+        self.uimanager.add_ui_from_string('''
+                <toolbar name="Toolbar">
+                    <placeholder name="pres-new-lyric"/>
+                    <placeholder name="pres-new-text"/>
+                    <toolitem action="pres-edit"/>
+                    <placeholder name="sched-new"/>
+                </toolbar>''')
+        
+        for mod in exposong._hook.get_hooks(exposong._hook.Toolbar):
+            mod.merge_toolbar(self.uimanager)
+        tb = self.uimanager.get_widget('/Toolbar')
+        tb.set_style(gtk.TOOLBAR_ICONS)
+        return tb
     
     def load_pres(self, filenm):
         'Load a single presentation.'

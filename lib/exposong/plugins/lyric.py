@@ -74,7 +74,7 @@ verse_names = {
 
 
 class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
-        _abstract.Schedule, _abstract.Screen):
+        exposong._hook.Toolbar, _abstract.Schedule, _abstract.Screen):
     '''
     Lyric presentation type.
     '''
@@ -1052,12 +1052,13 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         
         actiongroup = gtk.ActionGroup('exposong-lyric')
         actiongroup.add_actions([("pres-new-lyric", 'pres-lyric', None, None,
-                                None, cls._on_pres_new)])
+                                _("New Lyric Presentation"), cls._on_pres_new)])
         uimanager.insert_action_group(actiongroup, -1)
         
         cls.menu_merge_id = uimanager.add_ui_from_string("""
             <menubar name='MenuBar'>
                 <menu action="Presentation">
+                
                         <menu action="pres-new">
                             <menuitem action='pres-new-lyric' />
                         </menu>
@@ -1069,6 +1070,22 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
     def unmerge_menu(cls, uimanager):
         'Remove merged items from the menu.'
         uimanager.remove_ui(cls.menu_merge_id)
+
+    @classmethod
+    def merge_toolbar(cls, uimanager):
+        'Merge new values with the uimanager'
+        cls.tb_merge_id = uimanager.add_ui_from_string("""
+            <toolbar name='Toolbar'>
+                <placeholder name="pres-new-lyric">
+                <toolitem action='pres-new-lyric' />
+                </placeholder>
+            </toolbar>
+            """)
+    
+    @classmethod
+    def unmerge_toolbar(cls, uimanager):
+        'Remove merged items from the toolbar.'
+        uimanager.remove_ui(cls.tb_merge_id)
     
     @classmethod
     def schedule_name(cls):

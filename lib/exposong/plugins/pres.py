@@ -53,7 +53,7 @@ type_icon = gtk.gdk.pixbuf_new_from_file_at_size(
         os.path.join(RESOURCE_PATH, 'icons', 'pres-exposong.png'), 20, 14)
 
 class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
-                    _abstract.Schedule):
+                    exposong._hook.Toolbar, _abstract.Schedule):
     """
     ExpoSong presentation type.
     """
@@ -767,7 +767,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         
         actiongroup = gtk.ActionGroup('exposong-pres')
         actiongroup.add_actions([('pres-new-text', 'pres-exposong', None, None,
-                None, cls._on_pres_new)])
+                _("New ExpoSong Presentation"), cls._on_pres_new)])
         uimanager.insert_action_group(actiongroup, -1)
         
         cls.menu_merge_id = uimanager.add_ui_from_string("""
@@ -784,6 +784,22 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
     def unmerge_menu(cls, uimanager):
         "Remove merged items from the menu."
         uimanager.remove_ui(cls.menu_merge_id)
+    
+    @classmethod
+    def merge_toolbar(cls, uimanager):
+        'Merge new values with the uimanager'
+        cls.tb_merge_id = uimanager.add_ui_from_string("""
+            <toolbar name='Toolbar'>
+                <placeholder name="pres-new-text">
+                    <toolitem action='pres-new-text' />
+                </placeholder>
+            </toolbar>
+            """)
+    
+    @classmethod
+    def unmerge_toolbar(cls, uimanager):
+        'Remove merged items from the toolbar.'
+        uimanager.remove_ui(cls.tb_merge_id)
     
     @classmethod
     def schedule_name(cls):

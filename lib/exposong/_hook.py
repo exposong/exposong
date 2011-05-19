@@ -45,6 +45,20 @@ class Menu(object):
         'Remove merged items from the menu.'
         raise NotImplementedError
 
+class Toolbar(object):
+    '''
+    Subclasses of this class can modify the toolbar.
+    '''
+
+    @classmethod
+    def merge_toolbar(cls, uimanager):
+        'Merge new values with the uimanager.'
+        raise NotImplementedError
+
+    @classmethod
+    def unmerge_menu(cls, uimanager):
+        'Remove merged items from the toolbar.'
+        raise NotImplementedError
 
 ### Internal Functions ###
 

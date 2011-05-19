@@ -37,7 +37,7 @@ from exposong import statusbar
 schedlist = None
 DRAGDROP_SCHEDULE = [("text/treeview-path", gtk.TARGET_SAME_APP, 4121)]
 
-class ScheduleList(gtk.TreeView, exposong._hook.Menu):
+class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
     '''
     A TreeView of presentation schedules.
     '''
@@ -310,3 +310,14 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu):
                 """)
         # unmerge_menu not implemented, because we will never uninstall this as
         # a module.
+    
+    @classmethod
+    def merge_toolbar(cls, uimanager):
+        'Merge new values with the uimanager'
+        cls.tb_merge_id = uimanager.add_ui_from_string("""
+            <toolbar name='Toolbar'>
+                <placeholder name="sched-new">
+                <toolitem action='sched-new' />
+                </placeholder>
+            </toolbar>
+            """)
