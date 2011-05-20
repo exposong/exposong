@@ -101,8 +101,8 @@ class Main (gtk.Window):
         self.win_lft = gtk.VPaned()
         #### Schedule
         sched_v = gtk.VBox()
-        sched_v.pack_start(self._create_toolbar())
-        sched_v.pack_start(gtk.HSeparator())
+        sched_v.pack_start(self._create_toolbar(), False, False)
+        sched_v.pack_start(gtk.HSeparator(), False, False)
         schedule_scroll = gtk.ScrolledWindow()
         schedule_scroll.add(schedlist.schedlist)
         schedule_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -413,13 +413,13 @@ class Main (gtk.Window):
         task = self.build_pres_list()
         gobject.idle_add(task.next, priority=gobject.PRIORITY_DEFAULT_IDLE - 10)
         yield True
-        libitr = schedlist.schedlist.append(None, self.library, 1)
-        schedlist.schedlist.get_selection().select_iter(libitr)
-        schedlist.schedlist._on_schedule_activate()
         
         #Add schedules from plugins
-        plugins = exposong.plugins.get_plugins_by_capability(
-                exposong.plugins._abstract.Schedule)
+        #TODO: This won't work anymore when we allow to deactivate plugins.
+        # I did this to have a fixed order in the schedlist
+        plugins = [exposong.plugins.lyric.Presentation,
+                   exposong.plugins.pres.Presentation]
+        
         splash.splash.incr_total(len(plugins))
         for plugin in plugins:
             schedule = Schedule(plugin.schedule_name(),
@@ -429,9 +429,12 @@ class Main (gtk.Window):
                 item = self.library.get_value(itr, 0).presentation
                 schedule.append(item)
                 itr = self.library.iter_next(itr)
-            schedlist.schedlist.append(libitr, schedule, 2)
+            schedlist.schedlist.append(None, schedule, 2)
             splash.splash.incr(1)
             yield True
+        
+        schedlist.schedlist.get_selection().select_iter(
+            schedlist.schedlist.get_model().get_iter_first())
         
         #Add custom schedules from the data directory
         schedlist.schedlist.custom_schedules = schedlist.schedlist.append(None,
@@ -444,8 +447,6 @@ class Main (gtk.Window):
                 yield True
         schedlist.schedlist.expand_all()
         
-        schedmodel = schedlist.schedlist.get_model()
-        schedlist.schedlist.collapse_row(schedmodel.get_path(libitr))
         yield False
     
     def _on_about(self, *args):

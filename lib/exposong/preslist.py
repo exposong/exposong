@@ -60,7 +60,7 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         column.set_cell_data_func(pixbufrend, self._get_timer_icon)
         self.append_column(column)
         self.set_headers_clickable(False)
-        self.get_selection().connect("changed", self._on_pres_activate)
+        self.get_selection().connect("changed", self.activate_pres)
         
         self.connect("button-release-event", self._on_pres_rt_click)
         self.connect("drag-data-get", self._on_drag_get)
@@ -125,7 +125,7 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         else:
             #No presentations available.
             return False
-        self._on_pres_activate()
+        self.activate_pres()
     
     def prev_pres(self, *args):
         'Go to the previous presentation.'
@@ -137,7 +137,7 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
                 self.set_cursor(path)
                 self.scroll_to_cell(path)
     
-    def _on_pres_activate(self, *args):
+    def activate_pres(self, *args):
         'Change the slides to the current presentation.'
         if self.prev_selection != None:
             self.prev_selection.presentation.on_deselect()
@@ -169,7 +169,7 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         if not field:
             return False
         if field.edit():
-            self._on_pres_activate()
+            self.activate_pres()
     
     def _on_drag_get(self, treeview, context, selection, info, timestamp):
         'A presentation was dragged.'
@@ -235,7 +235,7 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
                 sched.remove_if(presentation=item.presentation)
                 itr = schmod.iter_next(itr)
             os.remove(os.path.join(DATA_PATH,"pres",item.filename))
-            self._on_pres_activate()
+            self.activate_pres()
 
     def _on_pres_remove_from_schedule(self, *args):
         'Remove the presentation from the current schedule.'

@@ -135,7 +135,7 @@ class PrefsDialog(gtk.Dialog):
             config.set("updates", "check_for_updates", str(g_update.get_active()))
             if config.get("general", "title_slide") != str(g_title.get_active()):
                 config.set("general", "title_slide", str(g_title.get_active()))
-                exposong.preslist.preslist._on_pres_activate()
+                exposong.preslist.preslist.activate_pres()
             
             if config.has_option("general", "data-path"):
                 curpath = config.get("general", "data-path")
