@@ -557,7 +557,7 @@ class ImageBackground(_Background, _Renderable):
         _Renderable.to_xml(self, el)
         _Background.to_xml(self, el)
         el.attrib['src'] = self.src
-        el.attrib['aspect'] = get_aspect_key(self.aspect == ASPECT_FILL)
+        el.attrib['aspect'] = get_aspect_key(self.aspect)
         return el
     
     def get_filename(self):
