@@ -47,11 +47,12 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
         self.set_size_request(200, 80)
         #Columns: Schedule, Name
         self.model = gtk.TreeStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING,
-                                   gobject.TYPE_STRING)
+                                   gobject.TYPE_STRING, gobject.TYPE_BOOLEAN)
         self.model.set_sort_column_id(2, gtk.SORT_ASCENDING)
         self.set_model(self.model)
         self.set_enable_search(False)
         self.set_headers_visible(False)
+        self.set_row_separator_func(self._row_separator)
         
         sched_rend = gtk.CellRendererText()
         column = gtk.TreeViewColumn( _("Schedules"), sched_rend, text=1)
@@ -73,16 +74,18 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
         self.connect("drag-data-received", self._on_sched_drag_received)
         #self.set_drag_dest_row((1,), gtk.TREE_VIEW_DROP_INTO_OR_BEFORE)
 
-    def append(self, parent, row, sort = None):
+    def append(self, parent, row, sort=None):
         'Add an item to the list.'
         if isinstance(row, exposong.schedule.Schedule):
             if sort is None:
                 sort = row.title
             else:
                 sort = "%03u" % sort
-            ret = self.model.append( parent, (row, row.title, sort) )
+            ret = self.model.append(parent, (row, row.title, sort, False))
         elif isinstance(row, tuple):
-            ret = self.model.append( parent, row )
+            ret = self.model.append(parent, row)
+        elif row==None: #Separator
+            return self.model.append(parent, (None, None, sort, True))
         else:
             exposong.log.warning("Schedule cannot append this item: %r" % row)
             return
@@ -220,6 +223,9 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
         cell.set_property('editable',
                           isinstance(sched, exposong.schedule.Schedule)
                           and sched.builtin is False)
+    
+    def _row_separator(self, model, iter):
+        return model.get_value(iter, 3)
     
     def _rename_schedule(self, text_rend, path, new_text):
         "Rename a schedule in the list and it's filename."

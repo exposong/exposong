@@ -435,10 +435,11 @@ class Main (gtk.Window):
         
         schedlist.schedlist.get_selection().select_iter(
             schedlist.schedlist.get_model().get_iter_first())
+        schedlist.schedlist.append(None, (None, None, 39, True))
         
         #Add custom schedules from the data directory
         schedlist.schedlist.custom_schedules = schedlist.schedlist.append(None,
-                (None, _("Custom Schedules"), 40))
+                (None, _("Custom Schedules"), 40, False))
         
         dir_list = os.listdir(directory)
         for filenm in dir_list:
