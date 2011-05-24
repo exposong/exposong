@@ -22,7 +22,7 @@ A widget to change the currently active theme.
 
 import gobject
 import gtk
-import os.path
+import os, os.path
 import pango
 import re
 from gtk.gdk import pixbuf_new_from_file as pb_new
@@ -160,25 +160,59 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         if itr:
             mod = combo.get_model()
             config.set("screen", "theme", mod.get_value(itr, 0))
-            t = os.path.basename(mod.get_value(itr, 0)).rstrip('.xml').title()
+            t = mod.get_value(itr, 1).get_title()
             exposong.log.info('Changing theme to "%s".',t)
+            self.set_tooltip_text(t)
             exposong.screen.screen.draw()
         self._set_menu_items_disabled()
     
     def new_theme(self, *args):
-        themeeditor.ThemeEditor(exposong.main.main)
+        editor = themeeditor.ThemeEditor(exposong.main.main)
+        editor.connect('destroy', self._add_theme)
         
-    def edit_theme(self, *args):
+    def _add_theme(self, editor):
+        if editor.theme.filename: #Not cancelled
+            itr = self.liststore.append([editor.theme.filename, editor.theme])
+            self.set_active_iter(itr)
+            self._load_theme_thumbs()
+        
+    def _edit_theme(self, *args):
         theme = self.get_active()
         if theme.is_builtin():
             raise Exception("Builtin themes cannot be modified.")
         filename = os.path.join(DATA_PATH, "theme", theme.filename)
-        themeeditor.ThemeEditor(exposong.main.main, filename)
+        editor = themeeditor.ThemeEditor(exposong.main.main, filename)
+        editor.connect('destroy', self._update_theme)
     
-    def delete_theme(self, *args):
-        #TODO
-        pass
+    def _update_theme(self, editor, *args):
+        cell = self.get_cells()[0]
+        self._delete_theme_thumb()
+        self._load_theme_thumbs()
+    
+    def _delete_theme(self, *args):
+        theme = self.get_active()
         
+        msg = _('Are you sure you want to delete the theme "%s"?')
+        dialog = gtk.MessageDialog(exposong.main.main, gtk.DIALOG_MODAL,
+                                   gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
+                                   msg % theme.get_title())
+        dialog.set_title(_("Delete Theme?"))
+        resp = dialog.run()
+        dialog.destroy()
+        if resp == gtk.RESPONSE_YES:
+            os.remove(os.path.join(DATA_PATH, 'theme', theme.filename))
+            for bg in theme.backgrounds:
+                if isinstance(bg, exposong.theme.ImageBackground):
+                    os.remove(os.path.join(DATA_PATH, 'theme', 'res', bg.src))
+                    self._delete_theme_thumb()
+            self.liststore.remove(self.get_active_iter())
+    
+    def _delete_theme_thumb(self):
+        cell = self.get_cells()[0]
+        size = (int(CELL_HEIGHT * CELL_ASPECT),
+                  CELL_HEIGHT)
+        cell._delete_pixmap(size)
+    
     @classmethod
     def merge_menu(cls, uimanager):
         'Merge new values with the uimanager.'
@@ -189,9 +223,9 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
                 ('theme-new', gtk.STOCK_NEW, _('New Theme'), None,
                         _("Create a new theme using the Theme Editor"), themeselect.new_theme),
                 ('theme-edit', gtk.STOCK_EDIT, _('Edit Theme'), None,
-                        _("Edit the current theme"), themeselect.edit_theme),
+                        _("Edit the current theme"), themeselect._edit_theme),
                 ('theme-delete', gtk.STOCK_DELETE, _("Delete Theme"), None,
-                        _('Delete the current theme'), themeselect.delete_theme),
+                        _('Delete the current theme'), themeselect._delete_theme),
                 ])
         
         uimanager.insert_action_group(cls._actions, -1)
@@ -209,7 +243,9 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
     
     def _set_menu_items_disabled(self):
         'Disable buttons if the presentation is not shown.'
-        enabled = not self.get_active().is_builtin()
+        enabled = False
+        if self.get_active() is not None:
+            enabled = not self.get_active().is_builtin()
         self._actions.get_action("theme-edit").set_sensitive(enabled)
         self._actions.get_action("theme-delete").set_sensitive(enabled)
     
@@ -254,8 +290,13 @@ class CellRendererTheme(gtk.GenericCellRenderer):
         self.active = 0
         self._pm = {}
     
-    def _get_pixmap(self, window, size):
-        "Render to an offscreen pixmap."
+    def _delete_pixmap(self, size):
+        'Deletes the cached image when the theme was deleted.'
+        fname  = self._get_pixmap_name(size)
+        del self._pm[fname]
+        os.remove(os.path.join(DATA_PATH, '.cache', 'theme', fname))
+    
+    def _get_pixmap_name(self, size):
         if self.theme.is_builtin():
             fname = '_builtin_' + re.sub('[^a-z]+','_',self.theme.meta['title'].lower()).rstrip('_')
         else:
@@ -264,6 +305,14 @@ class CellRendererTheme(gtk.GenericCellRenderer):
             return None
         fname += '.%s' % self.slide.id
         fname += '.%s.png' % 'x'.join(map(str, size))
+        return fname
+    
+    def _get_pixmap(self, window, size):
+        "Render to an offscreen pixmap."
+        
+        fname = self._get_pixmap_name(size)
+        if not fname:
+            return None
         if fname in self._pm:
             return self._pm[fname]
         
@@ -353,12 +402,10 @@ class _ExampleSlide(object):
         self.id = '_example'
         self.body = [
                 exposong.theme.Text('\n'.join([
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
-                    'Phasellus magna eros, congue vel euismod ut, suscipit nec sapien.'
-                    'Vestibulum vel est augue, quis viverra elit.'
-                    'Sed quis arcu sit amet dui lobortis accumsan sed eget tellus.'
-                    'Sed elit est, suscipit sit amet euismod quis, placerat ac neque.'
-                    'Maecenas ac diam porttitor sem porttitor dictum.']),
+                        'Amazing grace, how sweet the sound, ',
+                        'That saved a wretch like me! ',
+                        'I once was lost, but now I am found, ',
+                        'Was blind, but now I see.']),
                     pos=[0.0, 0.0, 1.0, 1.0], margin=10,
                     align=exposong.theme.CENTER, valign=exposong.theme.MIDDLE),
                 ]

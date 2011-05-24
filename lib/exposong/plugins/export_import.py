@@ -315,10 +315,11 @@ class ExportImport(Plugin, exposong._hook.Menu):
     @staticmethod
     def _export_theme_active(sel, action):
         "Is exporting available for the selected theme."
-        if sel.get_active().is_builtin():
-            action.set_sensitive(False)
-            return
-        action.set_sensitive(True)
+        if sel.get_active() is not None:
+            if not sel.get_active().is_builtin():
+                action.set_sensitive(True)
+                return
+        action.set_sensitive(False)
     
     @staticmethod
     def unmerge_menu(cls, uimanager):

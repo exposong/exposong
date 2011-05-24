@@ -646,6 +646,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
             model.remove(itr)
             self._update_bg_list_from_model()
             self.draw()
+            self._set_changed(True)
     
     def _bg_get_row_text(self, column, cell, model, titer):
         'Sets the row to the background name'
