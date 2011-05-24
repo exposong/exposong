@@ -24,7 +24,7 @@ import mimetypes
 
 import exposong.main
 import exposong.schedlist
-from exposong import DATA_PATH, options
+from exposong import DATA_PATH, options, themeselect, theme
 from exposong.plugins import Plugin
 from exposong.glob import *
 
@@ -152,39 +152,33 @@ class ExportImport(Plugin, exposong._hook.Menu):
         return lib_list
     
     @classmethod
-    def export_backgrounds(cls, *args):
-        'Export the backgrounds to tar-compressed file'
-        dlg = gtk.FileChooserDialog(_("Export Backgrounds"), exposong.main.main,
+    def export_theme(cls, *args):
+        'Export the active theme to tar-compressed file'
+        theme = exposong.themeselect.themeselect.get_active()
+        
+        dlg = gtk.FileChooserDialog(_("Export Theme"), exposong.main.main,
                                     gtk.FILE_CHOOSER_ACTION_SAVE,
                                     (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                     gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         dlg.add_filter(_FILTER)
         dlg.set_do_overwrite_confirmation(True)
         dlg.set_current_folder(os.path.expanduser("~"))
-        dlg.set_current_name(_("exposong_backgrounds.expo"))
+        dlg.set_current_name(_("theme_%s.expo")%title_to_filename(
+                                        os.path.basename(theme.get_title())))
         if dlg.run() == gtk.RESPONSE_ACCEPT:
             fname = dlg.get_filename()
             if not fname.endswith(".expo"):
                 fname += ".expo"
             tar = tarfile.open(fname, "w:gz")
-            for pic in cls._get_background_list():
-                tar.add(pic[0], pic[1])
+            
+            tar.add(os.path.join(DATA_PATH, 'theme', theme.filename),
+                    os.path.join('theme', theme.filename))
+            for bg in theme.backgrounds:
+                if isinstance(bg, exposong.theme.ImageBackground):
+                    tar.add(os.path.join(DATA_PATH, 'theme', 'res', bg.src),
+                            os.path.join('theme', 'res', bg.src))
             tar.close()
         dlg.destroy()
-    
-    @classmethod
-    def _get_background_list(cls, *args):
-        'Returns a list with all images in bg folder'
-        dir = os.path.join(DATA_PATH, "bg")
-        dir_list = os.listdir(dir)
-        image_list = []
-        for filenm in dir_list:
-            if os.path.isfile(os.path.join(dir, filenm)):
-                mime = mimetypes.guess_type(filenm)
-                if mime[0] and mime[0].startswith("image"):
-                    image_list.append((os.path.join(dir, filenm),
-                                       os.path.join("bg", filenm)))
-        return image_list
     
     @classmethod
     def import_dialog(cls, *args):
@@ -292,9 +286,14 @@ class ExportImport(Plugin, exposong._hook.Menu):
                         None, None, cls.export_sched),
                 ('export-lib', None, _("Whole _Library..."), None,
                         None, cls.export_lib),
-                ('export-bg', None, _("_Backgrounds..."), None,
-                        None, cls.export_backgrounds)
+                ('export-theme', None, _("Current _Theme..."), None,
+                        None, cls.export_theme)
                 ])
+        
+        action = actiongroup.get_action('export-theme')
+        exposong.themeselect.themeselect.connect('changed',
+                                                    cls()._export_theme_active,
+                                                    action)
         uimanager.insert_action_group(actiongroup, -1)
         
         #Had to use position='top' to put them above "Quit"
@@ -307,11 +306,19 @@ class ExportImport(Plugin, exposong._hook.Menu):
                     <menu action="file-export">
                         <menuitem action="export-lib" />
                         <menuitem action="export-sched" />
-                        <menuitem action="export-bg" />
+                        <menuitem action="export-theme" />
                     </menu>
                 </menu>
             </menubar>
             """)
+    
+    @staticmethod
+    def _export_theme_active(sel, action):
+        "Is exporting available for the selected theme."
+        if sel.get_active().is_builtin():
+            action.set_sensitive(False)
+            return
+        action.set_sensitive(True)
     
     @staticmethod
     def unmerge_menu(cls, uimanager):
