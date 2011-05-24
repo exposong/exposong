@@ -873,8 +873,9 @@ class Image(_RenderableSection):
         
         if self.valign != None:
             valign = self.valign
-        elif section.valign != None:
-            valign = section.valign
+        elif section:
+            if section.valign != None:
+                valign = section.valign
         
         if valign == TOP:
             top = self.rpos[1]
@@ -886,8 +887,9 @@ class Image(_RenderableSection):
         
         if self.align != None:
             align = self.align
-        elif section.align != None:
-            align = section.align
+        elif section:
+            if section.align != None:
+                align = section.align
         
         if align == LEFT:
             left = self.rpos[0]
