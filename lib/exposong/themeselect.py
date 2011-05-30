@@ -35,7 +35,6 @@ from exposong import DATA_PATH
 from exposong.config import config
 
 themeselect = None
-_example_slide = None
 SCALED_HEIGHT = 600
 CELL_HEIGHT = 65
 CELL_ASPECT = 16.0 / 9
@@ -182,11 +181,11 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
             raise Exception("Builtin themes cannot be modified.")
         filename = os.path.join(DATA_PATH, "theme", theme.filename)
         editor = themeeditor.ThemeEditor(exposong.main.main, filename)
-        editor.connect('destroy', self._update_theme)
+        editor.connect('destroy', self._update_theme, theme)
     
-    def _update_theme(self, editor, *args):
+    def _update_theme(self, editor, theme, *args):
         cell = self.get_cells()[0]
-        self._delete_theme_thumb()
+        self._delete_theme_thumb(theme)
         self._load_theme_thumbs()
     
     def _delete_theme(self, *args):
@@ -201,17 +200,17 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         dialog.destroy()
         if resp == gtk.RESPONSE_YES:
             os.remove(os.path.join(DATA_PATH, 'theme', theme.filename))
+            self._delete_theme_thumb(theme)
             for bg in theme.backgrounds:
                 if isinstance(bg, exposong.theme.ImageBackground):
                     os.remove(os.path.join(DATA_PATH, 'theme', 'res', bg.src))
-                    self._delete_theme_thumb()
             self.liststore.remove(self.get_active_iter())
     
-    def _delete_theme_thumb(self):
+    def _delete_theme_thumb(self, theme):
         cell = self.get_cells()[0]
-        size = (int(CELL_HEIGHT * CELL_ASPECT),
-                  CELL_HEIGHT)
-        cell._delete_pixmap(size)
+        cell.theme = theme
+        size = (int(CELL_HEIGHT * CELL_ASPECT), CELL_HEIGHT)
+        cell._get_pixmap(self.window, size, False)
     
     @classmethod
     def merge_menu(cls, uimanager):
@@ -307,13 +306,15 @@ class CellRendererTheme(gtk.GenericCellRenderer):
         fname += '.%s.png' % 'x'.join(map(str, size))
         return fname
     
-    def _get_pixmap(self, window, size):
+    def _get_pixmap(self, window, size, cache=True):
         "Render to an offscreen pixmap."
-        
+        cache = cache and self.can_cache
+        if not cache:
+            self._delete_pixmap(size)
         fname = self._get_pixmap_name(size)
         if not fname:
             return None
-        if fname in self._pm:
+        if cache and fname in self._pm:
             return self._pm[fname]
         
         width, height = size
@@ -326,7 +327,7 @@ class CellRendererTheme(gtk.GenericCellRenderer):
         cpath = os.path.join(cache_dir, fname)
         
         ccontext = self._pm[fname].cairo_create()
-        if self.can_cache and os.path.exists(cpath):
+        if cache and os.path.exists(cpath):
             # Load the image from memory, or disk if available
             exposong.log.debug('Loading theme thumbnail "%s".', fname)
             pb = pb_new(cpath)
