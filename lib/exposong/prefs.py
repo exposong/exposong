@@ -64,17 +64,17 @@ class PrefsDialog(gtk.Dialog):
         if config.get("updates", "check_for_updates") == "True":
             g_update.set_active(True)
         
-        table.attach_section_title(_("Lyrics"))
-        g_ccli = table.attach_entry(config.get("general","ccli"),
+        table.attach_section_title(_("Songs"))
+        g_ccli = table.attach_entry(config.get("songs","ccli"),
                                     label="CCLI #")
         songbooks = [sbook.name for t in exposong.main.main.library
-                     if t[0].get_type() == "lyric"
+                     if t[0].get_type() == "song"
                      for sbook in t[0].song.props.songbooks]
         songbooks = sorted(set(songbooks))
         g_songbook = table.attach_combo(songbooks,
-                                        config.get("general","songbook"),
+                                        config.get("songs","songbook"),
                                         label=_("Songbook"))
-        table.attach_comment(_("Songbooks in Lyrics are automatically added to this list."))
+        table.attach_comment(_("Songbooks in Songs are automatically added to this list."))
         
         notebook.append_page(table, gtk.Label( _("General") ))
         
@@ -126,9 +126,9 @@ class PrefsDialog(gtk.Dialog):
         
         self.show_all()
         if self.run() == gtk.RESPONSE_ACCEPT:
-            config.set("general", "ccli", g_ccli.get_text())
+            config.set("songs", "ccli", g_ccli.get_text())
             if g_songbook.get_active_text():
-                config.set("general", "songbook", g_songbook.get_active_text())
+                config.set("songs", "songbook", g_songbook.get_active_text())
             config.set("updates", "check_for_updates", str(g_update.get_active()))
             
             if config.has_option("general", "data-path"):

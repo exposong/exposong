@@ -750,6 +750,10 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         return False
     
     @staticmethod
+    def get_type_name():
+        return information['name']
+    
+    @staticmethod
     def get_type():
         "Return the presentation type."
         return 'text'

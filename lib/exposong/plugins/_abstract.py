@@ -141,6 +141,11 @@ class Presentation:
         raise NotImplementedError
     
     @staticmethod
+    def get_type_name():
+        'Return the presentation type name.'
+        raise NotImplementedError
+    
+    @staticmethod
     def get_type():
         'Return the presentation type.'
         raise NotImplementedError
@@ -206,8 +211,7 @@ class Presentation:
         if(self.get_title()):
             edit_dialog.set_title(_('Editing "%s"') % self.get_title())
         else:
-            # TODO get_type() needs to be translated as well. Find the best way to do this.
-            edit_dialog.set_title(_("New %s Presentation") % self.get_type().title())
+            edit_dialog.set_title(_("New %s") % self.get_type_name())
         notebook = gtk.Notebook()
         edit_dialog.vbox.pack_start(notebook, True, True, 6)
         

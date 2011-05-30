@@ -71,13 +71,18 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
             self.pres_type = pres.get_type()
             pres.slide_column(self.column1)
         
-        if config.config.get('songs', 'show_in_order') == "True":
+        if config.config.get('songs', 'show_in_order') == "True" and pres.get_type() == "song":
             slides = pres.get_slides_in_order()
         else:
             slides = pres.get_slide_list()
         for slide in slides:
             slist.append(slide)
-        self.slide_order = pres.get_order()
+        
+        if pres.get_type() == "song":
+            custom_order = not config.config.get('songs', 'show_in_order') == "True"
+            self.slide_order = pres.get_order(custom_order)
+        else:
+            self.slide_order = pres.get_order()
         self.slide_order_index = -1
         
         self.__timer += 1
@@ -204,7 +209,6 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
             action.set_active(True)
         exposong.preslist.preslist.get_selection().connect('changed',
                                 cls._show_in_order_active, action)
-        
         # unmerge_menu not implemented, because we will never uninstall this as
         # a module.
     
@@ -220,7 +224,7 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
         if sel.count_selected_rows() > 0:
             (model, itr) = sel.get_selected()
             pres = model.get_value(itr, 0)
-            if pres and pres.get_type() == 'lyric':
+            if pres and pres.get_type() == 'song':
                 action.set_sensitive(True)
                 return
         action.set_sensitive(False)

@@ -63,9 +63,6 @@ class Config(ConfigParser.SafeConfigParser):
         self.set("dialogs", "exposong_legacy-import-dir", os.path.expanduser("~"))
         self.set("dialogs", "opensong-import-dir", os.path.expanduser("~"))
         
-        self.set("general", "ccli", "")
-        self.set("general", "songbook", "")
-        
         self.set("screen", "logo",
                  os.path.join(SHARED_FILES, "res", "exposong.png"))
         self.setcolor("screen", "logo_bg", (65535, 43690, 4369))
@@ -75,6 +72,8 @@ class Config(ConfigParser.SafeConfigParser):
         self.set("updates", "check_for_updates", "True")
         self.set("updates", "last_check", "")
         
+        self.set("songs", "ccli", "")
+        self.set("songs", "songbook", "")
         self.set("songs", "show_in_order", "True")
         
         self.configfile = cfile

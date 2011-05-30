@@ -46,12 +46,12 @@ from exposong import version
 Lyric presentations.
 """
 information = {
-        'name': _("Lyric Presentation"),
+        'name': _("Song"),
         'description': __doc__,
         'required': False,
         }
 type_icon = gtk.gdk.pixbuf_new_from_file_at_size(
-        os.path.join(RESOURCE_PATH, 'icons', 'pres-lyric.png'), 20, 14)
+        os.path.join(RESOURCE_PATH, 'icons', 'pres-song.png'), 20, 14)
 
 # TODO These do not remain in order, so when creating the pull-down, the items
 # are in arbitrary order.
@@ -235,12 +235,14 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         else:
             return self.get_slide_list()
     
-    def get_order(self):
+    def get_order(self, custom_order=True):
         'Returns the order in which the slides should be presented.'
-        if len(self.song.props.verse_order) > 0:
+        if len(self.song.props.verse_order) > 0 and custom_order:
             return tuple(self.get_slide_from_order(n) for n in \
                          self.song.props.verse_order \
                          if self.get_slide_from_order(n) >= 0)
+        elif not custom_order:
+            pass
         else:
             return _abstract.Presentation.get_order(self)
 
@@ -809,7 +811,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             theme_value = model.get_value(itr,0)
             lang_value = model.get_value(itr,1)
         themes = [thm.name for t in exposong.main.main.library
-                     if t[0].get_type() == "lyric"
+                     if t[0].get_type() == "song"
                      for thm in t[0].song.props.themes]
         themes = sorted(set(themes))
         theme = gui.append_combo_entry(table, _('Theme Name:'),
@@ -857,7 +859,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             songbook_value = model.get_value(itr,0)
             entry_value = model.get_value(itr,1)
         songbooks = [sbook.name for t in exposong.main.main.library
-                     if t[0].get_type() == "lyric"
+                     if t[0].get_type() == "song"
                      for sbook in t[0].song.props.songbooks]
         songbooks = sorted(set(songbooks))
         songbook = gui.append_combo_entry(table, _('Songbook Name:'),
@@ -1028,9 +1030,14 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         return False
     
     @staticmethod
+    def get_type_name():
+        'Return the presentation type.'
+        return information['name']
+    
+    @staticmethod
     def get_type():
         'Return the presentation type.'
-        return 'lyric'
+        return 'song'
     
     @staticmethod
     def get_icon():
@@ -1040,19 +1047,19 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
     @classmethod
     def merge_menu(cls, uimanager):
         'Merge new values with the uimanager.'
-        gtk.stock_add([("pres-lyric",_("_Lyric"), gtk.gdk.MOD1_MASK, 0,
+        gtk.stock_add([("pres-song",_("_Song"), gtk.gdk.MOD1_MASK, 0,
                         "pymserv")])
         
-        actiongroup = gtk.ActionGroup('exposong-lyric')
-        actiongroup.add_actions([("pres-new-lyric", 'pres-lyric', None, None,
-                                _("New Lyric Presentation"), cls._on_pres_new)])
+        actiongroup = gtk.ActionGroup('exposong-song')
+        actiongroup.add_actions([("pres-new-song", 'pres-song', None, None,
+                                _("New Song"), cls._on_pres_new)])
         uimanager.insert_action_group(actiongroup, -1)
         
         cls.menu_merge_id = uimanager.add_ui_from_string("""
             <menubar name='MenuBar'>
                 <menu action="Presentation">
                         <menu action="pres-new">
-                            <menuitem action='pres-new-lyric' />
+                            <menuitem action='pres-new-song' position='top'/>
                         </menu>
                 </menu>
             </menubar>
@@ -1068,8 +1075,8 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         'Merge new values with the uimanager'
         cls.tb_merge_id = uimanager.add_ui_from_string("""
             <toolbar name='Toolbar'>
-                <placeholder name="pres-new-lyric">
-                    <toolitem action='pres-new-lyric' />
+                <placeholder name="pres-new-song">
+                    <toolitem action='pres-new-song' />
                 </placeholder>
             </toolbar>
             """)
@@ -1082,7 +1089,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
     @classmethod
     def schedule_name(cls):
         'Return the string schedule name.'
-        return _('Lyric Presentations')
+        return _('Songs')
     
     @classmethod
     def schedule_filter(cls, pres):
@@ -1097,7 +1104,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
     @staticmethod
     def get_description():
         'Return the description of the plugin.'
-        return "A lyric presentation type."
+        return "A Song presentation type."
 
 
 class SlideEdit(gtk.Dialog):
