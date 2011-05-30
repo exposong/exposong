@@ -1,0 +1,35 @@
+*
+{
+ font-family: sans-serif;
+}
+body
+{
+ margin: 0;
+}
+h1
+{
+ font-size: 1.55em;
+ margin: 1em 0 10px;
+}
+h2
+{
+ font-size: 1.2em;
+ font-weight: normal;
+}
+#header
+{
+ background: #fa1;
+ color: #fff;
+ padding: 6px 12px;
+ margin: 0;
+}
+#header h2
+{
+ padding: 0;
+ margin: 0;
+}
+#content
+{
+ margin: 21px
+}
+
