@@ -215,10 +215,23 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         return " ".join(self.song.props.verse_order)
     
     def get_slides_in_order(self, editing=False):
-        'Returns the list of songs in order.'
+        """Returns the list of verses in order.
+        Shows only first few words when verse appears a second time"""
+        a = []
+        markups = []
         if len(self.song.props.verse_order) > 0:
-            return tuple((self.slides[i], self.slides[i].get_markup(editing))
-                         for i in self.get_order())
+            for i in self.get_order():
+                markup = self.slides[i].get_markup(editing)
+                if not i in a:
+                    a.append(i)
+                    markups.append((self.slides[i], markup))
+                else:
+                    #Keep only the title and the first few words of the verse
+                    short_markup = markup.split("\n")[:2]
+                    short_markup[1] = " ".join(short_markup[1].split()[:7])
+                    short_markup[1] = "%s ..."%short_markup[1]
+                    markups.append((self.slides[i], "\n".join(short_markup)))
+            return tuple(m for m in markups)
         else:
             return self.get_slide_list()
     
