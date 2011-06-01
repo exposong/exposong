@@ -58,7 +58,7 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         textrend.set_property("ellipsize", pango.ELLIPSIZE_END)
         self.pack_start(textrend, True)
         self.set_cell_data_func(textrend, self._get_theme_title)
-        self.connect("changed", self._on_change)
+        self.connect("changed", self._theme_changed)
         
         task = self._load_builtin()
         gobject.idle_add(task.next)
@@ -153,8 +153,8 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         if thm:
             cell.set_property('text', thm.get_title())
     
-    def _on_change(self, combo):
-        "A new image was selected."
+    def _theme_changed(self, combo):
+        "A new theme was selected."
         itr = combo.get_active_iter()
         if itr:
             mod = combo.get_model()
@@ -166,7 +166,7 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         self._set_menu_items_disabled()
     
     def new_theme(self, *args):
-        editor = themeeditor.ThemeEditor(exposong.main.main)
+        editor = themeeditor.ThemeEditor(exposong.main.main, exposong.theme.Theme())
         editor.connect('destroy', self._add_theme)
         
     def _add_theme(self, editor):
@@ -179,18 +179,17 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         theme = self.get_active()
         if theme.is_builtin():
             raise Exception("Builtin themes cannot be modified.")
-        filename = os.path.join(DATA_PATH, "theme", theme.filename)
-        editor = themeeditor.ThemeEditor(exposong.main.main, filename)
+        editor = themeeditor.ThemeEditor(exposong.main.main, theme)
         editor.connect('destroy', self._update_theme, theme)
     
     def _update_theme(self, editor, theme, *args):
         cell = self.get_cells()[0]
         self._delete_theme_thumb(theme)
         self._load_theme_thumbs()
+        self._theme_changed(self)
     
     def _delete_theme(self, *args):
         theme = self.get_active()
-        
         msg = _('Are you sure you want to delete the theme "%s"?')
         dialog = gtk.MessageDialog(exposong.main.main, gtk.DIALOG_MODAL,
                                    gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
@@ -200,11 +199,14 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         dialog.destroy()
         if resp == gtk.RESPONSE_YES:
             os.remove(os.path.join(DATA_PATH, 'theme', theme.filename))
-            self._delete_theme_thumb(theme)
             for bg in theme.backgrounds:
                 if isinstance(bg, exposong.theme.ImageBackground):
                     os.remove(os.path.join(DATA_PATH, 'theme', 'res', bg.src))
+            size = (int(CELL_HEIGHT * CELL_ASPECT), CELL_HEIGHT)
+            self.get_cells()[0]._delete_pixmap(size)
             self.liststore.remove(self.get_active_iter())
+            del theme
+            self.set_active(0)
     
     def _delete_theme_thumb(self, theme):
         cell = self.get_cells()[0]

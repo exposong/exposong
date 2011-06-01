@@ -37,7 +37,7 @@ class ThemeEditor(gtk.Window):
     """
     Provides a simple interface for creating and editing themes
     """
-    def __init__(self, parent=None, filename=None):
+    def __init__(self, parent, theme_):
         gtk.Window.__init__(self)
         self.connect("delete_event", self._close)
         self.set_transient_for(parent)
@@ -45,7 +45,7 @@ class ThemeEditor(gtk.Window):
         
         self.__updating = False
         self._do_layout()        
-        self._load_theme(filename)
+        self._load_theme(theme_)
         self.show_all()
     
     def _do_layout(self):
@@ -86,7 +86,6 @@ class ThemeEditor(gtk.Window):
         btn = gtk.ToolButton(gtk.stock_lookup('add-background-solid')[0])
         btn.set_tooltip_markup(_("Add a new Solid Color Background"))
         btn.connect('clicked', self._on_bg_solid_new)
-        #title_list.get_selection().connect('changed', self._on_delete_bg)
         toolbar.insert(btn, -1)
         btn = gtk.ToolButton(gtk.stock_lookup('add-background-gradient')[0])
         btn.set_tooltip_markup(_("Add a new Gradient Background"))
@@ -98,8 +97,6 @@ class ThemeEditor(gtk.Window):
         toolbar.insert(btn, -1)
         button = gtk.ToolButton(gtk.STOCK_DELETE)
         button.connect('clicked', self._on_delete_bg)
-        #title_list.get_selection().connect('changed',
-        #                                   gui.treesel_disable_widget, button)
         toolbar.insert(button, -1)
         
         self._bg_model = gtk.ListStore(gobject.TYPE_PYOBJECT)
@@ -807,16 +804,16 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
             if self.get_title().startswith("*"):
                 self.set_title(self.get_title()[1:])
     
-    def _load_theme(self, filenm=None):
+    def _load_theme(self, theme_):
         'Loads a theme into the Theme Editor'
-        self.theme = theme.Theme(filenm)
+        self.theme = theme_
+        
         self._title_entry.set_text(self.theme.get_title())
         
         ########################## Backgrounds ################################
         for bg in self.theme.backgrounds:
-            self._bg_model.append((bg,))
+            self._bg_model.append((bg,)) 
         
-       
         ####################### Sections: Body ################################
         body = self.theme.get_body()
         self.body_widgets['font_button'].set_font_name(body.font)
@@ -948,5 +945,5 @@ class _ExampleSlide(object):
         return NotImplemented
 
 if __name__ == "__main__":
-    ThemeEditor()
+    ThemeEditor(None, theme.Theme())
     gtk.main()
