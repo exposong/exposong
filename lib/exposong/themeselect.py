@@ -183,10 +183,8 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         editor.connect('destroy', self._update_theme, theme)
     
     def _update_theme(self, editor, theme, *args):
-        cell = self.get_cells()[0]
         self._delete_theme_thumb(theme)
-        self._load_theme_thumbs()
-        self._theme_changed(self)
+        exposong.screen.screen.draw()
     
     def _delete_theme(self, *args):
         theme = self.get_active()

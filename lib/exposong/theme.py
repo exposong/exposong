@@ -116,6 +116,12 @@ class Theme(object):
         "Save/Editable only if not builtin."
         return self._builtin
     
+    def revert(self):
+        "Revert all changes and reload the theme from the file"
+        self.meta = {}
+        self.backgrounds = []
+        self.load(etree.parse(os.path.join(DATA_PATH, 'theme', self.filename)))
+    
     def load(self, tree):
         "Load the theme from an XML file."
         if isinstance(tree, etree.ElementTree):

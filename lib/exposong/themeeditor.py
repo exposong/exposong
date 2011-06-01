@@ -25,9 +25,8 @@ import gobject
 if __name__ == '__main__': #For testing
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-import gui
-import theme
-
+import exposong.theme
+from exposong import gui
 from exposong import DATA_PATH, RESOURCE_PATH
 from exposong.glob import title_to_filename, find_freefile, check_filename
 
@@ -263,9 +262,9 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         body.font = self.body_widgets['font_button'].get_font_name()
         body.color = self.body_widgets['font_color'].get_color().to_string()
         a = self.body_widgets['alignment_horizontal'].get_active_text()
-        body.align = theme.get_align_const(a)
+        body.align = exposong.theme.get_align_const(a)
         a = self.body_widgets['alignment_vertical'].get_active_text()
-        body.valign = theme.get_valign_const(a)
+        body.valign = exposong.theme.get_valign_const(a)
         
         body.spacing = self.body_widgets['line_spacing'].get_value()
         body.shadow_color = self.body_widgets['shadow_color'].get_color().to_string()
@@ -288,9 +287,9 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         footer.font = self.footer_widgets['font_button'].get_font_name()
         footer.color = self.footer_widgets['font_color'].get_color().to_string()
         a = self.footer_widgets['alignment_horizontal'].get_active()
-        footer.align = theme.get_align_const(a)
+        footer.align = exposong.theme.get_align_const(a)
         a = self.footer_widgets['alignment_vertical'].get_active()
-        footer.valign = theme.get_valign_const(a)
+        footer.valign = exposong.theme.get_valign_const(a)
         
         footer.spacing = self.footer_widgets['line_spacing'].get_value()
         footer.shadow_color = self.footer_widgets['shadow_color'].get_color().to_string()
@@ -329,7 +328,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
             if newpath != img:
                 shutil.copy(img, newpath)
             itr = self._bg_model.append(
-                (theme.ImageBackground(src=os.path.basename(img)),))
+                (exposong.theme.ImageBackground(src=os.path.basename(img)),))
             self._activate_bg(itr)
         fchooser.destroy()
         self.draw()
@@ -358,7 +357,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         bg = self._get_active_bg()
         self._bg_image_filech.set_filename(
                 os.path.join(DATA_PATH, 'theme', 'res', bg.src))
-        if bg.aspect == theme.ASPECT_FILL:
+        if bg.aspect == exposong.theme.ASPECT_FILL:
             self._bg_image_radio_mode_fill.set_active(True)
         else:
             self._bg_image_radio_mode_fit.set_active(True)
@@ -379,15 +378,15 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
             bg.src = os.path.basename(img)
             bg.reset_cache()
         if self._bg_image_radio_mode_fill.get_active():
-            bg.aspect = theme.ASPECT_FILL
+            bg.aspect = exposong.theme.ASPECT_FILL
         else:
-            bg.aspect = theme.ASPECT_FIT
+            bg.aspect = exposong.theme.ASPECT_FIT
         self.draw()
     
     def _on_bg_solid_new(self, widget=None):
         'Add a new solid color background'
         self._set_changed()
-        itr = self._bg_model.append((theme.ColorBackground(),))
+        itr = self._bg_model.append((exposong.theme.ColorBackground(),))
         self._activate_bg(itr)
     
     def _on_bg_solid(self, widget=None):
@@ -423,7 +422,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
     def _on_bg_gradient_new(self, widget=None):
         'Add a new gradient background'
         self._set_changed()
-        itr = self._bg_model.append((theme.GradientBackground(),))
+        itr = self._bg_model.append((exposong.theme.GradientBackground(),))
         self._activate_bg(itr)
     
     def _on_bg_gradient(self, widget=None):
@@ -481,11 +480,11 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         else:
             loc += random.uniform(0.1, 0.5)
         loc = round(loc, 2)
-        bg.stops.append(theme.GradientStop(location=loc, color=col))
+        bg.stops.append(exposong.theme.GradientStop(location=loc, color=col))
         if update:
-            if type(bg) == theme.GradientBackground:
+            if type(bg) == exposong.theme.GradientBackground:
                 self._on_bg_gradient()
-            elif type(bg) == theme.RadialGradientBackground:
+            elif type(bg) == exposong.theme.RadialGradientBackground:
                 self._on_bg_radial()
     
     def _on_bg_gradient_changed(self, *args):
@@ -516,7 +515,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
     def _on_bg_radial_new(self, widget=None):
         'Adds a new radial background'
         self._set_changed()
-        itr = self._bg_model.append((theme.RadialGradientBackground(),))
+        itr = self._bg_model.append((exposong.theme.RadialGradientBackground(),))
         self._activate_bg(itr)
     
     def _on_bg_radial(self, widget=None):
@@ -617,13 +616,13 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         if not bg:
             self._pos_expander.set_sensitive(False)
             return
-        if isinstance(bg, theme.ImageBackground):
+        if isinstance(bg, exposong.theme.ImageBackground):
             self._on_bg_image()
-        elif isinstance(bg, theme.ColorBackground):
+        elif isinstance(bg, exposong.theme.ColorBackground):
             self._on_bg_solid()
-        elif isinstance(bg, theme.GradientBackground):
+        elif isinstance(bg, exposong.theme.GradientBackground):
             self._on_bg_gradient()
-        elif isinstance(bg, theme.RadialGradientBackground):
+        elif isinstance(bg, exposong.theme.RadialGradientBackground):
             self._on_bg_radial()
         self._load_bg_position()
     
@@ -804,25 +803,28 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
             if self.get_title().startswith("*"):
                 self.set_title(self.get_title()[1:])
     
-    def _load_theme(self, theme_):
+    def _load_theme(self, theme):
         'Loads a theme into the Theme Editor'
-        self.theme = theme_
+        if isinstance(theme, exposong.theme.Theme):
+            self.theme = theme
+        else:
+            self.theme = exposong.theme.Theme(theme)
         
         self._title_entry.set_text(self.theme.get_title())
         
         ########################## Backgrounds ################################
         for bg in self.theme.backgrounds:
-            self._bg_model.append((bg,)) 
+            self._bg_model.append((bg,))
         
         ####################### Sections: Body ################################
         body = self.theme.get_body()
         self.body_widgets['font_button'].set_font_name(body.font)
         self.body_widgets['font_color'].set_color(gtk.gdk.Color(body.color))
-        if body.align == theme.LEFT:
+        if body.align == exposong.theme.LEFT:
             self.body_widgets['alignment_horizontal'].set_active(0)
-        elif body.align == theme.CENTER:
+        elif body.align == exposong.theme.CENTER:
             self.body_widgets['alignment_horizontal'].set_active(1)
-        elif body.align == theme.RIGHT:
+        elif body.align == exposong.theme.RIGHT:
             self.body_widgets['alignment_horizontal'].set_active(2)
         if body.valign:
             self.body_widgets['alignment_vertical'].set_active(body.valign)
@@ -839,11 +841,11 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         footer = self.theme.get_footer()
         self.footer_widgets['font_button'].set_font_name(footer.font)
         self.footer_widgets['font_color'].set_color(gtk.gdk.Color(footer.color))
-        if footer.align == theme.LEFT:
+        if footer.align == exposong.theme.LEFT:
             self.footer_widgets['alignment_horizontal'].set_active(0)
-        elif footer.align == theme.CENTER:
+        elif footer.align == exposong.theme.CENTER:
             self.footer_widgets['alignment_horizontal'].set_active(1)
-        elif footer.align == theme.RIGHT:
+        elif footer.align == exposong.theme.RIGHT:
             self.footer_widgets['alignment_horizontal'].set_active(2)
         if footer.valign:
             self.footer_widgets['alignment_vertical'].set_active(footer.valign)
@@ -865,7 +867,9 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
     
     def _revert_changes(self, *args):
         'Reverts all unsaved changes'
-        self._load_theme(self.theme.filename)
+        self._bg_model.clear()
+        self.theme.revert()
+        self._load_theme(self.theme)
         
     def _save_changes(self, *args):
         """
@@ -922,14 +926,14 @@ class _ExampleSlide(object):
     def __init__(self):
         object.__init__(self)
         self.body = [
-                theme.Text('\n'.join([
+                exposong.theme.Text('\n'.join([
                         'Amazing grace, how sweet the sound, ',
                         'That saved a wretch like me! ',
                         'I once was lost, but now I am found, ',
                         'Was blind, but now I see.']),
                     pos=[0.0, 0.0, 1.0, 1.0], margin=10),
                 ]
-        self.foot = [theme.Text('\n'.join([
+        self.foot = [exposong.theme.Text('\n'.join([
                         '"Amazing Grace"',
                         'Text: John Newton',
                         'Copyright &#169;: Public Domain'
@@ -945,5 +949,5 @@ class _ExampleSlide(object):
         return NotImplemented
 
 if __name__ == "__main__":
-    ThemeEditor(None, theme.Theme())
+    ThemeEditor(None, exposong.theme.Theme())
     gtk.main()
