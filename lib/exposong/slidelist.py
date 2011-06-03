@@ -38,8 +38,6 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
     def __init__(self):
         "Create the interface."
         self.pres = None
-        self.slide_order = ()
-        self.slide_order_index = -1
         # Used to stop or reset the timer if the presentation or slide changes.
         self.__timer = 0
 
@@ -48,7 +46,7 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
         self.set_enable_search(False)
         #self.set_headers_visible(False)
         
-        self.column1 = gtk.TreeViewColumn( _("Slides"))
+        self.column1 = gtk.TreeViewColumn(_("Slides"))
         self.column1.set_resizable(False)
         self.append_column(self.column1)
         
@@ -78,13 +76,6 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
         for slide in slides:
             slist.append(slide)
         
-        if pres.get_type() == "song":
-            custom_order = not config.config.get('songs', 'show_in_order') == "True"
-            self.slide_order = pres.get_order(custom_order)
-        else:
-            self.slide_order = pres.get_order()
-        self.slide_order_index = -1
-        
         self.__timer += 1
         men = slist.get_iter_first() is not None
         self._actions.get_action("pres-slide-next").set_sensitive(men)
@@ -100,27 +91,13 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
     
     def _move_to_slide(self, mv):
         'Move to the slide at mv. This ignores slide_order_index.'
-        order_index = self.slide_order_index
-        if self.slide_order_index == -1 and\
-                self.get_selection().count_selected_rows() > 0:
-            (model,itr) = self.get_selection().get_selected()
-            cur = model.get_string_from_iter(itr)
-            cnt = 0
-            for o in self.slide_order:
-                if o == int(cur):
-                    if len(self.slide_order) > cnt+mv and cnt+mv > 0:
-                        self.to_slide(self.slide_order[cnt+mv])
-                        self.slide_order_index = cnt+mv
-                        return True
-                    else:
-                        return False
-                cnt += 1
-        if order_index == self.slide_order_index and \
-                len(self.slide_order) > order_index+mv and order_index+mv >= 0:
-            self.to_slide(self.slide_order[order_index + mv])
-            self.slide_order_index = order_index + mv
-            return True
-        return False
+        (model,itr) = self.get_selection().get_selected()
+        if itr:
+            cur = int(model.get_string_from_iter(itr))
+        else:
+            cur = -1
+        if not (cur==0 and mv==-1):
+            self.to_slide(cur+mv)
     
     def prev_slide(self, *args):
         'Move to the previous slide.'
@@ -129,14 +106,6 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
     def next_slide(self, *args):
         'Move to the next slide.'
         return self._move_to_slide(1)
-    
-    def to_start(self):
-        'Reset to the first slide.'
-        self.slide_order_index = 0
-        if len(self.slide_order):
-            self.to_slide(self.slide_order[0])
-            return True
-        return False
     
     def to_slide(self, slide_num):
         model = self.get_model()
@@ -149,8 +118,6 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
     def _on_slide_activate(self, *args):
         'Present the selected slide to the screen.'
         exposong.screen.screen.draw()
-        self.slide_order_index = -1
-        
         self.reset_timer()
     
     def reset_timer(self):
@@ -167,7 +134,7 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
         if not exposong.screen.screen.is_running():
             return False
         if not self.next_slide(None) and self.pres.is_timer_looped():
-            self.to_start()
+            self.to_slide(0)
         # Return False, because the slide is activated, adding another timeout
         return False
     

@@ -45,7 +45,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
         "Initialize the interface of the schedule."
         gtk.TreeView.__init__(self)
         self.set_size_request(200, 80)
-        #Columns: Schedule, Name
+        #Columns: Schedule, Name, Sort, is_separator
         self.model = gtk.TreeStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING,
                                    gobject.TYPE_STRING, gobject.TYPE_BOOLEAN)
         self.model.set_sort_column_id(2, gtk.SORT_ASCENDING)
@@ -228,7 +228,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
         return model.get_value(iter, 3)
     
     def _rename_schedule(self, text_rend, path, new_text):
-        "Rename a schedule in the list and it's filename."
+        "Rename a schedule in the list and its filename."
         if len(new_text.strip()) == 0:
             return
         iter1 = self.model.get_iter(path)
