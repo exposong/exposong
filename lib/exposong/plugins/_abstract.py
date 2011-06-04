@@ -241,7 +241,7 @@ class Presentation:
     
     def _edit_tabs(self, notebook, parent):
         'Tabs for the dialog.'
-        # TODO: Presentation specific backgrounds.
+        # TODO: Presentation specific themes.
         pass
     
     def _edit_save(self):
@@ -262,10 +262,6 @@ class Presentation:
     def get_slide_list(self, editing=False):
         'Get the slide list.'
         return tuple( (sl, sl.get_markup(editing)) for sl in self.slides)
-    
-    def get_slide_list_with_title(self):
-        'Get the slide list with a title if available.'
-        return self.get_slide_list()
     
     def get_order_string(self):
         return ""
