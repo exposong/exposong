@@ -71,14 +71,12 @@ def get_plugins_by_capability(klass):
 # work with cx_Freeze.
 if hasattr(sys, "frozen"):
     import exposong.plugins.export_import
-    import exposong.plugins.image
     import exposong.plugins.lyric
     import exposong.plugins.lyric_legacy_convert
     import exposong.plugins.opensong_convert
-    import exposong.plugins.print_support
     import exposong.plugins.songselect_convert
-    import exposong.plugins.text
-    __all__ = ["export_import","image","lyric","text","print_support",
+    import exposong.plugins.pres
+    __all__ = ["export_import","lyric","pres",
                "lyric_legacy_convert","opensong_convert","songselect_convert"]
 else:
     __all__ = [fnm[:-3] for fnm in os.listdir(__path__[0])

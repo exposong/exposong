@@ -34,6 +34,7 @@ import exposong.help
 from exposong import RESOURCE_PATH, DATA_PATH
 from exposong import config, prefs, screen, schedlist, splash, exampledata
 from exposong import preslist, presfilter, slidelist, statusbar, themeselect
+from exposong import print_support
 from exposong.schedule import Schedule # ? where to put library
 
 main = None
@@ -140,6 +141,10 @@ class Main (gtk.Window):
         exposong.log.debug("Loading the status bar.")
         statusbar.statusbar = statusbar.timedStatusbar()
         win_v.pack_end(statusbar.statusbar, False)
+        
+        ## Printing
+        exposong.log.debug("Enabling Print Support")
+        print_support.Print()
         
         gtk.settings_get_default().set_long_property('gtk-button-images', True,
                                                      'main:__init__')
