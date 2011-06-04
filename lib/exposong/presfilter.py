@@ -6,7 +6,7 @@
 #
 # Copyright (C) 2007 Sebastian Heinlein
 #               2007-2009 Canonical Ltd.
-#               2010 ExpoSong.org
+#               2010-2011 Exposong.org
 #
 # Authors:
 #  Sebastian Heinlein <glatzor@ubuntu.com>

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2008-2010 Exposong.org
+# Copyright (C) 2008-2011 Exposong.org
 #
 # ExpoSong is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

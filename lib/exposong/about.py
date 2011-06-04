@@ -1,7 +1,7 @@
 #
 # vim: ts=4 sw=4 expandtab ai:
 #
-# Copyright (C) 2008-2010 Exposong.org
+# Copyright (C) 2008-2011 Exposong.org
 #
 # ExpoSong is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ class About:
         self.dialog.set_transient_for(parent)
         self.dialog.set_name("ExpoSong")
         self.dialog.set_version(exposong.version.__version__)
-        self.dialog.set_copyright(_("Copyright %s") % "2008-2010 Exposong.org")
+        self.dialog.set_copyright(_("Copyright %s") % "2008-2011 Exposong.org")
         self.dialog.set_authors(("Brad Landis",
                                  "Samuel Mehrbrodt",
                                  "Siegwart Bogatscher",))

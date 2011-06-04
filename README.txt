@@ -1,7 +1,7 @@
 +-----------------------------------------+
 | ExpoSong                                |
 | Version 0.7.1                           |
-| Copyright (C) 2008-2010 Exposong.org    |
+| Copyright (C) 2008-2011 Exposong.org    |
 +-----------------------------------------+
 
 = About =
