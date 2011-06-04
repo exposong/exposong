@@ -22,8 +22,6 @@ The SlideList class displays the slides for the currently select presentation.
 
 import gtk
 import gobject
-import pango
-import random
 
 import exposong.screen
 from exposong import config
@@ -38,19 +36,20 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
     def __init__(self):
         "Create the interface."
         self.pres = None
+        self.pres_type = None
         # Used to stop or reset the timer if the presentation or slide changes.
         self.__timer = 0
 
         gtk.TreeView.__init__(self)
         self.set_size_request(250, -1)
         self.set_enable_search(False)
-        #self.set_headers_visible(False)
         
         self.column1 = gtk.TreeViewColumn(_("Slides"))
         self.column1.set_resizable(False)
         self.append_column(self.column1)
         
-        self.set_model(gtk.ListStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING))
+        self.set_model(gtk.ListStore(gobject.TYPE_PYOBJECT, #Slide object
+                                     gobject.TYPE_STRING))  #Slide markup
         self.get_selection().connect("changed", self._on_slide_activate)
     
     def set_presentation(self, pres):
@@ -65,11 +64,13 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
         self.set_model(slist)
         exposong.log.debug('Activating "%s" %s presentation.',
                            pres.get_title(), pres.get_type())
-        if not hasattr(self, 'pres_type') or self.pres_type is not pres.get_type():
+        if not hasattr(self, 'pres_type') or\
+                self.pres_type is not pres.get_type():
             self.pres_type = pres.get_type()
             pres.slide_column(self.column1)
         
-        if config.config.get('songs', 'show_in_order') == "True" and pres.get_type() == "song":
+        if config.config.get('songs', 'show_in_order') == "True"\
+                and pres.get_type() == "song":
             slides = pres.get_slides_in_order()
         else:
             slides = pres.get_slide_list()
@@ -91,7 +92,7 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
     
     def _move_to_slide(self, mv):
         'Move to the slide at mv. This ignores slide_order_index.'
-        (model,itr) = self.get_selection().get_selected()
+        (model, itr) = self.get_selection().get_selected()
         if itr:
             cur = int(model.get_string_from_iter(itr))
         else:
@@ -108,6 +109,7 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
         return self._move_to_slide(1)
     
     def to_slide(self, slide_num):
+        'Move to the slide at slide_num'
         model = self.get_model()
         itr = model.iter_nth_child(None, slide_num)
         if itr:
@@ -129,7 +131,7 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
     
     def _set_timer(self, t):
         'Starts the timer, or continues a current timer.'
-        if t <> self.__timer:
+        if t != self.__timer:
             return False
         if not exposong.screen.screen.is_running():
             return False
@@ -188,6 +190,7 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
     
     @staticmethod
     def _show_in_order_active(sel, action):
+        'Activates or deactives the "Show in Order" Checkbutton'
         if sel.count_selected_rows() > 0:
             (model, itr) = sel.get_selected()
             pres = model.get_value(itr, 0)

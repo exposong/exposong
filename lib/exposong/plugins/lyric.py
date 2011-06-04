@@ -20,13 +20,11 @@ import gtk
 import gtk.gdk
 try:
     import gtkspell
-except Exception:
+except ImportError:
     pass
 import gobject
-import pango
 import re
 import os.path
-from datetime import datetime
 from xml.sax.saxutils import escape, unescape
 
 import exposong.main
@@ -83,7 +81,6 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         A lyric slide for the presentation.
         '''
         def __init__(self, pres, verse):
-            lines = []
             self.pres = pres
             
             if verse:
@@ -140,7 +137,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             'Draw text on the footer.'
             jn = ['"%s"' % self.pres.title]
             # TODO List only translators for the current translation.
-            author = self.pres._get_authors_string()
+            author = self.pres.get_authors_string()
             if len(author) > 0:
                 jn.append(author)
             if len(self.pres.song.props.copyright):
@@ -150,6 +147,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             return '\n'.join(jn)
         
         def _edit_window(self, parent):
+            'Open the Slide Editor'
             ret = False
             editor = SlideEdit(parent, self)
             ans = editor.run()
@@ -158,7 +156,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                 self.title = editor.get_slide_title()
                 self.verse.name = self.title
                 self._set_lines(editor.get_slide_text())
-                self.pres._rename_order(old_title, self.title)
+                self.pres.rename_order(old_title, self.title)
                 ret = True
             if ans == gtk.RESPONSE_APPLY:
                 ret = 2
@@ -177,9 +175,8 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         
         def _set_lines(self, text):
             'Set the text from a string.'
-            self.text = text
             lines = openlyrics.Lines()
-            for line in self.text.split('\n'):
+            for line in text.split('\n'):
                 lines.lines.append(openlyrics.Line(line))
             self.verse.lines = [lines]
         
@@ -212,6 +209,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             self.song = openlyrics.Song()
     
     def get_order_string(self):
+        'Return the verse order as a string'
         return " ".join(self.song.props.verse_order)
     
     def get_slides_in_order(self, editing=False):
@@ -229,11 +227,11 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                     #Keep only the title and the first few words of the verse
                     short_markup = markup.split("\n")[:2]
                     short_markup[1] = " ".join(short_markup[1].split()[:7])
-                    short_markup[1] = "%s ..."%short_markup[1]
+                    short_markup[1] = "%s ..."% short_markup[1]
                     markups.append((self.slides[i], "\n".join(short_markup)))
             return tuple(m for m in markups)
         else:
-            return self.get_slide_list()
+            return _abstract.Presentation.get_slide_list()
     
     def get_order(self, custom_order=True):
         'Returns the order in which the slides should be presented.'
@@ -587,7 +585,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             self._fields['title_list'].connect(event, self._title_list_changed)
         
         table = gui.Table(1)
-        vorder = " ".join(self.song.props.verse_order)
+        vorder = self.get_order_string()
         self._fields['verse_order'] = gui.append_entry(table, _("Verse Order:"),
                                                        vorder, 0)
         txt = _("Use the Slide names in brackets to modify the order")
@@ -661,7 +659,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         ans = sl._edit_window(treeview.get_toplevel())
         if ans:
             if edit:
-                if len(old_title) == 0 or old_title <> sl.title:
+                if len(old_title) == 0 or old_title != sl.title:
                     sl._set_id()
                 model.set(itr, 0, sl, 1, sl.get_markup(True))
             else:
@@ -675,7 +673,6 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         
     def _on_slide_delete(self, btn, treeview, parent):
         'Remove the selected slide.'
-        # TODO
         (model, itr) = treeview.get_selection().get_selected()
         if not itr:
             return False
@@ -772,9 +769,9 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             if dialog.run() == gtk.RESPONSE_ACCEPT:
                 if not author.get_text():
                     info_dialog = gtk.MessageDialog(treeview.get_toplevel(),
-                                                    gtk.DIALOG_DESTROY_WITH_PARENT,
-                                                    gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
-                                                    _("Please enter an Author Name."))
+                                            gtk.DIALOG_DESTROY_WITH_PARENT,
+                                            gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
+                                            _("Please enter an Author Name."))
                     info_dialog.run()
                     info_dialog.destroy()
                 else:
@@ -786,7 +783,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                             model.set_value(itr, 2, lang.get_active_text())
                     else:
                         self._fields['author'].append( (author.get_text(), val,
-                                                      lang.get_active_text()))
+                                                    lang.get_active_text()))
                     dialog.hide()
                     return True
             else:
@@ -814,7 +811,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                      if t[0].get_type() == "song"
                      for thm in t[0].song.props.themes]
         themes = sorted(set(themes))
-        theme = gui.append_combo_entry(table, _('Theme Name:'),
+        theme_ = gui.append_combo_entry(table, _('Theme Name:'),
                                           themes, theme_value, 0)
         #theme = gui.append_entry(table, _('Theme Name:'), theme_value, 0)
         lang = gui.append_language_combo(table, lang_value, 1)
@@ -822,7 +819,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         
         while True:
             if dialog.run() == gtk.RESPONSE_ACCEPT:
-                if not theme.get_active_text():
+                if not theme_.get_active_text():
                     info_dialog = gtk.MessageDialog(treeview.get_toplevel(),
                             gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO,
                             gtk.BUTTONS_OK, _("Please enter an Theme Name."))
@@ -830,10 +827,10 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                     info_dialog.destroy()
                 else:
                     if edit:
-                        model.set_value(itr, 0, theme.get_active_text())
+                        model.set_value(itr, 0, theme_.get_active_text())
                         model.set_value(itr, 1, lang.get_active_text())
                     else:
-                        self._fields['theme'].append( (theme.get_active_text(),
+                        self._fields['theme'].append( (theme_.get_active_text(),
                                 lang.get_active_text(), "") )
                     dialog.hide()
                     return True
@@ -908,11 +905,11 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         'Save the data to disk.'
         if self.filename:
             self.filename = check_filename(self.get_title(), self.filename)
-            self.song.modifiedIn = "ExpoSong %s" %exposong.version.__version__
+            self.song.modifiedIn = "ExpoSong %s"% exposong.version.__version__
         else:
             self.filename = check_filename(self.get_title(),
                     os.path.join(DATA_PATH, "pres"))
-            self.song.createdIn = "ExpoSong %s"%exposong.version.__version__
+            self.song.createdIn = "ExpoSong %s"% exposong.version.__version__
         self.song.write(self.filename)
     
     def get_title(self):
@@ -945,16 +942,17 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             self._fields['title'].set_text('')
         self._title_lock = False
     
-    def _rename_order(self, old_title, new_title):
+    def rename_order(self, old_title, new_title):
         'If a slide title was changed, update the order with the new title.'
-        if old_title == new_title: return
+        if old_title == new_title:
+            return
         order = self._fields['verse_order'].get_text().split()
         for i in range(len(order)):
             if order[i] == old_title:
                 order[i] = new_title
         self._fields['verse_order'].set_text(" ".join(order))
 
-    def _get_authors_string(self):
+    def get_authors_string(self):
         """"
         Returns a string with the authors of the song.
         Summarizes multiple occurrences
@@ -965,13 +963,13 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             auth_type = auth_types.get(a.type, _("Written By"))
             same = False
             for auth in authlist:
-                    if auth[0] == auth_type:
-                        auth[1] = "%s / %s" %(auth[1], str(a))
-                        same = True
+                if auth[0] == auth_type:
+                    auth[1] = "%s / %s"% (auth[1], str(a))
+                    same = True
             if not same:
                 for auth in authlist:
                     if auth[1] == str(a):
-                        auth[0] = "%s &amp; %s" %(auth[0], auth_type)
+                        auth[0] = "%s &amp; %s"% (auth[0], auth_type)
                         same = True
             if not same:
                 authlist.append([auth_type, str(a)])
@@ -984,7 +982,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                  % self.get_title()
         info = []
         if self.song.props.authors:
-            info.append(self._get_authors_string())
+            info.append(self.get_authors_string())
         if self.song.props.copyright:
             info.append(u"Copyright \xA9 %s" % self.song.props.copyright)
         if config.get("general", "ccli"):
@@ -1023,10 +1021,11 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         match = r'<song\b'
         lncnt = 0
         for ln in fl:
-                if lncnt > 2: break
-                if re.search(match, ln):
-                        return True
-                lncnt += 1
+            if lncnt > 2:
+                break
+            if re.search(match, ln):
+                return True
+            lncnt += 1
         return False
     
     @staticmethod
@@ -1252,7 +1251,8 @@ class SlideEdit(gtk.Dialog):
     
     def _ok_to_continue(self):
         if self._buffer.can_undo or self._get_title_value() != self.slide_title:
-            msg = _('Unsaved Changes exist. Do you really want to continue without saving?')
+            msg = _('Unsaved Changes exist. Do you really want to continue\
+without saving?')
             dlg = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
                     gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, msg)
             resp = dlg.run()
