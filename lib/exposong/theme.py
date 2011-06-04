@@ -87,6 +87,7 @@ class Theme(object):
             self.filename = filename
     
     def _init_sections(self):
+        "Create the Section variables for body and footer"
         self.body = Section(type_='body', font="Sans 48",
                             pos=[0.0, 0.0, 1.0, 0.8],
                             expand=['header.y1','footer.y2'])

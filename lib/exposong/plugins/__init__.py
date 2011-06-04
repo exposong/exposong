@@ -32,7 +32,8 @@ class Plugin(object):
     
     @staticmethod
     def get_version():
-        'Return the version number of the plugin.\n\nShould be in tuple format (e.g. (1,0) for 1.0)'
+        '''Return the version number of the plugin.
+        Should be in tuple format (e.g. (1,0) for 1.0)'''
         raise NotImplementedError
     
     @staticmethod
@@ -43,8 +44,7 @@ class Plugin(object):
 
 def init_plugin_system(plugins):
     'Load plugins dynamically.'
-    load_plugins(plugins)
-    
+    load_plugins()
 
 def load_plugins():
     'Import plugins.'
@@ -52,11 +52,9 @@ def load_plugins():
         for plugin in __all__:
             __import__("exposong.plugins."+plugin, None, None, [''])
 
-
 def find_plugins():
     'Return all of the current available plugins.'
     return Plugin.__subclasses__()
-
 
 def get_plugins_by_capability(klass):
     'Return all plugins that inherit from `klass`.'
@@ -83,4 +81,5 @@ if hasattr(sys, "frozen"):
     __all__ = ["export_import","image","lyric","text","print_support",
                "lyric_legacy_convert","opensong_convert","songselect_convert"]
 else:
-    __all__ = [fnm[:-3] for fnm in os.listdir(__path__[0]) if fnm.endswith(".py") and not fnm.startswith("_")]
+    __all__ = [fnm[:-3] for fnm in os.listdir(__path__[0])
+               if fnm.endswith(".py") and not fnm.startswith("_")]

@@ -22,8 +22,7 @@ import pango
 import exposong.preslist
 import exposong.main
 import exposong._hook
-from exposong import gui
-from exposong.plugins import _abstract, Plugin
+from exposong.plugins import Plugin
 
 """
 Adds functionality print a song or a list of Songs
@@ -48,6 +47,7 @@ class Print(Plugin, exposong._hook.Menu):
         pass
     
     def _get_page_setup(self):
+        'Returns the PageSetup object to be used by all Pages'
         ps = gtk.PageSetup()
         ps.set_left_margin(20, gtk.UNIT_MM)
         ps.set_right_margin(20, gtk.UNIT_MM)
@@ -64,7 +64,7 @@ class Print(Plugin, exposong._hook.Menu):
         print_op.set_default_page_setup(self._get_page_setup())
         print_op.set_n_pages(1)
         print_op.connect("draw_page", self._presentation_markup)
-        res = print_op.run(gtk.PRINT_OPERATION_ACTION_PRINT_DIALOG, None)
+        print_op.run(gtk.PRINT_OPERATION_ACTION_PRINT_DIALOG, None)
     
     def _presentation_markup(self, operation=None, context=None, page_nr=None):
         "Create the page layout for a presentation."
@@ -97,7 +97,7 @@ class Print(Plugin, exposong._hook.Menu):
         print_op.set_default_page_setup(self._get_page_setup())
         print_op.set_n_pages(1)
         print_op.connect("draw_page", self._songlist_markup)
-        res = print_op.run(gtk.PRINT_OPERATION_ACTION_PRINT_DIALOG, None)
+        print_op.run(gtk.PRINT_OPERATION_ACTION_PRINT_DIALOG, None)
     
     def _songlist_markup(self, operation=None, context=None, page_nr=None):
         'Create the page layout for the songlist'

@@ -71,6 +71,7 @@ class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
     
     @classmethod
     def import_dialog(cls, action):
+        'Show the file dialog for importing OpenSong files'
         dlg = gtk.FileChooserDialog(_("Import OpenSong File(s)"),
                 exposong.main.main, gtk.FILE_CHOOSER_ACTION_OPEN,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK,
@@ -80,10 +81,10 @@ class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
         if dlg.run() == gtk.RESPONSE_ACCEPT:
             dlg.hide()
             files = dlg.get_filenames()
-            for file in files:
-                filename = cls.convert(unicode(file))
+            for f in files:
+                filename = cls.convert(unicode(f))
                 exposong.main.main.load_pres(filename)
-            config.set("dialogs", "opensong-import-dir", os.path.dirname(file))
+            config.set("dialogs", "opensong-import-dir", os.path.dirname(f))
         dlg.destroy()
     
     @classmethod

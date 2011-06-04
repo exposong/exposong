@@ -18,11 +18,9 @@
 
 import gtk
 import gtk.gdk
-import gobject
 from xml.etree import cElementTree as etree
 
 from exposong.glob import *
-from exposong import DATA_PATH
 from exposong import theme
 import exposong.main
 import exposong.schedlist
@@ -284,6 +282,7 @@ class Presentation:
     
     @classmethod
     def _on_pres_new(cls, action):
+        "Called when a new presentation was created"
         pres = cls()
         if pres.edit():
             sched = exposong.schedlist.schedlist.get_active_item()

@@ -88,7 +88,8 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         
         themes['_builtin_white'] = exposong.theme.Theme(builtin=True)
         themes['_builtin_white'].meta['title'] = _('White')
-        themes['_builtin_white'].backgrounds.append(exposong.theme.ColorBackground("#fff"))
+        themes['_builtin_white'].backgrounds.append(
+                exposong.theme.ColorBackground("#fff"))
         themes['_builtin_white'].body.color = '#000'
         themes['_builtin_white'].body.shadow_color = '#fff'
         themes['_builtin_white'].footer.color = '#000'
@@ -296,6 +297,7 @@ class CellRendererTheme(gtk.GenericCellRenderer):
         os.remove(os.path.join(DATA_PATH, '.cache', 'theme', fname))
     
     def _get_pixmap_name(self, size):
+        'Return the filename of the pixmap (includes size)'
         if self.theme.is_builtin():
             fname = '_builtin_' + re.sub('[^a-z]+','_',self.theme.meta['title'].lower()).rstrip('_')
         else:
@@ -365,7 +367,6 @@ class CellRendererTheme(gtk.GenericCellRenderer):
         pm = self._get_pixmap(window, cell_position[2:4])
         if pm is None:
             return False
-        scrsize = exposong.screen.screen.get_size()
         window.draw_drawable(widget.get_style().fg_gc[gtk.STATE_NORMAL],
                              pm, 0, 0, cell_area.x + x_offset,
                              cell_area.y + y_offset, width, height)

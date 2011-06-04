@@ -112,6 +112,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             return None
         
         def _edit_window(self, parent):
+            'Open the Slide Edit Dialog'
             ret = 0
             editor = SlideEdit(parent, self)
             while True:
@@ -148,7 +149,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                     fpath, fname = os.path.split(c.src)
                     if not os.path.isdir(IMAGE_PATH):
                         os.makedirs(IMAGE_PATH)
-                    if os.path.abspath(IMAGE_PATH) <> os.path.abspath(fpath):
+                    if os.path.abspath(IMAGE_PATH) != os.path.abspath(fpath):
                         newfile = find_freefile(os.path.join(IMAGE_PATH, fname))
                         try:
                             shutil.copyfile(c.src, newfile)
@@ -536,7 +537,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         ans = sl._edit_window(treeview.get_toplevel())
         if ans:
             if edit:
-                if len(old_title) == 0 or old_title <> sl.title:
+                if len(old_title) == 0 or old_title != sl.title:
                     sl._set_id()
                 model.set(itr, 0, sl, 1, sl.get_markup(True))
             else:
@@ -709,8 +710,8 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         cr.height = 100
         cr.can_cache = False
         for thm in exposong.themeselect.themeselect.get_model():
-                if '_builtin_black' == thm[0]:
-                    cr.theme = thm[1]
+            if '_builtin_black' == thm[0]:
+                cr.theme = thm[1]
         col.pack_start(cr, False)
         col.add_attribute(cr, 'slide', 0)
     
@@ -742,11 +743,11 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         match = r'<presentation\b'
         lncnt = 0
         for ln in fl:
-                if lncnt > 2:
-                    break
-                if re.search(match, ln):
-                        return True
-                lncnt += 1
+            if lncnt > 2:
+                break
+            if re.search(match, ln):
+                    return True
+            lncnt += 1
         return False
     
     @staticmethod
@@ -907,8 +908,6 @@ class SlideEdit(gtk.Dialog):
         vbox.pack_start(scroll, True, True)
         hbox.pack_start(vbox, False, True)
         
-        rt_vbox = gtk.VBox()
-        
         # This will contain an editor for a `theme._RenderableSection`
         # It will load when an item is selected from the left.
         self._ctbl = gui.ESTable(4,1)
@@ -950,10 +949,11 @@ class SlideEdit(gtk.Dialog):
         table = gui.ESTable(5, 2)
         self._p = {}
         
-        help = gtk.image_new_from_stock(gtk.STOCK_HELP, gtk.ICON_SIZE_BUTTON)
-        helppos = _("Positions are relative, with values between 0 and 1. A value of 0 is on the far left or top, and a value of 1 is on the far right or bottom.")
-        help.set_tooltip_text(helppos)
-        table.attach_widget(help, None, x=2, y=0)
+        help_ = gtk.image_new_from_stock(gtk.STOCK_HELP, gtk.ICON_SIZE_BUTTON)
+        helppos = _("Positions are relative, with values between 0 and 1. \
+A value of 0 is on the far left or top, and a value of 1 is on the far right or bottom.")
+        help_.set_tooltip_text(helppos)
+        table.attach_widget(help_, None, x=2, y=0)
         
         adjust = gtk.Adjustment(el.pos[0], 0.0, 1.0, 0.01, 0.10)
         self._p['lf'] = table.attach_spinner(adjust, 0.02, 2, label=_('Left:'))
@@ -971,7 +971,8 @@ class SlideEdit(gtk.Dialog):
         self._p['tp'].connect('changed', self._on_change_pos)
         
         adjust = gtk.Adjustment(el.pos[3], 0.0, 1.0, 0.01, 0.10)
-        self._p['bt'] = table.attach_spinner(adjust, 0.02, 2, label=_('Bottom:'), x=1, y=1)
+        self._p['bt'] = table.attach_spinner(adjust, 0.02, 2, label=_('Bottom:'),
+                                             x=1, y=1)
         self._p['bt'].set_numeric(True)
         self._p['bt'].connect('changed', self._on_change_pos)
         
@@ -1102,10 +1103,12 @@ class SlideEdit(gtk.Dialog):
         
         `pos.right` will be updated to be larger than `pos.left`. Same for
         top and bottom."""
-        if self.__updating: return
+        if self.__updating:
+            return
         self.__updating = True
         el = self.get_selected_element()
-        if el is False: return False
+        if el is False:
+            return False
         
         lf = self._p['lf'].get_value()
         rt = self._p['rt'].get_value()
@@ -1135,7 +1138,8 @@ class SlideEdit(gtk.Dialog):
     
     def _on_change_mg(self, editable):
         "Update the margin on change."
-        if self.__updating: return
+        if self.__updating:
+            return
         el = self.get_selected_element()
         if el is False: return False
         el.margin = int(editable.get_value())
@@ -1143,7 +1147,8 @@ class SlideEdit(gtk.Dialog):
     
     def _on_change_al(self, combobox):
         "Update the alignment on change."
-        if self.__updating: return
+        if self.__updating:
+            return
         el = self.get_selected_element()
         
         el.align = theme.get_align_const(combobox.get_active_text())
@@ -1151,7 +1156,8 @@ class SlideEdit(gtk.Dialog):
     
     def _on_change_va(self, combobox):
         "Update the vertical alignment on change."
-        if self.__updating: return
+        if self.__updating:
+            return
         el = self.get_selected_element()
         
         el.valign = theme.get_valign_const(combobox.get_active_text())
@@ -1159,7 +1165,8 @@ class SlideEdit(gtk.Dialog):
     
     def _on_change_aspect(self, combobox):
         "Update the image's resize setting on change."
-        if self.__updating: return
+        if self.__updating:
+            return
         el = self.get_selected_element()
         
         el.aspect = theme.get_aspect_const(combobox.get_active_text())
@@ -1266,7 +1273,7 @@ class SlideEdit(gtk.Dialog):
     def _ok_to_continue(self):
         "Let the user know that there are changes."
         if self.changed:
-            msg = _('Unsaved Changes exist. Do you really want to continue without saving?')
+            msg = _('Unsaved Changes exist. Do you want to continue without saving?')
             dlg = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
                     gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, msg)
             resp = dlg.run()

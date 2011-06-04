@@ -26,7 +26,7 @@ import exposong.slidelist
 import exposong._hook
 import exposong.plugins.pres
 from exposong.glob import *
-from exposong import RESOURCE_PATH, DATA_PATH, theme
+from exposong import DATA_PATH, theme
 from exposong.plugins import Plugin, _abstract
 from exposong.prefs import config
 from openlyrics import openlyrics
@@ -108,10 +108,10 @@ class LegacyConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
         for author in authors:
             if author.text:
                 song.props.authors.append(openlyrics.Author(author.text,
-                                                                                                        author.get("type")))
-        copyright = root.findall('copyright')
-        if copyright:
-            song.props.copyright = copyright[0].text
+                                                            author.get("type")))
+        copyright_ = root.findall('copyright')
+        if copyright_:
+            song.props.copyright = copyright_[0].text
         order = root.findall('order')
         if order:
             song.props.order = order[0].text
@@ -178,6 +178,7 @@ class LegacyConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
     
     @classmethod
     def import_dialog(cls, action):
+        'Show the dialog for importing an ExpoSong Legacy File'
         dlg = gtk.FileChooserDialog(_("Import ExpoSong Legacy File(s)"),
                 exposong.main.main, gtk.FILE_CHOOSER_ACTION_OPEN,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK,

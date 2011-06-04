@@ -1251,8 +1251,7 @@ class SlideEdit(gtk.Dialog):
     
     def _ok_to_continue(self):
         if self._buffer.can_undo or self._get_title_value() != self.slide_title:
-            msg = _('Unsaved Changes exist. Do you really want to continue\
-without saving?')
+            msg = _('Unsaved Changes exist. Do you want to continue without saving?')
             dlg = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
                     gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, msg)
             resp = dlg.run()

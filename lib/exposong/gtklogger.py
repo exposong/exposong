@@ -139,10 +139,10 @@ class GTKHandler (logging.Handler, object):
         except ValueError:
             return False
     
-    def _refilter(self, list):
+    def _refilter(self, list_):
         "Call to force it to refilter the TreeFilter."
         gobject.timeout_add(150, self.scroll_to_end)
-        list.refilter()
+        list_.refilter()
     
     def _save(self, toplevel):
         "Save the log to file."

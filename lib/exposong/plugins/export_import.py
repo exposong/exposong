@@ -20,11 +20,10 @@ import os.path
 import shutil
 import tempfile
 import tarfile
-import mimetypes
 
 import exposong.main
 import exposong.schedlist
-from exposong import DATA_PATH, options, themeselect, theme
+from exposong import DATA_PATH
 from exposong.plugins import Plugin
 from exposong.glob import *
 
@@ -73,7 +72,6 @@ class ExportImport(Plugin, exposong._hook.Menu):
         dlg.set_current_folder(os.path.expanduser("~"))
         dlg.set_current_name(os.path.basename(title_to_filename(sched.title))+".expo")
         if dlg.run() == gtk.RESPONSE_ACCEPT:
-            oldpath = os.getcwd()
             os.chdir(DATA_PATH)
             fname = dlg.get_filename()
             if not fname.endswith(".expo"):
@@ -154,7 +152,7 @@ class ExportImport(Plugin, exposong._hook.Menu):
     @classmethod
     def export_theme(cls, *args):
         'Export the active theme to tar-compressed file'
-        theme = exposong.themeselect.themeselect.get_active()
+        cur_theme = exposong.themeselect.themeselect.get_active()
         
         dlg = gtk.FileChooserDialog(_("Export Theme"), exposong.main.main,
                                     gtk.FILE_CHOOSER_ACTION_SAVE,
@@ -164,16 +162,16 @@ class ExportImport(Plugin, exposong._hook.Menu):
         dlg.set_do_overwrite_confirmation(True)
         dlg.set_current_folder(os.path.expanduser("~"))
         dlg.set_current_name(_("theme_%s.expo")%title_to_filename(
-                                        os.path.basename(theme.get_title())))
+                                        os.path.basename(cur_theme.get_title())))
         if dlg.run() == gtk.RESPONSE_ACCEPT:
             fname = dlg.get_filename()
             if not fname.endswith(".expo"):
                 fname += ".expo"
             tar = tarfile.open(fname, "w:gz")
             
-            tar.add(os.path.join(DATA_PATH, 'theme', theme.filename),
-                    os.path.join('theme', theme.filename))
-            for bg in theme.backgrounds:
+            tar.add(os.path.join(DATA_PATH, 'theme', cur_theme.filename),
+                    os.path.join('theme', cur_theme.filename))
+            for bg in cur_theme.backgrounds:
                 if isinstance(bg, exposong.theme.ImageBackground):
                     tar.add(os.path.join(DATA_PATH, 'theme', 'res', bg.src),
                             os.path.join('theme', 'res', bg.src))
@@ -196,6 +194,7 @@ class ExportImport(Plugin, exposong._hook.Menu):
     
     @classmethod
     def import_file(cls, filename):
+        'Import anything that has been exported before (.expo file)'
         tar = tarfile.open(unicode(filename), "r:gz")
         # Make a temporary directory so that no files are overwritten.
         tmpdir = tempfile.mkdtemp(os.path.split(filename)[1].rstrip(".expo"))
@@ -312,16 +311,16 @@ class ExportImport(Plugin, exposong._hook.Menu):
             </menubar>
             """)
     
+    @classmethod
+    def unmerge_menu(cls, uimanager):
+        'Remove merged items from the menu.'
+        uimanager.remove_ui(cls.menu_merge_id)
+        
     @staticmethod
     def _export_theme_active(sel, action):
-        "Is exporting available for the selected theme."
+        "See wheter exporting is available for the selected theme."
         if sel.get_active() is not None:
             if not sel.get_active().is_builtin():
                 action.set_sensitive(True)
                 return
         action.set_sensitive(False)
-    
-    @staticmethod
-    def unmerge_menu(cls, uimanager):
-        'Remove merged items from the menu.'
-        uimanager.remove_ui(cls.menu_merge_id)

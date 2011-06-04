@@ -19,13 +19,12 @@ import gtk
 import gtk.gdk
 
 from openlyrics import openlyrics
-from xml.etree import cElementTree as etree
 
 import exposong.main
 import exposong.slidelist
 import exposong._hook
 from exposong.glob import *
-from exposong import RESOURCE_PATH, DATA_PATH
+from exposong import DATA_PATH
 from exposong.plugins import Plugin, _abstract
 from exposong.prefs import config
 
@@ -161,24 +160,25 @@ class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
     
     @classmethod
     def import_dialog(cls, action):
+        "Show the file dialog for importing SongSelect Lyrics"
         dlg = gtk.FileChooserDialog(_("Import SongSelect Lyrics"),
                                     exposong.main.main,
                                     gtk.FILE_CHOOSER_ACTION_OPEN,
                                     (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                     gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         dlg.set_select_multiple(True)
-        filter = gtk.FileFilter()
-        filter.set_name(_("SongSelect File (%s)") % ".usr")
-        filter.add_pattern("*.usr")
-        dlg.add_filter(filter)
+        filter_ = gtk.FileFilter()
+        filter_.set_name(_("SongSelect File (%s)") % ".usr")
+        filter_.add_pattern("*.usr")
+        dlg.add_filter(filter_)
         dlg.set_current_folder(config.get("dialogs", "songselect-import-dir"))
         if dlg.run() == gtk.RESPONSE_ACCEPT:
             dlg.hide()
             files = dlg.get_filenames()
-            for file in files:
-                filename = cls.convert(unicode(file), True)
+            for f in files:
+                filename = cls.convert(unicode(f), True)
                 exposong.main.main.load_pres(filename)
-            config.set("dialogs", "songselect-import-dir", os.path.dirname(file))
+            config.set("dialogs", "songselect-import-dir", os.path.dirname(f))
         dlg.destroy()
     
     @classmethod
