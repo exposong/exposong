@@ -1,6 +1,6 @@
 +-----------------------------------------+
 | ExpoSong                                |
-| Version 0.7.1                           |
+| Version 0.8                             |
 | Copyright (C) 2008-2011 Exposong.org    |
 +-----------------------------------------+
 
@@ -22,6 +22,7 @@
  * User will be notified of a new version.
 
 == 0.7.1 ==
+
  * Many performance improvements. Caching for images speed up loading the
    program by up to 5 times faster than before.
  * Logging is available for debugging program issues.
