@@ -27,7 +27,6 @@ import exposong.version
 import gettext
 import gettext_windows
 import gtk
-import imp
 import locale
 import logging
 import os
@@ -38,7 +37,7 @@ import shutil
 import sys
 import traceback
 from optparse import OptionParser, OptionGroup
-from os.path import abspath, dirname, join, pardir, expanduser
+from os.path import abspath, join, pardir, expanduser
 
 
 # Tell Windows that I am my own application, and not just python:
@@ -125,9 +124,9 @@ if options.log:
 log.info("Starting ExpoSong.")
 
 # Send exceptoins to our logger.
-def excepthook(type, value, tb):
+def excepthook(type_, value, tb):
     "Send exceptions to our custom logger."
-    exposong.log.error("".join(traceback.format_exception(type, value, tb)))
+    exposong.log.error("".join(traceback.format_exception(type_, value, tb)))
 sys.excepthook = excepthook
 
 pygtk.require("2.0")

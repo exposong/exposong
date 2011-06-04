@@ -18,13 +18,12 @@
 
 import gtk
 import gtk.gdk
-import gobject
 import os.path
 from xml.etree import cElementTree as etree
 
 from exposong import DATA_PATH
 from exposong import preslist
-from exposong.glob import *
+from exposong.glob import get_node_text, check_filename
 import exposong.plugins._abstract
 
 
@@ -64,7 +63,6 @@ class Schedule(gtk.ListStore):
             
             try:
                 filenm = os.path.split(get_node_text(presNode.find("file")))[1]
-                hasFile = True
             except IndexError:
                 exposong.log.warning('Missing filename for presentation in schedule "%s"',
                                      self.title)

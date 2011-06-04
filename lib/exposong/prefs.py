@@ -18,11 +18,9 @@
 
 import gtk
 import gtk.gdk
-import os
 
 from exposong import gui
 from exposong import DATA_PATH
-from exposong import SHARED_FILES
 from exposong.config import config
 import exposong.screen
 import exposong.main
@@ -56,7 +54,8 @@ class PrefsDialog(gtk.Dialog):
         else:
             folder = DATA_PATH
         g_data = table.attach_folderchooser(folder, label=_("Data folder"))
-        msg = _("The place where all your presentations, schedules and background images are stored.")
+        msg = _("The place where all your presentations, schedules and \
+background images are stored.")
         g_data.set_tooltip_text(msg)
         table.attach_section_title(_("Updates"))
         g_update = table.attach_checkbutton(
@@ -74,7 +73,8 @@ class PrefsDialog(gtk.Dialog):
         g_songbook = table.attach_combo(songbooks,
                                         config.get("songs","songbook"),
                                         label=_("Songbook"))
-        table.attach_comment(_("Songbooks in Songs are automatically added to this list."))
+        table.attach_comment(_("Songbooks in Songs are automatically \
+added to this list."))
         
         notebook.append_page(table, gtk.Label( _("General") ))
         
@@ -168,6 +168,3 @@ class PrefsDialog(gtk.Dialog):
         elif isinstance(target, (tuple, list)):
             for t in target:
                 self._on_toggle(button, t)
-
-def getGeometryFromRect(_g1):
-    return ','.join( map(str, (_g1.x, _g1.y, _g1.width, _g1.height)) )

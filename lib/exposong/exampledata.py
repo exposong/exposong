@@ -31,6 +31,7 @@ class ExampleData(exposong._hook.Menu):
         pass
     
     def check_presentations(self, parent):
+        "Check if any presentation exists, otherwise offer example data for download"
         if len(os.listdir(os.path.join(DATA_PATH, "pres"))) > 0:
             return
         msg = _("It seems you have no presentations yet created.\n"+\
@@ -45,6 +46,7 @@ class ExampleData(exposong._hook.Menu):
             self._offer_download(parent)
     
     def _offer_download(self, parent=None):
+        "Show download options for ExpoSong data"
         msg = _("1. Download the packages you want\n"+\
                 "2. Import them using File->Import->ExpoSong Data (.expo)")
         dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL,
@@ -72,7 +74,8 @@ class ExampleData(exposong._hook.Menu):
         cls._actions = gtk.ActionGroup('exampledata')
         cls._actions.add_actions([
                 ('ExampleData', None, _('_Download Example Data'), None,
-                        _('Offer Example Data for Download'), exampledata._offer_download),
+                        _('Offer Example Data for Download'),
+                        exampledata._offer_download),
                 ])
         
         uimanager.insert_action_group(cls._actions, -1)

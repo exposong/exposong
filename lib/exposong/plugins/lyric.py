@@ -231,7 +231,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                     markups.append((self.slides[i], "\n".join(short_markup)))
             return tuple(m for m in markups)
         else:
-            return _abstract.Presentation.get_slide_list()
+            return _abstract.Presentation.get_slide_list(self)
     
     def get_order(self, custom_order=True):
         'Returns the order in which the slides should be presented.'

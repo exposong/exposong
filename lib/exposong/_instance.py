@@ -126,7 +126,6 @@ class SingleInstance(object):
             return self.socket.recv(1024)
     
     def remote(self):
-        ""
         self.open()
         if exposong.options.import_:
             try:

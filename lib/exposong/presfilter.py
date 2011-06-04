@@ -114,6 +114,7 @@ class PresFilter(gtk.Entry, exposong._hook.Menu):
         self.handler_unblock(self._handler_changed)
 
     def _emit_terms_changed(self):
+        "Sends the 'terms-changed' signal"
         text = self.get_text()
         self.emit("terms-changed", text)
 

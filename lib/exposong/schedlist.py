@@ -24,13 +24,11 @@ user can select.
 import gtk
 import gtk.gdk
 import gobject
-import xml.dom
 
 import exposong.main
 import exposong._hook
 import exposong.preslist
 import exposong.schedule
-from glob import *
 from exposong import DATA_PATH
 from exposong import statusbar
 
@@ -84,7 +82,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
             ret = self.model.append(parent, (row, row.title, sort, False))
         elif isinstance(row, tuple):
             ret = self.model.append(parent, row)
-        elif row==None: #Separator
+        elif not row: #Separator
             return self.model.append(parent, (None, None, sort, True))
         else:
             exposong.log.warning("Schedule cannot append this item: %r" % row)
@@ -195,7 +193,6 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
         'Create a new schedule.'
         name = _("New Schedule")
         curnames = []
-        num = 1
         itr = self.model.iter_children(self.custom_schedules)
         while itr:
             if self.model.get_value(itr, 1).startswith(name):
@@ -224,8 +221,9 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
                           isinstance(sched, exposong.schedule.Schedule)
                           and sched.builtin is False)
     
-    def _row_separator(self, model, iter):
-        return model.get_value(iter, 3)
+    def _row_separator(self, model, itr):
+        "Determines wheter the current row should be a separator"
+        return model.get_value(itr, 3)
     
     def _rename_schedule(self, text_rend, path, new_text):
         "Rename a schedule in the list and its filename."
@@ -256,6 +254,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
         return []
     
     def _add_to_schedule_menu(self):
+        "Creates the context menu 'Add to Schedule'"
         if not hasattr(self, 'custom_schedules'):
             return False
         model = self.get_model()
@@ -272,10 +271,10 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
             uimanager.remove_ui(self._sched_mergeid)
         
         self._sched_actiongroup = gtk.ActionGroup('addtosched')
-        str = _("Add to Schedule %s")
+        str_ = _("Add to Schedule %s")
         self._sched_actiongroup.add_actions(
                 [('pres-add-%s' % s[1], None, s[1], None,
-                 str %s[1], s[0].append_action) for s in scheds])
+                 str_ %s[1], s[0].append_action) for s in scheds])
         
         uimanager.insert_action_group(self._sched_actiongroup)
         self._sched_mergeid = uimanager.add_ui_from_string("""

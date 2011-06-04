@@ -136,10 +136,11 @@ def find_freefile(filename):
     return "".join([root, n, ext])
 
 
-def random_string(len):
+def random_string(length):
+    "Return a random string with `lenght` characters"
     chars = string.ascii_letters + string.digits
     p = ""
-    for i in range(len):
+    for i in range(length):
         p += random.choice(chars)
     return p
 

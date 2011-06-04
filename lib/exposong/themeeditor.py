@@ -19,7 +19,6 @@ import sys
 import os
 import shutil
 import random
-import pango
 import gobject
 
 if __name__ == '__main__': #For testing
@@ -27,7 +26,7 @@ if __name__ == '__main__': #For testing
 
 import exposong.theme
 from exposong import gui
-from exposong import DATA_PATH, RESOURCE_PATH
+from exposong import DATA_PATH
 from exposong.glob import title_to_filename, find_freefile, check_filename
 
 BACKGROUND_TYPES = [_("Image"),  _("Color"), _("Gradient"), _("Radial Gradient")]
@@ -152,7 +151,8 @@ the first element in this list moving to the last one."), 0)
         self._notebook.append_page(footer_h, gtk.Label(_("Footer Text")))
         
         table_meta = gui.ESTable(4, auto_inc_y=True)
-        self._meta = {} #Key names must comply with the keys in the <meta> tag in the theme file
+        #Key names for meta must comply with the keys in the <meta> tag in the theme file
+        self._meta = {}
         self._meta['author'] = table_meta.attach_entry("", label=_("Author"))
         self._meta['themeurl'] = table_meta.attach_entry("", label=_("Theme URL"))
         self._meta['copyright'] = table_meta.attach_entry("", label=_("Copyright"))
@@ -296,7 +296,8 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         footer.shadow_offset[0] = self.footer_widgets['shadow_x_offset'].get_value()
         footer.shadow_offset[1] = self.footer_widgets['shadow_y_offset'].get_value()
         footer.outline_size = self.footer_widgets['outline_size'].get_value()
-        footer.outline_color = self.footer_widgets['outline_color'].get_color().to_string()
+        footer.outline_color = self.footer_widgets['outline_color'].\
+                get_color().to_string()
         
         self.draw()
     
@@ -475,7 +476,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
                             random.randint(0,65535)).to_string()
         if loc > 0.9:
             loc -= random.uniform(0.1, 0.8)
-        elif loc < 0.9 and loc>0.5:
+        elif loc < 0.9 and loc > 0.5:
             loc -= random.uniform(0.1, 0.5)
         else:
             loc += random.uniform(0.1, 0.5)
@@ -550,7 +551,8 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self._bg_radial_length.set_digits(0)
         self._bg_radial_length.connect('change-value', self._on_bg_radial_changed)
         self._bg_radial_pos_h = table.attach_widget(
-                gtk.HScale(gtk.Adjustment(0,0,100,1,10,0)), label=_("Horizontal Position"))
+                gtk.HScale(gtk.Adjustment(0,0,100,1,10,0)),
+                label=_("Horizontal Position"))
         self._bg_radial_pos_h.set_digits(0)
         self._bg_radial_pos_h.connect('change-value', self._on_bg_radial_changed)
         self._bg_radial_pos_v = table.attach_widget(
@@ -592,12 +594,12 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
     
     def _get_active_bg(self):
         'Returns the background of the currently selected item'
-        (model, iter) = self._treeview_bgs.get_selection().get_selected()
-        if iter:
-            return model.get_value(iter, 0)
+        (model, itr) = self._treeview_bgs.get_selection().get_selected()
+        if itr:
+            return model.get_value(itr, 0)
         return None
     
-    def _on_bgs_reordered(self, model, path, iter=None, new_order=None):
+    def _on_bgs_reordered(self, model, path, itr=None, new_order=None):
         'Called when a background in the list is being dragged to another position'
         #TODO: This doesnt't work. Need to get the order from the treeview.
         self._update_bg_list_from_model()
@@ -676,7 +678,8 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self._p['tp'].connect('changed', self._on_change_pos)
         
         adjust = gtk.Adjustment(0, 0.0, 1.0, 0.01, 0.10)
-        self._p['bt'] = table.attach_spinner(adjust, 0.02, 2, label=_('Bottom:'), x=1, y=1)
+        self._p['bt'] = table.attach_spinner(adjust, 0.02, 2,
+                                             label=_('Bottom:'), x=1, y=1)
         self._p['bt'].set_numeric(True)
         self._p['bt'].connect('changed', self._on_change_pos)
         
@@ -856,7 +859,8 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self.footer_widgets['shadow_x_offset'].set_value(footer.shadow_offset[0])
         self.footer_widgets['shadow_y_offset'].set_value(footer.shadow_offset[1])
         self.footer_widgets['outline_size'].set_value(footer.outline_size)
-        self.footer_widgets['outline_color'].set_color(gtk.gdk.Color(footer.outline_color))
+        self.footer_widgets['outline_color'].set_color(
+                gtk.gdk.Color(footer.outline_color))
         
         ##################### Metadata ########################################
         for key, value in self.theme.meta.iteritems():
@@ -940,6 +944,7 @@ class _ExampleSlide(object):
         ]))]
     
     def get_body(self):
+        "Returns the body of the "
         return self.body
     
     def get_footer(self):

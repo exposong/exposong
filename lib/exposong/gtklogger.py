@@ -24,12 +24,10 @@ import logging
 import gobject
 import gtk
 import os.path
-from exposong import gui
 
 _SEV_LEVELS = ['CRITICAL','ERROR','WARNING','INFO','DEBUG']
 
 class GTKHandler (logging.Handler, object):
-    
     def __init__(self, level=logging.NOTSET):
         self.liststore = gtk.ListStore(*([object] + [str] * 6))
         self.scroll = None
@@ -48,6 +46,7 @@ class GTKHandler (logging.Handler, object):
         gobject.timeout_add(150, self.scroll_to_end)
     
     def _get_color(self, levelname):
+        'Return the colors to be used in the table for `levelname`'
         if levelname == "CRITICAL":
             return ["Red","White"]
         if levelname == "ERROR":
@@ -72,12 +71,12 @@ class GTKHandler (logging.Handler, object):
         hbox.pack_start(gtk.Label(_("Filter Severity:")), False, True, 4)
         combo = gtk.combo_box_new_text()
         for opt in _SEV_LEVELS:
-            itr = combo.append_text(opt)
+            combo.append_text(opt)
         combo.set_active(3)
-        list = self.liststore.filter_new()
-        combo.connect("changed", lambda combo: self._refilter(list))
+        list_ = self.liststore.filter_new()
+        combo.connect("changed", lambda combo: self._refilter(list_))
         hbox.pack_start(combo, True, True, 4)
-        list.set_visible_func(self._row_filter, combo)
+        list_.set_visible_func(self._row_filter, combo)
         win.vbox.pack_start(hbox, False, True, 4)
         
         treeview = gtk.TreeView()
@@ -107,7 +106,7 @@ class GTKHandler (logging.Handler, object):
         col.add_attribute(cell, 'foreground', 6)
         treeview.append_column(col)
         
-        treeview.set_model(list)
+        treeview.set_model(list_)
         
         self.scroll = gtk.ScrolledWindow()
         self.scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)

@@ -35,15 +35,17 @@ class timedStatusbar(gtk.Statusbar):
         self._set_timer(timeout)
     
     def _del_timer(self):
+        "Delete the timer (when a new message is sent)"
         if self.last_tag:
             gobject.source_remove(self.last_tag)
-        #self.last_tag = None
     
     def _set_timer(self, timeout):
+        "Sets a timer to a message"
         if timeout > 0:
             self.last_tag = gobject.timeout_add(timeout*1000, self._clear)
     
     def _clear(self):
+        "Clears the statusbar"
         self.pop(1)
         self.push(1,"")
         return False

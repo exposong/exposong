@@ -20,16 +20,17 @@ import gtk
 import gtk.gdk
 try:
     import gtkspell
-except Exception:
+except ImportError:
     pass
-import gobject
 import os
 
 _LABEL_SPACING = 12
 WIDGET_SPACING = 4
 __pb_cache = {}
 
-
+"""
+Provides functions and classes to be used for UI building
+"""
 
 ## New Class ##
 
@@ -83,7 +84,7 @@ class ESTable(gtk.Table):
         return widget
     
     def attach_spinner(self, adjust, climb_rate=0.0, digits=0, **kw):
-        'Add a spinner widget.'
+        'Adds a spinner widget.'
         widget = gtk.SpinButton(adjust, climb_rate, digits)
         self.attach_widget(widget, **kw)
         return widget
@@ -99,6 +100,7 @@ class ESTable(gtk.Table):
         return widget
     
     def attach_checkbutton(self, buttonlabel, checked=False, **kw):
+        'Adds a CheckButton widget'
         widget = gtk.CheckButton(buttonlabel)
         self.attach_widget(widget, **kw)
         return widget
@@ -160,6 +162,7 @@ class ESTable(gtk.Table):
         return label
     
     def attach_comment(self, title, **kw):
+        'Adds an italic, small Label'
         label = gtk.Label()
         label.set_markup("<i><small>"+title+"</small></i>")
         label.set_line_wrap(True)
@@ -272,7 +275,8 @@ def append_color(table, label, value, top, alpha=False):
             button = gtk.ColorButton(gtk.gdk.Color(int(v[0]), int(v[1]), int(v[2])))
             if(alpha):
                 button.set_use_alpha(True)
-            table.attach(button, cnt, cnt+1, top, top+1, gtk.EXPAND|gtk.FILL, 0, WIDGET_SPACING)
+            table.attach(button, cnt, cnt+1, top, top+1,
+                         gtk.EXPAND|gtk.FILL, 0, WIDGET_SPACING)
             cnt += 1
             buttons.append(button)
         return buttons

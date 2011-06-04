@@ -23,20 +23,13 @@ done by the theme.
 """
 
 import gtk
-import pango
-import cairo
-import time
-import gobject
 import os
-from gtk.gdk import pixbuf_new_from_file as pb_new
-from gtk.gdk import pixbuf_new_from_file_at_size as pb_new_at_size
 
 import exposong.main
 import exposong.prefs
 import exposong.slidelist
 import exposong.theme
 from exposong.config import config
-from exposong import RESOURCE_PATH, DATA_PATH
 import exposong.notify
 
 
@@ -51,11 +44,11 @@ def c2dec(color):
     else:
         return color / 65535.0
 
-screen = None 
-"This will be the instance variable for Screen once Main runs."
+#This will be the instance variable for Screen once Main runs.
+screen = None
 
+#This static value determines the height of the preview screen.
 PREV_HEIGHT = 145
-"This static value determines the height of the preview screen."
 
 class Screen(exposong._hook.Menu):
     '''
@@ -84,31 +77,31 @@ class Screen(exposong._hook.Menu):
         Finds the best location for the screen.
         
         If the user is using one monitor, use the bottom right corner for
-        the presentation screen, otherwise, use the 2nd monitor.
+        the presentation screen_, otherwise, use the 2nd monitor.
         '''
         geometry = None
-        screen = parent.get_screen()
-        num_monitors = screen.get_n_monitors()
+        screen_ = parent.get_screen()
+        num_monitors = screen_.get_n_monitors()
         
         if config.has_option('screen','monitor'):
             if config.get('screen', 'monitor') == '1h':
-                scr_geom = screen.get_monitor_geometry(0)
+                scr_geom = screen_.get_monitor_geometry(0)
                 geometry = (scr_geom.width/2, scr_geom.height/2,
                             scr_geom.width/2, scr_geom.height/2)
             elif num_monitors >= config.getint('screen','monitor'):
-                scr_geom = screen.get_monitor_geometry(
+                scr_geom = screen_.get_monitor_geometry(
                                         config.getint('screen','monitor')-1)
                 geometry = (scr_geom.x, scr_geom.y, scr_geom.width,
                             scr_geom.height)
         
         if geometry == None:
             if(num_monitors > 1):
-                scr_geom = screen.get_monitor_geometry(1)
+                scr_geom = screen_.get_monitor_geometry(1)
                 geometry = (scr_geom.x, scr_geom.y, scr_geom.width,
                             scr_geom.height)
             else:
-                # No 2nd monitor, so preview it small in the corner of the screen
-                scr_geom = screen.get_monitor_geometry(0)
+                # No 2nd monitor, so preview it small in the corner of the screen_
+                scr_geom = screen_.get_monitor_geometry(0)
                 parent.move(0,0)
                 geometry = (scr_geom.width/2, scr_geom.height/2,
                             scr_geom.width/2, scr_geom.height/2)
@@ -185,7 +178,7 @@ class Screen(exposong._hook.Menu):
         if not widget.window or not widget.window.is_viewable():
             return False
         
-        if self.pres.window and self.pres.window.get_size() <> self._size:
+        if self.pres.window and self.pres.window.get_size() != self._size:
             exposong.log.error('The screen sizes are inconsistent. '
                                + 'Screen: "%s"; Stored: "%s".',
                                self.pres.window.get_size(), self._size)
@@ -349,7 +342,7 @@ class Screen(exposong._hook.Menu):
             action.set_active(True)
         for nm in ('Freeze', 'Background', 'Logo', 'Black Screen'):
             nmaction = self._actions.get_action(nm)
-            if action <> nmaction:
+            if action != nmaction:
                 nmaction.set_active(False)
             else:
                 self.show()
@@ -373,7 +366,7 @@ class Screen(exposong._hook.Menu):
             # TODO should we resize the logo? If not, we need to add the
             # feature to theme.Image
             try:
-                if self.__logo_fl <> config.get("screen", "logo"):
+                if self.__logo_fl != config.get("screen", "logo"):
                     self.__logo_fl = config.get('screen', 'logo')
                     self.__logo_img = exposong.theme.Image(self.__logo_fl,
                             pos=[0.2, 0.2, 0.8, 0.8])

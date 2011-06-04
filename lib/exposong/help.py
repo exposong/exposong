@@ -29,18 +29,21 @@ from exposong import RESOURCE_PATH, DATA_PATH
 from exposong import statusbar, config
 
 class Help(exposong._hook.Menu, object):
-    
+    """
+    A class to provide help to the user,
+    like a Browser help page and an update check
+    """
     def __init__(self):
         self.helpfile = os.path.join(DATA_PATH, 'help.html')
     
     def show(self, *args):
         "Show the file in the web browser."
-        all = self._header() + self._about() + self._schedules() +\
+        all_ = self._header() + self._about() + self._schedules() +\
                 self._presentations() + self._notifications() +\
                 self._backgrounds() + self._shortcuts_table()
         
         f = open(self.helpfile, "w")
-        f.write(all)
+        f.write(all_)
         exposong.log.info("Help page generated.")
         f.close()
         webbrowser.open("file:"+urllib.pathname2url(self.helpfile))
@@ -84,12 +87,13 @@ class Help(exposong._hook.Menu, object):
         dlg.destroy()
     
     def _update_available(self):
+        'Check exposong.org if an update is available'
         msg = ""
         err = new_version = False
         fl = None
         try:
             fl = urllib.urlopen("http://exposong.org/_current-version/")
-            if fl.getcode() <> 200:
+            if fl.getcode() != 200:
                 err = True
                 msg = _("Could not read the website (error code %d).")\
                       % fl.getcode()
@@ -97,8 +101,8 @@ class Help(exposong._hook.Menu, object):
                 version = fl.read().strip()
                 if version > exposong.version.__version__:
                     new_version = True
-                    msg = _("A new version (%s) is available. Would you like to be taken to the download page?")\
-                            % version
+                    msg = _("A new version (%s) is available. Would you like \
+to be taken to the download page?")% version
                 else:
                     new_version = False
                     msg = _("You are using the most recent version.")
@@ -112,11 +116,12 @@ class Help(exposong._hook.Menu, object):
         
         
     def delete_help_file(self):
-        'Delete the generated help file'
+        'Deletes the generated help file'
         if os.path.exists(self.helpfile):
             os.remove(self.helpfile)
     
     def _header(self):
+        'Returns the html header for the help page'
         header = """<head>
     <title>%(title)s</title>
     <meta http-equiv="content-type" content="text-html; charset=utf-8">
@@ -133,6 +138,7 @@ class Help(exposong._hook.Menu, object):
         return header
     
     def _about(self):
+        'Returns the introduction paragraph for the help page'
         about = self._h(_('About')) +\
                 self._p(_('ExpoSong is a free, open-source, presentation \
 program to assist with worship assemblies. Create lyrics or plain-text slides, \
@@ -140,6 +146,7 @@ create schedules, and put up slides on the screen.'))
         return about
     
     def _schedules(self):
+        'Returns the schedules paragraph for the help page'
         schedules = self._h(_('Schedules')) +\
                 self._p(_('Schedules are used to create an order of presentations.')) +\
                 self._p(_('To create a schedule, in the menu, select Schedule-&gt;\
@@ -148,6 +155,7 @@ schedule by dragging them from the library onto the schedule.'))
         return schedules
     
     def _presentations(self):
+        'Returns the Presentations parapraph of the help page'
         presentations = self._h(_('Creating Presentations')) +\
                 self._p(_('Presentations are a set of slides to be presented on the screen. \
 To create a new presentation, on the menu, select Presentation-&gt;New, and \
@@ -170,6 +178,7 @@ Rearrange images by using drag-and-drop.'))
         return presentations
         
     def _notifications(self):
+        'Returns the notifications paragraph of the help page'
         notifications = self._h(_('Notifications')) +\
                 self._p(_('You may have a need to notify someone in the audience of \
 something, such as a crying baby in the nursury. A notification can be used \
@@ -179,6 +188,7 @@ message.'))
         return notifications
     
     def _backgrounds(self):
+        'Returns the backgrounds paragraph of the help page'
         backgrounds = self._h(_('Backgrounds')) +\
                 self._p(_('The background image for presentations can be a gradient \
 or an image file. Change the image by using the controls next to the \
@@ -190,6 +200,7 @@ many colors make the text difficult to read.'))
         return backgrounds
     
     def _shortcuts_table(self):
+        'Returns a html table with the shortcuts used in ExpoSong listed'
         # value None means "this is a heading"
         shortcuts = [[_("Screen"), None],
                      [_("Present"), "F5"],

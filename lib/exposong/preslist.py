@@ -69,7 +69,7 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
                 exposong.schedlist.DRAGDROP_SCHEDULE,
                 gtk.gdk.ACTION_DEFAULT | gtk.gdk.ACTION_MOVE)
         
-    def _on_pres_added(self, model, path, iter):
+    def _on_pres_added(self, model, path, itr):
         "Select the recently added schedule."
         self.set_cursor(path)
     
@@ -181,7 +181,6 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
             timestamp):
         'A presentation was reordered.'
         drop_info = treeview.get_dest_row_at_pos(x, y)
-        model = treeview.get_model()
         sched = self.get_model() #Gets the current schedule
         path_mv = int(selection.data)
         

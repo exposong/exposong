@@ -19,10 +19,8 @@
 import gtk
 import gtk.gdk
 import gobject
-import thread
 import os
 import os.path
-import webbrowser
 import time
 from gtk.gdk import pixbuf_new_from_file as pb_new
 from xml.etree import cElementTree as etree
@@ -33,7 +31,7 @@ import exposong.plugins._abstract
 import exposong.notify
 import exposong._hook
 import exposong.help
-from exposong import RESOURCE_PATH, DATA_PATH, SHARED_FILES
+from exposong import RESOURCE_PATH, DATA_PATH
 from exposong import config, prefs, screen, schedlist, splash, exampledata
 from exposong import preslist, presfilter, slidelist, statusbar, themeselect
 from exposong.schedule import Schedule # ? where to put library
@@ -122,7 +120,6 @@ class Main (gtk.Window):
         
         exposong.log.debug("Laying out the slidelist.")
         ### Main right area
-        win_rt = gtk.VBox()
         #### Slide List
         slidelist.slide_scroll = gtk.ScrolledWindow()
         slidelist.slide_scroll.add(slidelist.slidelist)
@@ -165,7 +162,7 @@ class Main (gtk.Window):
     def _ready(self):
         "Called when ExpoSong is fully loaded."
         self.show_all()
-        self._auto_check_for_update()
+        self._autocheck_for_update()
         # Prepares all button visibility by hiding the screen.
         screen.screen.hide()
         statusbar.statusbar.output(_("Ready"))
@@ -181,7 +178,8 @@ class Main (gtk.Window):
                 exposong.plugins._abstract.Presentation):
             tlist = [p for p in self.library if p[0].get_type() == ptype.get_type()]
             info.append("   * %s: %d" % (ptype.get_type().title(), len(tlist)))
-        info.append(" * Custom Schedules: %d" % sch.get_model().iter_n_children(sch.custom_schedules))
+        info.append(" * Custom Schedules: %d" %
+                    sch.get_model().iter_n_children(sch.custom_schedules))
         info.append(" * Themes: %d" % len(exposong.themeselect.themeselect.liststore))
         exposong.log.info("\n".join(info))
         
@@ -327,6 +325,7 @@ class Main (gtk.Window):
         return menu
     
     def _create_toolbar(self):
+        'Set up the toolbar'
         self.uimanager.add_ui_from_string('''
                 <toolbar name="Toolbar">
                     <placeholder name="pres-new-song"/>
@@ -477,14 +476,14 @@ class Main (gtk.Window):
         for k in keys_to_disable:
             screen.screen._actions.get_action(k).connect_accelerator()
     
-    def _auto_check_for_update(self):
+    def _autocheck_for_update(self):
         'Checks for available updates at startup once in a month'
         if not config.config.get("updates", "check_for_updates") == "True":
             return
         if config.config.get("updates", "last_check") == "" or\
                 int(config.config.get("updates", "last_check"))+2678400 < time.time():
             exposong.log.info("Checking for updates")
-            exposong.help.help._check_for_update(auto_check=True)
+            exposong.help.help.check_for_update(auto_check=True)
     
     def _on_configure_event(self, widget, *args):
         'Sets the size and position in the config (matters, if not maximized)'
