@@ -874,6 +874,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self._bg_model.clear()
         self.theme.revert()
         self._load_theme(self.theme)
+        self.draw()
         
     def _save_changes(self, *args):
         """

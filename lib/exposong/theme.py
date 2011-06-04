@@ -74,11 +74,8 @@ class Theme(object):
         self._builtin = builtin
         self.meta = {}
         self.backgrounds = []
-        self.body = Section(type_='body', font="Sans 48",
-                            pos=[0.0, 0.0, 1.0, 0.8],
-                            expand=['header.y1','footer.y2'])
-        self.footer = Section(type_='footer', font="Sans 12",
-                              pos=[0.0, 0.8, 1.0, 1.0])
+        self._init_sections()
+        
         if filename:
             self.filename = os.path.split(filename)[1]
             try:
@@ -88,6 +85,13 @@ class Theme(object):
                 exposong.log.error("Could not load theme %s."%filename)
         else:
             self.filename = filename
+    
+    def _init_sections(self):
+        self.body = Section(type_='body', font="Sans 48",
+                            pos=[0.0, 0.0, 1.0, 0.8],
+                            expand=['header.y1','footer.y2'])
+        self.footer = Section(type_='footer', font="Sans 12",
+                              pos=[0.0, 0.8, 1.0, 1.0])
     
     def get_footer_pos(self):
         "Return the position where the footer begins."
@@ -117,10 +121,16 @@ class Theme(object):
         return self._builtin
     
     def revert(self):
-        "Revert all changes and reload the theme from the file"
-        self.meta = {}
-        self.backgrounds = []
-        self.load(etree.parse(os.path.join(DATA_PATH, 'theme', self.filename)))
+        """"
+        Revert all changes and reload the theme from the file
+        or reset changes if no file exists
+        """
+        if self.filename:
+            self.load(etree.parse(os.path.join(DATA_PATH, 'theme', self.filename)))
+        else:
+            self._init_sections()
+            self.meta = {}
+            self.backgrounds = []
     
     def load(self, tree):
         "Load the theme from an XML file."
