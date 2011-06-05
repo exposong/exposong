@@ -24,6 +24,7 @@ user can select.
 import gtk
 import gtk.gdk
 import gobject
+import os
 
 import exposong.main
 import exposong._hook
