@@ -110,9 +110,12 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             pass
         
         def get_title(self, editing=False):
-            'Return a formatted title.'
+            '''Return a formatted title.
+            Appends the original slide title in brackets if `editing` is True.'''
             if self.title[0] in verse_names:
-                if editing:
+                if editing and self.title[1:] == "":
+                    return "%s (%s)" % (verse_names[self.title[0]], self.title)
+                elif editing:
                     return "%s %s (%s)" % (verse_names[self.title[0]],
                                            self.title[1:], self.title)
                 else:
