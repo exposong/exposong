@@ -758,7 +758,15 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             else:
                 type_value = None
             lang_value = model.get_value(itr,2)
-        author = gui.append_entry(table, _('Author Name:'), author_value, 0)
+        
+        
+        authors = [a.name for t in exposong.main.main.library
+                     if t[0].get_type() == "song"
+                     for a in t[0].song.props.authors]
+        authors = sorted(set(authors))
+        
+        author = gui.append_combo_entry(table, _('Author Name:'),
+                                        authors, author_value, 0)
         type = gui.append_combo2(table, _('Author Type:'),
                                  tuple(auth_types.iteritems()), type_value, 1)
         tmodel = type.get_model()
