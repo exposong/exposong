@@ -169,7 +169,7 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         if not field:
             return False
         if field.edit():
-            self.activate_pres()
+            exposong.slidelist.slidelist.update()
     
     def _on_drag_get(self, treeview, context, selection, info, timestamp):
         'A presentation was dragged.'
