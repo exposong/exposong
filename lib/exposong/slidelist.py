@@ -85,6 +85,25 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
         self._actions.get_action("pres-slide-next").set_sensitive(men)
         self._actions.get_action("pres-slide-prev").set_sensitive(men)
     
+    def update(self):
+        '''When something in the presentation has changed, reset the slidelist and
+        activate the slide that was active before'''
+        (model, itr) = self.get_selection().get_selected()
+        slide = None
+        if itr:
+            slide = model.get_value(itr,0)
+            p = model.get_path(itr)
+        
+        self.set_presentation(self.pres)
+        
+        if slide:
+            #Try to activate the same slide as before
+            for row in model:
+                if slide == row[0]:
+                    p = row.path
+                    break
+            self.set_cursor(p)
+    
     def get_active_item(self):
         'Return the selected `Slide` object.'
         (model, s_iter) = self.get_selection().get_selected()
@@ -146,7 +165,7 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
     def toggle_show_order(self, widget):
         'Called when the "pres-show-in-order" action was toggled'
         config.config.set("songs", "show_in_order", str(widget.get_active()))
-        self.set_presentation(self.pres)
+        self.update()
     
     @classmethod
     def merge_menu(cls, uimanager):

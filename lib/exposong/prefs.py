@@ -144,7 +144,7 @@ added to this list."))
             
             if config.get("songs", "title_slide") != str(g_title.get_active()):
                 config.set("songs", "title_slide", str(g_title.get_active()))
-                exposong.preslist.preslist.activate_pres()
+                exposong.slidelist.slidelist.update()
             config.set("songs", "ccli", g_ccli.get_text())
             if g_songbook.get_active_text():
                 config.set("songs", "songbook", g_songbook.get_active_text())
