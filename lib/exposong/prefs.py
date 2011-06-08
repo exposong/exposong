@@ -55,7 +55,7 @@ class PrefsDialog(gtk.Dialog):
             folder = DATA_PATH
         g_data = table.attach_folderchooser(folder, label=_("Data folder"))
         msg = _("The place where all your presentations, schedules and \
-background images are stored.")
+themes are stored.")
         g_data.set_tooltip_text(msg)
         table.attach_section_title(_("Updates"))
         g_update = table.attach_checkbutton(
@@ -64,6 +64,10 @@ background images are stored.")
             g_update.set_active(True)
         
         table.attach_section_title(_("Songs"))
+        g_title = table.attach_checkbutton(_("Insert title slide"))
+        if config.get("songs", "title_slide") == "True":
+            g_title.set_active(True)
+
         g_ccli = table.attach_entry(config.get("songs","ccli"),
                                     label="CCLI #")
         songbooks = [sbook.name for t in exposong.main.main.library
@@ -126,11 +130,6 @@ added to this list."))
         
         self.show_all()
         if self.run() == gtk.RESPONSE_ACCEPT:
-            config.set("songs", "ccli", g_ccli.get_text())
-            if g_songbook.get_active_text():
-                config.set("songs", "songbook", g_songbook.get_active_text())
-            config.set("updates", "check_for_updates", str(g_update.get_active()))
-            
             if config.has_option("general", "data-path"):
                 curpath = config.get("general", "data-path")
             else:
@@ -142,6 +141,14 @@ added to this list."))
                         gtk.MESSAGE_INFO, gtk.BUTTONS_OK, msg)
                 dlg.run()
                 dlg.destroy()
+            
+            if config.get("songs", "title_slide") != str(g_title.get_active()):
+                config.set("songs", "title_slide", str(g_title.get_active()))
+                exposong.preslist.preslist.activate_pres()
+            config.set("songs", "ccli", g_ccli.get_text())
+            if g_songbook.get_active_text():
+                config.set("songs", "songbook", g_songbook.get_active_text())
+            config.set("updates", "check_for_updates", str(g_update.get_active()))
             
             if p_logo.get_filename() != None:
                 config.set("screen", "logo", p_logo.get_filename())

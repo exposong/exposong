@@ -75,6 +75,7 @@ class Config(ConfigParser.SafeConfigParser):
         self.set("songs", "ccli", "")
         self.set("songs", "songbook", "")
         self.set("songs", "show_in_order", "True")
+        self.set("songs", "title_slide", "False")
         
         self.configfile = cfile
         self.read(self.configfile)

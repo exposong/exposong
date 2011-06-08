@@ -236,6 +236,14 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         else:
             return _abstract.Presentation.get_slide_list(self)
     
+    def get_title_slide(self):
+        'Returns a `Slide` with the song title as text'
+        verse = openlyrics.Verse()
+        verse.name = _("Title")
+        slide = self.Slide(self, verse)
+        slide._set_lines(self.get_title())
+        return (slide, slide.get_markup())
+
     def get_order(self, custom_order=True):
         'Returns the order in which the slides should be presented.'
         if len(self.song.props.verse_order) > 0 and custom_order:

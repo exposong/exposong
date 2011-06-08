@@ -77,6 +77,9 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
         for slide in slides:
             slist.append(slide)
         
+        if pres.get_type() == "song" and config.config.get('songs', 'title_slide') == "True":
+            slist.insert(0,pres.get_title_slide())
+        
         self.__timer += 1
         men = slist.get_iter_first() is not None
         self._actions.get_action("pres-slide-next").set_sensitive(men)
