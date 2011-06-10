@@ -22,24 +22,17 @@ import pango
 import exposong.preslist
 import exposong.main
 import exposong._hook
-from exposong.plugins import Plugin
 
 """
 Adds functionality to print a Song or a list of Songs
 """
-
-information = {
-    'name': _("Print"),
-    'description': __doc__,
-    'required': False,
-}
 
 _COLUMN_COUNT = 3
 
 # TODO Multiple pages is not supported right now:
 # http://library.gnome.org/devel/pygtk/stable/class-gtkprintoperation.html#method-gtkprintoperation--set-n-pages
 
-class Print(Plugin, exposong._hook.Menu):
+class Print(exposong._hook.Menu):
     '''
     Print a song or a list of songs
     '''
