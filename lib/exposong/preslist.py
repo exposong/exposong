@@ -163,6 +163,22 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         for action in exposong.schedlist.schedlist.get_add_sched_actions():
             action.set_sensitive(self.has_selection())
     
+    def is_first_pres_active(self):
+        'True if the currently activated presentation is the first one in the schedule'
+        (model, s_iter) = self.get_selection().get_selected()
+        if s_iter:
+            if model.get_path(s_iter)[0] == 0:
+                return True
+        return False
+    
+    def is_last_pres_active(self):
+        'True if the currently activated presentation is the last one in the schedule'
+        (model, s_iter) = self.get_selection().get_selected()
+        if s_iter:
+            if model.get_path(s_iter)[0] == len(self.get_model())-1:
+                return True
+        return False
+    
     def _on_pres_edit(self, *args):
         'Edit the presentation.'
         field = exposong.slidelist.slidelist.pres
