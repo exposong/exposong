@@ -24,6 +24,7 @@ import gtk
 import gobject
 
 import exposong.screen
+import exposong.statusbar
 from exposong import config
 
 slidelist = None #will hold instance of SlideList
@@ -37,6 +38,10 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
         "Create the interface."
         self.pres = None
         self.pres_type = None
+        
+        # Used to go to the previous (-1) / next (1) pres when reaching the last slide
+        # See check_open_next_pres()
+        self.__pres_mv = 0
         # Used to stop or reset the timer if the presentation or slide changes.
         self.__timer = 0
 
@@ -113,14 +118,13 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
             return False
     
     def _move_to_slide(self, mv):
-        'Move to the slide at mv. This ignores slide_order_index.'
+        'Move to the slide at mv.'
         (model, itr) = self.get_selection().get_selected()
         if itr:
             cur = int(model.get_string_from_iter(itr))
         else:
             cur = -1
-        if not (cur==0 and mv==-1):
-            self.to_slide(cur+mv)
+        self.to_slide(cur+mv)
     
     def prev_slide(self, *args):
         'Move to the previous slide.'
@@ -133,11 +137,40 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
     def to_slide(self, slide_num):
         'Move to the slide at slide_num'
         model = self.get_model()
+        if slide_num < 0:
+            slide_num = 0
         itr = model.iter_nth_child(None, slide_num)
         if itr:
             selection = self.get_selection()
             selection.select_iter(itr)
             self.scroll_to_cell(model.get_path(itr))
+        self.check_open_pres(slide_num)
+    
+    def check_open_pres(self, cur_slide):
+        '''Activates the next/previous presentation if:
+         * The user presses the PgUp/PgDn key at the beginning/end of the list twice
+         * The schedule is a user-defined one
+         * The current presentation is not the last respectively the first one in the schedule.'''
+        if exposong.schedlist.schedlist.get_active_item().builtin:
+            return
+        preslist = exposong.preslist.preslist
+        if self.__pres_mv == 1 and not preslist.is_last_pres_active():
+            preslist.next_pres()
+            self.set_cursor(0)
+        elif self.__pres_mv == -1 and not preslist.is_first_pres_active():
+            preslist.prev_pres()
+            self.set_cursor(0)
+        
+        if cur_slide == len(self.get_model()) and not preslist.is_last_pres_active():
+            self.__pres_mv = 1
+            exposong.statusbar.statusbar.output(
+                _("Press %s once again to go to the next presentation")%_("Page Down"))
+        elif cur_slide == 0 and not preslist.is_first_pres_active():
+            self.__pres_mv = -1
+            exposong.statusbar.statusbar.output(
+                _("Press %s once again to go to the previous presentation")%_("Page Down"))
+        else:
+            self.__pres_mv = 0
     
     def _on_slide_activate(self, *args):
         'Present the selected slide to the screen.'
