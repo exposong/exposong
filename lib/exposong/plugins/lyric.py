@@ -786,7 +786,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         
         while True:
             if dialog.run() == gtk.RESPONSE_ACCEPT:
-                if not author.get_text():
+                if not author.get_active_text():
                     info_dialog = gtk.MessageDialog(treeview.get_toplevel(),
                                             gtk.DIALOG_DESTROY_WITH_PARENT,
                                             gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
@@ -796,12 +796,12 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                 else:
                     val = tmodel.get_value(type.get_active_iter(),1)
                     if edit:
-                        model.set_value(itr, 0, author.get_text())
+                        model.set_value(itr, 0, author.get_active_text())
                         model.set_value(itr, 1, val)
                         if tmodel.get_value(type.get_active_iter(),0) == 'translation':
                             model.set_value(itr, 2, lang.get_active_text())
                     else:
-                        self._fields['author'].append( (author.get_text(), val,
+                        self._fields['author'].append( (author.get_active_text(), val,
                                                     lang.get_active_text()))
                     dialog.hide()
                     return True
@@ -894,7 +894,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                 else:
                     if edit:
                         model.set_value(itr, 0, songbook.get_active_text())
-                        model.set_value(itr, 1, entry.get_text())
+                        model.set_value(itr, 1, entry.get_active_text())
                     else:
                         self._fields['songbook'].append( (songbook.get_active_text(),
                                 entry.get_text()) )
