@@ -387,7 +387,9 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
     def _on_bg_solid_new(self, widget=None):
         'Add a new solid color background'
         self._set_changed()
-        itr = self._bg_model.append((exposong.theme.ColorBackground(),))
+        col = gtk.gdk.Color(random.randint(0,65535),random.randint(0,65535),
+                            random.randint(0,65535)).to_string()
+        itr = self._bg_model.append((exposong.theme.ColorBackground(color=col),))
         self._activate_bg(itr)
     
     def _on_bg_solid(self, widget=None):
@@ -601,14 +603,12 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
     
     def _on_bgs_reordered(self, model, path, itr=None, new_order=None):
         'Called when a background in the list is being dragged to another position'
-        #TODO: This doesnt't work. Need to get the order from the treeview.
         gobject.idle_add(self._update_bg_list_from_model)
         self._set_changed()
         gobject.idle_add(self.draw)
     
     def _update_bg_list_from_model(self):
         'Updates the theme background list according to the model'
-        #self._bg_model.reorder()
         self.theme.backgrounds = []
         for bg in self._bg_model:
             self.theme.backgrounds.append(bg[0])
@@ -618,6 +618,8 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         bg = self._get_active_bg()
         if not bg:
             self._pos_expander.set_sensitive(False)
+            table = self._bg_edit_table
+            table.foreach(lambda w: table.remove(w))
             return
         if isinstance(bg, exposong.theme.ImageBackground):
             self._on_bg_image()
