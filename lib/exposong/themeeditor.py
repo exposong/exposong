@@ -42,7 +42,7 @@ class ThemeEditor(gtk.Window):
         self.set_title(_("ExpoSong Theme Editor"))
         
         self.__updating = False
-        self._do_layout()        
+        self._do_layout()
         self._load_theme(theme_)
         self.show_all()
     
@@ -602,8 +602,9 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
     def _on_bgs_reordered(self, model, path, itr=None, new_order=None):
         'Called when a background in the list is being dragged to another position'
         #TODO: This doesnt't work. Need to get the order from the treeview.
-        self._update_bg_list_from_model()
-        self.draw()
+        gobject.idle_add(self._update_bg_list_from_model)
+        self._set_changed()
+        gobject.idle_add(self.draw)
     
     def _update_bg_list_from_model(self):
         'Updates the theme background list according to the model'
@@ -816,8 +817,10 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self._title_entry.set_text(self.theme.get_title())
         
         ########################## Backgrounds ################################
+        self._bg_model.handler_block_by_func(self._on_bgs_reordered)
         for bg in self.theme.backgrounds:
             self._bg_model.append((bg,))
+        self._bg_model.handler_unblock_by_func(self._on_bgs_reordered)
         
         ####################### Sections: Body ################################
         body = self.theme.get_body()
