@@ -1069,7 +1069,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                         "pymserv")])
         
         actiongroup = gtk.ActionGroup('exposong-song')
-        actiongroup.add_actions([("pres-new-song", 'pres-song', None, None,
+        actiongroup.add_actions([("pres-new-song", 'pres-song-new', None, None,
                                 _("New Song"), cls._on_pres_new)])
         uimanager.insert_action_group(actiongroup, -1)
         

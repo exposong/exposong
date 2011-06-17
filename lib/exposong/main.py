@@ -334,7 +334,7 @@ class Main (gtk.Window):
         self.uimanager.add_ui_from_string('''
                 <toolbar name="Toolbar">
                     <placeholder name="pres-new-song"/>
-                    <placeholder name="pres-new-text"/>
+                    <placeholder name="pres-new-exposong"/>
                     <toolitem action="pres-edit"/>
                     <placeholder name="sched-new"/>
                 </toolbar>''')
