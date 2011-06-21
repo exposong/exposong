@@ -293,8 +293,11 @@ class CellRendererTheme(gtk.GenericCellRenderer):
     def _delete_pixmap(self, size):
         'Deletes the cached image when the theme was deleted.'
         fname  = self._get_pixmap_name(size)
-        del self._pm[fname]
-        os.remove(os.path.join(DATA_PATH, '.cache', 'theme', fname))
+        if fname in self._pm:
+            del self._pm[fname]
+        pm = os.path.join(DATA_PATH, '.cache', 'theme', fname)
+        if os.path.exists(pm):
+            os.remove(pm)
     
     def _get_pixmap_name(self, size):
         'Return the filename of the pixmap (includes size)'
