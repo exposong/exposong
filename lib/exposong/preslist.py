@@ -337,7 +337,7 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
                     <menu action="edit-pres">
                         <menuitem action="pres-edit" />
                         <menuitem action="pres-delete" />
-                        <placeholder name="add-to-schedule" />
+                        <menu action="pres-add-to-schedule"></menu>
                         <menuitem action="pres-remove-from-schedule" />
                     </menu>
                 </menu>

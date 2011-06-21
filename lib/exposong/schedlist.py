@@ -282,11 +282,9 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
             <menubar name="MenuBar">
                 <menu action="Edit">
                     <menu action="edit-pres">
-                        <placeholder name="add-to-schedule">
                             <menu action="pres-add-to-schedule">
                                 %s
                             </menu>
-                        </placeholder>
                     </menu>
                 </menu>
             </menubar>
