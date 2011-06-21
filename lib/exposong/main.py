@@ -286,7 +286,7 @@ class Main (gtk.Window):
                     <menu action="File">
                         <menu action="file-import"/>
                         <menu action="file-export"/>
-                        <menu action="file-print"/>
+                        <placeholder name="print" /> 
                         <separator/>
                         <menuitem action="Quit" position="bot" />
                     </menu>

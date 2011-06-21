@@ -84,59 +84,6 @@ class Print(exposong._hook.Menu):
         cairo_context.show_layout(self.pangolayout)
         return
     
-    def print_songlist(self, *args):
-        "Print a list of all songs"
-        print_op = gtk.PrintOperation()
-        print_op.set_default_page_setup(self._get_page_setup())
-        print_op.set_n_pages(1)
-        print_op.connect("draw_page", self._songlist_markup)
-        print_op.run(gtk.PRINT_OPERATION_ACTION_PRINT_DIALOG, None)
-    
-    def _songlist_markup(self, operation=None, context=None, page_nr=None):
-        'Create the page layout for the songlist'
-        library = exposong.main.main.library
-        songs = ""
-        for item in library:
-            if item[0].get_type() == "lyric":
-                songs += "%s\t"%item[0].get_title()
-        
-        if hasattr(locale, 'nl_langinfo'):
-            dfmt = locale.nl_langinfo(locale.D_FMT)
-        else:
-            dfmt = "%x"
-        markup = "<span face='sans' size='18000' weight='bold'>%(title)s</span>\n"
-        markup += "<span face='sans' size='12000'>%(date)s</span>\n\n\n"
-        markup += "<span face='sans' size='%(fontsize)d'>%(text)s</span>\n"
-        markup_keys = {'title':_("Alphabetical list of Songs"),
-                       'date':datetime.datetime.now().strftime(dfmt),
-                       'text':songs}
-        
-        page_width = context.get_width()*pango.SCALE
-        page_height = context.get_height()*pango.SCALE
-        self.pangolayout = context.create_pango_layout()
-        self.pangolayout.set_width(int(page_width))
-        tabs = pango.TabArray(_COLUMN_COUNT, True)
-        print page_width / pango.SCALE,
-        for i in range(_COLUMN_COUNT):
-            pos = int(i * page_width / (_COLUMN_COUNT))
-            tabs.set_tab(i, pango.TAB_LEFT, pos / pango.SCALE)
-            print pos / pango.SCALE,
-        print
-        self.pangolayout.set_tabs(tabs)
-        # Negative indent does weird things without newlines.
-        
-        size = 10000
-        markup_keys['fontsize'] = size
-        self.pangolayout.set_markup(markup % (markup_keys))
-        while self.pangolayout.get_size()[1] > page_height:
-            size *= 0.95
-            markup_keys['fontsize'] = size
-            self.pangolayout.set_markup(markup % (markup_keys))
-        
-        cairo_context = context.get_cairo_context()
-        cairo_context.show_layout(self.pangolayout)
-        return
-    
     @classmethod
     def merge_menu(cls, uimanager):
         "Merge new values with the uimanager."
@@ -144,10 +91,8 @@ class Print(exposong._hook.Menu):
         actiongroup = gtk.ActionGroup('print')
         actiongroup.add_actions([
                 ('print-presentation', None,
-                 _("_Current Presentation"),
+                 _("_Print"),
                  None, None, self.print_presentation),
-                ('print-songlist', None, _("_List of all Songs"), None,
-                        None, self.print_songlist),
                 ])
         
         action = actiongroup.get_action('print-presentation')
@@ -159,10 +104,9 @@ class Print(exposong._hook.Menu):
         cls.menu_merge_id = uimanager.add_ui_from_string("""
             <menubar name="MenuBar">
                 <menu action="File">
-                    <menu action="file-print">
+                    <placeholder name="print">
                         <menuitem action="print-presentation" />
-                        <menuitem action="print-songlist" />
-                    </menu>
+                    </placeholder>
                 </menu>
             </menubar>
             """)
