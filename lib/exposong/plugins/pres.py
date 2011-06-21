@@ -720,22 +720,9 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         return (self, self.get_title())
     
     ## Printing
-    
-    def get_print_markup(self):
-        "Return the presentation markup for printing."
-        markup = "<span face='sans' weight='bold' size='large'>%s</span>"\
-                 % self.get_title()
-        markup += "\n\n\n"
-        for slide in self.get_slide_list():
-            markup += "<span weight='bold' face='sans' size='%%(fontsize)d'>%s</span>\n"\
-                      % slide[0].get_title()
-            markup += "<span face='sans' size='%%(fontsize)d'>%s</span>\n\n" % slide[0].get_text()
-        
-        return markup
-    
     def can_print(self):
         "Return True if printing is available."
-        return True
+        return False
     
     @classmethod
     def is_type(cls, fl):

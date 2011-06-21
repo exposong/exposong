@@ -90,12 +90,12 @@ class Print(exposong._hook.Menu):
         self = cls()
         actiongroup = gtk.ActionGroup('print')
         actiongroup.add_actions([
-                ('print-presentation', None,
-                 _("_Print"),
+                ('print-song', None,
+                 _("_Print Song"),
                  None, None, self.print_presentation),
                 ])
         
-        action = actiongroup.get_action('print-presentation')
+        action = actiongroup.get_action('print-song')
         exposong.preslist.preslist.get_selection().connect('changed',
                                                            self._print_pres_active,
                                                            action)
@@ -105,7 +105,7 @@ class Print(exposong._hook.Menu):
             <menubar name="MenuBar">
                 <menu action="File">
                     <placeholder name="print">
-                        <menuitem action="print-presentation" />
+                        <menuitem action="print-song" />
                     </placeholder>
                 </menu>
             </menubar>
