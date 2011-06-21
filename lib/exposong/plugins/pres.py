@@ -759,15 +759,17 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         
         actiongroup = gtk.ActionGroup('exposong-pres')
         actiongroup.add_actions([('pres-new-exposong', 'pres-exposong-new',
-                None, None, _("New ExpoSong Presentation"), cls._on_pres_new)])
+                _("New ExpoSong Presentation"), None, _("New ExpoSong Presentation"), cls._on_pres_new)])
         uimanager.insert_action_group(actiongroup, -1)
         
         cls.menu_merge_id = uimanager.add_ui_from_string("""
             <menubar name='MenuBar'>
-                <menu action='Presentation'>
-                        <menu action='pres-new'>
+                <menu action='File'>
+                    <menu action='file-new'>
+                        <placeholder name="file-new-pres">
                             <menuitem action='pres-new-exposong' />
-                        </menu>
+                        </placeholder>
+                    </menu>
                 </menu>
             </menubar>
             """)
@@ -782,7 +784,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         'Merge new values with the uimanager'
         cls.tb_merge_id = uimanager.add_ui_from_string("""
             <toolbar name='Toolbar'>
-                <placeholder name="pres-new-exposong">
+                <placeholder name="file-new-exposong">
                     <toolitem action='pres-new-exposong' />
                 </placeholder>
             </toolbar>

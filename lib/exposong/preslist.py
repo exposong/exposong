@@ -333,14 +333,21 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         uimanager.insert_action_group(cls._actions, -1)
         uimanager.add_ui_from_string("""
             <menubar name="MenuBar">
-                <menu action="Presentation">
-                    <menuitem action="pres-edit" />
-                    <menu action="pres-add-to-schedule"></menu>
-                    <menuitem action="pres-remove-from-schedule" />
-                    <menuitem action="pres-delete" />
-                    <menuitem action="pres-prev" position="bot" />
-                    <menuitem action="pres-next" position="bot" />
+                <menu action="Edit">
+                    <menu action="edit-pres">
+                        <menuitem action="pres-edit" />
+                        <menuitem action="pres-delete" />
+                        <placeholder name="add-to-schedule" />
+                        <menuitem action="pres-remove-from-schedule" />
+                    </menu>
                 </menu>
+                <menu action="Presentation">
+                    <placeholder name="pres-movement">
+                        <menuitem action="pres-prev" position="bot" />
+                        <menuitem action="pres-next" position="bot" />
+                    </placeholder>
+                </menu>
+
             </menubar>
             """)
         # unmerge_menu not implemented, because we will never uninstall this as

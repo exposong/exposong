@@ -1069,15 +1069,17 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                         "pymserv")])
         
         actiongroup = gtk.ActionGroup('exposong-song')
-        actiongroup.add_actions([("pres-new-song", 'pres-song-new', None, None,
+        actiongroup.add_actions([("pres-new-song", 'pres-song-new', _("New Song"), "<Ctrl>n",
                                 _("New Song"), cls._on_pres_new)])
         uimanager.insert_action_group(actiongroup, -1)
         
         cls.menu_merge_id = uimanager.add_ui_from_string("""
             <menubar name='MenuBar'>
-                <menu action="Presentation">
-                        <menu action="pres-new">
-                            <menuitem action='pres-new-song' position='top'/>
+                <menu action="File">
+                        <menu action="file-new">
+                            <placeholder name="file-new-song">
+                                <menuitem action='pres-new-song' />
+                            </placeholder>
                         </menu>
                 </menu>
             </menubar>
@@ -1093,7 +1095,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         'Merge new values with the uimanager'
         cls.tb_merge_id = uimanager.add_ui_from_string("""
             <toolbar name='Toolbar'>
-                <placeholder name="pres-new-song">
+                <placeholder name="file-new-song">
                     <toolitem action='pres-new-song' />
                 </placeholder>
             </toolbar>

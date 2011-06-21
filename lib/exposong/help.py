@@ -50,11 +50,6 @@ class Help(exposong._hook.Menu, object):
         statusbar.statusbar.output(_("Help page opened in Web Browser"))
         exposong.log.info("Help page opened in Web Browser.")
     
-    def show_contrib(self, *args):
-        "Show the how to contribute page."
-        webbrowser.open("http://exposong.org/contribute")
-        exposong.log.info("Contribute page opened in Web Browser.")
-    
     def check_for_update(self, *args, **kw):
         "Let the user know if a new version is out."
         statusbar.statusbar.output(_("Checking for updates ..."))
@@ -245,8 +240,6 @@ many colors make the text difficult to read.'))
         cls._actions = gtk.ActionGroup('help')
         cls._actions.add_actions([
                 ('UsageGuide', None, _("Usage Guide"), None, None, self.show),
-                ('Contribute', None, _("Contribute"), None, None,
-                        self.show_contrib),
                 ('CheckUpdate', None, _("Check for New _Version"), None, None,
                         self.check_for_update),
                 ])
@@ -256,7 +249,6 @@ many colors make the text difficult to read.'))
             <menubar name="MenuBar">
                 <menu action="Help">
                     <menuitem action="UsageGuide" />
-                    <menuitem action="Contribute" />
                     <menuitem action="CheckUpdate" />
                 </menu>
             </menubar>

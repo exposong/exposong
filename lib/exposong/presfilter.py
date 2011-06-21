@@ -182,11 +182,7 @@ class PresFilter(gtk.Entry, exposong._hook.Menu):
         
         uimanager.insert_action_group(cls._actions, -1)
         uimanager.add_ui_from_string("""
-            <menubar name="MenuBar">
-                <menu action="Edit">
-                    <menuitem action="Search" position="bot" />
-                </menu>
-            </menubar>
+            <accelerator action="Search" />
             """)
         # unmerge_menu not implemented, because we will never uninstall this as
         # a module.

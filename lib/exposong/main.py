@@ -259,19 +259,20 @@ class Main (gtk.Window):
         self.main_actions.add_actions([
                 ('File', None, _('_File')),
                 ('Edit', None, _('_Edit')),
-                ('Schedule', None, _("_Schedule")),
-                ('Theme', None, _("_Theme")),
                 ('Presentation', None, _('P_resentation')),
                 ('pres-controls', None, _("Presentation _Controls")),
                 ('Help', None, _('_Help')),
                 ('Quit', gtk.STOCK_QUIT, None, None, None, self._quit),
                 ('Preferences', gtk.STOCK_PREFERENCES,
                         None, None, None, self._on_prefs),
+                ('file-new', None, _("_New"), "", ""),
                 ('file-import', None, _("_Import"), "",
                         _("Import a .expo package or other format")),
                 ('file-export', None, _("_Export"), "", _("Export a .expo package")),
                 ('file-print', None, _("_Print"), "", None),
-                ('pres-new', gtk.STOCK_NEW, None, "", _("Create a new presentation")),
+                ('edit-pres', None, _("Current Presentation"), "", ""),
+                ('edit-schedule', None, _("_Schedule"), "", ""),
+                ('edit-theme', None, _("_Theme")),
                 ('About', gtk.STOCK_ABOUT, None, None, None, self._on_about),
                 ])
         self.main_actions.add_actions([
@@ -284,41 +285,43 @@ class Main (gtk.Window):
         self.uimanager.add_ui_from_string('''
                 <menubar name="MenuBar">
                     <menu action="File">
-                        <menu action="file-import"/>
-                        <menu action="file-export"/>
-                        <placeholder name="print" /> 
+                        <menu action="file-new" >
+                            <placeholder name="file-new-song" />
+                            <placeholder name="file-new-pres" />
+                            <placeholder name="file-new-sched" />
+                            <placeholder name="file-new-theme" />
+                        </menu>
+                        <separator />
+                        <menu action="file-import" />
+                        <menu action="file-export" />
+                        <separator />
+                        <placeholder name="print" />
                         <separator/>
                         <menuitem action="Quit" position="bot" />
                     </menu>
                     <menu action="Edit">
-                        <menuitem action="Search" position="bot" />
+                        <menu action="edit-pres" position="top" />
+                        <menu action="edit-schedule"></menu>
+                        <menu action="edit-theme" />
                         <separator />
-                        <menuitem action="view-log" position="bot" />
                         <menuitem action="Preferences" position="bot" />
                     </menu>
-                    <menu action="Schedule"></menu>
-                    <menu action="Theme"></menu>
                     <menu action="Presentation">
-                        <menu action="pres-new" position="top"></menu>
-                        <menuitem action="pres-edit" />
-                        <menuitem action="pres-delete" />
-                        <separator />
-                        <menu action="pres-add-to-schedule"></menu>
-                        <menuitem action="pres-remove-from-schedule" />
-                        <separator />
                         <menuitem action="Present" position="bot" />
                         <menuitem action="Hide" position="bot" />
-                        <menu action="pres-controls" position="bot">
-                        </menu>
+                        <menu action="pres-controls" position="bot" />
                         <separator />
-                        <menuitem action="pres-prev" position="bot" />
-                        <menuitem action="pres-next" position="bot" />
-                        <menuitem action="pres-slide-prev" position="bot" />
-                        <menuitem action="pres-slide-next" position="bot" />
+                        <placeholder name="pres-movement" />
+                        <placeholder name="slide-movement" />
                     </menu>
                     <menu action="Help">
                         <menuitem action="UsageGuide" />
-                        <menuitem action="Contribute" />
+                        <menuitem action="ExampleData" />
+                        <separator />
+                        <menuitem action="view-log" />
+                        <separator />
+                        <menuitem action="CheckUpdate" />
+                        <separator />
                         <menuitem action="About" />
                     </menu>
                 </menubar>''')
@@ -333,10 +336,11 @@ class Main (gtk.Window):
         'Set up the toolbar'
         self.uimanager.add_ui_from_string('''
                 <toolbar name="Toolbar">
-                    <placeholder name="pres-new-song"/>
-                    <placeholder name="pres-new-exposong"/>
+                    <placeholder name="file-new-song"/>
+                    <placeholder name="file-new-exposong"/>
                     <toolitem action="pres-edit"/>
-                    <placeholder name="sched-new"/>
+                    <separator/>
+                    <placeholder name="file-new-sched"/>
                 </toolbar>''')
         
         for mod in exposong._hook.get_hooks(exposong._hook.Toolbar):

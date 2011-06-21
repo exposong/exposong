@@ -220,8 +220,11 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
         uimanager.add_ui_from_string("""
             <menubar name="MenuBar">
                 <menu action="Presentation">
-                    <menuitem action="pres-slide-prev" position="bot" />
-                    <menuitem action="pres-slide-next" position="bot" />
+                    <placeholder name="slide-movement">
+                        <menuitem action="pres-slide-prev" />
+                        <menuitem action="pres-slide-next" />
+                    </placeholder>
+                    <separator />
                     <menuitem action="pres-show-in-order" position="bot" />
                 </menu>
             </menubar>

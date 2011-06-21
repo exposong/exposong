@@ -82,7 +82,7 @@ class ExampleData(exposong._hook.Menu):
         uimanager.add_ui_from_string("""
             <menubar name="MenuBar">
                 <menu action="Help">
-                    <menuitem action="ExampleData" position="top" />
+                    <menuitem action="ExampleData"/>
                 </menu>
             </menubar>
             """)

@@ -220,7 +220,7 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         
         cls._actions = gtk.ActionGroup('theme')
         cls._actions.add_actions([
-                ('theme-new', gtk.STOCK_NEW, _('New Theme'), None,
+                ('theme-new', gtk.STOCK_NEW, _('New Theme'), "",
                         _("Create a new theme using the Theme Editor"), themeselect.new_theme),
                 ('theme-edit', gtk.STOCK_EDIT, _('Edit Theme'), None,
                         _("Edit the current theme"), themeselect._edit_theme),
@@ -231,10 +231,18 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         uimanager.insert_action_group(cls._actions, -1)
         uimanager.add_ui_from_string("""
             <menubar name="MenuBar">
-                <menu action="Theme">
-                    <menuitem action="theme-new" position="bot" />
-                    <menuitem action="theme-edit" position="bot" />
-                    <menuitem action="theme-delete" position="bot" />
+                <menu action="File">
+                    <menu action="file-new">
+                        <placeholder name="file-new-theme">
+                            <menuitem action="theme-new" />
+                        </placeholder>
+                    </menu>
+                </menu>
+                <menu action="Edit">
+                    <menu action="edit-theme">
+                        <menuitem action="theme-edit" position="bot" />
+                        <menuitem action="theme-delete" position="bot" />
+                    </menu>
                 </menu>
             </menubar>
             """)

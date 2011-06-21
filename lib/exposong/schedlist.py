@@ -280,9 +280,13 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
         uimanager.insert_action_group(self._sched_actiongroup)
         self._sched_mergeid = uimanager.add_ui_from_string("""
             <menubar name="MenuBar">
-                <menu action="Presentation">
-                    <menu action="pres-add-to-schedule">
-                        %s
+                <menu action="Edit">
+                    <menu action="edit-pres">
+                        <placeholder name="add-to-schedule">
+                            <menu action="pres-add-to-schedule">
+                                %s
+                            </menu>
+                        </placeholder>
                     </menu>
                 </menu>
             </menubar>
@@ -295,11 +299,11 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
         global schedlist
         cls._actions = gtk.ActionGroup('schedlist')
         cls._actions.add_actions([
-                ('sched-new', gtk.STOCK_NEW, None, None,
+                ('sched-new', gtk.STOCK_NEW, _("New Schedule"), "",
                         _("Create a new schedule"), schedlist._on_new),
-                ('sched-rename', None, _("_Rename"), None,
+                ('sched-rename', None, _("_Rename Schedule"), None,
                         _("Rename the selected schedule"), schedlist._on_rename),
-                ('sched-delete', gtk.STOCK_DELETE, None, None,
+                ('sched-delete', gtk.STOCK_DELETE, _("Delete Schedule"), None,
                         _("Delete the currently selected schedule"),
                         schedlist._on_sched_delete ),
                 ])
@@ -307,11 +311,19 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
         uimanager.insert_action_group(cls._actions, -1)
         uimanager.add_ui_from_string("""
                 <menubar name="MenuBar">
-                    <menu action="Schedule">
-                        <menuitem action='sched-new' />
-                        <menuitem action='sched-rename' />
-                        <menuitem action='sched-delete' />
-                    </menu>                
+                    <menu action="File">
+                        <menu action="file-new">
+                            <placeholder name="file-new-sched" >
+                                <menuitem action='sched-new' position='bot' />
+                            </placeholder>
+                        </menu>
+                    </menu>
+                    <menu action="Edit">
+                        <menu action="edit-schedule">
+                            <menuitem action='sched-rename' />
+                            <menuitem action='sched-delete' />
+                        </menu>
+                    </menu>
                 </menubar>
                 """)
         # unmerge_menu not implemented, because we will never uninstall this as
@@ -322,8 +334,8 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
         'Merge new values with the uimanager'
         cls.tb_merge_id = uimanager.add_ui_from_string("""
             <toolbar name='Toolbar'>
-                <placeholder name="sched-new">
-                <toolitem action='sched-new' />
+                <placeholder name="file-new-sched">
+                    <toolitem action='sched-new' />
                 </placeholder>
             </toolbar>
             """)
