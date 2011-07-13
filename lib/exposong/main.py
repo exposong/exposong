@@ -294,7 +294,6 @@ class Main (gtk.Window):
                         <separator />
                         <menu action="file-import" />
                         <menu action="file-export" />
-                        <separator />
                         <placeholder name="print" />
                         <separator/>
                         <menuitem action="Quit" position="bot" />
@@ -316,10 +315,9 @@ class Main (gtk.Window):
                     </menu>
                     <menu action="Help">
                         <menuitem action="UsageGuide" />
-                        <menuitem action="ExampleData" />
-                        <separator />
                         <menuitem action="view-log" />
                         <separator />
+                        <menuitem action="ExampleData" />
                         <menuitem action="CheckUpdate" />
                         <separator />
                         <menuitem action="About" />
