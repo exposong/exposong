@@ -62,6 +62,7 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         self.set_headers_clickable(False)
         self.get_selection().connect("changed", self.activate_pres)
         
+        self.connect("row-activated", self._on_pres_edit, True) # Double click to edit
         self.connect("button-release-event", self._on_pres_rt_click)
         self.connect("drag-data-get", self._on_drag_get)
         self.connect("drag-data-received", self._on_pres_drag_received)
