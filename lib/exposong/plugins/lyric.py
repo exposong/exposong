@@ -145,8 +145,8 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                 jn.append(author)
             if len(self.pres.song.props.copyright):
                 jn.append(u"Copyright \xA9 %s" % self.pres.song.props.copyright)
-            if config.get("general", "ccli"):
-                jn.append("CCLI# %s" % config.get("general", "ccli"))
+            if config.get("songs", "ccli"):
+                jn.append("CCLI# %s" % config.get("songs", "ccli"))
             return '\n'.join(jn)
         
         def _edit_window(self, parent):
@@ -1004,8 +1004,8 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             info.append(self.get_authors_string())
         if self.song.props.copyright:
             info.append(u"Copyright \xA9 %s" % self.song.props.copyright)
-        if config.get("general", "ccli"):
-            info.append("CCLI# %s" % config.get("general", "ccli"))
+        if config.get("songs", "ccli"):
+            info.append("CCLI# %s" % config.get("songs", "ccli"))
         if self.song.props.songbooks:
             info.append("; ".join(u'%s\xA0#%s' % (s.name, s.entry)
                         for s in self.song.props.songbooks))
