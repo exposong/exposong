@@ -26,6 +26,7 @@ import exposong.schedlist
 from exposong import DATA_PATH
 from exposong.plugins import Plugin
 from exposong.glob import *
+from exposong.config import config
 
 """
 Adds functionality to move schedules, or a full library to another exposong
@@ -57,6 +58,29 @@ class ExportImport(Plugin, exposong._hook.Menu):
         pass
     
     @classmethod
+    def export_song(cls, *args):
+        'Export a Song'
+        pres = exposong.preslist.preslist.get_active_item()
+        print pres.filename
+        
+        dlg = gtk.FileChooserDialog(_("Export Current Song"),
+                                    exposong.main.main,
+                                    gtk.FILE_CHOOSER_ACTION_SAVE,
+                                    (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+                                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        dlg.set_do_overwrite_confirmation(True)
+        dlg.set_current_folder(config.get("open-save-dialogs", "export-song"))
+        dlg.set_current_name(pres.filename)
+        if dlg.run() == gtk.RESPONSE_ACCEPT:
+            os.chdir(DATA_PATH)
+            fname = dlg.get_filename()
+            if not fname.endswith(".xml"):
+                fname += ".xml"
+            shutil.copy(pres.filename, fname)
+            config.set("open-save-dialogs", "export-song", os.path.dirname(fname))
+        dlg.destroy()
+    
+    @classmethod
     def export_sched(cls, *args):
         'Export a single schedule with belonging presentations to file.'
         sched = exposong.schedlist.schedlist.get_active_item()
@@ -69,7 +93,7 @@ class ExportImport(Plugin, exposong._hook.Menu):
                                     gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         dlg.add_filter(_FILTER)
         dlg.set_do_overwrite_confirmation(True)
-        dlg.set_current_folder(os.path.expanduser("~"))
+        dlg.set_current_folder(config.get("open-save-dialogs", "export-sched"))
         dlg.set_current_name(os.path.basename(title_to_filename(sched.title))+".expo")
         if dlg.run() == gtk.RESPONSE_ACCEPT:
             os.chdir(DATA_PATH)
@@ -80,6 +104,7 @@ class ExportImport(Plugin, exposong._hook.Menu):
             for item in cls._get_sched_list():
                 tar.add(item[0], item[1])
             tar.close()
+            config.set("open-save-dialogs", "export-sched", os.path.dirname(fname))
         dlg.destroy()
         
     @classmethod
@@ -114,7 +139,7 @@ class ExportImport(Plugin, exposong._hook.Menu):
         dlg.add_filter(_FILTER)
         dlg.set_do_overwrite_confirmation(True)
         dlg.set_current_name(_("exposong_library.expo"))
-        dlg.set_current_folder(os.path.expanduser("~"))
+        dlg.set_current_folder(config.get("open-save-dialogs", "export-lib"))
         if dlg.run() == gtk.RESPONSE_ACCEPT:
             fname = dlg.get_filename()
             if not fname.endswith(".expo"):
@@ -123,6 +148,7 @@ class ExportImport(Plugin, exposong._hook.Menu):
             for item in cls._get_library_list():
                 tar.add(item[0], item[1])
             tar.close()
+            config.set("open-save-dialogs", "export-lib", os.path.dirname(fname))
         dlg.destroy()
         
     @classmethod
@@ -160,7 +186,7 @@ class ExportImport(Plugin, exposong._hook.Menu):
                                     gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         dlg.add_filter(_FILTER)
         dlg.set_do_overwrite_confirmation(True)
-        dlg.set_current_folder(os.path.expanduser("~"))
+        dlg.set_current_folder(config.get("open-save-dialogs", "export-theme"))
         dlg.set_current_name(_("theme_%s.expo")%title_to_filename(
                                         os.path.basename(cur_theme.get_title())))
         if dlg.run() == gtk.RESPONSE_ACCEPT:
@@ -176,6 +202,31 @@ class ExportImport(Plugin, exposong._hook.Menu):
                     tar.add(os.path.join(DATA_PATH, 'theme', 'res', bg.src),
                             os.path.join('theme', 'res', bg.src))
             tar.close()
+            config.set("open-save-dialogs", "export-theme", os.path.dirname(fname))
+        dlg.destroy()
+    
+    @classmethod
+    def import_song(cls, *args):
+        'Import OpenLyrics Song(s)'
+        dlg = gtk.FileChooserDialog(_("Import Song(s) (OpenLyrics Format)"), exposong.main.main,
+                                    gtk.FILE_CHOOSER_ACTION_OPEN,
+                                    (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+                                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        _FILTER = gtk.FileFilter()
+        _FILTER.set_name("OpenLyrics Song")
+        _FILTER.add_pattern("*.xml")
+        dlg.add_filter(_FILTER)
+        dlg.set_select_multiple(True)
+        dlg.set_current_folder(config.get("open-save-dialogs", "import-song"))
+        if dlg.run() == gtk.RESPONSE_ACCEPT:
+            dlg.hide()
+            files = dlg.get_filenames()
+            for f in files:
+                newpath = os.path.join(DATA_PATH, "pres", os.path.basename(f))
+                if not os.path.exists(newpath):
+                    shutil.copy(f, newpath)
+                exposong.main.main.load_pres(f)
+            config.set("open-save-dialogs", "import-song", os.path.dirname(f))
         dlg.destroy()
     
     @classmethod
@@ -186,10 +237,11 @@ class ExportImport(Plugin, exposong._hook.Menu):
                                     (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                                     gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         dlg.add_filter(_FILTER)
-        dlg.set_current_folder(os.path.expanduser("~"))
+        dlg.set_current_folder(config.get("open-save-dialogs", "import-expo"))
         if dlg.run() == gtk.RESPONSE_ACCEPT:
             dlg.hide()
             cls.import_file(dlg.get_filename())
+            config.set("open-save-dialogs", "import-expo", os.path.dirname(dlg.get_filename()))
         dlg.destroy()
     
     @classmethod
@@ -276,10 +328,14 @@ class ExportImport(Plugin, exposong._hook.Menu):
     def merge_menu(cls, uimanager):
         'Merge new values with the uimanager.'
         actiongroup = gtk.ActionGroup('export-import')
-        actiongroup.add_actions([('import-schedule', None,
+        actiongroup.add_actions([('import-expo', None,
                         _("_ExpoSong Data (.expo)..."), None,
                         _("Import a schedule, presentations or backgrounds"),
                         cls.import_dialog),
+                ('import-song', None, _("ExpoSong Song (OpenLyrics Format)"),
+                        None, None, cls.import_song),
+                ('export-song', None, _("Current _Song"),
+                        None, None, cls.export_song),
                 ('export-sched', None,
                         _("_Current Schedule with Presentations..."),
                         None, None, cls.export_sched),
@@ -293,6 +349,10 @@ class ExportImport(Plugin, exposong._hook.Menu):
         exposong.themeselect.themeselect.connect('changed',
                                                     cls()._export_theme_active,
                                                     action)
+        action = actiongroup.get_action('export-song')
+        exposong.preslist.preslist.get_selection().connect('changed',
+                                                    cls()._export_song_active,
+                                                    action)
         uimanager.insert_action_group(actiongroup, -1)
         
         #Had to use position='top' to put them above "Quit"
@@ -300,9 +360,11 @@ class ExportImport(Plugin, exposong._hook.Menu):
             <menubar name="MenuBar">
                 <menu action="File">
                     <menu action='file-import'>
-                        <menuitem action="import-schedule" position="top" />
+                        <menuitem action="import-expo" position="top" />
+                        <menuitem action="import-song" position="top" />
                     </menu>
                     <menu action="file-export">
+                        <menuitem action="export-song" />
                         <menuitem action="export-lib" />
                         <menuitem action="export-sched" />
                         <menuitem action="export-theme" />
@@ -319,8 +381,19 @@ class ExportImport(Plugin, exposong._hook.Menu):
     @staticmethod
     def _export_theme_active(sel, action):
         "See wheter exporting is available for the selected theme."
-        if sel.get_active() is not None:
+        if sel.get_active():
             if not sel.get_active().is_builtin():
+                action.set_sensitive(True)
+                return
+        action.set_sensitive(False)
+    
+    @staticmethod
+    def _export_song_active(sel, action):
+        "See whether exporting is available for the selected Song"
+        if sel.count_selected_rows() > 0:
+            (model, itr) = sel.get_selected()
+            pres = model.get_value(itr, 0)
+            if pres.get_type() == 'song':
                 action.set_sensitive(True)
                 return
         action.set_sensitive(False)

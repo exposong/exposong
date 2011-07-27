@@ -26,7 +26,7 @@ import exposong._hook
 from exposong.glob import *
 from exposong import DATA_PATH
 from exposong.plugins import Plugin, _abstract
-from exposong.prefs import config
+from exposong.config import config
 
 
 """
@@ -171,14 +171,14 @@ class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
         filter_.set_name(_("SongSelect File (%s)") % ".usr")
         filter_.add_pattern("*.usr")
         dlg.add_filter(filter_)
-        dlg.set_current_folder(config.get("dialogs", "songselect-import-dir"))
+        dlg.set_current_folder(config.get("open-save-dialogs", "songselect-import-dir"))
         if dlg.run() == gtk.RESPONSE_ACCEPT:
             dlg.hide()
             files = dlg.get_filenames()
             for f in files:
                 filename = cls.convert(unicode(f), True)
                 exposong.main.main.load_pres(filename)
-            config.set("dialogs", "songselect-import-dir", os.path.dirname(f))
+            config.set("open-save-dialogs", "songselect-import-dir", os.path.dirname(f))
         dlg.destroy()
     
     @classmethod

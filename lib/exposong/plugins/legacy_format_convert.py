@@ -28,7 +28,7 @@ import exposong.plugins.pres
 from exposong.glob import *
 from exposong import DATA_PATH, theme
 from exposong.plugins import Plugin, _abstract
-from exposong.prefs import config
+from exposong.config import config
 from openlyrics import openlyrics
 
 """
@@ -188,14 +188,14 @@ class LegacyConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
         filt.set_name(_("ExpoSong Legacy File"))
         filt.add_pattern("*.xml")
         dlg.add_filter(filt)
-        dlg.set_current_folder(config.get("dialogs", "exposong_legacy-import-dir"))
+        dlg.set_current_folder(config.get("open-save-dialogs", "exposong_legacy-import-dir"))
         if dlg.run() == gtk.RESPONSE_ACCEPT:
             dlg.hide()
             files = dlg.get_filenames()
             for fl in files:
                 filename = cls.convert(unicode(fl), True)
                 exposong.main.main.load_pres(filename)
-            config.set("dialogs", "exposong_legacy-import-dir", os.path.dirname(file))
+            config.set("open-save-dialogs", "exposong_legacy-import-dir", os.path.dirname(file))
         dlg.destroy()
     
     @classmethod
