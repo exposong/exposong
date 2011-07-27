@@ -70,6 +70,7 @@ class Config(ConfigParser.SafeConfigParser):
         self.set("open-save-dialogs", "export-sched", os.path.expanduser("~"))
         self.set("open-save-dialogs", "export-theme", os.path.expanduser("~"))
         self.set("open-save-dialogs", "export-lib", os.path.expanduser("~"))
+        self.set("open-save-dialogs", "themeeditor-add-bg-image", os.path.expanduser("~"))
         
         self.set("screen", "logo",
                  os.path.join(SHARED_FILES, "res", "exposong.png"))

@@ -27,6 +27,7 @@ if __name__ == '__main__': #For testing
 import exposong.theme
 from exposong import gui
 from exposong import DATA_PATH
+from exposong.config import config
 from exposong.glob import title_to_filename, find_freefile, check_filename
 
 BACKGROUND_TYPES = [_("Image"),  _("Color"), _("Gradient"), _("Radial Gradient")]
@@ -317,7 +318,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
                 gtk.FILE_CHOOSER_ACTION_OPEN,
                 (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
                 gtk.STOCK_ADD, gtk.RESPONSE_ACCEPT) )
-        fchooser.set_current_folder(os.path.expanduser("~"))
+        fchooser.set_current_folder(config.get("open-save-dialogs", "themeeditor-add-bg-image"))
         filt = gtk.FileFilter()
         filt.set_name( _("Image Types") )
         filt.add_pixbuf_formats()
@@ -331,6 +332,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
             itr = self._bg_model.append(
                 (exposong.theme.ImageBackground(src=os.path.basename(img)),))
             self._activate_bg(itr)
+            config.set("open-save-dialogs", "themeeditor-add-bg-image", os.path.dirname(img))
         fchooser.destroy()
         self.draw()
 
