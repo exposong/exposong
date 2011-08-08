@@ -1,0 +1,122 @@
++-----------------------------------------+
+| ExpoSong                                |
+| Version 0.8                             |
+| Copyright (C) 2008-2011 Exposong.org    |
++-----------------------------------------+
+
+= Changelog =
+
+== 0.8 ==
+
+ * Themes have now replaced backgrounds. Three builtin themes are available,
+   or custom themes can created or imported.
+   * Backgrounds can be text, images, gradiants, radial gradiants, or a
+     combination.
+   * A text font family, style, and size can be changed. Shadows and outlines
+     can be added to the text.
+ * Improvements to the main window layout improve usability and appearance.
+ * A title slide is now optional on Lyrics.
+ * Only one instance of ExpoSong is allowed to run at a time.
+ * Control the presentation from the command line.
+ * The users preferred Songbook will be displayed in Lyrics.
+ * User will be notified of a new version.
+
+== 0.7.1 ==
+
+ * Many performance improvements. Caching for images speed up loading the
+   program by up to 5 times faster than before.
+ * Logging is available for debugging program issues.
+ * Translations are now working on Windows.
+ * Splash Screen.
+ * Freeze function to allow browsing through the library without affecting the
+   screen.
+
+== 0.7 ==
+ * Using OpenLyrics to store Lyrics (http://openlyrics.info)
+ * Enhanced Lyrics Edit Dialog
+ * User can change the output monitor in dual screen mode
+ * Display songbook number on presentation (more improvements in next release)
+ * Save and restore the main window's state
+ * Undo/Redo in some edit dialogs
+ * Shortcuts have been changed
+ * New config format
+ * setup.py script
+ * Printing Support
+ * Import from ExpoSong Legacy, OpenSong and SongSelect
+
+== 0.6.2 ==
+
+ * Issue 70: "Fails to import data.expo" fixed
+ * Translation fixes and minor bugfixes
+
+== 0.6.1 ==
+
+ * Edit dialog was modified to allow future features. Slides are now edited
+   individually. Lyrics can be entered the old way using "Paste as Text".
+ * In the Lyrics type, slides can now be ordered.
+ * Shortcuts added for lyric presentations. 1-9 are used for changing verses,
+   and C for Chorus.
+ * Export a list of songs sorted alphabetically.
+
+== 0.6 ==
+
+ * Presentations can now be searched.
+ * Slide timers make the slides move forward automatically. (Only one time for
+   now)
+ * You can import and export both schedules, or the whole library.
+ * Changed some icons.
+ * Some shortcuts have been simplified to single letters. More to come later.
+ * Bugs:
+   * Editing lyrics slides without titles.
+   * Images for slides no longer need to be in the data folder.
+ 
+== 0.5 ==
+
+ * On-screen notifications, for nursury alerts, or any other reason.
+ * Preset your church logo, and show it instead of a black screen or blank
+   background.
+ * Some bug fixes:
+   * Program now shows up faster.
+   * Preview screen no longer shows up blank, as it would in some cases.
+   * Preview screen always shows the correct aspect ratio.
+
+== 0.4 ==
+
+ * Author and copyright information on lyrics slide.
+ * Some help pages.
+ * Image Presentations. Drag and drop reorders the slides, and multiple images
+   can be added at a time.
+
+== 0.3 ==
+
+ * Custom schedules. Drag and drop adding, reordering, and
+   deleting of presentations removes it from all lists.
+ * Translations. A german translation is available.
+ * A plugin system has been added.
+ * Presentations can now use images as backgrounds.
+ * Rendering speed of presentation is faster.
+ * Lots of code, including making the application.py file shorter.
+
+== 0.2 ==
+
+ * Removed the toolbar for presentations, and created a right click menu
+   instead.
+ * User can now delete a presentation.
+ * Presentation type is now denoted by an icon in the list.
+ * Preferences dialog.
+ * Schedules (Only three built-in schedules so far (Library, Generic, and
+   Lyrics)
+
+== 0.1 ==
+ * Save slides to disk
+ * Create new slides
+ * Editing of slides
+ * The menu's have been moved to UIManager, which is easier to maintain.
+ * Preview is a duplicate of the presentation window when possible.
+
+== Version 0.03 ==
+ * Glade requirement removed
+ * Presentation data stored in xml.
+ * Presentation type for lyrics.
+ * Preferences stored in config.py
+
