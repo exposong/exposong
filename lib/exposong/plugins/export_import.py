@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import filecmp
 import gtk
 import os
 import os.path
@@ -23,6 +24,7 @@ import tarfile
 
 import exposong.main
 import exposong.schedlist
+import exposong.theme
 from exposong import DATA_PATH
 from exposong.plugins import Plugin
 from exposong.glob import *
@@ -51,7 +53,6 @@ class ExportImport(Plugin, exposong._hook.Menu):
     A .expo file is a tar.gz file, with the following format:
         sched/ - folder contains all schedule xml files.
         pres/ - folder containing all presentation files.
-        image/ - contains files for image presentations.
     '''
     def __init__(self):
         pass
@@ -96,11 +97,14 @@ class ExportImport(Plugin, exposong._hook.Menu):
             fn = os.path.basename(sched.get_value(itr, 0).filename)
             sched_list.append((os.path.join(DATA_PATH, "pres", fn),
                                os.path.join("pres", fn)))
-            if sched.get_value(itr, 0).get_type() == 'image':
+            if sched.get_value(itr, 0).get_type() == 'exposong':
                 for slide in sched.get_value(itr, 0).slides:
-                    fn = os.path.basename(slide.image)
-                    sched_list.append((os.path.join(DATA_PATH, "image", fn),
-                                       os.path.join("image", fn)))
+                    for c in slide._content:
+                        if c.__class__ != exposong.theme.Image: continue
+                        fn = os.path.basename(c.src)
+                        sched_list.append((os.path.join(DATA_PATH, "pres/res",
+                                                        fn),
+                                           os.path.join("pres/res", fn)))
             itr = sched.iter_next(itr)
         return sched_list
     
@@ -127,7 +131,8 @@ class ExportImport(Plugin, exposong._hook.Menu):
         
     @classmethod
     def _get_library_list(cls, *args):
-        'Returns a list with all items in pres, image and sched folder'
+        'Returns a list with all items in pres, presentation resources,\
+        and sched folder'
         #Make sure schedules are up to date.
         exposong.main.main._save_schedules() 
         library = exposong.main.main.library
@@ -136,10 +141,14 @@ class ExportImport(Plugin, exposong._hook.Menu):
         while itr:
             fn = library.get_value(itr, 0).filename
             lib_list.append((fn, os.path.join("pres", os.path.split(fn)[1])))
-            if library.get_value(itr, 0).get_type() == 'image':
+            if library.get_value(itr, 0).get_type() == 'exposong':
                 for slide in library.get_value(itr, 0).slides:
-                    lib_list.append((slide.image, os.path.join("image",
-                                     os.path.split(slide.image)[1])))
+                    for c in slide._content:
+                        if c.__class__ != exposong.theme.Image: continue
+                        fn = os.path.basename(c.src)
+                        lib_list.append((os.path.join(DATA_PATH, "pres/res",
+                                                      fn),
+                                         os.path.join("pres/res", fn)))
             itr = library.iter_next(itr)
         model = exposong.schedlist.schedlist.get_model()
         itr = model.iter_children(exposong.schedlist.schedlist.custom_schedules)
@@ -201,20 +210,25 @@ class ExportImport(Plugin, exposong._hook.Menu):
         tar.extractall(tmpdir)
         tar.close()
         imgs2rename = []
-        if os.path.isdir(os.path.join(tmpdir, "image")):
-            for nm in os.listdir(os.path.join(tmpdir,"image")):
-                if not os.path.exists(os.path.join(DATA_PATH, "image", nm)):
-                    shutil.move(os.path.join(tmpdir, "image", nm),
-                                os.path.join(DATA_PATH, "image", nm))
+        if os.path.isdir(os.path.join(tmpdir, "pres/res")):
+            for nm in os.listdir(os.path.join(tmpdir,"pres/res")):
+                if not os.path.exists(os.path.join(DATA_PATH, "pres/res", nm)):
+                    shutil.move(os.path.join(tmpdir, "pres/res", nm),
+                                os.path.join(DATA_PATH, "pres/res", nm))
+                elif filecmp.cmp(os.path.join(tmpdir, "pres/res", nm),
+                                 os.path.join(DATA_PATH, "pres/res", nm)):
+                    pass # Skip if they are the same.
                 else:
-                    nm2 = find_freefile(os.path.join(DATA_PATH, "image", nm))
-                    shutil.move(os.path.join(tmpdir, "image", nm), 
-                                os.path.join(DATA_PATH, "image", nm2))
+                    nm2 = find_freefile(os.path.join(DATA_PATH, "pres/res", nm))
+                    shutil.move(os.path.join(tmpdir, "pres/res", nm), 
+                                os.path.join(DATA_PATH, "pres/res", nm2))
                     imgs2rename.append((nm,nm2.rpartition(os.sep)[2]))
 
         if os.path.isdir(os.path.join(tmpdir, "pres")):
             pres2rename = []
             for nm in os.listdir(os.path.join(tmpdir,"pres")):
+                if not os.path.isfile(os.path.join(tmpdir,"pres",nm)):
+                    continue
                 # Rename Images
                 if len(imgs2rename) > 0:
                     infl = open(os.path.join(tmpdir,"pres",nm),"r")
@@ -231,6 +245,10 @@ class ExportImport(Plugin, exposong._hook.Menu):
                     shutil.move(os.path.join(tmpdir, "pres", nm),
                                 os.path.join(DATA_PATH, "pres", nm))
                     exposong.main.main.load_pres(nm)
+                elif filecmp.cmp(os.path.join(tmpdir, "pres", nm),
+                                 os.path.join(DATA_PATH, "pres", nm)):
+                    pass #Skip if they are the same.
+                    # Do we need to test if images have changed before skipping?
                 else:
                     nm2 = find_freefile(os.path.join(DATA_PATH, "pres", nm))
                     nm2 = nm2.rpartition(os.sep)[2]
@@ -258,6 +276,10 @@ class ExportImport(Plugin, exposong._hook.Menu):
                     shutil.move(os.path.join(tmpdir, "sched", nm),
                                 os.path.join(DATA_PATH, "sched", nm))
                     exposong.main.main.load_sched(nm)
+                elif filecmp.cmp(os.path.join(tmpdir, "sched", nm),
+                                 os.path.join(DATA_PATH, "sched", nm)):
+                    pass #Skip if they are the same.
+                    # Do we need to test if presentations have changed?
                 else:
                     nm2 = find_freefile(os.path.join(DATA_PATH, "sched", nm))
                     nm2 = nm2.rpartition(os.sep)[2]
@@ -265,12 +287,6 @@ class ExportImport(Plugin, exposong._hook.Menu):
                                 os.path.join(DATA_PATH, "sched", nm2))
                     exposong.main.main.load_sched(nm2)
 
-        if os.path.isdir(os.path.join(tmpdir, "bg")):
-            images = os.listdir(os.path.join(tmpdir, "bg"))
-            for i in range(len(images)):
-                images[i] = os.path.join(tmpdir, "bg", images[i])
-            exposong.bgselect.bgselect.add_images(images)
-        
     
     @classmethod
     def merge_menu(cls, uimanager):
