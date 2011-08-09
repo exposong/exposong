@@ -41,7 +41,7 @@ from os.path import abspath, join, pardir, expanduser
 
 
 # Tell Windows that I am my own application, and not just python:
-if sys.platform == 'win32':
+if sys.platform == 'win32' and platform.version().split('.') > ['6','0']:
     import ctypes
     myappid = 'ExpoSong.%s' % exposong.version.__version__
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
