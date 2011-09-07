@@ -35,7 +35,7 @@ from exposong.glob import *
 from exposong import RESOURCE_PATH, DATA_PATH
 from exposong import gui, theme
 from exposong.plugins import Plugin, _abstract
-from exposong.prefs import config
+from exposong.config import config
 from openlyrics import openlyrics
 from exposong import version
 
@@ -129,7 +129,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             f = [theme.Text(self.footer_text(), align=theme.CENTER, 
                  valign=theme.MIDDLE, pos=[0.25, 0.0, 0.75, 1.0], margin=5)]
             for s in self.pres.song.props.songbooks:
-                if s.name == config.get("general","songbook"):
+                if s.name == config.get("songs","songbook"):
                     f.append(theme.Text("<big>%s</big>\n<small>%s</small>" % \
                              (s.entry, s.name), pos=[0.0, 0.0, 0.25, 1.0],
                              align=theme.LEFT, valign=theme.BOTTOM, margin=5))
@@ -145,8 +145,8 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                 jn.append(author)
             if len(self.pres.song.props.copyright):
                 jn.append(u"Copyright \xA9 %s" % self.pres.song.props.copyright)
-            if config.get("general", "ccli"):
-                jn.append("CCLI# %s" % config.get("general", "ccli"))
+            if config.get("songs", "ccli"):
+                jn.append("CCLI# %s" % config.get("songs", "ccli"))
             return '\n'.join(jn)
         
         def _edit_window(self, parent):
@@ -1004,8 +1004,8 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             info.append(self.get_authors_string())
         if self.song.props.copyright:
             info.append(u"Copyright \xA9 %s" % self.song.props.copyright)
-        if config.get("general", "ccli"):
-            info.append("CCLI# %s" % config.get("general", "ccli"))
+        if config.get("songs", "ccli"):
+            info.append("CCLI# %s" % config.get("songs", "ccli"))
         if self.song.props.songbooks:
             info.append("; ".join(u'%s\xA0#%s' % (s.name, s.entry)
                         for s in self.song.props.songbooks))

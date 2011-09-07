@@ -53,7 +53,7 @@ class Config(ConfigParser.SafeConfigParser):
             del d
         
         self.add_section("main_window")
-        self.add_section("dialogs")
+        self.add_section("open-save-dialogs")
         self.add_section("general")
         self.add_section("screen")
         self.add_section("updates")
@@ -61,9 +61,16 @@ class Config(ConfigParser.SafeConfigParser):
 
         self.set("general", "data-path", "")
         
-        self.set("dialogs", "songselect-import-dir", os.path.expanduser("~"))
-        self.set("dialogs", "exposong_legacy-import-dir", os.path.expanduser("~"))
-        self.set("dialogs", "opensong-import-dir", os.path.expanduser("~"))
+        self.set("open-save-dialogs", "songselect-import-dir", os.path.expanduser("~"))
+        self.set("open-save-dialogs", "exposong_legacy-import-dir", os.path.expanduser("~"))
+        self.set("open-save-dialogs", "opensong-import-dir", os.path.expanduser("~"))
+        self.set("open-save-dialogs", "import-expo", os.path.expanduser("~"))
+        self.set("open-save-dialogs", "import-song", os.path.expanduser("~"))
+        self.set("open-save-dialogs", "export-song", os.path.expanduser("~"))
+        self.set("open-save-dialogs", "export-sched", os.path.expanduser("~"))
+        self.set("open-save-dialogs", "export-theme", os.path.expanduser("~"))
+        self.set("open-save-dialogs", "export-lib", os.path.expanduser("~"))
+        self.set("open-save-dialogs", "themeeditor-add-bg-image", os.path.expanduser("~"))
         
         self.set("screen", "logo",
                  os.path.join(SHARED_FILES, "res", "exposong.png"))

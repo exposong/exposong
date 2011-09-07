@@ -46,7 +46,6 @@ if sys.platform == 'win32' and platform.version().split('.') > ['6','0']:
     myappid = 'ExpoSong.%s' % exposong.version.__version__
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
-
 # Set up argument handling
 # TODO These cannot currently be translated, due to the required order. Do they
 # need to be?
@@ -206,7 +205,7 @@ if not os.path.exists(DATA_PATH):
         os.makedirs(DATA_PATH)
     except OSError:
         log.error('Could not access Data Path "%s".', DATA_PATH)
-for folder in ('bg', 'pres', 'sched', 'image', 'theme'):
+for folder in ('bg', 'pres', 'sched', 'image', 'theme', os.path.join('theme','res')):
     if not os.path.exists(join(DATA_PATH, folder)):
         os.mkdir(join(DATA_PATH, folder))
 
