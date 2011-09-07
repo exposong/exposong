@@ -20,12 +20,15 @@ import os.path
 import shutil
 import tempfile
 import tarfile
+import difflib
+
+from openlyrics import openlyrics
 
 import exposong.main
 import exposong.schedlist
 from exposong import DATA_PATH
 from exposong.plugins import Plugin
-from exposong.glob import *
+from exposong.glob import find_freefile, title_to_filename
 from exposong.config import config
 
 """
@@ -70,7 +73,7 @@ class ExportImport(Plugin, exposong._hook.Menu):
                                     gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         dlg.set_do_overwrite_confirmation(True)
         dlg.set_current_folder(config.get("open-save-dialogs", "export-song"))
-        dlg.set_current_name(pres.filename)
+        dlg.set_current_name(os.path.basename(pres.filename))
         if dlg.run() == gtk.RESPONSE_ACCEPT:
             os.chdir(DATA_PATH)
             fname = dlg.get_filename()
@@ -206,7 +209,7 @@ class ExportImport(Plugin, exposong._hook.Menu):
         dlg.destroy()
     
     @classmethod
-    def import_song(cls, *args):
+    def import_song_dialog(cls, *args):
         'Import OpenLyrics Song(s)'
         dlg = gtk.FileChooserDialog(_("Import Song(s) (OpenLyrics Format)"), exposong.main.main,
                                     gtk.FILE_CHOOSER_ACTION_OPEN,
@@ -223,11 +226,93 @@ class ExportImport(Plugin, exposong._hook.Menu):
             files = dlg.get_filenames()
             for f in files:
                 newpath = os.path.join(DATA_PATH, "pres", os.path.basename(f))
-                if not os.path.exists(newpath):
-                    shutil.copy(f, newpath)
-                exposong.main.main.load_pres(f)
+                cls.check_import_song(f)
             config.set("open-save-dialogs", "import-song", os.path.dirname(f))
         dlg.destroy()
+    
+    @classmethod
+    def check_import_song(cls, filename):
+        '''Creates a Song of the given filename and checks author and titles for
+        similarities. Asks the user which song to keep when similiarities are detected'''
+        new_song = openlyrics.Song(filename)
+        
+        library = exposong.main.main.library
+        itr = library.get_iter_first()
+        
+        # Highest author and title similiaritiy for all songs
+        max_author_sim = 0.0
+        max_title_sim = 0.0
+        most_similiar_song = None
+        
+        ## This iterates over every song in library and gets the similiarity for each author and title.
+        ## If title and author both have a high similiarity in one Song, than it is set as `most_similiar_song`.
+        while itr:
+            pres = library.get_value(itr, 0)
+            if pres.get_type() == "song":
+                cur_title_sim = None #Highest title similiarity only for one song
+                cur_author_sim = None #Highest author similiarity only for one song
+                
+                for title in pres.song.props.titles:
+                    for title_import in new_song.props.titles:
+                        sim = cls.get_similiarity(title.text, title_import.text)
+                        if not cur_title_sim:
+                            # The first time keep the computed similiarity
+                            cur_title_sim = sim
+                        else:
+                            # Then calculate all simularites from one song
+                            cur_title_sim = (cur_title_sim+sim)/2
+                for author in pres.song.props.authors:
+                    for author_import in new_song.props.authors:
+                        sim = cls.get_similiarity(author.name, author_import.name)
+                        if not cur_author_sim:
+                            cur_author_sim = sim
+                        else:
+                            cur_author_sim = (cur_author_sim+sim)/2
+                if cur_author_sim>max_author_sim and cur_title_sim>max_title_sim:
+                    max_author_sim = cur_author_sim
+                    max_title_sim = cur_title_sim
+                    most_similiar_song = pres
+                    
+            itr = library.iter_next(itr)
+        #TODO: Check 60 percent limit
+        #TODO: Add checkbox to content area to keep the choice for all songs.
+        #TODO: Add expander to dialog to show differences between songs
+        if most_similiar_song and (max_author_sim+max_title_sim)/2 > 0.6:
+            msg = _('The Song "%s" has similiarities with this existing Song from your library: %s .\
+What do you want to do?'%(new_song.props.titles[0].text, most_similiar_song.song.props.titles[0].text))
+            dlg = gtk.MessageDialog(type=gtk.MESSAGE_QUESTION,
+                    buttons=gtk.BUTTONS_NONE,
+                    message_format=msg)
+            btn = dlg.add_button(_("Replace existing Song"), 0)
+            btn.connect("clicked", cls._import_replace_existing_song, most_similiar_song.filename, filename)
+            btn = dlg.add_button(_("Keep existing Song"), 1)
+            btn.connect("clicked", cls._import_keep_existing_song)
+            btn = dlg.add_button(_("Keep both"), 2)
+            btn.connect("clicked", cls._import_keep_both_songs, filename)
+            
+            dlg.run()
+            dlg.destroy()
+    
+    @classmethod
+    def _import_replace_existing_song(cls, widget, existing, new):
+        shutil.copy(new, os.path.join(DATA_PATH, "pres", os.path.basename(new)))
+        os.remove(existing)
+        exposong.main.main.load_pres(os.path.basename(new))
+        #TODO: Remove existing presentation from preslist and schedules
+    
+    @classmethod
+    def _import_keep_existing_song(cls, widget, existing, new):
+        pass
+    
+    @classmethod
+    def _import_keep_both_songs(cls, widget, new_song_fn):
+        dest = find_freefile(os.path.join(DATA_PATH, "pres", os.path.basename(new_song_fn)))
+        shutil.copy(new_song_fn, dest)
+        exposong.main.main.load_pres(os.path.basename(dest))
+    
+    @classmethod
+    def get_similiarity(self, s1, s2):
+        return difflib.SequenceMatcher(a=s1.lower(), b=s2.lower()).ratio()
     
     @classmethod
     def import_dialog(cls, *args):
@@ -333,7 +418,7 @@ class ExportImport(Plugin, exposong._hook.Menu):
                         _("Import a schedule, presentations or backgrounds"),
                         cls.import_dialog),
                 ('import-song', None, _("ExpoSong Song (OpenLyrics Format)"),
-                        None, None, cls.import_song),
+                        None, None, cls.import_song_dialog),
                 ('export-song', None, _("Current _Song"),
                         None, None, cls.export_song),
                 ('export-sched', None,
