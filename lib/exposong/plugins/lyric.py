@@ -1179,7 +1179,7 @@ class SlideEdit(gtk.Dialog):
         scroll = gtk.ScrolledWindow()
         scroll.add(text)
         scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scroll.set_size_request(400, 250)
+        scroll.set_size_request(450, 250)
         scroll.set_shadow_type(gtk.SHADOW_IN)
         self.vbox.pack_start(scroll, True, True)
         
