@@ -305,6 +305,8 @@ What do you want to do?'%(new_song.props.titles[0].text, most_similiar_song.song
             
             dlg.run()
             dlg.destroy()
+        else:
+            cls._import_keep_both_songs(None, filename)
     
     @classmethod
     def _import_replace_existing_song(cls, widget, existing, new):
@@ -321,6 +323,18 @@ What do you want to do?'%(new_song.props.titles[0].text, most_similiar_song.song
         dest = find_freefile(os.path.join(DATA_PATH, "pres", os.path.basename(new_song_fn)))
         shutil.copy(new_song_fn, dest)
         exposong.main.main.load_pres(os.path.basename(dest))
+        
+        # Add to builtin presentations
+        # TODO move to another function, use in other _import_* functions
+        pres = exposong.main.main.library.find(filename=os.path.basename(dest))
+        model = exposong.schedlist.schedlist.get_model()
+        itr = model.get_iter_first()
+        while itr:
+            sched = model.get_value(itr, 0)
+            if sched:
+                print sched.title
+                sched.append(pres)
+            itr = model.iter_next(itr)
     
     @classmethod
     def get_similiarity(self, s1, s2):
@@ -367,6 +381,7 @@ What do you want to do?'%(new_song.props.titles[0].text, most_similiar_song.song
         if os.path.isdir(os.path.join(tmpdir, "pres")):
             pres2rename = []
             for nm in os.listdir(os.path.join(tmpdir,"pres")):
+                print nm
                 if not os.path.isfile(os.path.join(tmpdir,"pres",nm)):
                     continue
                 # Rename Images
@@ -382,9 +397,10 @@ What do you want to do?'%(new_song.props.titles[0].text, most_similiar_song.song
                     shutil.move(os.path.join(tmpdir,"pres",nm+".1"),
                                 os.path.join(tmpdir,"pres",nm))
                 
-                if filecmp.cmp(os.path.join(tmpdir, "pres", nm),
-                                 os.path.join(DATA_PATH, "pres", nm)):
-                    pass #Skip if they are the same.
+                if os.path.isfile(os.path.join(DATA_PATH, "pres", nm)):
+                    if filecmp.cmp(os.path.join(tmpdir, "pres", nm),
+                                   os.path.join(DATA_PATH, "pres", nm)):
+                        pass #Skip if they are the same.
                 else:
                     cls.check_import_song(os.path.join(tmpdir, "pres", nm))
                 # Do we need to test if images have changed before skipping?
