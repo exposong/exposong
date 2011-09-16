@@ -137,16 +137,17 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             return f
         
         def footer_text(self):
-            'Draw text on the footer.'
+            'Get the footer ownership information for the centered footer.'
             jn = ['"%s"' % self.pres.title]
             # TODO List only translators for the current translation.
             author = self.pres.get_authors_string()
             if len(author) > 0:
-                jn.append(author)
+                jn.append(escape(author))
             if len(self.pres.song.props.copyright):
-                jn.append(u"Copyright \xA9 %s" % self.pres.song.props.copyright)
+                jn.append(u"Copyright \xA9 %s" % \
+                          escape(self.pres.song.props.copyright))
             if config.get("songs", "ccli"):
-                jn.append("CCLI# %s" % config.get("songs", "ccli"))
+                jn.append("CCLI# %s" % escape(config.get("songs", "ccli")))
             return '\n'.join(jn)
         
         def _edit_window(self, parent):
@@ -988,7 +989,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             if not same:
                 for auth in authlist:
                     if auth[1] == str(a):
-                        auth[0] = "%s &amp; %s"% (auth[0], auth_type)
+                        auth[0] = "%s & %s"% (auth[0], auth_type)
                         same = True
             if not same:
                 authlist.append([auth_type, str(a)])
@@ -1001,13 +1002,13 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                  % self.get_title()
         info = []
         if self.song.props.authors:
-            info.append(self.get_authors_string())
+            info.append(escape(self.get_authors_string()))
         if self.song.props.copyright:
-            info.append(u"Copyright \xA9 %s" % self.song.props.copyright)
+            info.append(u"Copyright \xA9 %s" % escape(self.song.props.copyright))
         if config.get("songs", "ccli"):
-            info.append("CCLI# %s" % config.get("songs", "ccli"))
+            info.append("CCLI# %s" % escape(config.get("songs", "ccli")))
         if self.song.props.songbooks:
-            info.append("; ".join(u'%s\xA0#%s' % (s.name, s.entry)
+            info.append("; ".join(u'%s\xA0#%s' % (escape(s.name), escape(s.entry))
                         for s in self.song.props.songbooks))
         if self.song.props.verse_order:
             verses = _("Order:")
