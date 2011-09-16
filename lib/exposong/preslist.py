@@ -225,6 +225,7 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         item = self.get_active_item()
         if not item:
             return False
+        
         msg = _('Are you sure you want to delete "%s" from your library?')
         dialog = gtk.MessageDialog(exposong.main.main, gtk.DIALOG_MODAL,
                                    gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
@@ -250,8 +251,12 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
                 sched = schmod.get_value(itr, 0)
                 sched.remove_if(presentation=item.presentation)
                 itr = schmod.iter_next(itr)
+            
+            exposong.main.main.library.remove_if(presentation=item.presentation)
+            exposong.log.warning('Deleting "%s"', item.filename)
             os.remove(os.path.join(DATA_PATH,"pres",item.filename))
             self.activate_pres()
+            
 
     def _on_pres_remove_from_schedule(self, *args):
         'Remove the presentation from the current schedule.'
