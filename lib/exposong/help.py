@@ -20,7 +20,7 @@ import os
 import time
 import gtk
 import webbrowser
-import urllib
+import urllib, urllib2
 
 import exposong.main
 import exposong.version
@@ -87,7 +87,7 @@ class Help(exposong._hook.Menu, object):
         err = new_version = False
         fl = None
         try:
-            fl = urllib.urlopen("http://exposong.org/_current-version/")
+            fl = urllib2.urlopen("http://exposong.org/_current-version/", timeout=2)
             if fl.getcode() != 200:
                 err = True
                 msg = _("Could not read the website (error code %d).")\
