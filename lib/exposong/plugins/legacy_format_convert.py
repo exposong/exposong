@@ -29,7 +29,7 @@ from exposong.glob import *
 from exposong import DATA_PATH, theme
 from exposong.plugins import Plugin, _abstract
 from exposong.config import config
-from openlyrics import openlyrics
+from exposong_openlyrics import openlyrics
 
 """
 A converter from an old ExpoSong (< 0.8) format.

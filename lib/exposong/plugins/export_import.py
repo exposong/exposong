@@ -25,7 +25,7 @@ import tempfile
 import tarfile
 import difflib
 
-from openlyrics import openlyrics
+from exposong_openlyrics import openlyrics
 
 import exposong.main
 import exposong.schedlist

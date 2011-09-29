@@ -18,7 +18,7 @@
 import gtk
 import os
 
-from openlyrics.tools.opensong2openlyrics import OpenLyricsConverter
+from exposong_openlyrics.tools.opensong2openlyrics import OpenLyricsConverter
 
 import exposong.main
 import exposong._hook

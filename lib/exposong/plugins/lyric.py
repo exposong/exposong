@@ -36,7 +36,7 @@ from exposong import RESOURCE_PATH, DATA_PATH
 from exposong import gui, theme
 from exposong.plugins import Plugin, _abstract
 from exposong.config import config
-from openlyrics import openlyrics
+from exposong_openlyrics import openlyrics
 from exposong import version
 
 
