@@ -1,4 +1,6 @@
 #
+# vim: ts=4 sw=4 expandtab ai:
+#
 # Copyright (C) 2008-2011 Exposong.org
 #
 # ExpoSong is free software: you can redistribute it and/or modify
@@ -80,6 +82,8 @@ class ExportImport(Plugin, exposong._hook.Menu):
             fname = dlg.get_filename()
             if not fname.endswith(".xml"):
                 fname += ".xml"
+            exposong.log.info('Exporting presentation "%s" to "%s".',
+                              pres.get_title(), fname)
             shutil.copy(pres.filename, fname)
             config.set("open-save-dialogs", "export-song", os.path.dirname(fname))
         dlg.destroy()
@@ -104,6 +108,8 @@ class ExportImport(Plugin, exposong._hook.Menu):
             fname = dlg.get_filename()
             if not fname.endswith(".expo"):
                 fname += ".expo"
+            exposong.log.info('Exporting schedule "%s" to "%s".',
+                              sched.title, fname)
             tar = tarfile.open(fname, "w:gz")
             for item in cls._get_sched_list():
                 tar.add(item[0], item[1])
@@ -151,6 +157,7 @@ class ExportImport(Plugin, exposong._hook.Menu):
             fname = dlg.get_filename()
             if not fname.endswith(".expo"):
                 fname += ".expo"
+            exposong.log.info('Exporting library to "%s".', fname)
             tar = tarfile.open(fname, "w:gz")
             for item in cls._get_library_list():
                 tar.add(item[0], item[1])
@@ -205,6 +212,8 @@ class ExportImport(Plugin, exposong._hook.Menu):
             fname = dlg.get_filename()
             if not fname.endswith(".expo"):
                 fname += ".expo"
+            exposong.log.info('Exporting theme "%s" to "%s".',
+                              cur_theme.get_title(), fname)
             tar = tarfile.open(fname, "w:gz")
             
             tar.add(os.path.join(DATA_PATH, 'theme', cur_theme.filename),
@@ -238,6 +247,8 @@ class ExportImport(Plugin, exposong._hook.Menu):
                 if os.path.exists(newpath):
                     if filecmp.cmp(f, newpath):
                         pass #Skip if they are the same.
+                    else:
+                        cls.check_import_song(f)
                 else:
                     cls.check_import_song(f)
             config.set("open-save-dialogs", "import-song", os.path.dirname(f))
@@ -246,58 +257,47 @@ class ExportImport(Plugin, exposong._hook.Menu):
     @classmethod
     def check_import_song(cls, filename):
         '''Creates a Song of the given filename and checks author and titles for
-        similarities. Asks the user which song to keep when similiarities are detected'''
+        similarities. Asks the user which song to keep when similarities are detected'''
         new_song = openlyrics.Song(filename)
         
         library = exposong.main.main.library
         itr = library.get_iter_first()
         
-        # Highest author and title similiaritiy for all songs
+        # Highest author and title similaritiy for all songs
         max_author_sim = 0.0
         max_title_sim = 0.0
-        most_similiar_song = None
+        most_similar_song = None
         
-        ## This iterates over every song in library and gets the similiarity for each author and title.
-        ## If title and author both have a high similiarity in one Song, than it is set as `most_similiar_song`.
+        ## This iterates over every song in library and gets the similarity for each author and title.
+        ## If title and author both have a high similarity in one Song, than it is set as `most_similar_song`.
         while itr:
             pres = library.get_value(itr, 0)
             if pres.get_type() == "song":
-                cur_title_sim = None #Highest title similiarity only for one song
-                cur_author_sim = None #Highest author similiarity only for one song
+                cur_title_sim = cls.get_similarity([x.text for x in pres.song.props.titles],
+                                                   [x.text for x in new_song.props.titles])
+                cur_author_sim = cls.get_similarity([x.name for x in pres.song.props.authors],
+                                                    [x.name for x in new_song.props.authors])
                 
-                for title in pres.song.props.titles:
-                    for title_import in new_song.props.titles:
-                        sim = cls.get_similiarity(title.text, title_import.text)
-                        if not cur_title_sim:
-                            # The first time keep the computed similiarity
-                            cur_title_sim = sim
-                        else:
-                            # Then calculate all simularites from one song
-                            cur_title_sim = (cur_title_sim+sim)/2
-                for author in pres.song.props.authors:
-                    for author_import in new_song.props.authors:
-                        sim = cls.get_similiarity(author.name, author_import.name)
-                        if not cur_author_sim:
-                            cur_author_sim = sim
-                        else:
-                            cur_author_sim = (cur_author_sim+sim)/2
                 if cur_author_sim>max_author_sim and cur_title_sim>max_title_sim:
                     max_author_sim = cur_author_sim
                     max_title_sim = cur_title_sim
-                    most_similiar_song = pres
+                    most_similar_song = pres
                     
+            exposong.log.debug('Similarity between file "%s" and presentation "%s" is %d%%.',
+                               filename, pres.filename,
+                               (cur_author_sim+cur_title_sim)/200)
             itr = library.iter_next(itr)
         #TODO: Check 60 percent limit
         #TODO: Add checkbox to content area to keep the choice for all songs.
         #TODO: Add expander to dialog to show differences between songs
-        if most_similiar_song and (max_author_sim+max_title_sim)/2 > 0.6:
-            msg = _('The Song "%s" has similiarities with this existing Song from your library: "%s" .\
-What do you want to do?'%(new_song.props.titles[0].text, most_similiar_song.song.props.titles[0].text))
+        if most_similar_song and (max_author_sim+max_title_sim)/2 > 0.6:
+            msg = _('The Song "%s" has similarities with this existing Song from your library: "%s" .\
+What do you want to do?'%(new_song.props.titles[0].text, most_similar_song.song.props.titles[0].text))
             dlg = gtk.MessageDialog(type=gtk.MESSAGE_QUESTION,
                     buttons=gtk.BUTTONS_NONE,
                     message_format=msg)
             btn = dlg.add_button(_("Replace existing Song"), 0)
-            btn.connect("clicked", cls._import_replace_existing_song, most_similiar_song.filename, filename)
+            btn.connect("clicked", cls._import_replace_existing_song, most_similar_song.filename, filename)
             btn = dlg.add_button(_("Keep existing Song"), 1)
             btn.connect("clicked", cls._import_keep_existing_song)
             btn = dlg.add_button(_("Keep both Songs"), 2)
@@ -337,8 +337,17 @@ What do you want to do?'%(new_song.props.titles[0].text, most_similiar_song.song
             itr = model.iter_next(itr)
     
     @classmethod
-    def get_similiarity(self, s1, s2):
-        return difflib.SequenceMatcher(a=s1.lower(), b=s2.lower()).ratio()
+    def get_similarity(self, s1, s2):
+        "Returns a ratio (between 0 and 1) between s1 and s2."
+        # We are testing both objects together, because there is no use if they
+        # are of different types.
+        if isinstance(s1, str) and isinstance(s2, str):
+            s1 = s1.lower()
+            s2 = s2.lower()
+        elif isinstance(s1, list) and isinstance(s2, list):
+            s1 = [x.lower() for x in sorted(s1)]
+            s2 = [x.lower() for x in sorted(s2)]
+        return difflib.SequenceMatcher(a=s1, b=s2).ratio()
     
     @classmethod
     def import_dialog(cls, *args):
