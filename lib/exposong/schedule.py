@@ -164,8 +164,17 @@ class Schedule(gtk.ListStore):
         itr = self.get_iter_first()
         while itr:
             item = self.get_value(itr, 0)
-            if os.path.split(item.filename)[1] == filename:
+            if os.path.basename(item.filename) == filename:
                 return item.presentation
+            itr = self.iter_next(itr)
+    
+    def finditer(self, filename):
+        'Searches the schedule for the matching filename.'
+        itr = self.get_iter_first()
+        while itr:
+            item = self.get_value(itr, 0)
+            if os.path.basename(item.filename) == filename:
+                return itr
             itr = self.iter_next(itr)
     
     def resort(self):

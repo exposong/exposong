@@ -310,9 +310,37 @@ What do you want to do?'%(new_song.props.titles[0].text, most_similar_song.song.
     
     @classmethod
     def _import_replace_existing_song(cls, widget, existing, new):
+        os.remove(existing)
         shutil.copy(new, os.path.join(DATA_PATH, "pres", os.path.basename(new)))
+        presrm = exposong.main.main.library.finditer(filename=os.path.basename(existing))
+        if presrm: exposong.main.main.library.remove(presrm)
         exposong.main.main.load_pres(os.path.basename(new))
         #TODO: Remove existing presentation from preslist and schedules
+        
+        # Add to builtin presentations
+        # TODO move to another function, use in other _import_* functions
+        pres = exposong.main.main.library.find(filename=os.path.basename(new))
+        model = exposong.schedlist.schedlist.get_model()
+        itr = model.get_iter_first()
+        while itr:
+            sched = model.get_value(itr, 0)
+            if sched:
+                presrm = sched.finditer(os.path.basename(existing))
+                if presrm: sched.remove(presrm)
+                sched.append(pres)
+            itr = model.iter_next(itr)
+        
+        
+        model = exposong.schedlist.schedlist.get_model()
+        itr = model.iter_children(exposong.schedlist.schedlist.custom_schedules)
+        while itr:
+            sched = model.get_value(itr, 0)
+            scheditem = exposong.schedule.ScheduleItem(pres, "")
+            presrm = sched.finditer(os.path.basename(existing))
+            sched.insert_before(presrm, scheditem.get_row())
+            if presrm: sched.remove(presrm)
+            itr = model.iter_next(itr)
+        
     
     @classmethod
     def _import_keep_existing_song(cls, widget):
