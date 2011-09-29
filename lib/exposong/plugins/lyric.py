@@ -1112,11 +1112,6 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         'Return the string schedule name.'
         return _('Songs')
     
-    @classmethod
-    def schedule_filter(cls, pres):
-        'Called on each presentation, and return True if it can be added.'
-        return pres.__class__ is cls
-    
     @staticmethod
     def get_version():
         'Return the version number of the plugin.'

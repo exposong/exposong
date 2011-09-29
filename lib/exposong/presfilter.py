@@ -150,7 +150,7 @@ class PresFilter(gtk.Entry, exposong._hook.Menu):
             self.modify_text(gtk.STATE_NORMAL, black)
             
     def _filter(self, *args):
-        'Filters schedlist by the keywords.'
+        'Filters preslist by the keywords.'
         preslist = exposong.preslist.preslist
         if self.get_text() == "":
             preslist.set_model(preslist.get_model())

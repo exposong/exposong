@@ -27,22 +27,28 @@ from exposong.glob import get_node_text, check_filename
 import exposong.plugins._abstract
 
 
-class Schedule(gtk.ListStore):
+class Schedule:
     '''
     Schedule of presentations.
-    Can be built-in (ES Presentations, Lyric Presentations) or user-defined.
+    Can be built-in or user-defined.
     '''
-    def __init__(self, title="", filename = None, builtin = True, filter_func = None):
-        gtk.ListStore.__init__(self, *preslist.PresList.get_model_args())
+    def __init__(self, title="", filename = None, builtin = True, model = None):
         self.title = title
+        if model == None:
+            self._model = gtk.ListStore(*preslist.PresList.get_model_args())
+        else:
+            self._model = model
+        self._model.builtin = True
+        
         if filename == None:
             self.filename = os.path.join(DATA_PATH, "sched")
         else:
             self.filename = filename
         self.builtin = builtin
         if builtin:
-            self.get_model().set_sort_func(0, self._column_sort)
-            self.get_model().set_sort_column_id(0, gtk.SORT_ASCENDING)
+            mod = self.get_model(True)
+            mod.set_sort_func(0, self._column_sort)
+            mod.set_sort_column_id(0, gtk.SORT_ASCENDING)
         else:
             if filename:
                 exposong.log.info('Adding custom schedule "%s".',
@@ -50,7 +56,6 @@ class Schedule(gtk.ListStore):
             else:
                 exposong.log.info('Adding custom schedule "%s".',
                                   title)
-        self.filter_func = filter_func
     
     def load(self, dom, library):
         'Loads from an xml file.'
@@ -76,7 +81,7 @@ class Schedule(gtk.ListStore):
             if filenm:
                 pres = library.find(filename=filenm)
                 if pres:
-                    gtk.ListStore.append(self, ScheduleItem(pres, comment).get_row())
+                    self.get_model(True).append(ScheduleItem(pres, comment).get_row())
                     exposong.log.info('Adding %s presentation "%s" to schedule "%s".',
                                       pres.get_type(), pres.get_title(), self.title)
                 else:
@@ -111,8 +116,6 @@ class Schedule(gtk.ListStore):
     
     def append(self, pres, comment = ""):
         'Add a presentation to the schedule.'
-        if callable(self.filter_func) and not self.filter_func(pres):
-            return False
         if not self.builtin:
             exposong.log.info('Adding %s presentation "%s" to schedule "%s".',
                               pres.get_type(), pres.get_title(), self.title)
@@ -120,7 +123,7 @@ class Schedule(gtk.ListStore):
             sched = ScheduleItem(pres.presentation, comment)
         else:
             sched = ScheduleItem(pres, comment)
-        gtk.ListStore.append(self, sched.get_row())
+        self.get_model(True).append(sched.get_row())
     
     def append_action(self, action):
         'Add the selected presentation to the schedule (from a Menu button).'
@@ -130,7 +133,7 @@ class Schedule(gtk.ListStore):
     
     def remove(self, itr):
         'Remove a presentation from a schedule.'
-        gtk.ListStore.remove(self, itr)
+        self.get_model(True).remove(itr)
     
     def remove_if(self, presentation):
         'Searches and removes a presentation if it matches.'
@@ -147,13 +150,12 @@ class Schedule(gtk.ListStore):
                 itr = self.iter_next(itr)
         return ret
     
-    def set_model(self, model):
-        'Filter all presentations.'
-        gtk.ListStore = model
-    
-    def get_model(self):
+    def get_model(self, getliststore=False):
         'Return the filtered ListModel'
-        return self
+        mod = self._model
+        if getliststore and not isinstance(mod, gtk.ListStore):
+            mod = mod.get_model()
+        return mod
     
     def is_reorderable(self):
         'Checks to see if the list should be reorderable.'
@@ -180,7 +182,7 @@ class Schedule(gtk.ListStore):
     def resort(self):
         'Force the model to resort'
         if self.builtin:
-            self.get_model().set_sort_func(0, self._column_sort)
+            self.get_model(True).set_sort_func(0, self._column_sort)
     
     @staticmethod
     def _column_sort(treemodel, iter1, iter2):
@@ -191,6 +193,15 @@ class Schedule(gtk.ListStore):
         if c1 > c2:
             return 1
         return 0
+    
+    #Call model functions
+    def __getattr__(self, name):
+        'Get the attribute from the model if possible.'
+        if hasattr(self._model, name):
+            return getattr(self._model, name)
+        if isinstance(self._model, gtk.TreeModelFilter):
+            if hasattr(self._model.get_model(), name):
+                return getattr(self._model.get_model(), name)
 
 class ScheduleItem:
     '''

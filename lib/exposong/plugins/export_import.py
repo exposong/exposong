@@ -283,9 +283,9 @@ class ExportImport(Plugin, exposong._hook.Menu):
                     max_title_sim = cur_title_sim
                     most_similar_song = pres
                     
-            exposong.log.debug('Similarity between file "%s" and presentation "%s" is %d%%.',
-                               filename, pres.filename,
-                               (cur_author_sim+cur_title_sim)/200)
+                exposong.log.debug('Similarity between file "%s" and presentation "%s" is %d%%.',
+                                   filename, pres.filename,
+                                   (cur_author_sim+cur_title_sim)/200)
             itr = library.iter_next(itr)
         #TODO: Check 60 percent limit
         #TODO: Add checkbox to content area to keep the choice for all songs.
@@ -317,20 +317,7 @@ What do you want to do?'%(new_song.props.titles[0].text, most_similar_song.song.
         exposong.main.main.load_pres(os.path.basename(new))
         #TODO: Remove existing presentation from preslist and schedules
         
-        # Add to builtin presentations
-        # TODO move to another function, use in other _import_* functions
-        pres = exposong.main.main.library.find(filename=os.path.basename(new))
-        model = exposong.schedlist.schedlist.get_model()
-        itr = model.get_iter_first()
-        while itr:
-            sched = model.get_value(itr, 0)
-            if sched:
-                presrm = sched.finditer(os.path.basename(existing))
-                if presrm: sched.remove(presrm)
-                sched.append(pres)
-            itr = model.iter_next(itr)
-        
-        
+        # Add to Custom Schedules
         model = exposong.schedlist.schedlist.get_model()
         itr = model.iter_children(exposong.schedlist.schedlist.custom_schedules)
         while itr:
@@ -351,18 +338,6 @@ What do you want to do?'%(new_song.props.titles[0].text, most_similar_song.song.
         dest = find_freefile(os.path.join(DATA_PATH, "pres", os.path.basename(new_song_fn)))
         shutil.copy(new_song_fn, dest)
         exposong.main.main.load_pres(os.path.basename(dest))
-        
-        # Add to builtin presentations
-        # TODO move to another function, use in other _import_* functions
-        pres = exposong.main.main.library.find(filename=os.path.basename(dest))
-        model = exposong.schedlist.schedlist.get_model()
-        itr = model.get_iter_first()
-        while itr:
-            sched = model.get_value(itr, 0)
-            if sched:
-                print sched.title
-                sched.append(pres)
-            itr = model.iter_next(itr)
     
     @classmethod
     def get_similarity(self, s1, s2):

@@ -118,7 +118,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
         if self.has_selection():
             sched = self.get_active_item()
             if isinstance(sched, exposong.schedule.Schedule):
-                preslist.set_model(sched)
+                preslist.set_model(sched.get_model())
                 preslist.columns_autosize()
                 if sched.is_reorderable():
                     preslist.enable_model_drag_dest(DRAGDROP_SCHEDULE,

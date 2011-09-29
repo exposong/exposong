@@ -429,13 +429,10 @@ class Main (gtk.Window):
         
         splash.splash.incr_total(len(plugins))
         for plugin in plugins:
-            schedule = Schedule(plugin.schedule_name(),
-                                filter_func=plugin.schedule_filter)
+            model = self.library.filter_new()
+            model.set_visible_func(plugin.schedule_filter)
+            schedule = Schedule(plugin.schedule_name(), model=model)
             itr = self.library.get_iter_first()
-            while itr:
-                item = self.library.get_value(itr, 0).presentation
-                schedule.append(item)
-                itr = self.library.iter_next(itr)
             schedlist.schedlist.append(None, schedule, 2)
             splash.splash.incr(1)
             yield True

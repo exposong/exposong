@@ -289,13 +289,7 @@ class Presentation:
             if sched and not sched.builtin:
                 sched.append(pres)
             #Add presentation to appropriate builtin schedules
-            model = exposong.schedlist.schedlist.get_model()
-            itr = model.get_iter_first()
-            while itr:
-                sched = model.get_value(itr, 0)
-                if sched:
-                    sched.append(pres)
-                itr = model.iter_next(itr)
+            exposong.main.main.library.append(pres)
     
     def on_delete(self):
         'Called when the presentation is deleted.'
@@ -339,9 +333,11 @@ class Schedule:
         raise NotImplementedError
     
     @classmethod
-    def schedule_filter(cls, pres):
-        'Called on each presentation, and return True if it can be added.'
-        raise NotImplementedError
+    def schedule_filter(cls, model, itr):
+        "Called on each presentation, and return True if it can be added."
+        if model.get_value(itr, 0) != None:
+            return model.get_value(itr, 0).presentation.__class__ is cls
+        return False
 
 
 class Screen:
