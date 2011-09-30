@@ -81,8 +81,8 @@ class Theme(object):
             try:
                 tree = etree.parse(filename)
                 self.load(tree)
-            except etree.ParseError:
-                exposong.log.error("Could not load theme %s."%filename)
+            except Exception as e:
+                exposong.log.error("Could not load theme %s.\n%s",filename,e)
         else:
             self.filename = filename
     
