@@ -295,9 +295,11 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
     def merge_menu(cls, uimanager):
         "Create menu items."
         global schedlist
+        gtk.stock_add([("sched-new",_("New Schedule"), gtk.gdk.MOD1_MASK, 0,
+                      "pymserv")])
         cls._actions = gtk.ActionGroup('schedlist')
         cls._actions.add_actions([
-                ('sched-new', gtk.STOCK_NEW, _("New Schedule"), "",
+                ('sched-new', 'sched-new', _("New Schedule"), "",
                         _("Create a new schedule"), schedlist._on_new),
                 ('sched-rename', None, _("_Rename Schedule"), None,
                         _("Rename the selected schedule"), schedlist._on_rename),

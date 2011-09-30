@@ -1071,7 +1071,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         
         actiongroup = gtk.ActionGroup('exposong-song')
         actiongroup.add_actions([("pres-new-song", 'pres-song-new', _("New Song"), "<Ctrl>n",
-                                _("New Song"), cls._on_pres_new)])
+                                _("Create a new song"), cls._on_pres_new)])
         uimanager.insert_action_group(actiongroup, -1)
         
         cls.menu_merge_id = uimanager.add_ui_from_string("""
