@@ -647,16 +647,16 @@
        r="14.375000" />
   </defs>
   <sodipodi:namedview
-     inkscape:window-y="30"
-     inkscape:window-x="164"
+     inkscape:window-y="24"
+     inkscape:window-x="304"
      inkscape:window-height="598"
      inkscape:window-width="795"
      inkscape:document-units="px"
      inkscape:grid-bbox="true"
      showgrid="false"
      inkscape:current-layer="layer5"
-     inkscape:cy="26.18121"
-     inkscape:cx="24.508117"
+     inkscape:cy="24.383272"
+     inkscape:cx="28.006783"
      inkscape:zoom="8"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -776,150 +776,31 @@
      id="layer5"
      inkscape:label="Text"
      style="display:inline">
-    <rect
-       ry="0.065390877"
-       rx="0.12317187"
-       y="11"
-       x="18.121315"
-       height="1"
-       width="17.878685"
-       id="rect15686"
-       style="color:#000000;fill:#9b9b9b;fill-opacity:0.54970757;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible" />
-    <rect
-       ry="0.065390877"
-       rx="0.12317187"
-       y="13"
-       x="18.121315"
-       height="1"
-       width="17.878685"
-       id="rect15688"
-       style="color:#000000;fill:#9b9b9b;fill-opacity:0.54970757;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible" />
-    <rect
-       ry="0.065390877"
-       rx="0.12317187"
-       y="15"
-       x="18.121315"
-       height="1"
-       width="17.878685"
-       id="rect15690"
-       style="color:#000000;fill:#9b9b9b;fill-opacity:0.54970757;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible" />
-    <rect
-       ry="0.065390877"
-       rx="0.12317187"
-       y="17"
-       x="18.121315"
-       height="1"
-       width="17.878685"
-       id="rect15692"
-       style="color:#000000;fill:#9b9b9b;fill-opacity:0.54970757;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible" />
-    <rect
-       ry="0.065390877"
-       rx="0.12317187"
-       y="19"
-       x="18.121315"
-       height="1"
-       width="17.878685"
-       id="rect15694"
-       style="color:#000000;fill:#9b9b9b;fill-opacity:0.54970757;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible" />
-    <rect
-       ry="0.065390877"
-       rx="0.12317187"
-       y="21"
-       x="18.121315"
-       height="1"
-       width="17.878685"
-       id="rect15696"
-       style="color:#000000;fill:#9b9b9b;fill-opacity:0.54970757;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible" />
-    <rect
-       ry="0.065390877"
-       rx="0.12317187"
-       y="23"
-       x="18.121315"
-       height="1"
-       width="17.878685"
-       id="rect15698"
-       style="color:#000000;fill:#9b9b9b;fill-opacity:0.54970757;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible" />
-    <rect
-       ry="0.065390877"
-       rx="0.12317187"
-       y="25"
-       x="18.121315"
-       height="1"
-       width="17.878685"
-       id="rect15700"
-       style="color:#000000;fill:#9b9b9b;fill-opacity:0.54970757;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible" />
-    <rect
-       ry="0.065390877"
-       rx="0.0093010161"
-       y="10.94536"
-       x="15.986171"
-       height="1"
-       width="1.3500642"
-       id="rect15686-0"
-       style="color:#000000;fill:#9b9b9b;fill-opacity:0.54970757;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible" />
-    <rect
-       ry="0.065390877"
-       rx="0.0093010161"
-       y="12.94536"
-       x="15.986171"
-       height="1"
-       width="1.3500642"
-       id="rect15688-4"
-       style="color:#000000;fill:#9b9b9b;fill-opacity:0.54970757;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible" />
-    <rect
-       ry="0.065390877"
-       rx="0.0093010161"
-       y="14.945358"
-       x="15.986171"
-       height="1"
-       width="1.3500642"
-       id="rect15690-0"
-       style="color:#000000;fill:#9b9b9b;fill-opacity:0.54970757;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible" />
-    <rect
-       ry="0.065390877"
-       rx="0.0093010161"
-       y="16.945358"
-       x="15.986171"
-       height="1"
-       width="1.3500642"
-       id="rect15692-9"
-       style="color:#000000;fill:#9b9b9b;fill-opacity:0.54970757;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible" />
-    <rect
-       ry="0.065390877"
-       rx="0.0093010161"
-       y="18.945358"
-       x="15.986171"
-       height="1"
-       width="1.3500642"
-       id="rect15694-1"
-       style="color:#000000;fill:#9b9b9b;fill-opacity:0.54970757;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible" />
-    <rect
-       ry="0.065390877"
-       rx="0.0093010161"
-       y="20.945358"
-       x="15.986171"
-       height="1"
-       width="1.3500642"
-       id="rect15696-9"
-       style="color:#000000;fill:#9b9b9b;fill-opacity:0.54970757;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible" />
-    <rect
-       ry="0.065390877"
-       rx="0.0093010161"
-       y="22.945358"
-       x="15.986171"
-       height="1"
-       width="1.3500642"
-       id="rect15698-6"
-       style="color:#000000;fill:#9b9b9b;fill-opacity:0.54970757;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible" />
-    <rect
-       ry="0.065390877"
-       rx="0.0093010161"
-       y="24.945358"
-       x="15.986171"
-       height="1"
-       width="1.3500642"
-       id="rect15700-2"
-       style="color:#000000;fill:#9b9b9b;fill-opacity:0.54970757;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible" />
+    <g
+       id="g3182"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       transform="translate(0,-1.9073486e-6)"
+       style="fill:#555753;fill-opacity:1">
+      <rect
+         style="color:#000000;fill:#555753;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible"
+         id="rect15686"
+         width="17.378685"
+         height="1"
+         x="18.621315"
+         y="11"
+         rx="0.11972722"
+         ry="0.065390877" />
+      <rect
+         style="color:#000000;fill:#555753;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible"
+         id="rect15686-0"
+         width="1.3500642"
+         height="1"
+         x="15.986171"
+         y="10.94536"
+         rx="0.0093010161"
+         ry="0.065390877" />
+    </g>
     <path
        inkscape:export-ydpi="33.852203"
        inkscape:export-xdpi="33.852203"
@@ -933,5 +814,186 @@
        id="path12511"
        style="color:#000000;fill:url(#radialGradient3433);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.25000024;marker:none;visibility:visible;display:block"
        sodipodi:type="arc" />
+    <g
+       transform="translate(0,3.7360439)"
+       style="display:inline;fill:#555753;fill-opacity:1"
+       id="g3182-9"
+       inkscape:export-filename="/home/brad/exposong/share/exposong/res/icons/g3182-3.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         style="color:#000000;fill:#555753;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible"
+         id="rect15686-6"
+         width="17.378685"
+         height="1"
+         x="18.621315"
+         y="11"
+         rx="0.11972722"
+         ry="0.065390877" />
+      <rect
+         style="color:#000000;fill:#555753;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible"
+         id="rect15686-0-4"
+         width="1.3500642"
+         height="1"
+         x="15.986171"
+         y="10.94536"
+         rx="0.0093010161"
+         ry="0.065390877" />
+    </g>
+    <g
+       transform="translate(0,7.4720898)"
+       style="display:inline;fill:#555753;fill-opacity:1"
+       id="g3182-1"
+       inkscape:export-filename="/home/brad/exposong/share/exposong/res/icons/g3182-3.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         style="color:#000000;fill:#555753;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible"
+         id="rect15686-02"
+         width="17.378685"
+         height="1"
+         x="18.621315"
+         y="11"
+         rx="0.11972722"
+         ry="0.065390877" />
+      <rect
+         style="color:#000000;fill:#555753;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible"
+         id="rect15686-0-2"
+         width="1.3500642"
+         height="1"
+         x="15.986171"
+         y="10.94536"
+         rx="0.0093010161"
+         ry="0.065390877" />
+    </g>
+    <g
+       transform="translate(0,11.208136)"
+       style="display:inline;fill:#555753;fill-opacity:1"
+       id="g3182-974"
+       inkscape:export-filename="/home/brad/exposong/share/exposong/res/icons/g3182-3.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         style="color:#000000;fill:#555753;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible"
+         id="rect15686-9"
+         width="17.378685"
+         height="1"
+         x="18.621315"
+         y="11"
+         rx="0.11972722"
+         ry="0.065390877" />
+      <rect
+         style="color:#000000;fill:#555753;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible"
+         id="rect15686-0-1"
+         width="1.3500642"
+         height="1"
+         x="15.986171"
+         y="10.94536"
+         rx="0.0093010161"
+         ry="0.065390877" />
+    </g>
+    <g
+       transform="translate(0,14.944181)"
+       style="display:inline;fill:#555753;fill-opacity:1"
+       id="g3182-8"
+       inkscape:export-filename="/home/brad/exposong/share/exposong/res/icons/g3182-3.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         style="color:#000000;fill:#555753;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible"
+         id="rect15686-53"
+         width="17.378685"
+         height="1"
+         x="18.621315"
+         y="11"
+         rx="0.11972722"
+         ry="0.065390877" />
+      <rect
+         style="color:#000000;fill:#555753;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible"
+         id="rect15686-0-9"
+         width="1.3500642"
+         height="1"
+         x="15.986171"
+         y="10.94536"
+         rx="0.0093010161"
+         ry="0.065390877" />
+    </g>
+    <g
+       transform="translate(0,26.15232)"
+       style="display:inline;fill:#555753;fill-opacity:1"
+       id="g3182-41"
+       inkscape:export-filename="/home/brad/exposong/share/exposong/res/icons/g3182-3.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         style="color:#000000;fill:#555753;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible"
+         id="rect15686-54"
+         width="17.378685"
+         height="1"
+         x="18.621315"
+         y="11"
+         rx="0.11972722"
+         ry="0.065390877" />
+      <rect
+         style="color:#000000;fill:#555753;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible"
+         id="rect15686-0-15"
+         width="1.3500642"
+         height="1"
+         x="15.986171"
+         y="10.94536"
+         rx="0.0093010161"
+         ry="0.065390877" />
+    </g>
+    <g
+       transform="translate(0,18.680228)"
+       style="display:inline;fill:#555753;fill-opacity:1"
+       id="g3182-5"
+       inkscape:export-filename="/home/brad/exposong/share/exposong/res/icons/g3182-3.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         style="color:#000000;fill:#555753;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible"
+         id="rect15686-4"
+         width="17.378685"
+         height="1"
+         x="18.621315"
+         y="11"
+         rx="0.11972722"
+         ry="0.065390877" />
+      <rect
+         style="color:#000000;fill:#555753;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible"
+         id="rect15686-0-98"
+         width="1.3500642"
+         height="1"
+         x="15.986171"
+         y="10.94536"
+         rx="0.0093010161"
+         ry="0.065390877" />
+    </g>
+    <g
+       transform="translate(0,22.416274)"
+       style="display:inline;fill:#555753;fill-opacity:1"
+       id="g3182-3"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         style="color:#000000;fill:#555753;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible"
+         id="rect15686-8"
+         width="17.378685"
+         height="1"
+         x="18.621315"
+         y="11"
+         rx="0.11972722"
+         ry="0.065390877" />
+      <rect
+         style="color:#000000;fill:#555753;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;marker:none;visibility:visible;display:block;overflow:visible"
+         id="rect15686-0-5"
+         width="1.3500642"
+         height="1"
+         x="15.986171"
+         y="10.94536"
+         rx="0.0093010161"
+         ry="0.065390877" />
+    </g>
   </g>
 </svg>
