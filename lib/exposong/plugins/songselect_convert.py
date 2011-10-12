@@ -18,7 +18,7 @@
 import gtk
 import gtk.gdk
 
-from openlyrics import openlyrics
+from exposong_openlyrics import openlyrics
 
 import exposong.main
 import exposong.slidelist
