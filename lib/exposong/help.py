@@ -40,7 +40,8 @@ class Help(exposong._hook.Menu, object):
         "Show the file in the web browser."
         all_ = self._header() + self._about() + self._schedules() +\
                 self._presentations() + self._notifications() +\
-                self._backgrounds() + self._shortcuts_table()
+                self._backgrounds() + self._shortcuts_table() +\
+                self._footer()
         
         f = open(self.helpfile, "w")
         f.write(all_)
@@ -117,7 +118,7 @@ to be taken to the download page?")% version
     
     def _header(self):
         'Returns the html header for the help page'
-        header = """<head>
+        header = """<html>\n<head>
     <title>%(title)s</title>
     <meta http-equiv="content-type" content="text-html; charset=utf-8">
     <link rel='stylesheet' href='%(stylepath)s' content='text/css'>
@@ -213,7 +214,7 @@ many colors make the text difficult to read.'))
                      [_("New Schedule"), _("Ctrl-N")],
                      [_("Find Presentation"), _("Ctrl-F")]]
         
-        table = self._h(_('Shortcut Keys')) + '<table border="2" cellpadding="5"'
+        table = self._h(_('Shortcut Keys')) + '<table border="2" cellpadding="5">'
         
         for row in shortcuts:
             if not row[1]:
@@ -223,6 +224,16 @@ many colors make the text difficult to read.'))
         table += '</table>'
         return table
     
+    def _footer(self):
+        'Returns the html footer for the help page'
+        footer = "</div>" # id:content
+        footer += "<div id='footer'>\n"
+        footer += "%s --<a href='http://exposong.org'>%s</a>\n" %\
+                  (_("Thank you for your continued support."),
+                   _("The Exposong Team"))
+        footer += "</div>\n"
+        footer += "</body>\n</html>"
+        return footer
     
     def _p(self, text):
         'Wrap text in HTML <p> element'
