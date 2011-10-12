@@ -127,7 +127,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
                     preslist.unset_rows_drag_dest()
         try:
             enable = isinstance(sched, exposong.schedule.Schedule)\
-                     and not sched.builtin
+                     and not sched.is_builtin()
         except UnboundLocalError:
             enable = False
 
@@ -139,7 +139,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
     def _on_sched_delete(self, action):
         'Delete the selected schedule.'
         item = self.get_active_item()
-        if not item or item.builtin:
+        if not item or item.is_builtin():
             return False
         win = self
         while not isinstance(win, gtk.Window):
@@ -164,8 +164,8 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
         if drop_info:
             path, position = drop_info
             model = treeview.get_model()
-            val = model.get_value(model.get_iter(path), 0)
-            if val and not val.builtin:
+            sched = model.get_value(model.get_iter(path), 0)
+            if sched and not sched.is_builtin():
                 return
         return True
     
@@ -220,7 +220,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
         sched = model.get_value(iter1, 0)
         cell.set_property('editable',
                           isinstance(sched, exposong.schedule.Schedule)
-                          and sched.builtin is False)
+                          and sched.is_builtin() is False)
     
     def _row_separator(self, model, itr):
         "Determines wheter the current row should be a separator"
@@ -241,7 +241,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
     def _on_rt_click(self, widget, event):
         'The user right clicked in the schedule area.'
         if event.button == 3:
-            if widget.get_active_item() and not widget.get_active_item().builtin:
+            if widget.get_active_item() and not widget.get_active_item().is_builtin():
                 menu = gtk.Menu()
                 menu.append(self._actions.get_action('sched-rename').create_menu_item())
                 menu.append(self._actions.get_action('sched-delete').create_menu_item())

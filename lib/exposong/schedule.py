@@ -38,13 +38,13 @@ class Schedule:
             self._model = gtk.ListStore(*preslist.PresList.get_model_args())
         else:
             self._model = model
-        self._model.builtin = True
         
         if filename == None:
             self.filename = os.path.join(DATA_PATH, "sched")
         else:
             self.filename = filename
-        self.builtin = builtin
+
+        self._model.builtin = builtin
         if builtin:
             mod = self.get_model(True)
             mod.set_sort_func(0, self._column_sort)
@@ -60,7 +60,7 @@ class Schedule:
     def load(self, dom, library):
         'Loads from an xml file.'
         self.clear()
-        self.builtin = False
+        self._model.builtin = False
         self.title = get_node_text(dom.findall("title")[0])
         for presNode in dom.findall("presentation"):
             filenm = ""
@@ -116,7 +116,7 @@ class Schedule:
     
     def append(self, pres, comment = ""):
         'Add a presentation to the schedule.'
-        if not self.builtin:
+        if not self.is_builtin():
             exposong.log.info('Adding %s presentation "%s" to schedule "%s".',
                               pres.get_type(), pres.get_title(), self.title)
         if isinstance(pres, ScheduleItem):
@@ -157,9 +157,12 @@ class Schedule:
             mod = mod.get_model()
         return mod
     
+    def is_builtin(self):
+        return self._model.builtin
+    
     def is_reorderable(self):
         'Checks to see if the list should be reorderable.'
-        return not self.builtin
+        return not self.is_builtin()
     
     def find(self, filename):
         'Searches the schedule for the matching filename.'
@@ -181,7 +184,7 @@ class Schedule:
     
     def resort(self):
         'Force the model to resort'
-        if self.builtin:
+        if self.is_builtin():
             self.get_model(True).set_sort_func(0, self._column_sort)
     
     @staticmethod

@@ -151,7 +151,7 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
          * The user presses the PgUp/PgDn key at the beginning/end of the list twice
          * The schedule is a user-defined one
          * The current presentation is not the last respectively the first one in the schedule.'''
-        if exposong.schedlist.schedlist.get_active_item().builtin:
+        if exposong.schedlist.schedlist.get_active_item().is_builtin():
             return
         preslist = exposong.preslist.preslist
         if self.__pres_mv == 1 and not preslist.is_last_pres_active():

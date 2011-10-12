@@ -252,10 +252,10 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
 
     def _on_pres_remove_from_schedule(self, *args):
         'Remove the presentation from the current schedule.'
-        sched, itr = self.get_selection().get_selected()
-        if not itr or sched.builtin:
+        model, itr = self.get_selection().get_selected()
+        if not itr or model.builtin:
             return False
-        sched.remove(itr)
+        model.remove(itr)
     
     def _get_row_icon(self, column, cell, model, titer):
         'Returns the icon of the current presentation.'
