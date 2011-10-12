@@ -124,14 +124,13 @@ class Theme(object):
     def revert(self):
         """"
         Revert all changes and reload the theme from the file
-        or reset changes if no file exists
+        when the theme was saved before
         """
+        self._init_sections()
+        self.meta = {}
+        self.backgrounds = []
         if self.filename:
             self.load(etree.parse(os.path.join(DATA_PATH, 'theme', self.filename)))
-        else:
-            self._init_sections()
-            self.meta = {}
-            self.backgrounds = []
     
     def load(self, tree):
         "Load the theme from an XML file."
