@@ -77,6 +77,7 @@ class ThemeEditor(gtk.Window):
                ("add-background-image",_('Add Image'), gtk.gdk.MOD1_MASK, 0,
                 'pymserv')])
         
+        #Background Toolbar
         toolbar = gtk.Toolbar()
         btn = gtk.ToolButton(gtk.stock_lookup('add-background-image')[0])
         btn.set_tooltip_markup(_("Add a new Image Background"))
@@ -98,11 +99,15 @@ class ThemeEditor(gtk.Window):
         button.connect('clicked', self._on_delete_bg)
         toolbar.insert(button, -1)
         
+        # Background Treeview Columns
         self._bg_model = gtk.ListStore(gobject.TYPE_PYOBJECT)
         self._column_bgs = gtk.TreeViewColumn(_("Backgrounds"))
         textrend = gtk.CellRendererText()
         self._column_bgs.pack_start(textrend)
         self._column_bgs.set_cell_data_func(textrend, self._bg_get_row_text)
+        colorrend = gtk.CellRendererText()
+        self._column_bgs.pack_start(colorrend)
+        self._column_bgs.set_cell_data_func(colorrend, self._bg_get_row_color)
         self._treeview_bgs.append_column(self._column_bgs)
         self._treeview_bgs.set_size_request(90,200)
         self._treeview_bgs.set_model(self._bg_model)
@@ -652,9 +657,24 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
             self._set_changed(True)
     
     def _bg_get_row_text(self, column, cell, model, titer):
-        'Sets the row to the background name'
+        'Get the background name for the cell'
         bg = model.get_value(titer, 0)
-        cell.set_property('text', bg.get_name())
+        if isinstance(bg, exposong.theme.ImageBackground):
+            cell.set_property('text', "%s: %s"%(bg.get_name(), bg.src))
+        else:
+            cell.set_property('text', bg.get_name())
+    
+    def _bg_get_row_color(self, column, cell, model, titer):
+        'Get the background color for the cell'
+        bg = model.get_value(titer, 0)
+        if isinstance(bg, exposong.theme.ColorBackground):
+            cell.set_property('cell-background', bg.color)
+        elif isinstance(bg, exposong.theme.GradientBackground):
+            cell.set_property('cell-background', bg.stops[0].color)
+        elif isinstance(bg, exposong.theme.RadialGradientBackground):
+            cell.set_property('cell-background', bg.stops[0].color)
+        else:
+            cell.set_property('cell-background', None)
     
     
     ###########################
