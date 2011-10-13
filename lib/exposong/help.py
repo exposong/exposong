@@ -34,7 +34,7 @@ class Help(exposong._hook.Menu, object):
     like a Browser help page and an update check
     """
     def __init__(self):
-        self.helpfile = os.path.join(DATA_PATH, 'help.html')
+        self.helpfile = os.path.join(DATA_PATH, '.cache' 'help.html')
     
     def show(self, *args):
         "Show the file in the web browser."
@@ -211,7 +211,7 @@ many colors make the text difficult to read.'))
                      [_("Next Presentation"), _("Control-Page Down")],
                      [_("Previous Presentation"), _("Control-Page Up")],
                      [_("Other"), None],
-                     [_("New Schedule"), _("Ctrl-N")],
+                     [_("New Song"), _("Ctrl-N")],
                      [_("Find Presentation"), _("Ctrl-F")]]
         
         table = self._h(_('Shortcut Keys')) + '<table border="2" cellpadding="5">'
