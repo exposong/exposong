@@ -42,6 +42,9 @@ class ThemeEditor(gtk.Window):
         self.set_transient_for(parent)
         self.set_title(_("ExpoSong Theme Editor"))
         
+        # True when all widgets are filled with values from theme.
+        self.__ready = False
+        # Used when updating position spinners
         self.__updating = False
         self._do_layout()
         self._load_theme(theme_)
@@ -262,6 +265,9 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         Called when any part of the body section was changed to update
         the theme and the preview
         """
+        if not self.__ready: #Only allow when everything is loaded from theme.
+            return
+        
         self._set_changed()
         body = self.theme.get_body()
         
@@ -274,9 +280,9 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         
         body.spacing = self.body_widgets['line_spacing'].get_value()
         body.shadow_color = self.body_widgets['shadow_color'].get_color().to_string()
-        body.shadow_opacity = self.body_widgets['shadow_color'].get_alpha()/65535.0
-        body.shadow_offset[0] = self.body_widgets['shadow_x_offset'].get_value()
-        body.shadow_offset[1] = self.body_widgets['shadow_y_offset'].get_value()
+        body.shadow_opacity = round(self.body_widgets['shadow_color'].get_alpha()/65535.0, 1)
+        body.shadow_offset[0] = round(self.body_widgets['shadow_x_offset'].get_value(), 1)
+        body.shadow_offset[1] = round(self.body_widgets['shadow_y_offset'].get_value(), 1)
         body.outline_size = self.body_widgets['outline_size'].get_value()
         body.outline_color = self.body_widgets['outline_color'].get_color().to_string()
         
@@ -287,6 +293,9 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         Called when any part of the footer section was changed to update
         the theme and the preview
         """
+        if not self.__ready: #Only allow when everything is loaded from theme
+            return
+        
         self._set_changed()
         footer = self.theme.get_footer()
         
@@ -299,8 +308,9 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         
         footer.spacing = self.footer_widgets['line_spacing'].get_value()
         footer.shadow_color = self.footer_widgets['shadow_color'].get_color().to_string()
-        footer.shadow_offset[0] = self.footer_widgets['shadow_x_offset'].get_value()
-        footer.shadow_offset[1] = self.footer_widgets['shadow_y_offset'].get_value()
+        footer.shadow_opacity = round(self.footer_widgets['shadow_color'].get_alpha()/65535.0, 1)
+        footer.shadow_offset[0] = round(self.footer_widgets['shadow_x_offset'].get_value(), 1)
+        footer.shadow_offset[1] = round(self.footer_widgets['shadow_y_offset'].get_value(), 1)
         footer.outline_size = self.footer_widgets['outline_size'].get_value()
         footer.outline_color = self.footer_widgets['outline_color'].\
                 get_color().to_string()
@@ -883,8 +893,9 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self.footer_widgets['line_spacing'].set_value(footer.spacing)
         self.footer_widgets['shadow_color'].set_color(gtk.gdk.Color(footer.shadow_color))
         self.footer_widgets['shadow_color'].set_alpha(int(body.shadow_opacity*65535))
-        self.footer_widgets['shadow_x_offset'].set_value(footer.shadow_offset[0])
-        self.footer_widgets['shadow_y_offset'].set_value(footer.shadow_offset[1])
+        if footer.shadow_offset:
+            self.footer_widgets['shadow_x_offset'].set_value(footer.shadow_offset[0])
+            self.footer_widgets['shadow_y_offset'].set_value(footer.shadow_offset[1])
         self.footer_widgets['outline_size'].set_value(footer.outline_size)
         self.footer_widgets['outline_color'].set_color(
                 gtk.gdk.Color(footer.outline_color))
@@ -895,6 +906,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
                 self._meta[key].set_text(value)
         
         self._set_changed(False)
+        self.__ready = True
     
     def _revert_changes(self, *args):
         'Reverts all unsaved changes'
