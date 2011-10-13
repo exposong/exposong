@@ -527,10 +527,13 @@ class Main (gtk.Window):
 
     def save_state(self):
         'Saves the state of the panes in the window'
-        config.config.set("main_window", "left-paned",
-                                            str(self.win_lft.get_position()))
-        config.config.set("main_window", "main-paned",
-                                            str(self.win_h.get_position()))
+        # Only save the pane's states if the window is not maximized
+        # (otherwise it will cause trouble when minimizing the window)
+        if config.config.get("main_window", "maximized") == "False":
+            config.config.set("main_window", "left-paned",
+                                                str(self.win_lft.get_position()))
+            config.config.set("main_window", "main-paned",
+                                                str(self.win_h.get_position()))
 
     def _quit(self, *args):
         'Cleans up and exits the program.'
