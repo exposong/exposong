@@ -1,4 +1,6 @@
 #
+# vim: ts=4 sw=4 expandtab ai:
+#
 # Copyright (C) 2008-2011 Exposong.org
 #
 # ExpoSong is free software: you can redistribute it and/or modify
@@ -21,10 +23,8 @@ import shutil
 import random
 import gobject
 
-if __name__ == '__main__': #For testing
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-
 import exposong.theme
+import exposong.exampleslide
 from exposong import gui
 from exposong import DATA_PATH
 from exposong.config import config
@@ -206,7 +206,7 @@ the first element in this list moving to the last one."), 0)
         bounds = widget.get_size_request()
         #ccontext.scale(float(400)/bounds[0],
         #                float(300)/bounds[1])
-        self._example_slide = _ExampleSlide()
+        self._example_slide = exposong.exampleslide._ExampleTextSlide()
         self.theme.render(ccontext, bounds, self._example_slide)
         return True
     
@@ -962,37 +962,3 @@ Do you want to save?")
         if __name__ == "__main__":
             gtk.main_quit()
 
-
-class _ExampleSlide(object):
-    """
-    A slide to draw as an example for the preview widget.
-    """
-    def __init__(self):
-        object.__init__(self)
-        self.body = [
-                exposong.theme.Text('\n'.join([
-                        'Amazing grace, how sweet the sound, ',
-                        'That saved a wretch like me! ',
-                        'I once was lost, but now I am found, ',
-                        'Was blind, but now I see.']),
-                    pos=[0.0, 0.0, 1.0, 1.0], margin=10),
-                ]
-        self.foot = [exposong.theme.Text('\n'.join([
-                        '"Amazing Grace"',
-                        'Text: John Newton',
-                        'Copyright &#169;: Public Domain'
-        ]))]
-    
-    def get_body(self):
-        "Returns the body of the "
-        return self.body
-    
-    def get_footer(self):
-        return self.foot
-    
-    def get_slide(self):
-        return NotImplemented
-
-if __name__ == "__main__":
-    ThemeEditor(None, exposong.theme.Theme())
-    gtk.main()
