@@ -40,7 +40,7 @@ class Help(exposong._hook.Menu, object):
         "Show the file in the web browser."
         all_ = self._header() + self._about() + self._schedules() +\
                 self._presentations() + self._notifications() +\
-                self._backgrounds() + self._shortcuts_table() +\
+                self._themes() + self._shortcuts_table() +\
                 self._footer()
         
         f = open(self.helpfile, "w")
@@ -137,40 +137,39 @@ to be taken to the download page?")% version
         'Returns the introduction paragraph for the help page'
         about = self._h(_('About')) +\
                 self._p(_('ExpoSong is a free, open-source, presentation \
-program to assist with worship assemblies. Create lyrics or plain-text slides, \
-create schedules, and put up slides on the screen.'))
+program to assist with worship assemblies. Create lyrics or custom \
+presentations, create schedules, and create custom themes.'))
         return about
     
     def _schedules(self):
         'Returns the schedules paragraph for the help page'
         schedules = self._h(_('Schedules')) +\
                 self._p(_('Schedules are used to create an order of presentations.')) +\
-                self._p(_('To create a schedule, in the menu, select Schedule-&gt;\
-New. Name your schedule, according to the date or event. Add songs to the \
-schedule by dragging them from the library onto the schedule.'))
+                self._p(_('To create a schedule, in the menu, select \
+File-New-New Schedule. We suggest you name your schedule with the date, along \
+with an event description if needed. Add songs to the schedule by dragging \
+them onto the schedule, or Edit-Current Presentation-Add to Schedule.'))
         return schedules
     
     def _presentations(self):
         'Returns the Presentations parapraph of the help page'
         presentations = self._h(_('Creating Presentations')) +\
-                self._p(_('Presentations are a set of slides to be presented on the screen. \
-To create a new presentation, on the menu, select Presentation-&gt;New, and \
-then the appropriate presentation type.')) +\
-            self._p(_('Add, edit, or delete slides using the toolbar buttons. \
-In a schedule, you can drag and drop slides to reorder the slides.')) +\
-            self._p(_('The <b>text</b> presentation is used to create a non-specific, \
-text slide. It can be used for sermons, announcements, or anything else.')) +\
-            self._p(_('The <b>lyric</b> presentation is for song lyrics. It contains \
-slide descriptors, such as "Verse #", "Chorus", "Bridge", or "Refrain", which are \
-for the benefit of the presenter. There are some information tabs, and some of \
-the data from this area, like author, songbook number, copyright and ccli \
-number, are displayed on the bottom of the presentation screen.')) +\
+                self._p(_('Presentations are a set of slides to be presented \
+on the screen. To create a new presentation, on the menu, select File-New, and \
+select New Song or New ExpoSong Presentation.')) +\
+            self._p(_('Lyric presentations')) +\
+            self._p(_('The <b>ExpoSong Presentation</b> is used to create \
+general presentations. It can be used for  sermons, announcements, or anything \
+other than lyrics. Currently, the only content can be text or images, but other \
+media may be available in future releases.')) +\
+            self._p(_('The <b>Song</b> presentation type is for song lyrics. The \
+slides can be verses, choruses, or other lyrics parts, and can contain indexes \
+(such as Verse 1, Verse 2). Songs can contain metadata as well, such as author, \
+songbook number, copyright and ccli number, which may be displayed on the \
+screen with the Lyric.')) +\
             self._p(_('Lyric presentations can also be reordered. Use the verse \
-names in brackets and enter them in the order you wish to have in the "Order" \
-field, for example: "v1 c v2 b c e"')) +\
-            self._p(_('The <b>image</b> presentation is used to present images. \
-Add multiple images at once by using [shift] or [control] in the add dialog. \
-Rearrange images by using drag-and-drop.'))
+names in quotes and enter them in the order you wish to have separated by \
+spaces in the "Order" field, for example: "v1 c v2 b c e"'))
         return presentations
         
     def _notifications(self):
@@ -183,17 +182,24 @@ the preview screen. Use the buttons right to it to display and remove the \
 message.'))
         return notifications
     
-    def _backgrounds(self):
-        'Returns the backgrounds paragraph of the help page'
-        backgrounds = self._h(_('Backgrounds')) +\
-                self._p(_('The background image for presentations can be a gradient \
-or an image file. Change the image by using the controls next to the \
-preview screen.')) +\
-                self._h(_('Background Image Tips'), 2) +\
-                self._p(_('Background images should generally have a soft focus to them, \
-and use a minimal amount of contrast. Backgrounds with hard lines, or with \
-many colors make the text difficult to read.'))
-        return backgrounds
+    def _themes(self):
+        'Returns the themes paragraph of the help page.'
+        themes = self._h(_('Themes')) +\
+                self._p(_('Themes can be created by using File-New-New Theme. \
+The first part of a theme is the background. It can consist of images, solid \
+colors, and gradient (which is a gradual change from one color to the next).')) +\
+                self._p(_('The body and footer text can be moved and modified \
+in font name and size, color, alignment, line spacing (from one row to the \
+next), the text shadow\'s color and offset, and a text outline size and color.')) +\
+                self._p(_('Both backgrounds and body and footer texts can be \
+moved to different positions using the form under the preview.')) +\
+                self._p(_('Metadata, such as author, copyright, and tags can \
+also be added to the theme using the tab.')) +\
+                self._h(_('Background Tips'), 2) +\
+                self._p(_('Presentation backgrounds should generally have a \
+soft focus to them, and use a minimal amount of contrast. Backgrounds with hard \
+lines, or with many colors make the text difficult to read.'))
+        return themes
     
     def _shortcuts_table(self):
         'Returns a html table with the shortcuts used in ExpoSong listed'
