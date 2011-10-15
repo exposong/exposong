@@ -754,10 +754,15 @@ class _RenderableSection(_Renderable):
         _Renderable.draw(self, ccontext, bounds)
         self._section = self._expand = None
         
-        self.rpos[0] += self.margin
-        self.rpos[1] += self.margin
-        self.rpos[2] -= self.margin
-        self.rpos[3] -= self.margin
+        if self.margin > 1.0:
+            self.margin = 0.02
+        sx1, sy1, sx2, sy2 = ccontext.clip_extents()
+        mx = (sx2 - sx1) * self.margin * 0.5
+        my = (sy2 - sy1) * self.margin * 0.5
+        self.rpos[0] += mx
+        self.rpos[1] += my
+        self.rpos[2] -= mx
+        self.rpos[3] -= my
         assert self.rpos[0] < self.rpos[2]
         assert self.rpos[1] < self.rpos[3]
 

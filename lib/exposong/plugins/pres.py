@@ -960,8 +960,8 @@ A value of 0 is on the far left or top, and a value of 1 is on the far right or 
         self._p['bt'].set_numeric(True)
         self._p['bt'].connect('changed', self._on_change_pos)
         
-        adjust = gtk.Adjustment(el.margin, 0, 40, 1, 5)
-        self._p['mg'] = table.attach_spinner(adjust, 1, 0, label=_('Margin:'),
+        adjust = gtk.Adjustment(el.margin, 0.0, 1.0, 0.01, 0.05)
+        self._p['mg'] = table.attach_spinner(adjust, 0.01, 2, label=_('Margin:'),
                                              y=2, w=2)
         self._p['mg'].set_numeric(True)
         self._p['mg'].connect('changed', self._on_change_mg)
@@ -1126,7 +1126,7 @@ A value of 0 is on the far left or top, and a value of 1 is on the far right or 
             return
         el = self.get_selected_element()
         if el is False: return False
-        el.margin = int(editable.get_value())
+        el.margin = editable.get_value()
         self._set_changed()
     
     def _on_change_al(self, combobox):

@@ -42,12 +42,13 @@ class _ExampleTextSlide(object):
                         'Phasellus ac mauris a mauris elementum convallis.',
                         'Cras vel magna semper nisi mattis feugiat.',
                         'Sed consectetur dolor eu est iaculis convallis.']),
-                    pos=[0.0, 0.0, 1.0, 1.0], margin=10),
+                    margin=0.04),
                 ]
         self.foot = [exposong.theme.Text('\n'.join([
                         '"Lorum Ipsum" Text',
                         _('Written by: %s') % 'Cicero (45 B.C.)',
-                        _('Generated from: %s') % 'http://lipsum.com']))
+                        _('Generated from: %s') % 'http://lipsum.com']),
+                    margin=0.04)
                 ]
     
     def get_body(self):
@@ -55,11 +56,10 @@ class _ExampleTextSlide(object):
         return self.body
     
     def get_footer(self):
-    	"Returns the slide footer text."
+        "Returns the slide footer text."
         return self.foot
     
     def get_slide(self):
         return NotImplemented
 
-# It might be useful to have an overriding slide
-
+# Add image or other example slides if needed.
