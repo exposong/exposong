@@ -72,7 +72,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                 self._theme = value.get("theme", '')
                 for el in value:
                     k = {}
-                    k['margin'] = int(el.get('margin', 0))
+                    k['margin'] = el.get('margin', 0)
                     k['pos'] = [0,0,0,0]
                     k['pos'][0] = float(el.get('x1', 0.0))
                     k['pos'][1] = float(el.get('y1', 0.0))
