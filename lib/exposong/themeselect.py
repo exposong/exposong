@@ -30,6 +30,7 @@ from gtk.gdk import pixbuf_new_from_file as pb_new
 import exposong.main
 import exposong.screen
 import exposong.theme
+import exposong.exampleslide
 from exposong import themeeditor
 from exposong import DATA_PATH
 from exposong.config import config
@@ -51,7 +52,7 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         
         gtk.ComboBox.__init__(self, self.liststore)
         themerend = CellRendererTheme()
-        themerend.slide = _ExampleSlide()
+        themerend.slide = exposong.exampleslide._ExampleTextSlide()
         self.pack_start(themerend, False)
         self.add_attribute(themerend, 'theme', 1)
         textrend = gtk.CellRendererText()
@@ -405,31 +406,4 @@ class CellRendererTheme(gtk.GenericCellRenderer):
     def do_get_property(self, pspec):
         return getattr(self, pspec.name)
 gobject.type_register(CellRendererTheme)
-
-class _ExampleSlide(object):
-    """
-    A slide to draw as an example for the theme selection widget.
-    """
-    def __init__(self):
-        object.__init__(self)
-        self.id = '_example'
-        self.body = [
-                exposong.theme.Text('\n'.join([
-                        'Amazing grace, how sweet the sound, ',
-                        'That saved a wretch like me! ',
-                        'I once was lost, but now I am found, ',
-                        'Was blind, but now I see.']),
-                    pos=[0.0, 0.0, 1.0, 1.0], margin=10,
-                    align=exposong.theme.CENTER, valign=exposong.theme.MIDDLE),
-                ]
-        self.foot = []
-
-    def get_body(self):
-        return self.body
-    
-    def get_footer(self):
-        return self.foot
-    
-    def get_slide(self):
-        return NotImplemented
 

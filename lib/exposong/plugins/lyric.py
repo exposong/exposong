@@ -127,12 +127,12 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         def get_footer(self):
             'Return a list of renderable theme items.'
             f = [theme.Text(self.footer_text(), align=theme.CENTER, 
-                 valign=theme.MIDDLE, pos=[0.25, 0.0, 0.75, 1.0], margin=5)]
+                 valign=theme.MIDDLE, pos=[0.25, 0.0, 0.75, 1.0], margin=0.02)]
             for s in self.pres.song.props.songbooks:
                 if s.name == config.get("songs","songbook"):
                     f.append(theme.Text("<big>%s</big>\n<small>%s</small>" % \
                              (s.entry, s.name), pos=[0.0, 0.0, 0.25, 1.0],
-                             align=theme.LEFT, valign=theme.BOTTOM, margin=5))
+                             align=theme.LEFT, valign=theme.BOTTOM, margin=0.02))
                     break
             return f
         

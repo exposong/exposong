@@ -78,7 +78,7 @@ class Presentation:
         
         def get_body(self):
             'Return a list of renderable theme items.'
-            return [theme.Text(self.get_text())]
+            return [theme.Text(self.get_text(), margin=0.04)]
         
         def get_footer(self):
             'Return a list of renderable theme items.'

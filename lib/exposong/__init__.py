@@ -195,7 +195,11 @@ if options.reset:
         shutil.rmtree(DATA_PATH)
     dlg.destroy()
 elif options.clear_cache:
-    shutil.rmtree(os.path.join(DATA_PATH,'.cache'))
+    log.info("Cleared ExpoSong's cache.")
+    try:
+        shutil.rmtree(os.path.join(DATA_PATH,'.cache'))
+    except OSError:
+        pass
 
 # Initialize the data directories. This assumes that if they exist, they are
 # either directories or symlinks. We might need to handle the case where they
