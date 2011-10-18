@@ -34,13 +34,13 @@ class Help(exposong._hook.Menu, object):
     like a Browser help page and an update check
     """
     def __init__(self):
-        self.helpfile = os.path.join(DATA_PATH, '.cache' 'help.html')
+        self.helpfile = os.path.join(DATA_PATH, '.cache', 'help.html')
     
     def show(self, *args):
         "Show the file in the web browser."
-        all_ = self._header() + self._about() + self._schedules() +\
-                self._presentations() + self._notifications() +\
-                self._themes() + self._shortcuts_table() +\
+        all_ = self._header() + self._about() + self._presentations() +\
+                self._schedules() + self._themes() +\
+                self._notifications() + self._shortcuts_table() +\
                 self._footer()
         
         f = open(self.helpfile, "w")
@@ -109,12 +109,6 @@ to be taken to the download page?")% version
             if fl:
                 fl.close()
         return (new_version, msg, err)
-        
-        
-    def delete_help_file(self):
-        'Deletes the generated help file'
-        if os.path.exists(self.helpfile):
-            os.remove(self.helpfile)
     
     def _header(self):
         'Returns the html header for the help page'
@@ -146,18 +140,17 @@ presentations, create schedules, and create custom themes.'))
         schedules = self._h(_('Schedules')) +\
                 self._p(_('Schedules are used to create an order of presentations.')) +\
                 self._p(_('To create a schedule, in the menu, select \
-File-New-New Schedule. We suggest you name your schedule with the date, along \
+File|New|New Schedule. We suggest you name your schedule with the date, along \
 with an event description if needed. Add songs to the schedule by dragging \
-them onto the schedule, or Edit-Current Presentation-Add to Schedule.'))
+them onto the schedule, or Edit|Current Presentation|Add to Schedule.'))
         return schedules
     
     def _presentations(self):
         'Returns the Presentations parapraph of the help page'
         presentations = self._h(_('Creating Presentations')) +\
                 self._p(_('Presentations are a set of slides to be presented \
-on the screen. To create a new presentation, on the menu, select File-New, and \
+on the screen. To create a new presentation, on the menu, select File|New, and \
 select New Song or New ExpoSong Presentation.')) +\
-            self._p(_('Lyric presentations')) +\
             self._p(_('The <b>ExpoSong Presentation</b> is used to create \
 general presentations. It can be used for  sermons, announcements, or anything \
 other than lyrics. Currently, the only content can be text or images, but other \
@@ -167,7 +160,7 @@ slides can be verses, choruses, or other lyrics parts, and can contain indexes \
 (such as Verse 1, Verse 2). Songs can contain metadata as well, such as author, \
 songbook number, copyright and ccli number, which may be displayed on the \
 screen with the Lyric.')) +\
-            self._p(_('Lyric presentations can also be reordered. Use the verse \
+            self._p(_('Song presentations can also be reordered. Use the verse \
 names in quotes and enter them in the order you wish to have separated by \
 spaces in the "Order" field, for example: "v1 c v2 b c e"'))
         return presentations
@@ -185,7 +178,7 @@ message.'))
     def _themes(self):
         'Returns the themes paragraph of the help page.'
         themes = self._h(_('Themes')) +\
-                self._p(_('Themes can be created by using File-New-New Theme. \
+                self._p(_('Themes can be created by using File|New|New Theme. \
 The first part of a theme is the background. It can consist of images, solid \
 colors, and gradient (which is a gradual change from one color to the next).')) +\
                 self._p(_('The body and footer text can be moved and modified \
@@ -194,7 +187,7 @@ next), the text shadow\'s color and offset, and a text outline size and color.')
                 self._p(_('Both backgrounds and body and footer texts can be \
 moved to different positions using the form under the preview.')) +\
                 self._p(_('Metadata, such as author, copyright, and tags can \
-also be added to the theme using the tab.')) +\
+also be added to the theme using the tab. This information will not appear on the screen.')) +\
                 self._h(_('Background Tips'), 2) +\
                 self._p(_('Presentation backgrounds should generally have a \
 soft focus to them, and use a minimal amount of contrast. Backgrounds with hard \
@@ -206,19 +199,19 @@ lines, or with many colors make the text difficult to read.'))
         # value None means "this is a heading"
         shortcuts = [[_("Screen"), None],
                      [_("Present"), "F5"],
-                     [_("Logo Screen"), _("Control-g")],
-                     [_("Black Screen"), "b"],
+                     [_("Logo Screen"), _("Ctrl+G")],
+                     [_("Black Screen"), "B"],
                      [_("Hide"), "Esc"],
                      [_("Slide Movement"), None],
-                     [_("Next Slide"), _("Down")],
-                     [_("Previous Slide"), _("Up")],
-                     [_("Next Slide (Use Order)"), _("Page Down")],
-                     [_("Previous Slide (Use Order)"), _("Page Up")],
-                     [_("Next Presentation"), _("Control-Page Down")],
-                     [_("Previous Presentation"), _("Control-Page Up")],
+                     [_("Next Slide"), _("Page Down")],
+                     [_("Previous Slide"), _("Page Up")],
+                     [_("Next Presentation"), _("Ctrl+Page Down")],
+                     [_("Previous Presentation"), _("Ctrl+Page Up")],
                      [_("Other"), None],
-                     [_("New Song"), _("Ctrl-N")],
-                     [_("Find Presentation"), _("Ctrl-F")]]
+                     [_("New Song"), _("Ctrl+N")],
+                     [_("Find Presentation"), _("Ctrl+F")],
+                     [_("Quit"), _("Ctrl+Q")]
+                     ]
         
         table = self._h(_('Shortcut Keys')) + '<table border="2" cellpadding="5">'
         
@@ -234,7 +227,7 @@ lines, or with many colors make the text difficult to read.'))
         'Returns the html footer for the help page'
         footer = "</div>" # id:content
         footer += "<div id='footer'>\n"
-        footer += "%s --<a href='http://exposong.org'>%s</a>\n" %\
+        footer += u"%s \u2013 <a href='http://exposong.org'>%s</a>\n" %\
                   (_("Thank you for your continued support."),
                    _("The Exposong Team"))
         footer += "</div>\n"

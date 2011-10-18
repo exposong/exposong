@@ -540,7 +540,6 @@ class Main (gtk.Window):
         self._save_schedules()
         self.save_state()
         config.config.write()
-        exposong.help.help.delete_help_file()
         gtk.main_quit()
 
 
