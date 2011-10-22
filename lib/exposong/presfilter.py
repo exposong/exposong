@@ -30,11 +30,13 @@ The PresFilter class will allow the user to search the presentations by text.
 
 import gtk
 import gobject
+import re
 
 import exposong.main
 import exposong.preslist
 
-presfilter = None #will hold PresFilter instance
+presfilter = None # will hold PresFilter instance
+blacklist = "[.,'?!]" # [ and ] are part of the regex
 
 class PresFilter(gtk.Entry, exposong._hook.Menu):
     """
@@ -50,7 +52,7 @@ class PresFilter(gtk.Entry, exposong._hook.Menu):
                                     (gobject.TYPE_STRING,))}
 
     SEARCH_TIMEOUT = 200
-
+    
     def __init__(self):
         "Initialize the PresFilter."
         gtk.Entry.__init__(self)
@@ -161,9 +163,17 @@ class PresFilter(gtk.Entry, exposong._hook.Menu):
 
     def _visible_func(self, model, itr):
         'Tests the row for visibility.'
+        global blacklist
         pres = model.get_value(itr, 0)
         if pres is not None:
-            return pres.matches(self.get_text())
+            for word in re.sub(blacklist, "", self.get_text()).split():
+                exposong.log.debug('Searching for "%s".',
+                                   word)
+                if not pres.matches(word):
+                    exposong.log.debug('"%s" not found in presentation "%s".',
+                                       word, pres.get_title())
+                    return False
+            return True
         return False
 
     def focus(self, *args):
@@ -186,3 +196,19 @@ class PresFilter(gtk.Entry, exposong._hook.Menu):
             """)
         # unmerge_menu not implemented, because we will never uninstall this as
         # a module.
+
+def matches(word, element):
+    "Takes an item, and tests it for a matching word."
+    if isinstance(element, (list, tuple)):
+        for item in element:
+            if matches(word, item):
+                return True
+    else:
+        regex = re.compile("\\b"+re.escape(word), re.U|re.I)
+        try:
+            if regex.search(str(element)):
+                return True
+        except:
+            pass
+
+    return False

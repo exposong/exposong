@@ -18,12 +18,14 @@
 
 import gtk
 import gtk.gdk
+import re
 from xml.etree import cElementTree as etree
 
 from exposong.glob import *
 from exposong import theme
 import exposong.main
 import exposong.schedlist
+import exposong.presfilter
 
 '''
 Abstract classes that create plugin functionality.
@@ -181,22 +183,19 @@ class Presentation:
         'Gets the slide index.'
         return int(order_value)
 
-    def matches(self, text):
-        'Tests to see if the presentation matches `text`.'
-        # Remove some punctuation marks from title and search text
-        blacklist = ".,'?!"
-        title = self.get_title()
-        for char in blacklist:
-            text = text.replace(char, "")
-            title = title.replace(char, "")
-        
-        regex = re.compile("\\b"+re.escape(text), re.U|re.I)
-        if regex.search(title):
+    def matches(self, word):
+        'Tests to see if a word is in the presentation.'
+        if exposong.presfilter.matches(word, self.get_title()):
+            exposong.log.debug("Matches presentation title")
             return True
-        if self.slides:
-            if hasattr(self.slides[0], 'text') and \
-                    regex.search(" ".join(s.title+" "+s.text for s in self.slides)):
+        for s in self.slides:
+            if exposong.presfilter.matches(word, s.get_title()):
+                exposong.log.debug("Matches slide title")
                 return True
+            if exposong.presfilter.matches(word, s.get_text()):
+                exposong.log.debug("Matches slide text")
+                return True
+        return False
     
     def edit(self):
         'Run the edit edit_dialog for the presentation.'

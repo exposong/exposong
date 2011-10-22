@@ -265,6 +265,45 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             i += 1
         exposong.log.warning("Slide in order does not exist: %s", order_value)
         return -1
+        
+    def matches(self, word):
+        'Tests to see if a word is in the presentation.'
+        if _abstract.Presentation.matches(self, word):
+            return True
+        if exposong.presfilter.matches(word, self.song.props.titles):
+            exposong.log.debug("Matches song title")
+            return True
+        if exposong.presfilter.matches(word, self.song.props.authors):
+            exposong.log.debug("Matches song author")
+            return True
+        if exposong.presfilter.matches(word, self.song.props.songbooks):
+            exposong.log.debug("Matches songbook")
+            return True
+        if exposong.presfilter.matches(word, self.song.props.themes):
+            exposong.log.debug("Matches song theme")
+            return True
+        if exposong.presfilter.matches(word, self.song.props.comments):
+            exposong.log.debug("Matches song comments")
+            return True
+        if exposong.presfilter.matches(word, self.song.props.ccli_no):
+            exposong.log.debug("Matches song ccli_no")
+            return True
+        if exposong.presfilter.matches(word, self.song.props.variant):
+            exposong.log.debug("Matches song variant")
+            return True
+        if exposong.presfilter.matches(word, self.song.props.keywords):
+            exposong.log.debug("Matches song keyword")
+            return True
+        if exposong.presfilter.matches(word, self.song.props.copyright):
+            exposong.log.debug("Matches song copyright")
+            return True
+        if exposong.presfilter.matches(word, self.song.props.publisher):
+            exposong.log.debug("Matches song publisher")
+            return True
+        if exposong.presfilter.matches(word, self.song.props.custom_version):
+            exposong.log.debug("Matches song custome version")
+            return True
+        return False
     
     def _edit_tabs(self, notebook, parent):
         'Run the edit dialog for the presentation.'
