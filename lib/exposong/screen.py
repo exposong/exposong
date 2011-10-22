@@ -226,9 +226,9 @@ class Screen(exposong._hook.Menu):
                 theme.render(ccontext, bounds, None)
             else:
                 theme.render(ccontext, bounds, slide)
-            exposong.notify.notify.draw(ccontext, bounds)
         else:
             theme.render(ccontext, bounds, slide)
+        exposong.notify.notify.draw(ccontext, bounds)
             
         return True
     
