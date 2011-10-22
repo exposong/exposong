@@ -16,6 +16,9 @@
      can be added to the text.
  * Improvements to the main window layout improve usability and appearance.
  * A title slide is now optional on Lyrics.
+ * Slides are shown in order in the list, and can be turned off with a checkbox
+   in the main window.
+ * Search is now by word, and searches both Songs and ExpoSong presentations.
  * Only one instance of ExpoSong is allowed to run at a time.
  * Control the presentation from the command line.
  * The users preferred Songbook will be displayed in Lyrics.

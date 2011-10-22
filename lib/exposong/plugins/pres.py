@@ -100,6 +100,14 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             self._set_id(value)
             _abstract.Presentation.Slide.__init__(self, pres, value)
         
+        def get_text(self):
+            'Returns the contents of text elements for the slide.'
+            l = []
+            for c in self._content:
+                if isinstance(c, theme.Text):
+                    l.append(escape(c.markup))
+            return "\n".join(l)
+        
         def get_theme(self):
             'Return the theme for this slide.'
             if self._theme:
