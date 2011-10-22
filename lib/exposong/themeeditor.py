@@ -239,6 +239,8 @@ the first element in this list moving to the last one."), 0)
         "Returns a table with the right part of the section edit controls"
         table = gui.ESTable(8, 1, row_spacing=10, auto_inc_y=True)
         widgets['shadow_title'] = table.attach_section_title(_("Text Shadow"))
+        widgets['shadow_apply'] = table.attach_checkbutton(_("Apply Shadow"))
+        widgets['shadow_apply'].connect('toggled', cb)
         widgets['shadow_color'] = table.attach_widget(
                 gtk.ColorButton(gtk.gdk.Color(0,0,0)), label=_("Color"))
         widgets['shadow_color'].set_use_alpha(True)
@@ -279,10 +281,15 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         body.valign = exposong.theme.get_valign_const(a)
         
         body.spacing = self.body_widgets['line_spacing'].get_value()
-        body.shadow_color = self.body_widgets['shadow_color'].get_color().to_string()
-        body.shadow_opacity = round(self.body_widgets['shadow_color'].get_alpha()/65535.0, 1)
-        body.shadow_offset[0] = round(self.body_widgets['shadow_x_offset'].get_value(), 1)
-        body.shadow_offset[1] = round(self.body_widgets['shadow_y_offset'].get_value(), 1)
+        if self.body_widgets['shadow_apply'].get_active():
+            body.shadow_color = self.body_widgets['shadow_color'].get_color().to_string()
+            body.shadow_opacity = round(self.body_widgets['shadow_color'].get_alpha()/65535.0, 1)
+            body.shadow_offset[0] = round(self.body_widgets['shadow_x_offset'].get_value(), 1)
+            body.shadow_offset[1] = round(self.body_widgets['shadow_y_offset'].get_value(), 1)
+            self._on_shadow_widgets_set_sensitive(self.body_widgets, True)
+        else:
+            body.shadow_color = None
+            self._on_shadow_widgets_set_sensitive(self.body_widgets, False)
         body.outline_size = self.body_widgets['outline_size'].get_value()
         body.outline_color = self.body_widgets['outline_color'].get_color().to_string()
         
@@ -307,15 +314,26 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         footer.valign = exposong.theme.get_valign_const(a)
         
         footer.spacing = self.footer_widgets['line_spacing'].get_value()
-        footer.shadow_color = self.footer_widgets['shadow_color'].get_color().to_string()
-        footer.shadow_opacity = round(self.footer_widgets['shadow_color'].get_alpha()/65535.0, 1)
-        footer.shadow_offset[0] = round(self.footer_widgets['shadow_x_offset'].get_value(), 1)
-        footer.shadow_offset[1] = round(self.footer_widgets['shadow_y_offset'].get_value(), 1)
+        if self.footer_widgets['shadow_apply'].get_active():
+            footer.shadow_color = self.footer_widgets['shadow_color'].get_color().to_string()
+            footer.shadow_opacity = round(self.footer_widgets['shadow_color'].get_alpha()/65535.0, 1)
+            footer.shadow_offset[0] = round(self.footer_widgets['shadow_x_offset'].get_value(), 1)
+            footer.shadow_offset[1] = round(self.footer_widgets['shadow_y_offset'].get_value(), 1)
+            self._on_shadow_widgets_set_sensitive(self.footer_widgets, True)
+        else:
+            footer.shadow_color = None
+            self._on_shadow_widgets_set_sensitive(self.footer_widgets, False)
         footer.outline_size = self.footer_widgets['outline_size'].get_value()
         footer.outline_color = self.footer_widgets['outline_color'].\
                 get_color().to_string()
         
         self.draw()
+    
+    def _on_shadow_widgets_set_sensitive(self, widget_list, sensitive=True):
+        'Helper method to enable/disable shadow widget after clicking the shadow checkbox'
+        widget_list['shadow_color'].set_sensitive(sensitive)
+        widget_list['shadow_x_offset'].set_sensitive(sensitive)
+        widget_list['shadow_y_offset'].set_sensitive(sensitive)
     
     #######################
     #    Backgrounds      #
@@ -467,7 +485,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
             self._bg_gradient_colors[i].set_use_alpha(True)
             self._bg_gradient_colors[i].connect('color-set',
                                                 self._on_bg_gradient_changed)
-            # Delete Button if more than two points exits
+            # Delete Button only when more than two points exist
             if len(bg.stops)>2:
                 del_button = gtk.Button(None)
                 img = gtk.Image()
@@ -889,6 +907,10 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
             self.body_widgets['alignment_vertical'].set_active(body.valign)
         
         self.body_widgets['line_spacing'].set_value(body.spacing)
+        if body.shadow_color != None:
+            self.body_widgets['shadow_apply'].set_active(True)
+        else:
+            self._on_shadow_widgets_set_sensitive(self.body_widgets, False)
         self.body_widgets['shadow_color'].set_color(gtk.gdk.Color(body.shadow_color))
         self.body_widgets['shadow_color'].set_alpha(int(body.shadow_opacity*65535))
         self.body_widgets['shadow_x_offset'].set_value(body.shadow_offset[0])
@@ -910,6 +932,10 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
             self.footer_widgets['alignment_vertical'].set_active(footer.valign)
         
         self.footer_widgets['line_spacing'].set_value(footer.spacing)
+        if footer.shadow_color != None:
+            self.footer_widgets['shadow_apply'].set_active(True)
+        else:
+            self._on_shadow_widgets_set_sensitive(self.footer_widgets, False)
         self.footer_widgets['shadow_color'].set_color(gtk.gdk.Color(footer.shadow_color))
         self.footer_widgets['shadow_color'].set_alpha(int(body.shadow_opacity*65535))
         if footer.shadow_offset:
