@@ -61,8 +61,6 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         self.set_cell_data_func(textrend, self._get_theme_title)
         self.connect("changed", self._theme_changed)
         
-        task = self._load_builtin()
-        gobject.idle_add(task.next)
         task = self._load_themes()
         gobject.idle_add(task.next)
     
@@ -73,44 +71,6 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
             return self.liststore.get_value(itr, 1)
         return None
     
-    def _load_builtin(self):
-        "Load some builtin themes."
-        try:
-            active = config.get("screen", "theme")
-        except Exception:
-            active = None
-        
-        yield True
-        
-        themes = {}
-        
-        themes['_builtin_black'] = exposong.theme.Theme(builtin=True)
-        themes['_builtin_black'].meta['title'] = _('Black')
-        
-        themes['_builtin_white'] = exposong.theme.Theme(builtin=True)
-        themes['_builtin_white'].meta['title'] = _('White')
-        themes['_builtin_white'].backgrounds.append(
-                exposong.theme.ColorBackground("#fff"))
-        themes['_builtin_white'].body.color = '#000'
-        themes['_builtin_white'].body.shadow_color = '#fff'
-        themes['_builtin_white'].footer.color = '#000'
-        themes['_builtin_white'].footer.shadow_color = '#fff'
-        
-        themes['_builtin_blue_gradient'] = exposong.theme.Theme(builtin=True)
-        themes['_builtin_blue_gradient'].meta['title'] = _('ES Blue')
-        themes['_builtin_blue_gradient'].body.outline_color = '#000'
-        bg = exposong.theme.GradientBackground(45)
-        bg.stops.append(exposong.theme.GradientStop(0.0, '#034'))
-        bg.stops.append(exposong.theme.GradientStop(1.0, '#069'))
-        themes['_builtin_blue_gradient'].backgrounds.append(bg)
-        
-        for k,v in themes.iteritems():
-            itr = self.liststore.append([k, v])
-            if k == active:
-                self.set_active_iter(itr)
-            yield True
-        yield False
-    
     def _load_themes(self):
         "Load all the themes from disk."
         exposong.log.debug("Loading theme previews.")
@@ -118,8 +78,16 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
             active = config.get("screen", "theme")
         except Exception:
             active = None
-        dir = os.path.join(DATA_PATH, "theme")
+        
+        name = '_builtin_black'
+        bltheme = exposong.theme.Theme(builtin=True)
+        bltheme.meta['title'] = _('Black')
+        
+        itr = self.liststore.append([name, bltheme])
+        self.set_active_iter(itr)
         yield True
+        
+        dir = os.path.join(DATA_PATH, "theme")
         for filenm in os.listdir(dir):
             if not filenm.endswith('.xml'):
                 continue
@@ -130,7 +98,7 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
                               filenm)
             theme = exposong.theme.Theme(path)
             itr = self.liststore.append([path, theme])
-            if path == active or (active == None and path.endswith("/exposong.xml")):
+            if path == active:
                 self.set_active_iter(itr)
             yield True
         task = self._load_theme_thumbs()
