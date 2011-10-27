@@ -29,6 +29,7 @@ line (e.g. `exposong --next` will move to the next slide).
 import select
 import socket
 import sys
+import time
 
 import exposong
 # Imports from ExpoSong classes are done when they are needed, so that loading
@@ -122,19 +123,23 @@ class SingleInstance(object):
         self.socket.settimeout(TIMEOUT*3)
         self.socket.connect((HOST, PORT))
         self.socket.send(text)
+        time.sleep(0.5) # To prevent sending too many commands that they run together
         if recv:
             return self.socket.recv(1024)
     
     def remote(self):
         self.open()
-        if exposong.options.import_:
+        rval = False
+        for fl in exposong.options.import_:
             try:
-                self._send('Import %s' % exposong.options.import_)
-                exposong.log.warning("Importing to running instance.")
-                return True
+                self._send('Import %s' % fl)
+                exposong.log.warning("Importing %s to running instance.", fl)
+                rval = True
             except:
                 self.reopen()
                 return False
+        else:
+            return rval
         
         try:
             if exposong.options.next:
@@ -202,5 +207,5 @@ else:
             break
         except ExposongInstanceError:
             if inst.is_running():
-                sys.exit(0)
+                exit(0)
             PORT += 10000

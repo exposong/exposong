@@ -190,7 +190,8 @@ class Main (gtk.Window):
         exposong.log.info('Ready.')
         if exposong.options.import_:
             from exposong.plugins import export_import
-            export_import.ExportImport.import_file(exposong.options.import_)
+            for fl in exposong.options.import_:
+                export_import.ExportImport.import_file(fl)
         self._check_no_presentations()
         return False
     

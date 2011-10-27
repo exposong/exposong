@@ -50,12 +50,13 @@ if sys.platform == 'win32' and platform.version().split('.') > ['6','0']:
 # TODO These cannot currently be translated, due to the required order. Do they
 # need to be?
 parser = OptionParser(version=exposong.version.__version__,
-                      description="A presentation software with a focus on Christian worship settings.")
+                      description="A presentation software with a focus on Christian worship settings.",
+                      usage="%prog [options] [import-file1 ...]")
 parser.add_option('-v', '--verbose', dest='debug', action='count',
                   help='Print verbose debugging information to the command line')
 parser.add_option('-o', '--log', dest='log', action='store',
                   help='Write the log to a file.')
-parser.add_option('-i', '--import', dest='import_', action='store',
+parser.add_option('-i', '--import', dest='import_', action='append',
                   help='Import an ExpoSong data file. Can import for existing program.')
 
 group = OptionGroup(parser, 'Locations')
@@ -90,6 +91,10 @@ parser.add_option_group(group)
 del group
 
 (options, args) = parser.parse_args()
+if not isinstance(options.import_, list):
+    options.import_ = []
+if args:
+    options.import_.extend(args)
 del parser
 
 # Set up logging
