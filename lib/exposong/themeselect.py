@@ -138,7 +138,13 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
     def new_theme(self, *args):
         editor = themeeditor.ThemeEditor(exposong.main.main, exposong.theme.Theme())
         editor.connect('destroy', self._add_theme)
-        
+    
+    def append(self, filename):
+        "Add a new theme to ExpoSong."
+        exposong.log.info('Loading theme "%s".', filename)
+        itr = self.liststore.append([filename, exposong.theme.Theme(filename)])
+        self._load_theme_thumbs()
+    
     def _add_theme(self, editor):
         if editor.theme.filename: #Not cancelled
             itr = self.liststore.append([editor.theme.filename, editor.theme])

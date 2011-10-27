@@ -369,14 +369,18 @@ What do you want to do?'%(new_song.props.titles[0].text, most_similar_song.song.
     @classmethod
     def import_file(cls, filename):
         'Import anything that has been exported before (.expo file)'
+        exposong.log.info("Importing %s", filename)
         tar = tarfile.open(unicode(filename), "r:gz")
         # Make a temporary directory so that no files are overwritten.
         tmpdir = tempfile.mkdtemp(os.path.split(filename)[1].rstrip(".expo"))
         tar.extractall(tmpdir)
         tar.close()
+        
+        ### Presentation Images ###
         imgs2rename = []
         if os.path.isdir(os.path.join(tmpdir, "pres/res")):
             for nm in os.listdir(os.path.join(tmpdir,"pres/res")):
+                exposong.log.debug("  Presentation Image: %s", nm)
                 if not os.path.exists(os.path.join(DATA_PATH, "pres/res", nm)):
                     shutil.move(os.path.join(tmpdir, "pres/res", nm),
                                 os.path.join(DATA_PATH, "pres/res", nm))
@@ -388,10 +392,12 @@ What do you want to do?'%(new_song.props.titles[0].text, most_similar_song.song.
                     shutil.move(os.path.join(tmpdir, "pres/res", nm), 
                                 os.path.join(DATA_PATH, "pres/res", nm2))
                     imgs2rename.append((nm,nm2.rpartition(os.sep)[2]))
-
+        
+        ### Presentations ###
+        pres2rename = []
         if os.path.isdir(os.path.join(tmpdir, "pres")):
-            pres2rename = []
             for nm in os.listdir(os.path.join(tmpdir,"pres")):
+                exposong.log.debug("  Presentation: %s", nm)
                 if not os.path.isfile(os.path.join(tmpdir,"pres",nm)):
                     continue
                 # Rename Images
@@ -414,9 +420,11 @@ What do you want to do?'%(new_song.props.titles[0].text, most_similar_song.song.
                 else:
                     cls.check_import_song(os.path.join(tmpdir, "pres", nm))
                 # Do we need to test if images have changed before skipping?
-
+        
+        ### Schedules ###
         if os.path.isdir(os.path.join(tmpdir, "sched")):
             for nm in os.listdir(os.path.join(tmpdir,"sched")):
+                exposong.log.debug("  Schedule: %s", nm)
                 # Rename presentations
                 if len(pres2rename) > 0:
                     infl = open(os.path.join(tmpdir,"sched",nm),"r")
@@ -429,7 +437,7 @@ What do you want to do?'%(new_song.props.titles[0].text, most_similar_song.song.
                     outfl.close()
                     shutil.move(os.path.join(tmpdir,"sched",nm+".1"),
                                 os.path.join(tmpdir,"sched",nm))
-
+                
                 if not os.path.exists(os.path.join(DATA_PATH, "sched", nm)):
                     shutil.move(os.path.join(tmpdir, "sched", nm),
                                 os.path.join(DATA_PATH, "sched", nm))
@@ -445,7 +453,61 @@ What do you want to do?'%(new_song.props.titles[0].text, most_similar_song.song.
                                 os.path.join(DATA_PATH, "sched", nm2))
                     
                     exposong.main.main.load_sched(nm2)
-
+        
+        ### Theme Backgrounds ###
+        imgs2rename = []
+        if os.path.isdir(os.path.join(tmpdir,'theme/res')):
+            for nm in os.listdir(os.path.join(tmpdir,'theme/res')):
+                if not os.path.isfile(os.path.join(tmpdir, "theme/res", nm)):
+                    continue
+                exposong.log.debug("  Theme Image: %s", nm)
+                if not os.path.exists(os.path.join(DATA_PATH, "theme/res", nm)):
+                    shutil.move(os.path.join(tmpdir, "theme/res", nm),
+                                os.path.join(DATA_PATH, "theme/res", nm))
+                elif filecmp.cmp(os.path.join(tmpdir, "theme/res", nm),
+                                 os.path.join(DATA_PATH, "theme/res", nm)):
+                    pass # Skip if they are the same.
+                else:
+                    nm2 = find_freefile(os.path.join(DATA_PATH, "pres/res", nm))
+                    shutil.move(os.path.join(tmpdir, "pres/res", nm), 
+                                os.path.join(DATA_PATH, "pres/res", nm2))
+                    imgs2rename.append((nm,nm2.rpartition(os.sep)[2]))
+        
+        ### Themes ###
+        if os.path.isdir(os.path.join(tmpdir, "theme")):
+            for nm in os.listdir(os.path.join(tmpdir,"theme")):
+                if not os.path.isfile(os.path.join(tmpdir, "theme", nm)):
+                    continue
+                exposong.log.debug("  Theme: %s", nm)
+                # Rename background images
+                if len(imgs2rename) > 0:
+                    infl = open(os.path.join(tmpdir,"theme",nm),"r")
+                    outfl = open(os.path.join(tmpdir,"theme",nm+".1"),"w")
+                    for ln in infl:
+                        for img in imgs2rename:
+                            ln = re.subn(r"\b"+img[0]+r"\b",img[1],ln)[0]
+                        outfl.write(ln)
+                    infl.close()
+                    outfl.close()
+                    shutil.move(os.path.join(tmpdir,"theme",nm+".1"),
+                                os.path.join(tmpdir,"theme",nm))
+                
+                if not os.path.exists(os.path.join(DATA_PATH, "theme", nm)):
+                    shutil.move(os.path.join(tmpdir, "theme", nm),
+                                os.path.join(DATA_PATH, "theme", nm))
+                    exposong.themeselect.themeselect.append(
+                            os.path.join(DATA_PATH, "theme", nm))
+                elif filecmp.cmp(os.path.join(tmpdir, "theme", nm),
+                                 os.path.join(DATA_PATH, "theme", nm)):
+                    pass #Skip if they are the same.
+                    # Do we need to test if presentations have changed?
+                else:
+                    nm2 = find_freefile(os.path.join(DATA_PATH, "theme", nm))
+                    nm2 = nm2.rpartition(os.sep)[2]
+                    shutil.move(os.path.join(tmpdir, "theme", nm),
+                                os.path.join(DATA_PATH, "theme", nm2))
+                    exposong.themeselect.themeselect.append(
+                            os.path.join(DATA_PATH, "theme", nm2))
     
     @classmethod
     def merge_menu(cls, uimanager):
