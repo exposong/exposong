@@ -290,8 +290,8 @@ class ExportImport(Plugin, exposong._hook.Menu):
         #TODO: Add checkbox to content area to keep the choice for all songs.
         #TODO: Add expander to dialog to show differences between songs
         if most_similar_song and (max_author_sim+max_title_sim)/2 > 0.6:
-            msg = _('The Song "%(new_song)s" has similarities with this existing Song from your library: "%(existing_song)s" .\
-What do you want to do?'%{'new_song':new_song.props.titles[0].text, 'existing_song':most_similar_song.song.props.titles[0].text})
+            msg = _('The Song "%(new_song)s" has similarities with this existing Song from your library: "%(existing_song)s".\
+ What do you want to do?'%{'new_song':new_song.props.titles[0].text, 'existing_song':most_similar_song.song.props.titles[0].text})
             dlg = gtk.MessageDialog(type=gtk.MESSAGE_QUESTION,
                     buttons=gtk.BUTTONS_NONE,
                     message_format=msg)

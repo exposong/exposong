@@ -59,7 +59,7 @@ themes are stored.")
         g_data.set_tooltip_text(msg)
         table.attach_section_title(_("Updates"))
         g_update = table.attach_checkbutton(
-            _("Automatically check for updates"))
+            _("Automatically check for a new version"))
         if config.get("updates", "check_for_updates") == "True":
             g_update.set_active(True)
         

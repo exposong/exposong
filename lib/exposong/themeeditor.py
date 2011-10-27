@@ -470,7 +470,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         table.foreach(lambda w: table.remove(w))
         bg = self._get_active_bg()
         
-        table.attach_section_title(_("Gradient Background"))
+        table.attach_section_title(_("Gradient"))
         self._bg_gradient_colors = []
         self._bg_gradient_lengths = []
         self._bg_gradient_delete_buttons = []
@@ -582,7 +582,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         table.foreach(lambda w: table.remove(w))
         bg = self._get_active_bg()
         
-        table.attach_section_title(_("Radial Background"))
+        table.attach_section_title(_("Radial Gradient"))
         self._bg_radial_colors = []
         self._bg_radial_lengths = []
         loc = 0.1
@@ -595,15 +595,15 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
             self._bg_radial_colors[i].set_use_alpha(True)
             self._bg_radial_colors[i].connect('color-set', self._on_bg_radial_changed)
             self._bg_radial_lengths.append(table.attach_widget(
-                    gtk.HScale(gtk.Adjustment(50,0,100,1,10,0)), label=_("Length")))
+                    gtk.HScale(gtk.Adjustment(50,0,100,1,10,0)), label=_("Position")))
             self._bg_radial_lengths[i].set_digits(0)
             self._bg_radial_lengths[i].connect('change-value', self._on_bg_radial_changed)
             table.attach_hseparator()
-        add = table.attach_widget(gtk.Button(_("Add Stop"), gtk.STOCK_ADD), "")
+        add = table.attach_widget(gtk.Button(_("Add Point"), gtk.STOCK_ADD), "")
         add.connect('clicked', self._bg_gradient_add_point)
         
         self._bg_radial_length = table.attach_widget(
-                gtk.HScale(gtk.Adjustment(1,1,100,1,10,0)), label=_("Overall Length"))
+                gtk.HScale(gtk.Adjustment(1,1,100,1,10,0)), label=_("Length"))
         self._bg_radial_length.set_digits(0)
         self._bg_radial_length.connect('change-value', self._on_bg_radial_changed)
         self._bg_radial_pos_h = table.attach_widget(
