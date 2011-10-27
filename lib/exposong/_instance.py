@@ -130,9 +130,8 @@ class SingleInstance(object):
         if exposong.options.import_:
             try:
                 self._send('Import %s' % exposong.options.import_)
+                exposong.log.warning("Importing to running instance.")
                 return True
-            except socket.timeout:
-                self.reopen()
             except:
                 self.reopen()
                 return False
@@ -154,8 +153,10 @@ class SingleInstance(object):
                 self._send('Logo')
             else:
                 return False
-        except socket.timeout:
+            exposong.log.info("Sending command to running instance.")
+        except:
             self.reopen()
+            exposong.log.error("ExpoSong is not running. Could not send command.")
             import gtk
             msg = _('ExpoSong is not running.')
             dlg = gtk.MessageDialog(type=gtk.MESSAGE_WARNING, buttons=gtk.BUTTONS_OK,
