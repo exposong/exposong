@@ -1,0 +1,833 @@
+# Chinese (Simplified) translation for exposong
+# Copyright (c) 2010 Rosetta Contributors and Canonical Ltd 2010
+# This file is distributed under the same license as the exposong package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: exposong\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2010-09-05 23:35+0200\n"
+"PO-Revision-Date: 2010-09-13 12:22+0000\n"
+"Last-Translator: Isaac Trumbo <itbcn8@live.com>\n"
+"Language-Team: Chinese (Simplified) <zh_CN@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2010-09-14 05:10+0000\n"
+"X-Generator: Launchpad (build Unknown)\n"
+
+#: share/exposong/lib/exposong/about.py:31
+#, python-format
+msgid "Copyright %s"
+msgstr "版权 %s"
+
+#: share/exposong/lib/exposong/about.py:34
+#: share/exposong/lib/exposong/about.py:35
+msgid "translator-credits"
+msgstr ""
+"Launchpad Contributions:\n"
+"  Isaac Trumbo https://launchpad.net/~itbcn8\n"
+"  Jianle Ma https://launchpad.net/~majianle\n"
+"  英华 https://launchpad.net/~wantinghard"
+
+#: share/exposong/lib/exposong/application.py:132
+msgid "Present"
+msgstr "演示"
+
+#: share/exposong/lib/exposong/application.py:135
+#: share/exposong/lib/exposong/prefs.py:72
+#: share/exposong/lib/exposong/prefs.py:76
+msgid "Background"
+msgstr "背景"
+
+#: share/exposong/lib/exposong/application.py:139
+#: share/exposong/lib/exposong/prefs.py:70
+msgid "Logo"
+msgstr "徽标"
+
+#: share/exposong/lib/exposong/application.py:142
+msgid "Black Screen"
+msgstr "黑色屏幕"
+
+#: share/exposong/lib/exposong/application.py:145
+msgid "Hide"
+msgstr "隐藏"
+
+#: share/exposong/lib/exposong/application.py:180
+msgid "_File"
+msgstr "文件(_F)"
+
+#: share/exposong/lib/exposong/application.py:181
+msgid "_Edit"
+msgstr "编辑(_E)"
+
+#: share/exposong/lib/exposong/application.py:182
+msgid "_Schedule"
+msgstr "计划安排(_S)"
+
+#: share/exposong/lib/exposong/application.py:183
+msgid "P_resentation"
+msgstr "演出(_P)"
+
+#: share/exposong/lib/exposong/application.py:184
+msgid "_Help"
+msgstr "帮助(_H)"
+
+#: share/exposong/lib/exposong/application.py:188
+msgid "_Import"
+msgstr "导入(_I)"
+
+#: share/exposong/lib/exposong/application.py:189
+msgid "Import a .expo package or other format"
+msgstr "从.expo包或其他格式导入"
+
+#: share/exposong/lib/exposong/application.py:190
+msgid "_Export"
+msgstr "导出(_E)"
+
+#: share/exposong/lib/exposong/application.py:190
+msgid "Export a .expo package"
+msgstr "导出为.expo包"
+
+#: share/exposong/lib/exposong/application.py:191
+msgid "_Print"
+msgstr "打印(_P)"
+
+#: share/exposong/lib/exposong/application.py:192
+msgid "Create a new schedule"
+msgstr "创建一个新计划"
+
+#: share/exposong/lib/exposong/application.py:194
+msgid "_Rename"
+msgstr "重命名(_R)"
+
+#: share/exposong/lib/exposong/application.py:195
+msgid "Rename the selected schedule"
+msgstr "重命名所选计划安排"
+
+#: share/exposong/lib/exposong/application.py:197
+msgid "Delete the currently selected schedule"
+msgstr "删除当前所选计划安排"
+
+#: share/exposong/lib/exposong/application.py:199
+msgid "Create a new presentation"
+msgstr "创建一个新演示"
+
+#: share/exposong/lib/exposong/application.py:201
+msgid "Edit the currently selected presentation"
+msgstr "编辑当前所选演示"
+
+#: share/exposong/lib/exposong/application.py:204
+msgid "_Remove from Schedule"
+msgstr "从计划中删除(_R)"
+
+#: share/exposong/lib/exposong/application.py:205
+msgid "Remove the presentation from schedule"
+msgstr "从计划中删除演示"
+
+#: share/exposong/lib/exposong/application.py:208
+msgid "Delete the presentation"
+msgstr "删除演示"
+
+#: share/exposong/lib/exposong/application.py:209
+msgid "Previous Presentation"
+msgstr "上一个演示"
+
+#: share/exposong/lib/exposong/application.py:211
+msgid "Previous Slide"
+msgstr "前一张幻灯片"
+
+#: share/exposong/lib/exposong/application.py:213
+msgid "Next Slide"
+msgstr "下一张幻灯片"
+
+#: share/exposong/lib/exposong/application.py:215
+msgid "Next Presentation"
+msgstr "下一个演示"
+
+#: share/exposong/lib/exposong/application.py:217
+msgid "_Find Presentation"
+msgstr "查找演示(_F)"
+
+#: share/exposong/lib/exposong/application.py:218
+msgid "Search for a presentation"
+msgstr "搜索一个演示"
+
+#: share/exposong/lib/exposong/application.py:219
+msgid "_Present"
+msgstr "演示(_P)"
+
+#: share/exposong/lib/exposong/application.py:221
+msgid "Bac_kground"
+msgstr "背_景"
+
+#: share/exposong/lib/exposong/application.py:223
+msgid "Lo_go"
+msgstr "徽标(_G)"
+
+#: share/exposong/lib/exposong/application.py:225
+msgid "_Black Screen"
+msgstr "_黑屏"
+
+#: share/exposong/lib/exposong/application.py:227
+msgid "Hi_de"
+msgstr "隐藏(_D)"
+
+#: share/exposong/lib/exposong/application.py:230
+msgid "Contribute"
+msgstr "贡献"
+
+#: share/exposong/lib/exposong/application.py:357
+msgid "Ready"
+msgstr "就绪"
+
+#: share/exposong/lib/exposong/application.py:385
+msgid "Library"
+msgstr "库"
+
+#: share/exposong/lib/exposong/application.py:408
+msgid "Custom Schedules"
+msgstr "自定义计划"
+
+#: share/exposong/lib/exposong/bgselect.py:72
+msgid "Add"
+msgstr "添加"
+
+#: share/exposong/lib/exposong/bgselect.py:150
+#: share/exposong/lib/exposong/plugins/image.py:259
+msgid "Image Types"
+msgstr "图像类型"
+
+#: share/exposong/lib/exposong/bgselect.py:154
+msgid "Add Image"
+msgstr "添加图像"
+
+#: share/exposong/lib/exposong/gui.py:62
+msgid "Choose File"
+msgstr "选择文件"
+
+#: share/exposong/lib/exposong/gui.py:75
+msgid "Choose Folder"
+msgstr "选择文件夹"
+
+#: share/exposong/lib/exposong/gui.py:158
+msgid "Language Code"
+msgstr "语言代码"
+
+#: share/exposong/lib/exposong/__init__.py:54
+msgid "en"
+msgstr "en"
+
+#: share/exposong/lib/exposong/prefs.py:36
+msgid "Preferences"
+msgstr "首选项"
+
+#: share/exposong/lib/exposong/prefs.py:49
+msgid "Data folder"
+msgstr "数据文件夹"
+
+#: share/exposong/lib/exposong/prefs.py:50
+msgid ""
+"The place where all your presentations, schedules and background images are "
+"stored."
+msgstr "这是你所有的演示、计划以及背景图片将要存放的位置。"
+
+#: share/exposong/lib/exposong/prefs.py:53
+msgid "Legal"
+msgstr "合法"
+
+#: share/exposong/lib/exposong/prefs.py:56
+msgid "General"
+msgstr "常规"
+
+#: share/exposong/lib/exposong/prefs.py:61
+msgid "Font"
+msgstr "字体"
+
+#: share/exposong/lib/exposong/prefs.py:62
+msgid "Text Color"
+msgstr "文本颜色"
+
+#: share/exposong/lib/exposong/prefs.py:64
+msgid "Text Shadow"
+msgstr "文本阴影"
+
+#: share/exposong/lib/exposong/prefs.py:66
+msgid "Max Font Size"
+msgstr "最大字号"
+
+#: share/exposong/lib/exposong/prefs.py:71
+msgid "Image"
+msgstr "图像"
+
+#: share/exposong/lib/exposong/prefs.py:75
+msgid "Notify"
+msgstr "通知"
+
+#: share/exposong/lib/exposong/prefs.py:84
+msgid "Primary"
+msgstr "主要"
+
+#: share/exposong/lib/exposong/prefs.py:84
+msgid "Primary (Bottom-Right)"
+msgstr "主要(右下)"
+
+#: share/exposong/lib/exposong/prefs.py:85
+msgid "Secondary"
+msgstr "次要"
+
+#: share/exposong/lib/exposong/prefs.py:85
+msgid "Tertiary"
+msgstr "第三"
+
+#: share/exposong/lib/exposong/prefs.py:85
+msgid "Monitor 4"
+msgstr "监控 4"
+
+#: share/exposong/lib/exposong/prefs.py:104
+msgid "Position"
+msgstr "位置"
+
+#: share/exposong/lib/exposong/prefs.py:105
+msgid "Monitor"
+msgstr "显示器"
+
+#: share/exposong/lib/exposong/prefs.py:107
+msgid "Screen"
+msgstr "屏幕"
+
+#: share/exposong/lib/exposong/prefs.py:116
+msgid ""
+"You will have to restart ExpoSong so that the new data folder will be used."
+msgstr "要使得用新的数据文件夹你需要重启ExpoSong。"
+
+#: share/exposong/lib/exposong/presfilter.py:69
+msgid "Search"
+msgstr "搜索"
+
+#: share/exposong/lib/exposong/preslist.py:41
+msgid "Presentation"
+msgstr "演示文稿"
+
+#: share/exposong/lib/exposong/preslist.py:195
+#, python-format
+msgid "Are you sure you want to delete \"%s\" from your library?"
+msgstr "你确定要从你的库中删除 \"%s\" ?"
+
+#: share/exposong/lib/exposong/preslist.py:197
+msgid "Delete Presentation?"
+msgstr "删除演示?"
+
+#: share/exposong/lib/exposong/schedlist.py:47
+msgid "Schedule"
+msgstr "计划"
+
+#: share/exposong/lib/exposong/schedlist.py:132
+#, python-format
+msgid "Are you sure you want to delete \"%s\"?"
+msgstr "你确定要删除 \"%s\" 吗？"
+
+#: share/exposong/lib/exposong/schedlist.py:133
+msgid "Delete Schedule?"
+msgstr "删除计划?"
+
+#: share/exposong/lib/exposong/schedlist.py:169
+#, python-format
+msgid "Added Presentation >%(presentation)s< to Schedule >%(schedule)s<"
+msgstr "添加演示 >%(presentation)s< 至计划 >%(schedule)s< 中"
+
+#: share/exposong/lib/exposong/schedlist.py:174
+msgid "New Schedule"
+msgstr "新建计划"
+
+#: share/exposong/lib/exposong/screen.py:139
+msgid "No Logo set. Do you want to choose a Logo now?"
+msgstr "未设置Logo标识。你是否要现在选择一个Logo?"
+
+#: share/exposong/lib/exposong/screen.py:140
+msgid "Set Logo?"
+msgstr "设置Logo?"
+
+#: share/exposong/lib/exposong/slidelist.py:43
+#: share/exposong/lib/exposong/plugins/text.py:111
+msgid "Slide"
+msgstr "幻灯片"
+
+#: share/exposong/lib/exposong/plugins/_abstract.py:229
+msgid "New Presentation"
+msgstr "新建演示"
+
+#: share/exposong/lib/exposong/plugins/_abstract.py:235
+#, python-format
+msgid "Editing \"%s\""
+msgstr "编辑 \"%s\""
+
+#: share/exposong/lib/exposong/plugins/_abstract.py:238
+#, python-format
+msgid "New %s Presentation"
+msgstr "新建 %s 演示"
+
+#: share/exposong/lib/exposong/plugins/_abstract.py:275
+msgid "Use Timer"
+msgstr "使用定时器"
+
+#: share/exposong/lib/exposong/plugins/_abstract.py:285
+msgid "Seconds Per Slide"
+msgstr "每张幻灯片放映秒数"
+
+#: share/exposong/lib/exposong/plugins/_abstract.py:298
+msgid "Loop Slides"
+msgstr "循环放映"
+
+#: share/exposong/lib/exposong/plugins/_abstract.py:303
+msgid "Timer"
+msgstr "定时器"
+
+#: share/exposong/lib/exposong/plugins/export_import.py:36
+msgid "Export/Import Functions"
+msgstr "导出/导入功能"
+
+#: share/exposong/lib/exposong/plugins/export_import.py:64
+msgid "Export Current Schedule"
+msgstr "导出当前计划"
+
+#: share/exposong/lib/exposong/plugins/export_import.py:108
+msgid "Export Library"
+msgstr "导出库"
+
+#: share/exposong/lib/exposong/plugins/export_import.py:113
+msgid "exposong_library.expo"
+msgstr "exposong_library.expo"
+
+#: share/exposong/lib/exposong/plugins/export_import.py:152
+msgid "Export Backgrounds"
+msgstr "导出背景"
+
+#: share/exposong/lib/exposong/plugins/export_import.py:158
+msgid "exposong_backgrounds.expo"
+msgstr "exposong_backgrounds.expo"
+
+#: share/exposong/lib/exposong/plugins/export_import.py:186
+msgid "Import"
+msgstr "导入"
+
+#: share/exposong/lib/exposong/plugins/export_import.py:276
+msgid "_Schedule or Library ..."
+msgstr "计划或库(_S)..."
+
+#: share/exposong/lib/exposong/plugins/export_import.py:277
+msgid "Import a schedule or full library."
+msgstr "导入一个计划或完整的库。"
+
+#: share/exposong/lib/exposong/plugins/export_import.py:279
+msgid "_Current Schedule (and belonging presentations) ..."
+msgstr "当前属于演示的计划(_C)..."
+
+#: share/exposong/lib/exposong/plugins/export_import.py:281
+msgid "Whole _Library ..."
+msgstr "整个库(_L)..."
+
+#: share/exposong/lib/exposong/plugins/export_import.py:283
+msgid "_Backgrounds ..."
+msgstr "背景(_B)..."
+
+#: share/exposong/lib/exposong/plugins/image.py:35
+msgid "Image Presentation"
+msgstr "图片演示"
+
+#: share/exposong/lib/exposong/plugins/image.py:184
+#: share/exposong/lib/exposong/plugins/lyric.py:570
+#: share/exposong/lib/exposong/plugins/text.py:91
+#: share/exposong/lib/exposong/plugins/text.py:373
+msgid "Title:"
+msgstr "标题:"
+
+#: share/exposong/lib/exposong/plugins/image.py:219
+#: share/exposong/lib/exposong/plugins/text.py:140
+msgid "Edit"
+msgstr "编辑"
+
+#: share/exposong/lib/exposong/plugins/image.py:242
+msgid "Please enter a Title"
+msgstr "请输入一个标题"
+
+#: share/exposong/lib/exposong/plugins/image.py:250
+msgid "Add Images"
+msgstr "添加图片"
+
+#: share/exposong/lib/exposong/plugins/image.py:318
+msgid "_Image"
+msgstr "图片(_I)"
+
+#: share/exposong/lib/exposong/plugins/image.py:344
+msgid "Image Presentations"
+msgstr "图片演示"
+
+#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:35
+msgid "ExpoSong Lyrics Converter"
+msgstr "ExpoSong歌词转换器"
+
+#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:96
+#: share/exposong/lib/exposong/plugins/songselect_convert.py:123
+msgid "Undefined Title"
+msgstr "未指定的标题"
+
+#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:115
+msgid "Import ExpoSong Legacy File(s)"
+msgstr "导入ExpoSong Legacy文件"
+
+#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:121
+msgid "ExpoSong Legacy File"
+msgstr "ExpoSong Legacy文件"
+
+#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:138
+msgid "_ExpoSong Legacy File(s) ..."
+msgstr "导入ExpoSong Legacy文件(_E) ..."
+
+#: share/exposong/lib/exposong/plugins/lyric_legacy_convert.py:139
+msgid "Import a Lyric Presentation from ExpoSong before 0.7"
+msgstr "从0.7版之前的ExpoSong导入歌词演示"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:45
+msgid "Lyric Presentation"
+msgstr "歌词演示"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:55
+msgid "Words"
+msgstr "文字"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:56
+msgid "Music"
+msgstr "音乐"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:57
+msgid "Translation"
+msgstr "翻译"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:61
+msgid "Verse"
+msgstr "节"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:62
+msgid "Pre-Chorus"
+msgstr "前奏"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:63
+msgid "Chorus"
+msgstr "合唱"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:64
+msgid "Refrain"
+msgstr "副歌"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:65
+msgid "Bridge"
+msgstr "间奏"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:66
+msgid "Ending"
+msgstr "结尾"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:139
+msgid "Written By"
+msgstr "作者"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:263
+#: share/exposong/lib/exposong/plugins/lyric.py:288
+msgid "Title"
+msgstr "标题"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:269
+#: share/exposong/lib/exposong/plugins/lyric.py:329
+#: share/exposong/lib/exposong/plugins/lyric.py:383
+msgid "Language"
+msgstr "语言"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:280
+msgid "Variant:"
+msgstr "差别:"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:283
+msgid "Custom Version:"
+msgstr "自定义版本:"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:285
+msgid "Release Date:"
+msgstr "发布日期:"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:319
+msgid "Author"
+msgstr "作者"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:324
+msgid "Type"
+msgstr "类型"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:339
+msgid "Copyright:"
+msgstr "版权:"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:341
+msgid "CCLI Number:"
+msgstr "CCLI 号码:"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:343
+msgid "Publisher:"
+msgstr "出品商:"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:346
+msgid "Ownership"
+msgstr "所有者"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:377
+#: share/exposong/lib/exposong/plugins/lyric.py:404
+msgid "Theme"
+msgstr "主旋律"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:389
+msgid "ID"
+msgstr "ID"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:401
+msgid "Keywords:"
+msgstr "关键词:"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:434
+msgid "Songbook Name"
+msgstr "歌集名"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:440
+msgid "Entry"
+msgstr "条目"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:453
+msgid "Transposition:"
+msgstr "变调:"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:455
+msgid "Tempo:"
+msgstr "节拍:"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:458
+msgid "Tempo Type:"
+msgstr "节奏类型:"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:459
+msgid "bpm"
+msgstr "bpm"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:459
+msgid "Text"
+msgstr "文本"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:462
+msgid "Key:"
+msgstr "关键字:"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:465
+msgid "Music Info"
+msgstr "音乐信息"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:469
+msgid "Comments:"
+msgstr "评论:"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:471
+msgid "Other"
+msgstr "其他"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:480
+msgid "Verse Order:"
+msgstr "小节顺序:"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:482
+msgid "Use the Slide names in brackets to modify the order"
+msgstr "使用括号括起来的幻灯片名称来修改顺序"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:553
+msgid "New Title"
+msgstr "新建标题"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:565
+#, python-format
+msgid "Editing Title \"%s\""
+msgstr "编辑标题 \"%s\""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:579
+#: share/exposong/lib/exposong/plugins/text.py:164
+#: share/exposong/lib/exposong/plugins/text.py:445
+msgid "Please enter a Title."
+msgstr "请输入一个标题。"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:606
+msgid "New Author"
+msgstr "新建作者"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:618
+#, python-format
+msgid "Editing Author \"%s\""
+msgstr "编辑作者 \"%s\""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:627
+msgid "Author Name:"
+msgstr "作者姓名:"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:628
+msgid "Author Type:"
+msgstr "作者类型:"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:642
+msgid "Please enter an Author Name."
+msgstr "请输入作者姓名。"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:673
+msgid "New Theme"
+msgstr "新建旋律"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:685
+#, python-format
+msgid "Editing Theme \"%s\""
+msgstr "编辑旋律 \"%s\""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:688
+msgid "Theme Name:"
+msgstr "旋律名称:"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:697
+msgid "Please enter an Theme Name."
+msgstr "请输入旋律名称。"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:724
+msgid "New songbook"
+msgstr "新建歌集"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:736
+#, python-format
+msgid "Editing Songbook \"%s\""
+msgstr "编辑歌集 \"%s\""
+
+#: share/exposong/lib/exposong/plugins/lyric.py:739
+msgid "Songbook Name:"
+msgstr "歌集名:"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:740
+msgid "Entry:"
+msgstr "条目:"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:748
+msgid "Please enter a Songbook."
+msgstr "请输入歌集名称。"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:775
+msgid "You must enter at least one title."
+msgstr "你至少需要输入一个标题。"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:863
+msgid "_Lyric"
+msgstr "歌词(_L)"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:889
+msgid "Lyric Presentations"
+msgstr "歌词演示"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:924
+msgid "Name:"
+msgstr "名称:"
+
+#: share/exposong/lib/exposong/plugins/lyric.py:941
+msgid "Index:"
+msgstr "索引:"
+
+#: share/exposong/lib/exposong/plugins/opensong_convert.py:32
+msgid "OpenSong Lyrics Converter"
+msgstr "OpenSong 歌词转换器"
+
+#: share/exposong/lib/exposong/plugins/opensong_convert.py:72
+msgid "Import OpenSong File(s)"
+msgstr "导入OpenSong文件"
+
+#: share/exposong/lib/exposong/plugins/opensong_convert.py:91
+msgid "_OpenSong File(s) ..."
+msgstr "_OpenSong文件..."
+
+#: share/exposong/lib/exposong/plugins/opensong_convert.py:92
+msgid "Import a Lyric Presentation from OpenSong"
+msgstr "从OpenSong导入一个歌词演示"
+
+#: share/exposong/lib/exposong/plugins/print_support.py:30
+msgid "Print"
+msgstr "打印"
+
+#: share/exposong/lib/exposong/plugins/print_support.py:48
+msgid "Please select the presentation you want to print."
+msgstr "请选择要打印的演示。"
+
+#: share/exposong/lib/exposong/plugins/print_support.py:49
+msgid "Select Presentation"
+msgstr "选择演示"
+
+#: share/exposong/lib/exposong/plugins/print_support.py:95
+msgid "Alphabetical list of Songs"
+msgstr "歌曲列表(按字母顺序)"
+
+#: share/exposong/lib/exposong/plugins/print_support.py:114
+msgid "_Current Presentation"
+msgstr "当前演示(_C)"
+
+#: share/exposong/lib/exposong/plugins/print_support.py:116
+msgid "_List of all Songs"
+msgstr "列出所有歌曲(_L)"
+
+#: share/exposong/lib/exposong/plugins/songselect_convert.py:37
+msgid "SongSelect Lyrics Converter"
+msgstr "SongSelect歌词转换器"
+
+#: share/exposong/lib/exposong/plugins/songselect_convert.py:142
+msgid "Import SongSelect Lyrics"
+msgstr "导入SongSelect歌词"
+
+#: share/exposong/lib/exposong/plugins/songselect_convert.py:148
+#, python-format
+msgid "SongSelect File (%s)"
+msgstr "SongSelect文件 (%s)"
+
+#: share/exposong/lib/exposong/plugins/songselect_convert.py:165
+msgid "_SongSelect Lyrics ..."
+msgstr "_SongSelect歌词..."
+
+#: share/exposong/lib/exposong/plugins/songselect_convert.py:166
+msgid "Converts a SongSelect file to OpenLyrics"
+msgstr "转换一个SongSelect文件至OpenLyrics"
+
+#: share/exposong/lib/exposong/plugins/text.py:31
+msgid "Text Presentation"
+msgstr "文本演示"
+
+#: share/exposong/lib/exposong/plugins/text.py:171
+msgid "The presentation must have at least one slide."
+msgstr "演示至少要有一张幻灯片。"
+
+#: share/exposong/lib/exposong/plugins/text.py:219
+msgid "Are you sure you want to delete this slide? This cannot be undone."
+msgstr "你确定要删除这张幻灯片? 该操作不能撤销。"
+
+#: share/exposong/lib/exposong/plugins/text.py:220
+msgid "Delete Slide?"
+msgstr "删除幻灯片?"
+
+#: share/exposong/lib/exposong/plugins/text.py:259
+msgid "_Text"
+msgstr "文本(_T)"
+
+#: share/exposong/lib/exposong/plugins/text.py:285
+msgid "Text Presentations"
+msgstr "文本演示"
+
+#: share/exposong/lib/exposong/plugins/text.py:308
+msgid "Editing Slide"
+msgstr "编辑幻灯片"
+
+#: share/exposong/lib/exposong/plugins/text.py:416
+msgid "Unsaved Changes exist. Do you really want to continue without saving?"
+msgstr "有未保存的更改项存在。你确定不保存继续操作吗？"
