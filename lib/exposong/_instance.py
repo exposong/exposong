@@ -133,6 +133,9 @@ class SingleInstance(object):
                 return True
             except socket.timeout:
                 self.reopen()
+            except:
+                self.reopen()
+                return False
         
         try:
             if exposong.options.next:
