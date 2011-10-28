@@ -32,22 +32,16 @@ class _ExampleTextSlide(object):
         self.id = '_example'
         self.body = [
                 exposong.theme.Text('\n'.join([
-                        'In cursus libero et mi imperdiet pulvinar.',
-                        'Nunc blandit posuere felis ac egestas.',
-                        'Cras vitae mauris magna, ut porttitor elit.',
-                        'Nulla pulvinar justo sapien.',
-                        'Ut in nulla quis justo laoreet malesuada.',
-                        'Ut scelerisque semper ipsum id congue.',
-                        'Vestibulum mattis hendrerit elementum.',
-                        'Phasellus ac mauris a mauris elementum convallis.',
-                        'Cras vel magna semper nisi mattis feugiat.',
-                        'Sed consectetur dolor eu est iaculis convallis.']),
+                        "Amazing grace, how sweet the sound",
+                        "That sav'd a wretch like me!",
+                        "I once was lost, but now am found",
+                        "Was blind, but now I see."]),
                     margin=0.04),
                 ]
         self.foot = [exposong.theme.Text('\n'.join([
-                        '"Lorum Ipsum" Text',
-                        _('Written by: %s') % 'Cicero (45 B.C.)',
-                        _('Generated from: %s') % 'http://lipsum.com']),
+                        '"Amazing Grace"',
+                        _('Written by: %s') % 'John Newton',
+                        _('Copyright: %s') % 'Public Domain']),
                     margin=0.04)
                 ]
     
