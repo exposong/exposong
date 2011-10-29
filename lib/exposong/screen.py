@@ -402,6 +402,7 @@ class Screen(exposong._hook.Menu):
             action = self._actions.get_action('Logo')
         if not action.get_active():
             self._secondary_button_toggle(action)
+            return
         if config.has_option("screen", "logo") and \
                 os.path.isfile(config.get("screen", "logo")):
             # TODO should we resize the logo? If not, we need to add the
