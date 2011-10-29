@@ -63,7 +63,7 @@ class PresFilter(gtk.Entry, exposong._hook.Menu):
         self.connect("key-press-event", self._on_key_pressed)
         self.connect("focus-in-event", exposong.main.main.disable_shortcuts)
         self.connect("focus-out-event", exposong.main.main.enable_shortcuts)
-        self.connect("terms-changed", self._filter)
+        self.connect("terms-changed", self.filter)
         
         # Make sure icons are supported by GTK version
         self.use_icons = gtk.gtk_version[0] >= 2 and gtk.gtk_version[1] > 16
@@ -151,7 +151,7 @@ class PresFilter(gtk.Entry, exposong._hook.Menu):
             self.modify_base(gtk.STATE_NORMAL, yellowish)
             self.modify_text(gtk.STATE_NORMAL, black)
             
-    def _filter(self, *args):
+    def filter(self, *args):
         'Filters preslist by the keywords.'
         preslist = exposong.preslist.preslist
         if self.get_text() == "":

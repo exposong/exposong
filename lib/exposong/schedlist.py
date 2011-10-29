@@ -125,6 +125,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
                                                     gtk.gdk.ACTION_DEFAULT)
                 else:
                     preslist.unset_rows_drag_dest()
+                    exposong.presfilter.presfilter.filter()
         try:
             enable = isinstance(sched, exposong.schedule.Schedule)\
                      and not sched.is_builtin()
