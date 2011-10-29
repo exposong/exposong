@@ -208,7 +208,7 @@ class Presentation:
         if(self.get_title()):
             edit_dialog.set_title(_('Editing "%s"') % self.get_title())
         else:
-            edit_dialog.set_title(_("New %s") % self.get_type_name())
+            edit_dialog.set_title(self.get_edit_dialog_title())
         notebook = gtk.Notebook()
         edit_dialog.vbox.pack_start(notebook, True, True, 6)
         

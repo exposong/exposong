@@ -1093,6 +1093,10 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         return information['name']
     
     @staticmethod
+    def get_edit_dialog_title():
+        return _("New Song")
+    
+    @staticmethod
     def get_type():
         'Return the presentation type.'
         return 'song'
