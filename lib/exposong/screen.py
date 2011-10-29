@@ -73,24 +73,31 @@ class Screen(exposong._hook.Menu):
         
         # Themes being used for the preview when black, background or logo  is active
         t = exposong.theme
+        pos = [0.0, 0.3, 1.0, 0.7]
         # Black theme
         self._theme_black = t.Theme()
         self._theme_black.backgrounds.append(t.ColorBackground(color='#000'))
         self._theme_black.backgrounds.append(t.ImageBackground(
                 os.path.join(RESOURCE_PATH, 'icons', 'screen-black.png'),
-                aspect=exposong.theme.ASPECT_FIT))
+                aspect=exposong.theme.ASPECT_FIT, pos=pos))
         # Background theme
         self._theme_bg = t.Theme()
         self._theme_bg.backgrounds.append(t.ColorBackground(color='#000'))
         self._theme_bg.backgrounds.append(t.ImageBackground(
                 os.path.join(RESOURCE_PATH, 'icons', 'screen-bg.png'),
-                aspect=exposong.theme.ASPECT_FIT))
+                aspect=exposong.theme.ASPECT_FIT, pos=pos))
         # Logo theme
         self._theme_logo = t.Theme()
         self._theme_logo.backgrounds.append(t.ColorBackground(color='#000'))
         self._theme_logo.backgrounds.append(t.ImageBackground(
                 os.path.join(RESOURCE_PATH, 'icons', 'screen-logo.png'),
-                aspect=exposong.theme.ASPECT_FIT))
+                aspect=exposong.theme.ASPECT_FIT, pos=pos))
+        # Freeze theme
+        self._theme_freeze = t.Theme()
+        self._theme_freeze.backgrounds.append(t.ColorBackground(color='#000'))
+        self._theme_freeze.backgrounds.append(t.ImageBackground(
+                os.path.join(RESOURCE_PATH, 'icons', 'screen-freeze.png'),
+                aspect=exposong.theme.ASPECT_FIT, pos=pos))
     
     def reposition(self, parent):
         '''
@@ -258,6 +265,8 @@ class Screen(exposong._hook.Menu):
                 self._theme_bg.render(ccontext, bounds, None)
             elif self._actions.get_action('Logo').get_active():
                 self._theme_logo.render(ccontext, bounds, None)
+            elif self._actions.get_action('Freeze').get_active():
+                self._theme_freeze.render(ccontext, bounds, None)
         
         exposong.notify.notify.draw(ccontext, bounds)
             
@@ -391,6 +400,8 @@ class Screen(exposong._hook.Menu):
         'Set the screen to the ExpoSong logo or a user-defined one.'
         if action == None:
             action = self._actions.get_action('Logo')
+        if not action.get_active():
+            self._secondary_button_toggle(action)
         if config.has_option("screen", "logo") and \
                 os.path.isfile(config.get("screen", "logo")):
             # TODO should we resize the logo? If not, we need to add the

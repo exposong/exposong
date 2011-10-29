@@ -155,6 +155,10 @@ class Presentation:
         'Return the pixbuf icon.'
         raise NotImplementedError
     
+    @staticmethod
+    def get_edit_dialog_title():
+        return _("New Presentation")
+    
     def slide_column(self, col):
         'Sets the column for slidelist.'
         col.clear()
