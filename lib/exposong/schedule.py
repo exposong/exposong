@@ -33,6 +33,7 @@ class Schedule:
     Can be built-in or user-defined.
     '''
     def __init__(self, title="", filename = None, builtin = True, model = None):
+        'Initialize the Schedule.'
         self.title = title
         if model == None:
             self._model = gtk.ListStore(*preslist.PresList.get_model_args())

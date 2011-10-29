@@ -83,6 +83,7 @@ class PresFilter(gtk.Entry, exposong._hook.Menu):
 
         # data
         self._timeout_id = 0
+        self.__fmodel = None
 
     def _on_icon_pressed(self, widget, icon, mouse_button):
         """
@@ -155,11 +156,16 @@ class PresFilter(gtk.Entry, exposong._hook.Menu):
         'Filters preslist by the keywords.'
         preslist = exposong.preslist.preslist
         if self.get_text() == "":
-            preslist.set_model(preslist.get_model())
+            if preslist.get_model() == self.__fmodel:
+                preslist.set_model(preslist.get_model().get_model())
+            self.__fmodel = None
         else:
-            filt = preslist.get_model().filter_new()
-            filt.set_visible_func(self._visible_func)
-            preslist.set_model(filt)
+            if preslist.get_model() == self.__fmodel:
+                self.__fmodel = preslist.get_model().get_model().filter_new()
+            else:
+                self.__fmodel = preslist.get_model().filter_new()
+            self.__fmodel.set_visible_func(self._visible_func)
+            preslist.set_model(self.__fmodel)
 
     def _visible_func(self, model, itr):
         'Tests the row for visibility.'

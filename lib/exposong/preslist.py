@@ -98,11 +98,11 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         'Return true if an item is selected.'
         return bool(self.get_selection().count_selected_rows())
     
-    def get_model(self):
+    def get_model(self, liststore=False):
         "Get the model (schedule) that contains the items."
         model = gtk.TreeView.get_model(self)
-        if isinstance(model, (gtk.TreeModelFilter, gtk.TreeModelSort)):
-            return model.get_model()
+        while liststore and isinstance(model, (gtk.TreeModelFilter, gtk.TreeModelSort)):
+            model = model.get_model()
         return model
     
     def get_filter_model(self):
@@ -159,7 +159,7 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         pres_add = self._actions.get_action("pres-add-to-schedule")
         pres_delete.set_sensitive(self.has_selection() and self.get_model().builtin)
         pres_remove.set_sensitive(self.has_selection() and not self.get_model().builtin)
-        pres_remove.set_visible(not self.get_model().builtin)
+        pres_remove.set_visible(not self.get_model(True).builtin)
         pres_add.set_sensitive(self.has_selection())
         for action in exposong.schedlist.schedlist.get_add_sched_actions():
             action.set_sensitive(self.has_selection())
