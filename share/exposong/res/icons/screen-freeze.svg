@@ -10,18 +10,25 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   inkscape:export-ydpi="90.000000"
-   inkscape:export-xdpi="90.000000"
-   inkscape:export-filename="C:\Users\Brad Landis\Desktop\es-images\freeze.png"
+   inkscape:export-ydpi="180"
+   inkscape:export-xdpi="180"
+   inkscape:export-filename="C:\Users\Owner\exposong\share\exposong\res\icons\screen-freeze.png"
    width="48px"
    height="48px"
    id="svg11300"
    sodipodi:version="0.32"
-   inkscape:version="0.48.0 r9654"
-   sodipodi:docname="freeze.svg"
+   inkscape:version="0.47 r22583"
+   sodipodi:docname="screen-freeze.svg"
    version="1.1">
   <defs
      id="defs3">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 24 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="48 : 24 : 1"
+       inkscape:persp3d-origin="24 : 16 : 1"
+       id="perspective78" />
     <linearGradient
        inkscape:collect="always"
        id="linearGradient10020">
@@ -343,8 +350,8 @@
      inkscape:showpageshadow="false"
      inkscape:window-width="972"
      inkscape:window-height="727"
-     inkscape:window-x="1541"
-     inkscape:window-y="160"
+     inkscape:window-x="333"
+     inkscape:window-y="48"
      inkscape:window-maximized="0" />
   <metadata
      id="metadata4">
