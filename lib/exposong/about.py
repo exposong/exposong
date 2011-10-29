@@ -38,7 +38,8 @@ class About:
         self.dialog.set_authors(("Brad Landis",
                                  "Samuel Mehrbrodt",
                                  "Siegwart Bogatscher",))
-        self.dialog.set_artists(("Tango (http://tango.freedesktop.org)",))
+        self.dialog.set_artists(("Tango (http://tango.freedesktop.org)",
+                                 "Brad Landis"))
         if _("translator-credits") is not "translator-credits":
             self.dialog.set_translator_credits(_("translator-credits"))
         self.dialog.set_logo(gtk.gdk.pixbuf_new_from_file(
