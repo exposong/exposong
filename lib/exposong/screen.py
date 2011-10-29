@@ -29,8 +29,10 @@ import exposong.main
 import exposong.prefs
 import exposong.slidelist
 import exposong.theme
-from exposong.config import config
 import exposong.notify
+
+from exposong.config import config
+from exposong import RESOURCE_PATH
 
 
 def c2dec(color):
@@ -54,7 +56,6 @@ class Screen(exposong._hook.Menu):
     '''
     The presentation screen for ExpoSong.
     '''
-    
     def __init__(self):
         "Create the screen's GUI."
         self.aspect = 4 / 3
@@ -64,13 +65,32 @@ class Screen(exposong._hook.Menu):
         
         self.pres = gtk.DrawingArea()
         self.pres.connect("expose-event", self._expose_pres)
-        #self.pres.set_redraw_on_allocate(False) #This may fix the compiz redraw problem.
         self.window.add(self.pres)
         
         self.preview = gtk.DrawingArea()
         self.preview.connect("expose-event", self._expose_preview)
         
-        #self.draw()
+        
+        # Themes being used for the preview when black, background or logo  is active
+        t = exposong.theme
+        # Black theme
+        self._theme_black = t.Theme()
+        self._theme_black.backgrounds.append(t.ColorBackground(color='#000'))
+        self._theme_black.backgrounds.append(t.ImageBackground(
+                os.path.join(RESOURCE_PATH, 'icons', 'screen-black.png'),
+                aspect=exposong.theme.ASPECT_FIT))
+        # Background theme
+        self._theme_bg = t.Theme()
+        self._theme_bg.backgrounds.append(t.ColorBackground(color='#000'))
+        self._theme_bg.backgrounds.append(t.ImageBackground(
+                os.path.join(RESOURCE_PATH, 'icons', 'screen-bg.png'),
+                aspect=exposong.theme.ASPECT_FIT))
+        # Logo theme
+        self._theme_logo = t.Theme()
+        self._theme_logo.backgrounds.append(t.ColorBackground(color='#000'))
+        self._theme_logo.backgrounds.append(t.ImageBackground(
+                os.path.join(RESOURCE_PATH, 'icons', 'screen-logo.png'),
+                aspect=exposong.theme.ASPECT_FIT))
     
     def reposition(self, parent):
         '''
@@ -228,6 +248,17 @@ class Screen(exposong._hook.Menu):
                 theme.render(ccontext, bounds, slide)
         else:
             theme.render(ccontext, bounds, slide)
+        
+        # In Preview show the themes defined in __init__ when
+        # one of the secondary buttons is active.
+        if widget is self.preview:
+            if self._actions.get_action('Black Screen').get_active():
+                self._theme_black.render(ccontext, bounds, None)
+            elif self._actions.get_action('Background').get_active():
+                self._theme_bg.render(ccontext, bounds, None)
+            elif self._actions.get_action('Logo').get_active():
+                self._theme_logo.render(ccontext, bounds, None)
+        
         exposong.notify.notify.draw(ccontext, bounds)
             
         return True
@@ -260,7 +291,6 @@ class Screen(exposong._hook.Menu):
                 #('Pause', gtk.STOCK_MEDIA_PAUSE, None, None,
                 #        _('Pause a timed slide.'), screen.pause),
                 ])
-        #cls._actions2 = gtk.ActionGroup('screen2')
         cls._actions.add_toggle_actions([
                 ('Black Screen', 'screen-black', _('_Black Screen'), "b",
                         _("Show a black screen."),
