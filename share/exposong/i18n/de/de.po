@@ -2,22 +2,22 @@
 # Copyright (C) 2008-2011 Exposong.org
 # This file is distributed under the same license as the ExpoSong package.
 # Siegwart B. <siegwart.b@googlemail.com>, 2008.
-# Samuel Mehrbrodt <s.mehrbrodt@gmail.com>, 2011.
+# Samuel Mehrbrodt <Unknown>, 2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-27 20:25+0200\n"
-"PO-Revision-Date: 2011-10-25 22:57+0200\n"
-"Last-Translator: Samuel Mehrbrodt <s.mehrbrodt@gmail.com>\n"
+"POT-Creation-Date: 2011-10-27 21:00+0200\n"
+"PO-Revision-Date: 2011-11-05 22:11+0100\n"
+"Last-Translator: Samuel Mehrbrodt <Unknown>\n"
 "Language-Team: German>\n"
-"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-10-26 04:51+0000\n"
-"X-Generator: Launchpad (build Unknown)\n"
+"X-Launchpad-Export-Date: 2011-10-29 05:27+0000\n"
+"X-Generator: Launchpad (build 14197)\n"
+"Language: \n"
 
 #: lib/exposong/about.py:37
 #, python-format
@@ -28,10 +28,7 @@ msgstr "Copyright %s"
 msgid "translator-credits"
 msgstr ""
 "Siegwart Bogatscher\n"
-"Samuel Mehrbrodt\n"
-"\n"
-"Launchpad Contributions:\n"
-"  Samuel Mehrbrodt https://launchpad.net/~sam92"
+"Samuel Mehrbrodt"
 
 #: lib/exposong/exampleslide.py:49
 #, python-format
@@ -172,6 +169,10 @@ msgid ""
 "Currently, the only content can be text or images, but other media may be "
 "available in future releases."
 msgstr ""
+"Die <b>ExpoSong-Präsentation</b> ist für allgemeine Präsentationen gedacht. "
+"Sie kann für Predigten, Ansagen oder sonst etwas anderes als Liedtexte "
+"benutzt werden. Im Moment können Texte und Bilder dazu verwendet werden, bei "
+"späteren Versionen werden eventuell noch andere Medien unterstützt."
 
 #: lib/exposong/help.py:158
 msgid ""
@@ -181,9 +182,11 @@ msgid ""
 "songbook number, copyright and ccli number, which may be displayed on the "
 "screen with the Lyric."
 msgstr ""
-"Die Lieder-Präsentation ist für Liedtexte gedacht. Die Folien können Strophen, Chorusse oder andere Liedteile sein und "
-"Zahlen enthalten (wie z.B. Strophe 1, Strophe 2). Liedtexte können auch Metadaten wie Autor, Liederbuchnummer,"
-"Copyright und CCLI-Nummer enthalten, welche auf dem Bildschirm zusammen mit dem Liedtext angezeigt werden können."
+"Die <b>Liedtext</b>-Präsentation ist für Liedtexte gedacht. Die Folien "
+"können Strophen, Chorusse oder andere Liedteile sein und Zahlen enthalten "
+"(wie z.B. Strophe 1, Strophe 2). Liedtexte können auch Metadaten wie Autor, "
+"Liederbuchnummer,Copyright und CCLI-Nummer enthalten, welche auf dem "
+"Bildschirm zusammen mit dem Liedtext angezeigt werden können."
 
 #: lib/exposong/help.py:163
 msgid ""
@@ -221,33 +224,37 @@ msgid ""
 "Themes can be created by using File|New|New Theme. The first part of a theme "
 "is the background. It can consist of images, solid colors, and gradient "
 "(which is a gradual change from one color to the next)."
-msgstr "Über Datei|Neu|Neues Design können Sie ein neues Design erstellen."
-"Der erste Teil des Designs ist der Hintergrund. Er kann aus Bilder, "
-"einfachen Farben und Farbverläufen bestehen."
-
+msgstr ""
+"Über Datei|Neu|Neues Design können Sie ein neues Design erstellen.Der erste "
+"Teil des Designs ist der Hintergrund. Er kann aus Bilder, einfachen Farben "
+"und Farbverläufen bestehen."
 
 #: lib/exposong/help.py:184
 msgid ""
 "The body and footer text can be moved and modified in font name and size, "
 "color, alignment, line spacing (from one row to the next), the text shadow's "
 "color and offset, and a text outline size and color."
-msgstr "Der Textkörper und die Fußzeile können verschoben und verändert werden "
-"in der Schriftart und -größe, "
-"Farbe, Ausrichtung, Zeilenabstand, Textschattenfarbe und -abstand, und Textkontur und -farbe."
+msgstr ""
+"Der Textkörper und die Fußzeile können verschoben und verändert werden in "
+"der Schriftart und -größe, Farbe, Ausrichtung, Zeilenabstand, "
+"Textschattenfarbe und -abstand, und Textkontur und -farbe."
 
 #: lib/exposong/help.py:187
 msgid ""
 "Both backgrounds and body and footer texts can be moved to different "
 "positions using the form under the preview."
-msgstr "Hintergründe, Textkörper und auch die Fußzeile können mit den Eingabefeldern unter der Vorschau "
-"verschoben werden."
+msgstr ""
+"Hintergründe, Textkörper und auch die Fußzeile können mit den Eingabefeldern "
+"unter der Vorschau verschoben werden."
 
 #: lib/exposong/help.py:189
 msgid ""
 "Metadata, such as author, copyright, and tags can also be added to the theme "
 "using the tab. This information will not appear on the screen."
-msgstr "Sie können auch Metadaten wie Autor, Copyright und Schlagwörter zu dem Design hinzufügen. "
-"Benutzen Sie dafür den entsprechenden Reiter. Diese Informationen erscheinen nicht auf dem Bildschirm."
+msgstr ""
+"Sie können auch Metadaten wie Autor, Copyright und Schlagwörter zu dem "
+"Design hinzufügen. Benutzen Sie dafür den entsprechenden Reiter. Diese "
+"Informationen erscheinen nicht auf dem Bildschirm."
 
 #: lib/exposong/help.py:191
 msgid "Background Tips"
@@ -526,7 +533,8 @@ msgstr "Liederbuch"
 #: lib/exposong/prefs.py:80
 msgid "Songbooks in Songs are automatically added to this list."
 msgstr ""
-"Liederbücher aus den Liedtexten werden automatisch zu dieser Liste hinzugefügt."
+"Liederbücher aus den Liedtexten werden automatisch zu dieser Liste "
+"hinzugefügt."
 
 #: lib/exposong/prefs.py:83
 msgid "General"
@@ -817,7 +825,8 @@ msgstr "Farbe"
 msgid "Gradient"
 msgstr "Farbverlauf"
 
-#: lib/exposong/themeeditor.py:33 lib/exposong/theme.py:377
+#: lib/exposong/themeeditor.py:33 lib/exposong/themeeditor.py:585
+#: lib/exposong/theme.py:377
 msgid "Radial Gradient"
 msgstr "Kreisförmiger Farbverlauf"
 
@@ -856,7 +865,7 @@ msgstr "Einen neuen Bildhintergrund hinzufügen"
 
 #: lib/exposong/themeeditor.py:90
 msgid "Add a new Solid Color Background"
-msgstr "Einen neuen einfachen Farbhintergrund hinzufügen"
+msgstr "Einen neuen Farbhintergrund hinzufügen"
 
 #: lib/exposong/themeeditor.py:94
 msgid "Add a new Gradient Background"
@@ -875,8 +884,8 @@ msgid ""
 "Backgrounds will be drawn starting with the first element in this list "
 "moving to the last one."
 msgstr ""
-"Hintergründe werden übereinander gelegt, beginnend mit dem obersten Element "
-"in dieser Liste."
+"Hintergründe werden hintereinander vom ersten bis zum letzten Element in "
+"dieser Liste gezeichnet."
 
 #: lib/exposong/themeeditor.py:150
 msgid "Body Text"
@@ -924,9 +933,7 @@ msgstr "Typ und Größe"
 
 #: lib/exposong/themeeditor.py:221
 msgid "Note that the font size might be scaled down if it doesn't fit."
-msgstr ""
-"Die Schriftgröße wird verkleinert werden, falls sie nicht auf den Bildschirm "
-"passt."
+msgstr "Schriftgröße kann verkleinert werden wenn sie nicht hineinpasst."
 
 #: lib/exposong/themeeditor.py:225
 msgid "Alignment"
@@ -1001,8 +1008,9 @@ msgid ""
 "Shadow offsets are measured in percentage of font height. So an offset of "
 "0.5 for point 12 font is 6 points."
 msgstr ""
-"Schattenverschiebung wird in Prozent der Schriftgröße gemessen. Somit hat "
-"eine Schrift der Größe 12 eine Verschiebung von 6 Punkt."
+"Schattenverschiebung wird in Prozent von der Schrifthöhe angegeben. Bei "
+"einer Verschiebung von 0,5 und Schriftgröße 12 beträgt die Verschiebung 6 "
+"Punkte."
 
 #: lib/exposong/themeeditor.py:256
 msgid "Text Outline"
@@ -1113,7 +1121,8 @@ msgstr "Fußzeilen-Position"
 msgid ""
 "Unsaved Changes will be lost if you close the Editor. Do you want to save?"
 msgstr ""
-"Ungespeicherte Änderungen gehen verloren, wenn sie den Editor beenden. Möchten Sie speichern?"
+"Ungespeicherte Änderungen gehen verloren, wenn sie den Editor beenden. "
+"Möchten Sie speichern?"
 
 #: lib/exposong/themeeditor.py:991
 msgid "Unsaved changes"
@@ -1130,7 +1139,7 @@ msgstr "Schwarz"
 #: lib/exposong/themeselect.py:167
 #, python-format
 msgid "Are you sure you want to delete the theme \"%s\"?"
-msgstr "Sind Sie sicher, dass Sie dieses Design löschen möchten?"
+msgstr "Sind Sie sicher, dass Sie das Design \"%s\" löschen möchten?"
 
 #: lib/exposong/themeselect.py:171
 msgid "Delete Theme?"
@@ -1208,8 +1217,10 @@ msgstr "Liedtext(e) importieren (OpenLyrics-Format)"
 msgid ""
 "The Song \"%(new_song)s\" has similarities with this existing Song from your "
 "library: \"%(existing_song)s\". What do you want to do?"
-msgstr "Der Liedtext \"%(new_song)s\" hat Ähnlichkeiten mit diesem bereits bestehenden Liedtext aus der Bibliothek: "
-"\"%(existing_song)s\". Was möchten Sie tun?"
+msgstr ""
+"Der Liedtext \"%(new_song)s\" hat Ähnlichkeiten mit diesem bereits "
+"bestehenden Liedtext aus der Bibliothek: \"%(existing_song)s\". Was möchten "
+"Sie tun?"
 
 #: lib/exposong/plugins/export_import.py:298
 msgid "Replace existing Song"
@@ -1281,7 +1292,7 @@ msgstr "Eine Lieder-Präsentation von ExpoSong vor 0.7 importieren"
 
 #: lib/exposong/plugins/lyric.py:47
 msgid "Song"
-msgstr ""
+msgstr "Liedtext"
 
 #: lib/exposong/plugins/lyric.py:57
 msgid "Words"
@@ -1589,7 +1600,7 @@ msgstr "Wert"
 
 #: lib/exposong/plugins/pres.py:399
 msgid "Information"
-msgstr "Informationen"
+msgstr "Information"
 
 #: lib/exposong/plugins/pres.py:411
 msgid "Use Timer"
@@ -1629,7 +1640,7 @@ msgstr "Textfolie"
 
 #: lib/exposong/plugins/pres.py:583
 msgid "Create a slide with text only."
-msgstr "Nur-Text-Folie erstellen"
+msgstr "Eine Folie nur mit Text erstellen."
 
 #: lib/exposong/plugins/pres.py:590
 msgid "Image Slide"
@@ -1682,18 +1693,19 @@ msgstr "Text hinzufügen"
 
 #: lib/exposong/plugins/pres.py:878
 msgid "Add a new text element."
-msgstr "Ein neues Textelement hinzufügen."
+msgstr "Ein neues Text-Element hinzufügen"
 
 #: lib/exposong/plugins/pres.py:882
 msgid "Add a new image element."
-msgstr "Ein neues Bildelement hinzufügen"
+msgstr "EIn neues Bild-Element hinzufügen"
 
 #: lib/exposong/plugins/pres.py:945
 msgid ""
 "Positions are relative, with values between 0 and 1. A value of 0 is on the "
 "far left or top, and a value of 1 is on the far right or bottom."
-msgstr "Positionen sind relativ, mit Werten zwischen 0 und 1. Ein Wert von 0 ist ganz links oder oben,"
-"und ein Wert von 1 ist ganz rechts oder unten."
+msgstr ""
+"Positionen sind relativ mit Werten zwischen 0 und 1. Ein Wert von 0 ist ganz "
+"links oder oben und ein Wert von 1 ist ganz rechts oder unten."
 
 #: lib/exposong/plugins/pres.py:972
 msgid "Margin:"
@@ -1709,7 +1721,9 @@ msgstr "Vertikale Ausrichtung:"
 
 #: lib/exposong/plugins/pres.py:1000
 msgid "Select or add an item from the left to edit."
-msgstr "Einen Eintrag auswählen oder hinzufügen zum bearbeiten."
+msgstr ""
+"Wählen Sie ein Element von der linken Seite oder fügen Sie eins hinzu, um es "
+"zu bearbeiten."
 
 #: lib/exposong/plugins/pres.py:1067
 msgid "Resize to:"
@@ -1717,7 +1731,7 @@ msgstr "Verkleinern auf:"
 
 #: lib/exposong/plugins/pres.py:1238
 msgid "The image's source was not set."
-msgstr "Die Bildquelle wurde nicht eingegeben."
+msgstr "Die Bildquelle wurde nicht definiert."
 
 #: lib/exposong/plugins/pres.py:1246
 msgid "The text must have a value."
@@ -1743,240 +1757,3 @@ msgstr "_SongSelect-Liedtexte ..."
 #: lib/exposong/plugins/songselect_convert.py:190
 msgid "Converts a SongSelect file to OpenLyrics"
 msgstr "Konvertiert eine SongSelect-Datei zu OpenLyrics"
-
-#~ msgid "1. Download the packages you want\n"
-#~ msgstr "1. Laden Sie die Pakete, die Sie möchten herunter\n"
-
-#~ msgid "Download Example Data"
-#~ msgstr "Beispieldaten herunterladen"
-
-#~ msgid "Free English Lyrics"
-#~ msgstr "Freie Englische Lieder"
-
-#~ msgid "Background Pack"
-#~ msgstr "Hintergrund-Paket"
-
-#~ msgid "Download using Webbrowser"
-#~ msgstr "Mit dem Webbrowser herunterladen"
-
-#~ msgid "_Download Example Data"
-#~ msgstr "Beispieldaten _herunterladen"
-
-#~ msgid "Offer Example Data for Download"
-#~ msgstr "Beispieldaten zum Download anbieten"
-
-#~ msgid "Statistics and System Information"
-#~ msgstr "Statistiken und System-Informationen"
-
-#~ msgid "ExpoSong Statistics"
-#~ msgstr "ExpoSong Statistiken"
-
-#~ msgid "Platform:"
-#~ msgstr "Plattform:"
-
-#~ msgid "Background Select"
-#~ msgstr "Hintergrund auswählen"
-
-#~ msgid "Add"
-#~ msgstr "Hinzufügen"
-
-#~ msgid ""
-#~ "Add, edit, or delete slides using the toolbar buttons. In a schedule, you "
-#~ "can drag and drop slides to reorder the slides."
-#~ msgstr ""
-#~ "Das Hinzufügen, Bearbeiten oder Löschen von Folien geschieht mit den "
-#~ "Toolbar-Buttons. Um Ihre Folien neu anzuordnen, ziehen Sie sie einfach an "
-#~ "die gewünschte Stelle."
-
-#~ msgid ""
-#~ "The <b>text</b> presentation is used to create a non-specific, text "
-#~ "slide. It can be used for sermons, announcements, or anything else."
-#~ msgstr ""
-#~ "Die <b>Text</b>-Präsentation wird verwendet um einfache Textfolien zu "
-#~ "erstellen. Sie kann für Predigten, Ankündigungen oder andere "
-#~ "Informationen eingesetzt werden."
-
-#~ msgid ""
-#~ "The <b>image</b> presentation is used to present images. Add multiple "
-#~ "images at once by using [shift] or [control] in the add dialog. Rearrange "
-#~ "images by using drag-and-drop."
-#~ msgstr ""
-#~ "Die Bilder-Präsentation wird verwendet um Bilder zu präsentieren. Fügen "
-#~ "Sie mehrere Bilder auf einmal hinzu, indem sie im Auswahl-Dialog die "
-#~ "Shift- oder Strg-Taste drücken. Ändern Sie die Reihenfolge der Bilder, "
-#~ "indem Sie die Bilder ziehen und an der gewünschten Position ablegen."
-
-#~ msgid ""
-#~ "The background image for presentations can be a gradient or an image "
-#~ "file. Change the image by using the controls next to the preview screen."
-#~ msgstr ""
-#~ "Das Hintergrundbild von Präsentationen kann entweder ein Farbübergang "
-#~ "oder eine Bild-Datei sein. Ändern Sie das Bild indem Sie die die "
-#~ "Schaltflächen links neben dem Vorschau-Bildschirm benutzen."
-
-#~ msgid "Background Image Tips"
-#~ msgstr "Tips für Hintergrundbilder"
-
-#~ msgid "Control-g"
-#~ msgstr "Strg-g"
-
-#~ msgid "Next Screen"
-#~ msgstr "Nächste Folie"
-
-#~ msgid "Down"
-#~ msgstr "Pfeil runter"
-
-#~ msgid "Previous Screen"
-#~ msgstr "Vorherige Folie"
-
-#~ msgid "Up"
-#~ msgstr "Pfeil hoch"
-
-#~ msgid "Next Screen (Use Order)"
-#~ msgstr "Nächste Folie (Reihenfolge benutzen)"
-
-#~ msgid "Previous Screen (Use Order)"
-#~ msgstr "Vorherige Folie (Reihenfolge benutzen)"
-
-#~ msgid "Lyrics type"
-#~ msgstr "Liedtexte"
-
-#~ msgid "Go to Verse #"
-#~ msgstr "Gehe zu Strophe #"
-
-#~ msgid "1, 2, 3 and so on"
-#~ msgstr "1, 2, 3 usw."
-
-#~ msgid "Go to Chorus"
-#~ msgstr "Gehe zum Chorus"
-
-#~ msgid "Contribute"
-#~ msgstr "Mitarbeiten"
-
-#~ msgid "Legal"
-#~ msgstr "Rechtslage"
-
-#~ msgid "Max Font Size"
-#~ msgstr "Maximale Schriftgröße"
-
-#~ msgid "_Rename"
-#~ msgstr "_Umbenennen"
-
-#~ msgid "_Normal"
-#~ msgstr "_Normal"
-
-#~ msgid "_Normal State"
-#~ msgstr "_Normaler Zustand"
-
-#~ msgid "Back to normal state"
-#~ msgstr "Zurück zum normalen Zustand"
-
-#~ msgid "Show Logo"
-#~ msgstr "Logo anzeigen"
-
-#~ msgid "New %s Presentation"
-#~ msgstr "Neue %s-Präsentation"
-
-#~ msgid "exposong_backgrounds.expo"
-#~ msgstr "exposong_backgrounds.expo"
-
-#~ msgid "_Backgrounds..."
-#~ msgstr "Hinter_gründe..."
-
-#~ msgid "Please enter a Title"
-#~ msgstr "Bitte geben Sie einen Titel ein"
-
-#~ msgid "_Image"
-#~ msgstr "_Bilder"
-
-#~ msgid "Image Presentations"
-#~ msgstr "Bilder-Präsentationen"
-
-#~ msgid "Lyric Presentation"
-#~ msgstr "Lieder-Präsentation"
-
-#~ msgid "_Lyric"
-#~ msgstr "_Liedtext"
-
-#~ msgid "Lyric Presentations"
-#~ msgstr "Lieder-Präsentationen"
-
-#~ msgid "Print"
-#~ msgstr "Drucken"
-
-#~ msgid "Alphabetical list of Songs"
-#~ msgstr "Alphabetische Liederliste"
-
-#~ msgid "_List of all Songs"
-#~ msgstr "_Liste aller Lieder"
-
-#~ msgid "Text Presentation"
-#~ msgstr "Text-Präsentation"
-
-#~ msgid "_Text"
-#~ msgstr "_Text"
-
-#~ msgid "en"
-#~ msgstr "de"
-
-#~ msgid "_Present"
-#~ msgstr "_Präsentieren"
-
-#~ msgid "Hi_de"
-#~ msgstr "_Ausblenden"
-
-#~ msgid "Translators Name"
-#~ msgstr ""
-#~ "Siegwart Bogatscher\n"
-#~ "Samuel Mehrbrodt"
-
-#~ msgid "_Background"
-#~ msgstr "Hinter_grund"
-
-#~ msgid "Blac_k Screen"
-#~ msgstr "_Schwarzer Bildschirm"
-
-#~ msgid "Export Alphabetical Song List"
-#~ msgstr "Alphabetische Liederliste exportieren"
-
-#~ msgid "Import a schedule or full library."
-#~ msgstr "Ablaufplan oder Bibliothek importieren"
-
-#~ msgid "Export _Alphabetical Song List"
-#~ msgstr "Alphabetische _Liederliste exportieren"
-
-#~ msgid "CCLI Number:"
-#~ msgstr "CCLI Nummer:"
-
-#~ msgid "Delete from _Schedule"
-#~ msgstr "Aus _Ablaufplan löschen"
-
-#~ msgid "Words:"
-#~ msgstr "Text:"
-
-#~ msgid "Music:"
-#~ msgstr "Melodie:"
-
-#~ msgid "Paste As Text"
-#~ msgstr "Als Text einfügen"
-
-#~ msgid "music"
-#~ msgstr "melodie"
-
-#~ msgid "<b>Timer</b>"
-#~ msgstr "<b>Timer</b>"
-
-#~ msgid "Settings"
-#~ msgstr "Einstellungen"
-
-#~ msgid "None"
-#~ msgstr "Keine"
-
-#~ msgid "Part"
-#~ msgstr "Part"
-
-#~ msgid "Please select the presentation you want to print."
-#~ msgstr "Bitte wählen Sie eine Präsentation aus, die Sie drucken wollen."
-
-#~ msgid "_Schedule or Library ..."
-#~ msgstr "_Ablaufplan oder Bibliothek ..."

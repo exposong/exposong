@@ -32,7 +32,7 @@ if len(sys.argv)>1 and os.path.isdir(sys.argv[1]):
 else:
   print "Please pass the i18n folder in translation-export branch from"+\
         "Launchpad as a command line argument if you want it to be imported."
-EXPOSONG_TRANSLATIONS = "../share/exposong/i18n"
+EXPOSONG_TRANSLATIONS = os.path.realpath(os.path.join(__file__, '..', '..', 'share', 'exposong', 'i18n'))
 
 # Copy po files
 if PO_FILES:
@@ -40,10 +40,10 @@ if PO_FILES:
   for file in os.listdir(PO_FILES):
       if not os.path.isfile(os.path.join(PO_FILES, file)):
           continue
-      path = os.path.join(EXPOSONG_TRANSLATIONS, file.rstrip(".po"))
+      path = os.path.join(EXPOSONG_TRANSLATIONS, file.split(".")[0])
       if not os.path.exists(path):
           os.mkdir(path)
-      shutil.copy(os.path.join(PO_FILES, file), os.path.join(path, file))
+          shutil.copy(os.path.join(PO_FILES, file), os.path.join(path, file))
       cnt += 1
   print "Copied %i po-files."%cnt
   
