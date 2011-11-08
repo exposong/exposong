@@ -644,7 +644,7 @@ msgstr "Präsentation löschen"
 
 #: lib/exposong/print_support.py:94
 msgid "_Print Song"
-msgstr "Lied _Drucken"
+msgstr "Liedtext _drucken"
 
 #: lib/exposong/richedit.py:88
 msgid "_Cut"
@@ -721,7 +721,7 @@ msgstr "Ausgewählten Ablaufplan umbenennen"
 
 #: lib/exposong/schedlist.py:306
 msgid "Delete Schedule"
-msgstr "Ablaufplan löschen?"
+msgstr "Ablaufplan löschen"
 
 #: lib/exposong/schedlist.py:307
 msgid "Delete the currently selected schedule"
