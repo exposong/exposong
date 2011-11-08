@@ -165,6 +165,13 @@ class Screen(exposong._hook.Menu):
         self._actions.get_action("Hide").set_visible(False)
         self.window.hide()
         self._set_menu_items_disabled()
+        self.__block_toggle = True
+        for nm in ('Freeze', 'Background', 'Logo', 'Black Screen'):
+            nmaction = self._actions.get_action(nm)
+            if action != nmaction:
+                nmaction.set_active(False)
+        self.__block_toggle = False
+        self.preview.queue_draw()
     
     def show(self, *args):
         'Show the presentation screen.'
@@ -382,7 +389,7 @@ class Screen(exposong._hook.Menu):
             if action != nmaction:
                 nmaction.set_active(False)
             else:
-                self.show()
+                self.draw()
         self.draw()
         self.__block_toggle = False
     
@@ -430,4 +437,3 @@ class Screen(exposong._hook.Menu):
                     self.to_logo()
             else:
                 self.to_background()
-        
