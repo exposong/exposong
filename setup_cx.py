@@ -67,21 +67,19 @@ recursive_add(GTK_DIR+normpath('/share/themes/VistaBut/*'), GTK_DIR)
 
 
 setup(name       = 'exposong',
-    version      = '0.7.1',
+    version      = '0.8',
     description  = 'ExpoSong',
     long_description="""
-    ExpoSong is a presentation software with a focus on displaying lyrics, 
-    text and image slides in a Christian setting.
-
-    Features:
-    * Image, lyric, and text presentations
-    * Images and gradient backgrounds
+    ExpoSong is a presentation software with a focus on displaying Songs and
+    generic slides in a Christian setting.
+    
+    Features
+    * Create Songs or ExpoSong Presentations with mixed images and text
+    * Themes with background images, colors and gradients
     * Schedules
     * On-screen notifications
     * Logo and black screen
-    * Importing and Exporting possibilities
-    * Printing Support
-    * OpenLyrics Data Format
+    * Importing and Exporting
     * Full-text search""",
     author       = 'Exposong Team',
     author_email = 'exposong@googlegroups.com',
@@ -92,7 +90,7 @@ setup(name       = 'exposong',
     scripts      = ['bin/exposong'],
     package_dir  = {'': 'lib'},
     packages     = ['exposong', 'exposong.plugins',
-                    'openlyrics', 'openlyrics.tools'],
+                    'exposong_openlyrics', 'exposong_openlyrics.tools'],
     py_modules   = ['undobuffer', 'gettext_windows'],#+plugins,
     executables=[Executable(
         script       = 'bin/exposong',
