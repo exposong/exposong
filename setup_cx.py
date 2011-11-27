@@ -34,6 +34,8 @@ data_files = []
 # Add images
 data_files.append((normpath('share/exposong/res'),
                    glob.glob(normpath('share/exposong/res/*.png'))))
+data_files.append((normpath('share/exposong/res/icons/'),
+                   glob.glob(normpath('share/exposong/res/icons/*.png'))))
 
 # Add css file(s)
 data_files.append((normpath('share/exposong/res'),
@@ -60,10 +62,11 @@ def recursive_add(dir, pre):
         if isfile(p1):
             if re.match("^[A-Za-z_][A-Za-z0-9_.-]*$", p1.rpartition(os.sep)[2]):
                 data_files.append((p1.lstrip(pre).rpartition(os.sep)[0], [p1]))
-            continue
-        recursive_add(p1+normpath("/*"), pre)
+        else:
+            recursive_add(p1+normpath("/*"), pre)
 
-recursive_add(GTK_DIR+normpath('/share/themes/VistaBut/*'), GTK_DIR)
+# TODO: Theme not working.
+recursive_add(GTK_DIR + normpath('/share/themes/VistaBut/*'), GTK_DIR)
 
 
 setup(name       = 'exposong',

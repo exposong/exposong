@@ -26,13 +26,11 @@ import __builtin__
 import exposong.version
 import gettext
 import gettext_windows
-import gtk
 import locale
 import logging
 import os
 import os.path
 import platform
-import pygtk
 import shutil
 import sys
 import traceback
@@ -112,6 +110,8 @@ _handler.setFormatter(_fmt)
 log.addHandler(_handler)
 
 # Logging to the Exposong Debug Window
+import gtk
+import pygtk
 import exposong.gtklogger
 exposong.gtklogger.handler = exposong.gtklogger.GTKHandler(logging.DEBUG)
 log.addHandler(exposong.gtklogger.handler)
@@ -119,7 +119,7 @@ log.addHandler(exposong.gtklogger.handler)
 # Log to a file.
 if options.log:
     _handler = logging.FileHandler(options.log)
-    _handler.setLevel(logging.INFO)
+    _handler.setLevel(logging.DEBUG)
     _fmt = logging.Formatter("%(asctime)s:%(filename)\
             s@%(lineno)d:%(levelname)s: %(message)s")
     _handler.setFormatter(_fmt)

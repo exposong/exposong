@@ -72,12 +72,12 @@ def get_plugins_by_capability(klass):
 if hasattr(sys, "frozen"):
     import exposong.plugins.export_import
     import exposong.plugins.lyric
-    import exposong.plugins.lyric_legacy_convert
+    import exposong.plugins.pres
+    import exposong.plugins.legacy_format_convert
     import exposong.plugins.opensong_convert
     import exposong.plugins.songselect_convert
-    import exposong.plugins.pres
     __all__ = ["export_import","lyric","pres",
-               "lyric_legacy_convert","opensong_convert","songselect_convert"]
+               "legacy_format_convert","opensong_convert","songselect_convert"]
 else:
     __all__ = [fnm[:-3] for fnm in os.listdir(__path__[0])
                if fnm.endswith(".py") and not fnm.startswith("_")]
