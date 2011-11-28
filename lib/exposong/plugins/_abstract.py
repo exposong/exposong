@@ -288,10 +288,19 @@ class Presentation:
         "Called when a new presentation was created"
         pres = cls()
         if pres.edit():
-            sched = exposong.schedlist.schedlist.get_active_item()
-            if sched and not sched.builtin:
-                sched.append(pres)
             #Add presentation to appropriate builtin schedules
+            sched = exposong.schedlist.schedlist.get_active_item()
+            if not sched:
+                pass
+            elif sched.builtin and sched.title != cls.schedule_name():
+                # Select the schedule for the presentation type
+                for s2 in exposong.schedlist.schedlist.get_model():
+                    if s2[0] and s2[0].title == cls.schedule_name():
+                        exposong.schedlist.schedlist.get_selection().select_iter(s2.iter)
+                        break
+            elif not sched.builtin:
+                sched.append(pres)
+                
             exposong.main.main.library.append(pres)
     
     def on_delete(self):
