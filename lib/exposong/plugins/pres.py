@@ -129,7 +129,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                     if editor.changed:
                         self.title = editor.get_slide_title()
                         self._content = editor.slide_content
-                        ret = 1
+                    ret = 1
                 elif ans == gtk.RESPONSE_APPLY: #Close and new
                     if editor.changed:
                         self.title = editor.get_slide_title()
@@ -189,6 +189,14 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             slide._content = copy.deepcopy(self._content)
             return slide
         
+        def _on_delete(self):
+            "Called when the slide is to be deleted."
+            for c in self._content:
+                print c
+                if hasattr(c, "src") and \
+                        c.src.startswith(os.path.join(IMAGE_PATH)):
+                    os.remove(c.src)
+
         @staticmethod
         def get_version():
             "Return the version number of the plugin."
@@ -286,6 +294,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
     
     def _edit_tabs(self, notebook, parent):
         "Tabs for the dialog."
+        self._on_edit_confirm = []
         vbox = gtk.VBox()
         vbox.set_border_width(4)
         vbox.set_spacing(7)
@@ -507,6 +516,9 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             self._timer = None
         
         _abstract.Presentation._edit_save(self)
+        for x in self._on_edit_confirm:
+            x()
+        del self._on_edit_confirm
     
     def _is_editing_complete(self, parent):
         "Test to see if all fields have been filled which are required."
@@ -570,6 +582,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         resp = dialog.run()
         dialog.hide()
         if resp == gtk.RESPONSE_YES:
+            self._on_edit_confirm.append(model.get_value(itr, 0)._on_delete)
             model.remove(itr)
 
     ## Predefined Slide Types
@@ -681,6 +694,11 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             
         fchooser.destroy()
     
+    def on_delete(self):
+        "Called when the presentation is deleted."
+        for s in self.slides:
+            s._on_delete()
+                    
     ## Order
     
     def get_order(self):
