@@ -41,7 +41,7 @@ for filepath in glob.glob(normpath('share/exposong/i18n/*/LC_MESSAGES/exposong.m
 # Add menu entry for Linux
 data_files.append(('share/applications',
                    [normpath("debian/exposong.desktop")]))
-data_files.append(('share/mime/packages/exposong.xml',
+data_files.append(('share/mime/packages',
                    [normpath("debian/exposong.xml")]))
 data_files.append(('share/pixmaps',
                    [normpath('share/exposong/res/es64.png')]))
