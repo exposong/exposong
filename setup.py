@@ -26,6 +26,10 @@ data_files = []
 data_files.append((normpath('share/exposong/res'),
                    glob.glob(normpath('share/exposong/res/*.png'))))
 
+# Add icons
+data_files.append((normpath('share/exposong/res/icons'),
+                   glob.glob(normpath('share/exposong/res/icons/*.png'))))
+
 # Add css file(s)
 data_files.append((normpath('share/exposong/res'),
                    glob.glob(normpath('share/exposong/res/*.css'))))
