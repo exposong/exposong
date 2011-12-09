@@ -1,0 +1,1728 @@
+# Hebrew translation for exposong
+# Copyright (c) 2011 Rosetta Contributors and Canonical Ltd 2011
+# This file is distributed under the same license as the exposong package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2011.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: exposong\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2011-10-27 21:00+0200\n"
+"PO-Revision-Date: 2011-10-29 10:24+0000\n"
+"Last-Translator: Yaron <sh.yaron@gmail.com>\n"
+"Language-Team: Hebrew <he@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2011-10-30 05:22+0000\n"
+"X-Generator: Launchpad (build 14197)\n"
+
+#: lib/exposong/about.py:37
+#, python-format
+msgid "Copyright %s"
+msgstr "זכויות יוצרים %s"
+
+#: lib/exposong/about.py:42 lib/exposong/about.py:43
+msgid "translator-credits"
+msgstr ""
+"Launchpad Contributions:\n"
+"  Yaron https://launchpad.net/~sh-yaron"
+
+#: lib/exposong/exampleslide.py:49
+#, python-format
+msgid "Written by: %s"
+msgstr "נכתב על ידי: %s"
+
+#: lib/exposong/exampleslide.py:50
+#, python-format
+msgid "Generated from: %s"
+msgstr "נוצר מ־: %s"
+
+#: lib/exposong/gtklogger.py:71
+msgid "Filter Severity:"
+msgstr "חומרת המסנן:"
+
+#: lib/exposong/gtklogger.py:84
+msgid "Time"
+msgstr "זמן"
+
+#: lib/exposong/gtklogger.py:92
+msgid "Severity"
+msgstr "חומרה"
+
+#: lib/exposong/gtklogger.py:101
+msgid "Message"
+msgstr "הודעה"
+
+#: lib/exposong/gui.py:134 lib/exposong/gui.py:145 lib/exposong/gui.py:245
+msgid "Choose File"
+msgstr "בחירת קובץ"
+
+#: lib/exposong/gui.py:258
+msgid "Choose Folder"
+msgstr "בחירת תיקייה"
+
+#: lib/exposong/gui.py:368
+msgid "Language Code"
+msgstr "קוד השפה"
+
+#: lib/exposong/help.py:51
+msgid "Help page opened in Web Browser"
+msgstr "דף העזרה נפתח בדפדפן אינטרנט"
+
+#: lib/exposong/help.py:56
+msgid "Checking for updates ..."
+msgstr "מתבצעת בדיקת עדכונים ..."
+
+#: lib/exposong/help.py:64
+msgid "An Error Occurred"
+msgstr "אירעה שגיאה"
+
+#: lib/exposong/help.py:68
+msgid "A New Version is Available"
+msgstr "גרסה חדשה זמינה"
+
+#: lib/exposong/help.py:72
+msgid "ExpoSong is Up to Date"
+msgstr "ExpoSong עדכנית"
+
+#: lib/exposong/help.py:94
+#, python-format
+msgid "Could not read the website (error code %d)."
+msgstr "לא ניתן לקרוא מהאתר (קוד שגיאה %d)."
+
+#: lib/exposong/help.py:100
+#, python-format
+msgid ""
+"A new version (%s) is available. Would you like to be taken to the download "
+"page?"
+msgstr "גרסה חדשה (%s) זמינה. האם לקחת אותך אל עמוד ההורדה?"
+
+#: lib/exposong/help.py:104
+msgid "You are using the most recent version."
+msgstr "הגרסה שברשותך היא העדכנית ביותר."
+
+#: lib/exposong/help.py:107
+#, python-format
+msgid "Could not connect to %s."
+msgstr "לא ניתן להתחבר אל %s."
+
+#: lib/exposong/help.py:125
+msgid "ExpoSong Help"
+msgstr "העזרה של ExpoSong"
+
+#: lib/exposong/help.py:132
+msgid "About"
+msgstr "על אודות"
+
+#: lib/exposong/help.py:133
+msgid ""
+"ExpoSong is a free, open-source, presentation program to assist with worship "
+"assemblies. Create lyrics or custom presentations, create schedules, and "
+"create custom themes."
+msgstr ""
+"ExpoSong הנה תכנית מצגות חופשית ובקוד פתוח שתסייע לך לבנות מקדש הערצה. ניתן "
+"ליצור באמצעותה מצגות מותאמות אישית, ליצור לוחות זמנים וליצור ערכות עיצוב "
+"אישיות."
+
+#: lib/exposong/help.py:140 lib/exposong/schedlist.py:57
+msgid "Schedules"
+msgstr "לוחות זמנים"
+
+#: lib/exposong/help.py:141
+msgid "Schedules are used to create an order of presentations."
+msgstr "לוחות זמנים משמשים ליצירת רצף של מצגות."
+
+#: lib/exposong/help.py:142
+msgid ""
+"To create a schedule, in the menu, select File|New|New Schedule. We suggest "
+"you name your schedule with the date, along with an event description if "
+"needed. Add songs to the schedule by dragging them onto the schedule, or "
+"Edit|Current Presentation|Add to Schedule."
+msgstr ""
+"כדי ליצור לוח זמנים, בתפריט יש לבחור בקובץ|חדש|לוח זמנים. אנו מציעים לרשום "
+"את התאריך יחד עם תיאור האירוע אם נדרש. יש להוסיף שירים ללוח הזמנים על ידי "
+"גרירתם ללוח הזמנים, או דרך עריכה|מצגת נוכחית|הוספה ללוח הזמנים."
+
+#: lib/exposong/help.py:150
+msgid "Creating Presentations"
+msgstr "יצירת מצגות"
+
+#: lib/exposong/help.py:151
+msgid ""
+"Presentations are a set of slides to be presented on the screen. To create a "
+"new presentation, on the menu, select File|New, and select New Song or New "
+"ExpoSong Presentation."
+msgstr ""
+"מצגות הן ערכות של שקופיות שמוצגות על המסך. כדי ליצור מצגת חדש, בתפריט, יש "
+"לבחור בקובץ|חדש ולבחור בשיר חדש או במצגת ExpoSong חדשה."
+
+#: lib/exposong/help.py:154
+msgid ""
+"The <b>ExpoSong Presentation</b> is used to create general presentations. It "
+"can be used for  sermons, announcements, or anything other than lyrics. "
+"Currently, the only content can be text or images, but other media may be "
+"available in future releases."
+msgstr ""
+"<b>מצגת ה־ExpoSong</b> משמשת ליצירת מצגות כלליות. ניתן להשתמש בה ליצירת "
+"דרשות, הכרזות או כל דבר שאינו מילות שירים. נכון לעכשיו התוכן היחידי שניתן "
+"להוסיף הוא טקסט או תמונות, אך הגרסאות הבאות יכילו תמיכה בסוגי מדיה נוספים."
+
+#: lib/exposong/help.py:158
+msgid ""
+"The <b>Song</b> presentation type is for song lyrics. The slides can be "
+"verses, choruses, or other lyrics parts, and can contain indexes (such as "
+"Verse 1, Verse 2). Songs can contain metadata as well, such as author, "
+"songbook number, copyright and ccli number, which may be displayed on the "
+"screen with the Lyric."
+msgstr ""
+"מצגת מסוג <b>שיר</b> מיועדת למילות שירים. השקפים יכולים להיות מורכבות "
+"מפסקאות, פזמונים או כל חלק אחר ממילות השיר, כמו גם אינדקסים (כגון פסקה 1, "
+"פסקה 2). שירים יכולים להכיל גם מידע על, כגון שם הכותב, מספר ספר השירים, "
+"זכויות יוצרים ומספר ccli, אותו ניתן להציג על המסך יחד עם המילים."
+
+#: lib/exposong/help.py:163
+msgid ""
+"Song presentations can also be reordered. Use the verse names in quotes and "
+"enter them in the order you wish to have separated by spaces in the "
+"\"Order\" field, for example: \"v1 c v2 b c e\""
+msgstr ""
+"מצגת שירים ניתנות גם לסידור מחדש. יש להשתמש בשם הפסקה במירכאות ולהזין אותן "
+"בסדר המועדף עליך תוך הפרדה ברווחים בשדה „סדר“, לדוגמה: \"v1 c v2 b c e\""
+
+#: lib/exposong/help.py:170
+msgid "Notifications"
+msgstr "התרעות"
+
+#: lib/exposong/help.py:171
+msgid ""
+"You may have a need to notify someone in the audience of something, such as "
+"a crying baby in the nursury. A notification can be used to let them know. "
+"The notification can be set using the text box underneath the preview "
+"screen. Use the buttons right to it to display and remove the message."
+msgstr ""
+"יתכן שיהיה עליך להודיע למישהו בקהל משהו, כגון תינוק בוכה בחדר התינוקות. לשם "
+"כך נועדו ההתרעות. ניתן להגדיר התרעות באמצעות תיבת הטקסט שמתחת לחלון התצוגה "
+"המקדימה. יש להשתמש במקשים ישר בתיבה זו כדי להציג או להסיר הודעה."
+
+#: lib/exposong/help.py:180
+msgid "Themes"
+msgstr "ערכות עיצוב"
+
+#: lib/exposong/help.py:181
+msgid ""
+"Themes can be created by using File|New|New Theme. The first part of a theme "
+"is the background. It can consist of images, solid colors, and gradient "
+"(which is a gradual change from one color to the next)."
+msgstr ""
+"ניתן ליצור ערכות עיצוב על ידי שימוש בקובץ|חדש|ערכת עיצוב חדשה. החלק הראשון "
+"בערכת העיצוב הוא הרקע. הוא יכול להיות מורכב מתמונות, צבעים אחידים ומדרג (שזה "
+"הוא שינוי הדרגתי מצבע אחד למשנהו)."
+
+#: lib/exposong/help.py:184
+msgid ""
+"The body and footer text can be moved and modified in font name and size, "
+"color, alignment, line spacing (from one row to the next), the text shadow's "
+"color and offset, and a text outline size and color."
+msgstr ""
+"הגוף והכותרת התחתית ניתנות להעברה ולשינוי במובנים של שם הגופן, הצבע, היישור, "
+"ריווח השורות (בין שורה לבאה אחריה), צבע ההצללה של הטקסט והמרחק שלו, והגודל "
+"והצבע של מתאר הטקסט."
+
+#: lib/exposong/help.py:187
+msgid ""
+"Both backgrounds and body and footer texts can be moved to different "
+"positions using the form under the preview."
+msgstr ""
+"הרקע, כמו גם הטקסט שברקע ובכותרת התחתית ניתנים להעברה למיקום שונה באמצעות "
+"הטופס שתחת התצוגה המקדימה."
+
+#: lib/exposong/help.py:189
+msgid ""
+"Metadata, such as author, copyright, and tags can also be added to the theme "
+"using the tab. This information will not appear on the screen."
+msgstr ""
+"מידע על, כגון שם האמן, זכויות היוצרים ותגיות ניתנים גם הם להוספה לערכת "
+"העיצוב באמצעות הלשונית. פרטים אלו לא יופיעו על גבי המסך."
+
+#: lib/exposong/help.py:191
+msgid "Background Tips"
+msgstr "עצות ברקע"
+
+#: lib/exposong/help.py:192
+msgid ""
+"Presentation backgrounds should generally have a soft focus to them, and use "
+"a minimal amount of contrast. Backgrounds with hard lines, or with many "
+"colors make the text difficult to read."
+msgstr ""
+"רקעי המצגות אמורים, על פי רוב, לקבל מיקוד עדין ולהשתמש ברמת ניגודיות "
+"מינימלית. רקעים עם קווים נוקשים או עם צבעים רבים מקשים על קריאת הטקסט."
+
+#: lib/exposong/help.py:200 lib/exposong/prefs.py:129
+msgid "Screen"
+msgstr "מסך"
+
+#: lib/exposong/help.py:201
+msgid "Present"
+msgstr "נוכח"
+
+#: lib/exposong/help.py:202
+msgid "Logo Screen"
+msgstr "מסך לוגו"
+
+#: lib/exposong/help.py:202
+msgid "Ctrl+G"
+msgstr "Ctrl+G"
+
+#: lib/exposong/help.py:203
+msgid "Black Screen"
+msgstr "מסך שחור"
+
+#: lib/exposong/help.py:204
+msgid "Hide"
+msgstr "הסתרה"
+
+#: lib/exposong/help.py:205
+msgid "Slide Movement"
+msgstr "תזוזת השקפים"
+
+#: lib/exposong/help.py:206 lib/exposong/slidelist.py:222
+msgid "Next Slide"
+msgstr "השקף הבא"
+
+#: lib/exposong/help.py:206 lib/exposong/slidelist.py:167
+#: lib/exposong/slidelist.py:171
+msgid "Page Down"
+msgstr "Page Down"
+
+#: lib/exposong/help.py:207 lib/exposong/slidelist.py:220
+msgid "Previous Slide"
+msgstr "השקף הקודם"
+
+#: lib/exposong/help.py:207
+msgid "Page Up"
+msgstr "Page Up"
+
+#: lib/exposong/help.py:208 lib/exposong/preslist.py:327
+msgid "Next Presentation"
+msgstr "המצגת הקודמת"
+
+#: lib/exposong/help.py:208
+msgid "Ctrl+Page Down"
+msgstr "Ctrl+Page Down"
+
+#: lib/exposong/help.py:209 lib/exposong/preslist.py:325
+msgid "Previous Presentation"
+msgstr "המצגת הקודמת"
+
+#: lib/exposong/help.py:209
+msgid "Ctrl+Page Up"
+msgstr "Ctrl+Page Up"
+
+#: lib/exposong/help.py:210 lib/exposong/plugins/lyric.py:569
+msgid "Other"
+msgstr "אחר"
+
+#: lib/exposong/help.py:211 lib/exposong/plugins/lyric.py:1112
+msgid "New Song"
+msgstr "שיר חדש"
+
+#: lib/exposong/help.py:211
+msgid "Ctrl+N"
+msgstr "Ctrl+N"
+
+#: lib/exposong/help.py:212
+msgid "Find Presentation"
+msgstr "חיפוש מצגת"
+
+#: lib/exposong/help.py:212
+msgid "Ctrl+F"
+msgstr "Ctrl+F"
+
+#: lib/exposong/help.py:213
+msgid "Quit"
+msgstr "יציאה"
+
+#: lib/exposong/help.py:213
+msgid "Ctrl+Q"
+msgstr "Ctrl+Q"
+
+#: lib/exposong/help.py:216
+msgid "Shortcut Keys"
+msgstr "מקשי קיצור"
+
+#: lib/exposong/help.py:231
+msgid "Thank you for your continued support."
+msgstr "תודה לך על תמיכתך המתמשכת"
+
+#: lib/exposong/help.py:232
+msgid "The Exposong Team"
+msgstr "צוות Exposong"
+
+#: lib/exposong/help.py:252
+msgid "Usage Guide"
+msgstr "מדריך שימוש"
+
+#: lib/exposong/help.py:253
+msgid "Check for New _Version"
+msgstr "בדיקה אם יש גרסה _חדשה"
+
+#: lib/exposong/__init__.py:190
+msgid ""
+"Are you sure you want to empty the data folder? This cannot be undone."
+msgstr "האם אכן ברצונך לרוקן את תיקיית הנתונים? לא ניתן לבטל פעולה זו."
+
+#: lib/exposong/_instance.py:157
+msgid "ExpoSong is not running."
+msgstr "התכנית ExpoSong אינה פעילה."
+
+#: lib/exposong/_instance.py:172
+msgid "ExpoSong is already running."
+msgstr "התכנית ExpoSong כבר פעילה."
+
+#: lib/exposong/main.py:172
+msgid "Ready"
+msgstr "בהמתנה"
+
+#: lib/exposong/main.py:222 lib/exposong/themeeditor.py:177
+msgid "Preview"
+msgstr "תצוגה מקדימה"
+
+#: lib/exposong/main.py:236
+msgid "Theme Selection"
+msgstr "בחירת ערכות נושא"
+
+#: lib/exposong/main.py:244 lib/exposong/prefs.py:94
+msgid "Notify"
+msgstr "התרעה"
+
+#: lib/exposong/main.py:259
+msgid "_File"
+msgstr "_קובץ"
+
+#: lib/exposong/main.py:260
+msgid "_Edit"
+msgstr "ע_ריכה"
+
+#: lib/exposong/main.py:261
+msgid "P_resentation"
+msgstr "ה_צגה"
+
+#: lib/exposong/main.py:262
+msgid "Presentation _Controls"
+msgstr "_בקרי הצגה"
+
+#: lib/exposong/main.py:263
+msgid "_Help"
+msgstr "ע_זרה"
+
+#: lib/exposong/main.py:267
+msgid "_New"
+msgstr "_חדש"
+
+#: lib/exposong/main.py:268
+msgid "_Import"
+msgstr "י_בוא"
+
+#: lib/exposong/main.py:269
+msgid "Import a .expo package or other format"
+msgstr "יבוא של חבילת ‎.expo או מבנה אחר"
+
+#: lib/exposong/main.py:270
+msgid "_Export"
+msgstr "י_צוא"
+
+#: lib/exposong/main.py:270
+msgid "Export a .expo package"
+msgstr "יצוא חבילת ‎.expo"
+
+#: lib/exposong/main.py:271
+msgid "_Print"
+msgstr "ה_דפסה"
+
+#: lib/exposong/main.py:272
+msgid "Current Presentation"
+msgstr "המצגת הנוכחית"
+
+#: lib/exposong/main.py:273
+msgid "_Schedule"
+msgstr "_לוח זמנים"
+
+#: lib/exposong/main.py:274
+msgid "_Theme"
+msgstr "_ערכת עיצוב"
+
+#: lib/exposong/main.py:278
+msgid "View _Log"
+msgstr "הצ_גת רישום"
+
+#: lib/exposong/main.py:279
+msgid "Show the event log"
+msgstr "הצגת רישום האירועים"
+
+#: lib/exposong/main.py:416
+msgid "Library"
+msgstr "ספרייה"
+
+#: lib/exposong/main.py:443
+msgid "Custom Schedules"
+msgstr "לוחות זמנים מותאמים אישית"
+
+#: lib/exposong/main.py:485
+msgid ""
+"It seems you have no presentations yet created.\n"
+"\n"
+"Visit the following URL to download free Songs and Themes:"
+msgstr ""
+"מסתבר כי לא יצרת עדיין מצגות.\n"
+"\n"
+"נא לבקר בכתובת הבאה כדי להוריד ערכות עיצוב ושירים בחינם:"
+
+#: lib/exposong/main.py:490
+msgid "Example Content"
+msgstr "תוכן לדוגמה"
+
+#: lib/exposong/prefs.py:42
+msgid "Preferences"
+msgstr "העדפות"
+
+#: lib/exposong/prefs.py:56
+msgid "Data folder"
+msgstr "תיקיית הנתונים"
+
+#: lib/exposong/prefs.py:57
+msgid ""
+"The place where all your presentations, schedules and themes are stored."
+msgstr "המקום בו שמורים כל המצגות, לוחות הזמנים וערכות העיצוב."
+
+#: lib/exposong/prefs.py:60
+msgid "Updates"
+msgstr "עדכונים"
+
+#: lib/exposong/prefs.py:62
+msgid "Automatically check for a new version"
+msgstr "חיפוש אוטומטי אחר גרסה חדשה"
+
+#: lib/exposong/prefs.py:66 lib/exposong/plugins/lyric.py:1152
+msgid "Songs"
+msgstr "שירים"
+
+#: lib/exposong/prefs.py:67
+msgid "Insert title slide"
+msgstr "הוספת כותרת לשקף"
+
+#: lib/exposong/prefs.py:79
+msgid "Songbook"
+msgstr "ספר שירים"
+
+#: lib/exposong/prefs.py:80
+msgid "Songbooks in Songs are automatically added to this list."
+msgstr "ספרי שירים נוספים אוטומטית לרשימה זו."
+
+#: lib/exposong/prefs.py:83
+msgid "General"
+msgstr "כללי"
+
+#: lib/exposong/prefs.py:88
+msgid "Logo"
+msgstr "לוגו"
+
+#: lib/exposong/prefs.py:90 lib/exposong/themeeditor.py:33
+#: lib/exposong/themeeditor.py:378 lib/exposong/theme.py:554
+msgid "Image"
+msgstr "תמונה"
+
+#: lib/exposong/prefs.py:92 lib/exposong/prefs.py:98
+#: lib/exposong/themeeditor.py:139 lib/exposong/theme.py:308
+msgid "Background"
+msgstr "רקע"
+
+#: lib/exposong/prefs.py:96
+msgid "Font Color"
+msgstr "צבע גופן"
+
+#: lib/exposong/prefs.py:105
+msgid "Primary"
+msgstr "ראשי"
+
+#: lib/exposong/prefs.py:105
+msgid "Primary (Bottom-Right)"
+msgstr "ראשי (מימין למטה)"
+
+#: lib/exposong/prefs.py:106
+msgid "Secondary"
+msgstr "משני"
+
+#: lib/exposong/prefs.py:106
+msgid "Tertiary"
+msgstr "שלישוני"
+
+#: lib/exposong/prefs.py:106
+msgid "Monitor 4"
+msgstr "צג 4"
+
+#: lib/exposong/prefs.py:126 lib/exposong/themeeditor.py:499
+#: lib/exposong/themeeditor.py:598
+msgid "Position"
+msgstr "מיקום"
+
+#: lib/exposong/prefs.py:127
+msgid "Monitor"
+msgstr "צג"
+
+#: lib/exposong/prefs.py:139
+msgid ""
+"You will have to restart ExpoSong so that the new data folder will be used."
+msgstr ""
+"יהיה עליך להפעיל מחדש את ExpoSong כדי לעשות שימוש בתיקיית הנתונים החדשה."
+
+#: lib/exposong/presfilter.py:82
+msgid "Search"
+msgstr "חיפוש"
+
+#: lib/exposong/presfilter.py:189
+msgid "_Find Presentation"
+msgstr "_חיפוש מצגת"
+
+#: lib/exposong/presfilter.py:190
+msgid "Search for a presentation"
+msgstr "חיפוש אחר מצגת"
+
+#: lib/exposong/preslist.py:51
+msgid "Presentations"
+msgstr "מצגות"
+
+#: lib/exposong/preslist.py:229
+#, python-format
+msgid "Are you sure you want to delete \"%s\" from your library?"
+msgstr "האם אכן ברצונך למחוק את „%s“"
+
+#: lib/exposong/preslist.py:233
+msgid "Delete Presentation?"
+msgstr "האם למחוק את המצגת?"
+
+#: lib/exposong/preslist.py:313
+msgid "_Add to Schedule"
+msgstr "הו_ספה ללוח זמנים"
+
+#: lib/exposong/preslist.py:314
+msgid "Add the Selected Presentation to a Schedule"
+msgstr "הוספת המצגת הנבחרת ללוח זמנים"
+
+#: lib/exposong/preslist.py:317
+msgid "Edit the currently selected presentation"
+msgstr "עריכת המצגת שבבחירה הנוכחית"
+
+#: lib/exposong/preslist.py:320
+msgid "_Remove from Schedule"
+msgstr "ה_סרה מלוח הזמנים"
+
+#: lib/exposong/preslist.py:321
+msgid "Remove the presentation from schedule"
+msgstr "הסרת המצגת מלוח הזמנים"
+
+#: lib/exposong/preslist.py:324
+msgid "Delete the presentation"
+msgstr "מחיקת המצגת"
+
+#: lib/exposong/print_support.py:94
+msgid "_Print Song"
+msgstr "ה_דפסת השיר"
+
+#: lib/exposong/richedit.py:88
+msgid "_Cut"
+msgstr "ג_זירה"
+
+#: lib/exposong/richedit.py:89
+msgid "_Copy"
+msgstr "ה_עתקה"
+
+#: lib/exposong/richedit.py:90
+msgid "_Paste"
+msgstr "ה_דבקה"
+
+#: lib/exposong/richedit.py:92
+msgid "_Bold"
+msgstr "מוד_גש"
+
+#: lib/exposong/richedit.py:93
+msgid "_Italic"
+msgstr "_נטוי"
+
+#: lib/exposong/richedit.py:94
+msgid "_Underline"
+msgstr "קו _תחתי"
+
+#: lib/exposong/richedit.py:95
+msgid "Strike Through"
+msgstr "קו־חוצה"
+
+#: lib/exposong/richedit.py:96
+msgid "Smaller"
+msgstr "קטן יותר"
+
+#: lib/exposong/richedit.py:97
+msgid "Larger"
+msgstr "גדול יותר"
+
+#: lib/exposong/schedlist.py:149
+#, python-format
+msgid "Are you sure you want to delete \"%s\"?"
+msgstr "האם אכן ברצונך למחוק את „%s“?"
+
+#: lib/exposong/schedlist.py:151
+msgid "Delete Schedule?"
+msgstr "האם למחוק את לוח הזמנים?"
+
+#: lib/exposong/schedlist.py:187
+#, python-format
+msgid "Added Presentation \"%(presentation)s\" to Schedule \"%(schedule)s\""
+msgstr "המצגת „%(presentation)s“ נוספה ללוח הזמנים „%(schedule)s“"
+
+#: lib/exposong/schedlist.py:195 lib/exposong/schedlist.py:298
+#: lib/exposong/schedlist.py:302
+msgid "New Schedule"
+msgstr "לוח זמנים חדש"
+
+#: lib/exposong/schedlist.py:275
+#, python-format
+msgid "Add to Schedule %s"
+msgstr "הוספה ללוח הזמנים %s"
+
+#: lib/exposong/schedlist.py:303
+msgid "Create a new schedule"
+msgstr "יצירת לוח זמנים חדש"
+
+#: lib/exposong/schedlist.py:304
+msgid "_Rename Schedule"
+msgstr "_שינוי שם לוח הזמנים"
+
+#: lib/exposong/schedlist.py:305
+msgid "Rename the selected schedule"
+msgstr "שינוי שם לוח הזמנים הנבחר"
+
+#: lib/exposong/schedlist.py:306
+msgid "Delete Schedule"
+msgstr "מחיקת לוח הזמנים"
+
+#: lib/exposong/schedlist.py:307
+msgid "Delete the currently selected schedule"
+msgstr "מחיקת לוח הזמנים הנבחר"
+
+#: lib/exposong/screen.py:249
+msgid "_Black"
+msgstr "_שחור"
+
+#: lib/exposong/screen.py:250 lib/exposong/screen.py:268
+msgid "Bac_kground"
+msgstr "_רקע"
+
+#: lib/exposong/screen.py:251 lib/exposong/screen.py:271
+msgid "Lo_go"
+msgstr "_לוגו"
+
+#: lib/exposong/screen.py:252 lib/exposong/screen.py:273
+msgid "_Freeze"
+msgstr "ה_קפאה"
+
+#: lib/exposong/screen.py:256
+msgid "Start _Presentation"
+msgstr "ה_צגת מצגת"
+
+#: lib/exposong/screen.py:257
+msgid "Show the presentation screen"
+msgstr "הצגת מסך ההצגה"
+
+#: lib/exposong/screen.py:258
+msgid "_Exit Presentation"
+msgstr "י_ציאה מהמצגת"
+
+#: lib/exposong/screen.py:259
+msgid "Hide the presentation screen"
+msgstr "הסתרת מסך ההצגה"
+
+#: lib/exposong/screen.py:265
+msgid "_Black Screen"
+msgstr "מ_סך שחור"
+
+#: lib/exposong/screen.py:266
+msgid "Show a black screen."
+msgstr "הצגת מסך שחור."
+
+#: lib/exposong/screen.py:269
+msgid "Show only the background."
+msgstr "הצגת הרקע בלבד."
+
+#: lib/exposong/screen.py:272
+msgid "Display the logo."
+msgstr "הצגת הלוגו."
+
+#: lib/exposong/screen.py:274
+msgid "Freeze the screen."
+msgstr "הקפאת המסך."
+
+#: lib/exposong/screen.py:380
+msgid "No Logo set. Do you want to choose a Logo now?"
+msgstr "לא הוגדר לוגו. האם ברצונך לבחור לוגו כעת?"
+
+#: lib/exposong/screen.py:384
+msgid "Set Logo?"
+msgstr "האם להגדיר לוגו?"
+
+#: lib/exposong/slidelist.py:52
+msgid "Slides"
+msgstr "שקפים"
+
+#: lib/exposong/slidelist.py:167
+#, python-format
+msgid "Press %s once again to go to the next presentation"
+msgstr "יש ללחוץ על %s פעם נוספת כדי לעבור למצגת הבאה"
+
+#: lib/exposong/slidelist.py:171
+#, python-format
+msgid "Press %s once again to go to the previous presentation"
+msgstr "יש ללחוץ על %s פעם נוספת כדי לעבור למצגת הקודמת"
+
+#: lib/exposong/slidelist.py:226
+msgid "Show Slides in Order"
+msgstr "הצגת השקפים בסדר מסוים"
+
+#: lib/exposong/splash.py:39
+msgid "Loading ExpoSong"
+msgstr "ExpoSong נטענת"
+
+#: lib/exposong/splash.py:50
+msgid "Loading, Please Wait."
+msgstr "בטעינה, נא להמתין."
+
+#: lib/exposong/themeeditor.py:33 lib/exposong/themeeditor.py:223
+#: lib/exposong/themeeditor.py:245 lib/exposong/themeeditor.py:261
+#: lib/exposong/themeeditor.py:438 lib/exposong/theme.py:329
+msgid "Color"
+msgstr "צבע"
+
+#: lib/exposong/themeeditor.py:33 lib/exposong/themeeditor.py:473
+#: lib/exposong/theme.py:447
+msgid "Gradient"
+msgstr "מדרג"
+
+#: lib/exposong/themeeditor.py:33 lib/exposong/themeeditor.py:585
+#: lib/exposong/theme.py:377
+msgid "Radial Gradient"
+msgstr "מדרג מעגלי"
+
+#: lib/exposong/themeeditor.py:43
+msgid "ExpoSong Theme Editor"
+msgstr "עורך ערכות העיצוב של ExpoSong"
+
+#: lib/exposong/themeeditor.py:60 lib/exposong/themeselect.py:198
+#: lib/exposong/plugins/lyric.py:854
+msgid "New Theme"
+msgstr "ערכת עיצוב חדשה"
+
+#: lib/exposong/themeeditor.py:61
+msgid "Theme Name"
+msgstr "שם ערכת העיצוב"
+
+#: lib/exposong/themeeditor.py:74
+msgid "Add Gradient"
+msgstr "הוספת מדרג"
+
+#: lib/exposong/themeeditor.py:76
+msgid "Add Solid Color"
+msgstr "הוספת צבע אחיד"
+
+#: lib/exposong/themeeditor.py:78
+msgid "Add Radial Gradient"
+msgstr "הוספת מדרג מעגלי"
+
+#: lib/exposong/themeeditor.py:80 lib/exposong/plugins/pres.py:874
+msgid "Add Image"
+msgstr "הוספת תמונה"
+
+#: lib/exposong/themeeditor.py:86
+msgid "Add a new Image Background"
+msgstr "הוספת תמונה חדשה לרקע"
+
+#: lib/exposong/themeeditor.py:90
+msgid "Add a new Solid Color Background"
+msgstr "הוספת רקע חדש בעל צבע אחיד"
+
+#: lib/exposong/themeeditor.py:94
+msgid "Add a new Gradient Background"
+msgstr "הוספת רקע חדש בעל צבע מדורג"
+
+#: lib/exposong/themeeditor.py:98
+msgid "Add a new Radial Gradient Background"
+msgstr "הוספת רקע חדש בעל צבע בדירוג מעגלי"
+
+#: lib/exposong/themeeditor.py:107
+msgid "Backgrounds"
+msgstr "רקעים"
+
+#: lib/exposong/themeeditor.py:122
+msgid ""
+"Backgrounds will be drawn starting with the first element in this list "
+"moving to the last one."
+msgstr "הרקעים יצוירו החל מהרכיב הראשון ברשימה זו ועד לאחרון."
+
+#: lib/exposong/themeeditor.py:150
+msgid "Body Text"
+msgstr "טקסט הגוף"
+
+#: lib/exposong/themeeditor.py:160
+msgid "Footer Text"
+msgstr "טקסט הכותרת התחתית"
+
+#: lib/exposong/themeeditor.py:165 lib/exposong/plugins/lyric.py:402
+msgid "Author"
+msgstr "מאת"
+
+#: lib/exposong/themeeditor.py:166
+msgid "Theme URL"
+msgstr "כתובת ערכת העיצוב"
+
+#: lib/exposong/themeeditor.py:167
+msgid "Copyright"
+msgstr "זכויות יוצרים"
+
+#: lib/exposong/themeeditor.py:168
+msgid "Description"
+msgstr "תיאור"
+
+#: lib/exposong/themeeditor.py:169
+msgid "Tags"
+msgstr "תגיות"
+
+#: lib/exposong/themeeditor.py:170
+msgid "Separate tags with commas"
+msgstr "הפרדת תגיות בפסיקים"
+
+#: lib/exposong/themeeditor.py:171
+msgid "Metadata"
+msgstr "נתוני על"
+
+#: lib/exposong/themeeditor.py:216
+msgid "Font"
+msgstr "גופן"
+
+#: lib/exposong/themeeditor.py:218
+msgid "Type and Size"
+msgstr "סוג וגודל"
+
+#: lib/exposong/themeeditor.py:221
+msgid "Note that the font size might be scaled down if it doesn't fit."
+msgstr "נא לשים לב שגודל הגופן יוקטן במידה שלא יתאים."
+
+#: lib/exposong/themeeditor.py:225
+msgid "Alignment"
+msgstr "יישור"
+
+#: lib/exposong/themeeditor.py:226 lib/exposong/theme.py:940
+#: lib/exposong/theme.py:950 lib/exposong/theme.py:960
+#: lib/exposong/theme.py:961
+msgid "Left"
+msgstr "שמאלה"
+
+#: lib/exposong/themeeditor.py:227 lib/exposong/theme.py:942
+#: lib/exposong/theme.py:952 lib/exposong/theme.py:962
+#: lib/exposong/theme.py:963
+msgid "Center"
+msgstr "מרכז"
+
+#: lib/exposong/themeeditor.py:227 lib/exposong/theme.py:944
+#: lib/exposong/theme.py:954 lib/exposong/theme.py:964
+#: lib/exposong/theme.py:965
+msgid "Right"
+msgstr "ימינה"
+
+#: lib/exposong/themeeditor.py:227
+msgid "Text Alignment"
+msgstr "יישור הטקסט"
+
+#: lib/exposong/themeeditor.py:230 lib/exposong/theme.py:971
+#: lib/exposong/theme.py:981 lib/exposong/theme.py:991
+#: lib/exposong/theme.py:992
+msgid "Top"
+msgstr "מעלה"
+
+#: lib/exposong/themeeditor.py:230 lib/exposong/themeeditor.py:231
+#: lib/exposong/theme.py:973 lib/exposong/theme.py:983
+#: lib/exposong/theme.py:993 lib/exposong/theme.py:994
+msgid "Middle"
+msgstr "אמצע"
+
+#: lib/exposong/themeeditor.py:231 lib/exposong/theme.py:975
+#: lib/exposong/theme.py:985 lib/exposong/theme.py:995
+#: lib/exposong/theme.py:996
+msgid "Bottom"
+msgstr "מטה"
+
+#: lib/exposong/themeeditor.py:231
+msgid "Vertical Text Alignment"
+msgstr "יישור טקסט אנכית"
+
+#: lib/exposong/themeeditor.py:234
+msgid "Line Spacing"
+msgstr "ריווח שורות"
+
+#: lib/exposong/themeeditor.py:241
+msgid "Text Shadow"
+msgstr "הצללת טקסט"
+
+#: lib/exposong/themeeditor.py:242
+msgid "Apply Shadow"
+msgstr "החלת הצללה"
+
+#: lib/exposong/themeeditor.py:249
+msgid "x-Offset"
+msgstr "מרחק ב־x"
+
+#: lib/exposong/themeeditor.py:252
+msgid "y-Offset"
+msgstr "מרחק ב־y"
+
+#: lib/exposong/themeeditor.py:254
+msgid ""
+"Shadow offsets are measured in percentage of font height. So an offset of "
+"0.5 for point 12 font is 6 points."
+msgstr ""
+"מרחקי ההצללה נמדדים באחוזים מגובה הגופן. כך שמרחק של 0.5 עבור גופן בגודל 12 "
+"נקודות הוא 6 נקודות."
+
+#: lib/exposong/themeeditor.py:256
+msgid "Text Outline"
+msgstr "מתאר הטקסט"
+
+#: lib/exposong/themeeditor.py:258
+msgid "Size (Pixel)"
+msgstr "גודל (פיקסלים)"
+
+#: lib/exposong/themeeditor.py:350 lib/exposong/plugins/pres.py:650
+msgid "Add Images"
+msgstr "הוספת תמונות"
+
+#: lib/exposong/themeeditor.py:356 lib/exposong/plugins/pres.py:661
+msgid "Image Types"
+msgstr "סוגי התמונות"
+
+#: lib/exposong/themeeditor.py:377
+msgid "Image Background"
+msgstr "תמונת רקע"
+
+#: lib/exposong/themeeditor.py:380 lib/exposong/theme.py:1002
+#: lib/exposong/theme.py:1010 lib/exposong/theme.py:1018
+#: lib/exposong/theme.py:1019
+msgid "Fit"
+msgstr "התאמה"
+
+#: lib/exposong/themeeditor.py:383 lib/exposong/theme.py:1004
+#: lib/exposong/theme.py:1012 lib/exposong/theme.py:1020
+#: lib/exposong/theme.py:1021
+msgid "Fill"
+msgstr "מילוי"
+
+#: lib/exposong/themeeditor.py:387
+msgid "Mode"
+msgstr "מצב"
+
+#: lib/exposong/themeeditor.py:436
+msgid "Color Background"
+msgstr "צבע הרקע"
+
+#: lib/exposong/themeeditor.py:484 lib/exposong/themeeditor.py:594
+#, python-format
+msgid "Color %d"
+msgstr "צבע %d"
+
+#: lib/exposong/themeeditor.py:504 lib/exposong/themeeditor.py:602
+msgid "Add Point"
+msgstr "הוסף נקודה"
+
+#: lib/exposong/themeeditor.py:509
+msgid "Angle"
+msgstr "זווית"
+
+#: lib/exposong/themeeditor.py:606
+msgid "Length"
+msgstr "אורך"
+
+#: lib/exposong/themeeditor.py:611
+msgid "Horizontal Position"
+msgstr "מיקום אופקי"
+
+#: lib/exposong/themeeditor.py:615
+msgid "Vertical Position"
+msgstr "מיקום אנכי"
+
+#: lib/exposong/themeeditor.py:693
+msgid "Are you sure you want to delete this background?"
+msgstr "האם אכן ברצונך למחוק רקע זה?"
+
+#: lib/exposong/themeeditor.py:697
+msgid "Delete Background?"
+msgstr "האם למחוק את הרקע?"
+
+#: lib/exposong/themeeditor.py:732 lib/exposong/plugins/pres.py:939
+msgid "Element Position"
+msgstr "מיקום הרכיב"
+
+#: lib/exposong/themeeditor.py:738 lib/exposong/plugins/pres.py:951
+msgid "Left:"
+msgstr "שמאל:"
+
+#: lib/exposong/themeeditor.py:743 lib/exposong/plugins/pres.py:956
+msgid "Right:"
+msgstr "ימין:"
+
+#: lib/exposong/themeeditor.py:748 lib/exposong/plugins/pres.py:961
+msgid "Top:"
+msgstr "מלמעלה:"
+
+#: lib/exposong/themeeditor.py:754 lib/exposong/plugins/pres.py:966
+msgid "Bottom:"
+msgstr "מלמטה:"
+
+#: lib/exposong/themeeditor.py:817
+msgid "Selected Background Position"
+msgstr "מיקום הרקע הנבחר"
+
+#: lib/exposong/themeeditor.py:823
+msgid "Body Section Position"
+msgstr "מיקום מקטע הגוף"
+
+#: lib/exposong/themeeditor.py:827
+msgid "Footer Section Position"
+msgstr "מיקום הכותרת התחתית"
+
+#: lib/exposong/themeeditor.py:986
+msgid ""
+"Unsaved Changes will be lost if you close the Editor. Do you want to save?"
+msgstr "השינויים שלא נשמרו ילכו לאיבוד אם העורך ייסגר. האם ברצונך לשמור?"
+
+#: lib/exposong/themeeditor.py:991
+msgid "Unsaved changes"
+msgstr "שינויים שלא נשמרו"
+
+#: lib/exposong/theme.py:118
+msgid "Unnamed Theme"
+msgstr "ערכת עיצוב ללא שם"
+
+#: lib/exposong/themeselect.py:84
+msgid "Black"
+msgstr "שחור"
+
+#: lib/exposong/themeselect.py:167
+#, python-format
+msgid "Are you sure you want to delete the theme \"%s\"?"
+msgstr "האם אכן ברצונך למחוק את ערכת העיצוב „%s“?"
+
+#: lib/exposong/themeselect.py:171
+msgid "Delete Theme?"
+msgstr "האם למחוק את ערכת העיצוב?"
+
+#: lib/exposong/themeselect.py:199
+msgid "Create a new theme using the Theme Editor"
+msgstr "יצירת ערכת עיצוב חדשה באמצעות עורך ערכות העיצוב"
+
+#: lib/exposong/themeselect.py:200
+msgid "Edit Theme"
+msgstr "עריכת ערכת העיצוב"
+
+#: lib/exposong/themeselect.py:201
+msgid "Edit the current theme"
+msgstr "עריכת ערכת העיצוב הנוכחית"
+
+#: lib/exposong/themeselect.py:202
+msgid "Delete Theme"
+msgstr "מחיקת ערכת העיצוב"
+
+#: lib/exposong/themeselect.py:203
+msgid "Delete the current theme"
+msgstr "מחיקת ערכת העיצוב הנוכחית"
+
+#: lib/exposong/plugins/_abstract.py:203
+msgid "New Presentation"
+msgstr "מצגת חדשה"
+
+#: lib/exposong/plugins/_abstract.py:209 lib/exposong/plugins/pres.py:459
+#, python-format
+msgid "Editing \"%s\""
+msgstr "„%s“ בהליכי עריכה"
+
+#: lib/exposong/plugins/_abstract.py:211
+#, python-format
+msgid "New %s"
+msgstr "%s חדש/ה"
+
+#: lib/exposong/plugins/export_import.py:44
+msgid "Export/Import Functions"
+msgstr "יבוא/יצוא תכונות"
+
+#: lib/exposong/plugins/export_import.py:71
+msgid "Export Current Song"
+msgstr "יצוא השיר הנוכחי"
+
+#: lib/exposong/plugins/export_import.py:96
+msgid "Export Current Schedule"
+msgstr "יצוא לוח הזמנים הנוכחי"
+
+#: lib/exposong/plugins/export_import.py:147
+msgid "Export Library"
+msgstr "יצוא מהספרייה"
+
+#: lib/exposong/plugins/export_import.py:153
+msgid "exposong_library.expo"
+msgstr "ספרייה_של_exposong.expo"
+
+#: lib/exposong/plugins/export_import.py:201
+msgid "Export Theme"
+msgstr "יצוא ערכת נושא"
+
+#: lib/exposong/plugins/export_import.py:208
+#, python-format
+msgid "theme_%s.expo"
+msgstr "ערכת_עיצוב_%s.expo"
+
+#: lib/exposong/plugins/export_import.py:231
+msgid "Import Song(s) (OpenLyrics Format)"
+msgstr "יבוא שיר/ים (במבנה OpenLyrics)"
+
+#: lib/exposong/plugins/export_import.py:293
+#, python-format
+msgid ""
+"The Song \"%(new_song)s\" has similarities with this existing Song from your "
+"library: \"%(existing_song)s\". What do you want to do?"
+msgstr ""
+"לשיר „%(new_song)s“ יש התאמות דומות לשיר זה מהספרייה שלך: "
+"„%(existing_song)s“. מה ברצונך לעשות?"
+
+#: lib/exposong/plugins/export_import.py:298
+msgid "Replace existing Song"
+msgstr "החלפת שיר קיים"
+
+#: lib/exposong/plugins/export_import.py:300
+msgid "Keep existing Song"
+msgstr "השארת שיר קיים"
+
+#: lib/exposong/plugins/export_import.py:302
+msgid "Keep both Songs"
+msgstr "השארת שני השירים"
+
+#: lib/exposong/plugins/export_import.py:357
+msgid "Import"
+msgstr "יבוא"
+
+#: lib/exposong/plugins/export_import.py:517
+msgid "_ExpoSong Data (.expo)..."
+msgstr "_נתוני ExpoSong ‏(‎.expo)..."
+
+#: lib/exposong/plugins/export_import.py:518
+msgid "Import a schedule, presentations or backgrounds"
+msgstr "יבוא לוח זמנים, מצגות או רקעים"
+
+#: lib/exposong/plugins/export_import.py:520
+msgid "ExpoSong Song (OpenLyrics Format)"
+msgstr "שיר של ExpoSong (במבנה OpenLyrics)"
+
+#: lib/exposong/plugins/export_import.py:522
+msgid "Current _Song"
+msgstr "השיר ה_נוכחי"
+
+#: lib/exposong/plugins/export_import.py:525
+msgid "_Current Schedule with Presentations..."
+msgstr "לוח ה_זמנים הנוכחי עם מצגות..."
+
+#: lib/exposong/plugins/export_import.py:527
+msgid "Whole _Library..."
+msgstr "הספרייה _כולה..."
+
+#: lib/exposong/plugins/export_import.py:529
+msgid "Current _Theme..."
+msgstr "ערכת ה_עיצוב הנוכחית..."
+
+#: lib/exposong/plugins/legacy_format_convert.py:38
+msgid "ExpoSong Converter"
+msgstr "הממיר של ExpoSong"
+
+#: lib/exposong/plugins/legacy_format_convert.py:122
+msgid "Undefined Title"
+msgstr "כותרת בלתי מוגדרת"
+
+#: lib/exposong/plugins/legacy_format_convert.py:182
+msgid "Import ExpoSong Legacy File(s)"
+msgstr "יבוא קבצים ישנים של ExpoSong"
+
+#: lib/exposong/plugins/legacy_format_convert.py:188
+msgid "ExpoSong Legacy File"
+msgstr "קובץ ישן של ExpoSong"
+
+#: lib/exposong/plugins/legacy_format_convert.py:206
+msgid "_ExpoSong Legacy File(s) ..."
+msgstr "קבצים _ישנים של ExpoSong ..."
+
+#: lib/exposong/plugins/legacy_format_convert.py:207
+msgid "Import a Lyric Presentation from ExpoSong before 0.7"
+msgstr "יבוא מצגת מילות שירים מ־ExpoSong בגרסה שלפני 0.7"
+
+#: lib/exposong/plugins/lyric.py:47
+msgid "Song"
+msgstr "שיר"
+
+#: lib/exposong/plugins/lyric.py:57
+msgid "Words"
+msgstr "מילים"
+
+#: lib/exposong/plugins/lyric.py:58
+msgid "Music"
+msgstr "מוזיקה"
+
+#: lib/exposong/plugins/lyric.py:59
+msgid "Translation"
+msgstr "תרגום"
+
+#: lib/exposong/plugins/lyric.py:60 lib/exposong/plugins/lyric.py:1022
+msgid "Written By"
+msgstr "נכתב על ידי"
+
+#: lib/exposong/plugins/lyric.py:63
+msgid "Verse"
+msgstr "פסוק"
+
+#: lib/exposong/plugins/lyric.py:64
+msgid "Pre-Chorus"
+msgstr "טרום הפזמון"
+
+#: lib/exposong/plugins/lyric.py:65
+msgid "Chorus"
+msgstr "פזמון"
+
+#: lib/exposong/plugins/lyric.py:66
+msgid "Refrain"
+msgstr "בית"
+
+#: lib/exposong/plugins/lyric.py:67
+msgid "Bridge"
+msgstr "גשר"
+
+#: lib/exposong/plugins/lyric.py:68
+msgid "Ending"
+msgstr "סיומת"
+
+#: lib/exposong/plugins/lyric.py:70
+msgid "Miscellaneous"
+msgstr "שונות"
+
+#: lib/exposong/plugins/lyric.py:243 lib/exposong/plugins/lyric.py:341
+#: lib/exposong/plugins/lyric.py:368
+msgid "Title"
+msgstr "כותרת"
+
+#: lib/exposong/plugins/lyric.py:347 lib/exposong/plugins/lyric.py:412
+#: lib/exposong/plugins/lyric.py:472
+msgid "Language"
+msgstr "שפה"
+
+#: lib/exposong/plugins/lyric.py:358
+msgid "Variant:"
+msgstr "הגוון:"
+
+#: lib/exposong/plugins/lyric.py:361
+msgid "Custom Version:"
+msgstr "גרסה מותאמת אישית:"
+
+#: lib/exposong/plugins/lyric.py:364
+msgid "Release Date:"
+msgstr "תאריך ההפצה:"
+
+#: lib/exposong/plugins/lyric.py:407
+msgid "Type"
+msgstr "סוג"
+
+#: lib/exposong/plugins/lyric.py:422
+msgid "Copyright:"
+msgstr "זכויות יוצרים:"
+
+#: lib/exposong/plugins/lyric.py:426
+msgid "CCLI Song ID:"
+msgstr "מזהה השיר ב־CCLI:"
+
+#: lib/exposong/plugins/lyric.py:428
+msgid "Publisher:"
+msgstr "מוציא לאור:"
+
+#: lib/exposong/plugins/lyric.py:432
+msgid "Ownership"
+msgstr "בעלות"
+
+#: lib/exposong/plugins/lyric.py:466 lib/exposong/plugins/lyric.py:493
+msgid "Theme"
+msgstr "ערכת עיצוב"
+
+#: lib/exposong/plugins/lyric.py:478
+msgid "ID"
+msgstr "מס׳"
+
+#: lib/exposong/plugins/lyric.py:490
+msgid "Keywords:"
+msgstr "מילות מפתח:"
+
+#: lib/exposong/plugins/lyric.py:527
+msgid "Songbook Name"
+msgstr "שם ספר השירים"
+
+#: lib/exposong/plugins/lyric.py:533
+msgid "Entry"
+msgstr "רשומה"
+
+#: lib/exposong/plugins/lyric.py:548
+msgid "Transposition:"
+msgstr "טרנספוזיציה:"
+
+#: lib/exposong/plugins/lyric.py:550
+msgid "Tempo:"
+msgstr "קצב:"
+
+#: lib/exposong/plugins/lyric.py:553
+msgid "Tempo Type:"
+msgstr "סוג הקצב:"
+
+#: lib/exposong/plugins/lyric.py:554
+msgid "bpm"
+msgstr "פעימות לדקה"
+
+#: lib/exposong/plugins/lyric.py:554
+msgid "Text"
+msgstr "טקסט"
+
+#: lib/exposong/plugins/lyric.py:559
+msgid "Key:"
+msgstr "מפתח:"
+
+#: lib/exposong/plugins/lyric.py:562
+msgid "Music Info"
+msgstr "נתונים מוזיקליים"
+
+#: lib/exposong/plugins/lyric.py:567
+msgid "Comments:"
+msgstr "הערות:"
+
+#: lib/exposong/plugins/lyric.py:577 lib/exposong/plugins/lyric.py:759
+#: lib/exposong/plugins/pres.py:294 lib/exposong/plugins/pres.py:924
+msgid "Title:"
+msgstr "כותרת:"
+
+#: lib/exposong/plugins/lyric.py:597 lib/exposong/plugins/pres.py:314
+msgid "Slide"
+msgstr "שקף"
+
+#: lib/exposong/plugins/lyric.py:628 lib/exposong/plugins/pres.py:345
+msgid "Edit"
+msgstr "עריכה"
+
+#: lib/exposong/plugins/lyric.py:640
+msgid "Verse Order:"
+msgstr "סדר הפסקאות:"
+
+#: lib/exposong/plugins/lyric.py:642
+msgid "Use the Slide names in brackets to modify the order"
+msgstr "יש להשתמש בשם השקף בסוגריים מרובעים כדי לשנות את הסדר"
+
+#: lib/exposong/plugins/lyric.py:730 lib/exposong/plugins/pres.py:565
+msgid "Are you sure you want to delete this slide? This cannot be undone."
+msgstr "האם אכן ברצונך למחוק מצגת זו? לא ניתן לבטל פעולה זו."
+
+#: lib/exposong/plugins/lyric.py:734 lib/exposong/plugins/pres.py:569
+msgid "Delete Slide?"
+msgstr "מחיקת מצגת?"
+
+#: lib/exposong/plugins/lyric.py:742
+msgid "New Title"
+msgstr "כותרת חדשה"
+
+#: lib/exposong/plugins/lyric.py:754
+#, python-format
+msgid "Editing Title \"%s\""
+msgstr "עריכת הכותרת „%s“"
+
+#: lib/exposong/plugins/lyric.py:770 lib/exposong/plugins/lyric.py:1339
+#: lib/exposong/plugins/pres.py:517 lib/exposong/plugins/pres.py:1228
+msgid "Please enter a Title."
+msgstr "נא להזין כותרת."
+
+#: lib/exposong/plugins/lyric.py:788
+msgid "New Author"
+msgstr "יוצר חדש"
+
+#: lib/exposong/plugins/lyric.py:800
+#, python-format
+msgid "Editing Author \"%s\""
+msgstr "עריכת היוצר „%s“"
+
+#: lib/exposong/plugins/lyric.py:816
+msgid "Author Name:"
+msgstr "שם היוצר:"
+
+#: lib/exposong/plugins/lyric.py:818
+msgid "Author Type:"
+msgstr "סוג היוצר:"
+
+#: lib/exposong/plugins/lyric.py:833
+msgid "Please enter an Author Name."
+msgstr "נא להזין את שם היוצר."
+
+#: lib/exposong/plugins/lyric.py:866
+#, python-format
+msgid "Editing Theme \"%s\""
+msgstr "עריכת ערכת העיצוב „%s“"
+
+#: lib/exposong/plugins/lyric.py:873
+msgid "Theme Name:"
+msgstr "שם ערכת העיצוב:"
+
+#: lib/exposong/plugins/lyric.py:884
+msgid "Please enter an Theme Name."
+msgstr "נא להזין שם לערכת העיצוב."
+
+#: lib/exposong/plugins/lyric.py:902
+msgid "New songbook"
+msgstr "ספר שירים חדש"
+
+#: lib/exposong/plugins/lyric.py:914
+#, python-format
+msgid "Editing Songbook \"%s\""
+msgstr "עריכת ספר השירים „%s“"
+
+#: lib/exposong/plugins/lyric.py:921
+msgid "Songbook Name:"
+msgstr "שם ספר השירים:"
+
+#: lib/exposong/plugins/lyric.py:923
+msgid "Entry:"
+msgstr "רשומה:"
+
+#: lib/exposong/plugins/lyric.py:931
+msgid "Please enter a Songbook."
+msgstr "נא להזין ספר שירים."
+
+#: lib/exposong/plugins/lyric.py:957
+msgid "You must enter at least one title."
+msgstr "עליך להזין כותרת אחת לפחות."
+
+#: lib/exposong/plugins/lyric.py:1053
+msgid "Order:"
+msgstr "סדר:"
+
+#: lib/exposong/plugins/lyric.py:1108
+msgid "_Song"
+msgstr "_שיר"
+
+#: lib/exposong/plugins/lyric.py:1113
+msgid "Create a new song"
+msgstr "יצירת שיר חדש"
+
+#: lib/exposong/plugins/lyric.py:1168 lib/exposong/plugins/pres.py:827
+msgid "Editing Slide"
+msgstr "עריכת שקף"
+
+#: lib/exposong/plugins/lyric.py:1175 lib/exposong/plugins/pres.py:849
+msgid "Save and New"
+msgstr "שמירה ויצירת חדש"
+
+#: lib/exposong/plugins/lyric.py:1245 lib/exposong/plugins/pres.py:462
+msgid "Name:"
+msgstr "שם:"
+
+#: lib/exposong/plugins/lyric.py:1262
+msgid "Index:"
+msgstr "אינדקס:"
+
+#: lib/exposong/plugins/lyric.py:1310 lib/exposong/plugins/pres.py:1268
+msgid "Unsaved Changes exist. Do you want to continue without saving?"
+msgstr "קיימים שינויים שלא נשמרו. האם ברצונך להמשיך מבלי לשמור?"
+
+#: lib/exposong/plugins/opensong_convert.py:34
+msgid "OpenSong Lyrics Converter"
+msgstr "ממיר מילות שירים במבנה OpenLyrics"
+
+#: lib/exposong/plugins/opensong_convert.py:75
+msgid "Import OpenSong File(s)"
+msgstr "יבוא קבצים ב־OpenLyrics"
+
+#: lib/exposong/plugins/opensong_convert.py:95
+msgid "_OpenSong File(s) ..."
+msgstr "_קו_בצי OpenSong ..."
+
+#: lib/exposong/plugins/opensong_convert.py:96
+msgid "Import a Lyric Presentation from OpenSong"
+msgstr "יבוא מצגת מילות שירים מ־OpenSong"
+
+#: lib/exposong/plugins/pres.py:48
+msgid "ExpoSong Presentation"
+msgstr "מצגת ExpoSong"
+
+#: lib/exposong/plugins/pres.py:362
+msgid "Name"
+msgstr "שם"
+
+#: lib/exposong/plugins/pres.py:368
+msgid "Value"
+msgstr "ערך"
+
+#: lib/exposong/plugins/pres.py:399
+msgid "Information"
+msgstr "פרטים"
+
+#: lib/exposong/plugins/pres.py:411
+msgid "Use Timer"
+msgstr "שימוש במתזמן"
+
+#: lib/exposong/plugins/pres.py:421
+msgid "Seconds Per Slide"
+msgstr "שניות לשקופית"
+
+#: lib/exposong/plugins/pres.py:435
+msgid "Loop Slides"
+msgstr "חזרה בלולאה על השקפים"
+
+#: lib/exposong/plugins/pres.py:440
+msgid "Timer"
+msgstr "מתזמן"
+
+#: lib/exposong/plugins/pres.py:446
+msgid "Presentation Information"
+msgstr "פרטי מצגת"
+
+#: lib/exposong/plugins/pres.py:463
+msgid "Value:"
+msgstr "ערך:"
+
+#: lib/exposong/plugins/pres.py:472
+msgid "Please enter a Key."
+msgstr "נא להזין מפתח."
+
+#: lib/exposong/plugins/pres.py:522
+msgid "The presentation must have at least one slide."
+msgstr "במצגת חייב להיות שקף אחד לפחות."
+
+#: lib/exposong/plugins/pres.py:582
+msgid "Text Slide"
+msgstr "שקף טקסט"
+
+#: lib/exposong/plugins/pres.py:583
+msgid "Create a slide with text only."
+msgstr "יצירת שקף עם טקסט בלבד."
+
+#: lib/exposong/plugins/pres.py:590
+msgid "Image Slide"
+msgstr "שקף תמונה"
+
+#: lib/exposong/plugins/pres.py:591
+msgid "Create a slide with an image only."
+msgstr "יצירת שקף עם תמונה בלבד."
+
+#: lib/exposong/plugins/pres.py:596
+msgid "Image Slide With Caption"
+msgstr "שקף תמונה עם כותרת"
+
+#: lib/exposong/plugins/pres.py:597
+msgid "Create an image slide with a caption."
+msgstr "יצירת שקף תמונה עם כותרת."
+
+#: lib/exposong/plugins/pres.py:603
+msgid "Multiple Image Slides"
+msgstr "מספר שקפי תמונה"
+
+#: lib/exposong/plugins/pres.py:604
+msgid "Add multiple image slides from image files."
+msgstr "הוספת מספר שקפי תמונה מקובצי תמונה."
+
+#: lib/exposong/plugins/pres.py:671
+#, python-format
+msgid "Image: %s"
+msgstr "תמונה: %s"
+
+#: lib/exposong/plugins/pres.py:765
+msgid "_ExpoSong Presentation"
+msgstr "מ_צגת ExpoSong"
+
+#: lib/exposong/plugins/pres.py:770
+msgid "New ExpoSong Presentation"
+msgstr "מצגת ExpoSong חדשה"
+
+#: lib/exposong/plugins/pres.py:809
+msgid "ExpoSong Presentations"
+msgstr "מצגות ExpoSong"
+
+#: lib/exposong/plugins/pres.py:835
+msgid "Slide Element"
+msgstr "רכיב שקף"
+
+#: lib/exposong/plugins/pres.py:872
+msgid "Add Text"
+msgstr "הוספת טקסט"
+
+#: lib/exposong/plugins/pres.py:878
+msgid "Add a new text element."
+msgstr "הוספת רכיב טקסט חדש."
+
+#: lib/exposong/plugins/pres.py:882
+msgid "Add a new image element."
+msgstr "הוספת רכיב תמונה חדש."
+
+#: lib/exposong/plugins/pres.py:945
+msgid ""
+"Positions are relative, with values between 0 and 1. A value of 0 is on the "
+"far left or top, and a value of 1 is on the far right or bottom."
+msgstr ""
+"המיקומים הם יחסיים, הערכים צריכים להיות בין 0 ל־1. כאשר הערך 0 הוא קיצוני "
+"לכיוון שמאל או למעלה, וערך של אחד הוא קיצוני לכיוון ימין או למטה."
+
+#: lib/exposong/plugins/pres.py:972
+msgid "Margin:"
+msgstr "שול:"
+
+#: lib/exposong/plugins/pres.py:979
+msgid "Alignment:"
+msgstr "יישור:"
+
+#: lib/exposong/plugins/pres.py:985
+msgid "Vertical Alignment:"
+msgstr "יישור אנכי:"
+
+#: lib/exposong/plugins/pres.py:1000
+msgid "Select or add an item from the left to edit."
+msgstr "יש לבחור או להוסיף פריט מימין לעריכה."
+
+#: lib/exposong/plugins/pres.py:1067
+msgid "Resize to:"
+msgstr "שינוי גודל לכדי:"
+
+#: lib/exposong/plugins/pres.py:1238
+msgid "The image's source was not set."
+msgstr "מקור התמונה לא הוגדר."
+
+#: lib/exposong/plugins/pres.py:1246
+msgid "The text must have a value."
+msgstr "לטקסט חייב להיות ערך."
+
+#: lib/exposong/plugins/songselect_convert.py:36
+msgid "SongSelect Lyrics Converter"
+msgstr "ממיר מילות השירים מ‏־SongSelect"
+
+#: lib/exposong/plugins/songselect_convert.py:164
+msgid "Import SongSelect Lyrics"
+msgstr "יבוא מילות שירים של SongSelect"
+
+#: lib/exposong/plugins/songselect_convert.py:171
+#, python-format
+msgid "SongSelect File (%s)"
+msgstr "קובץ SongSelect‏ (%s)"
+
+#: lib/exposong/plugins/songselect_convert.py:189
+msgid "_SongSelect Lyrics ..."
+msgstr "מילות שירים מ_סוג SongSelect ..."
+
+#: lib/exposong/plugins/songselect_convert.py:190
+msgid "Converts a SongSelect file to OpenLyrics"
+msgstr "המרת קובץ SongSelect לקובץ OpenLyrics"
