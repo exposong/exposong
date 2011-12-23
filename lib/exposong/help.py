@@ -158,7 +158,7 @@ media may be available in future releases.')) +\
             self._p(_('The <b>Song</b> presentation type is for song lyrics. The \
 slides can be verses, choruses, or other lyrics parts, and can contain indexes \
 (such as Verse 1, Verse 2). Songs can contain metadata as well, such as author, \
-songbook number, copyright and ccli number, which may be displayed on the \
+songbook number, copyright and CCLI number, which may be displayed on the \
 screen with the Lyric.')) +\
             self._p(_('Song presentations can also be reordered. Use the verse \
 names in quotes and enter them in the order you wish to have separated by \

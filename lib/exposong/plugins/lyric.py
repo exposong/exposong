@@ -147,7 +147,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                 jn.append(u"\xA9 %s" % \
                           escape(self.pres.song.props.copyright))
             if config.get("songs", "ccli"):
-                jn.append("CCLI License # %s" % escape(config.get("songs", "ccli")))
+                jn.append(_("CCLI License # %s") % escape(config.get("songs", "ccli")))
             return '\n'.join(jn)
         
         def _edit_window(self, parent):
@@ -1045,7 +1045,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         if self.song.props.copyright:
             info.append(u"Copyright \xA9 %s" % escape(self.song.props.copyright))
         if config.get("songs", "ccli"):
-            info.append("CCLI# %s" % escape(config.get("songs", "ccli")))
+            info.append(_("CCLI License # %s") % escape(config.get("songs", "ccli")))
         if self.song.props.songbooks:
             info.append("; ".join(u'%s\xA0#%s' % (escape(s.name), escape(s.entry))
                         for s in self.song.props.songbooks))
