@@ -214,7 +214,7 @@ if not os.path.exists(DATA_PATH):
         os.makedirs(DATA_PATH)
     except OSError:
         log.error('Could not access Data Path "%s".', DATA_PATH)
-for folder in ('bg', 'pres', 'sched', 'image', 'theme', os.path.join('theme','res')):
+for folder in ('pres', 'pres/res', 'sched', 'theme', 'theme/res'):
     if not os.path.exists(join(DATA_PATH, folder)):
         os.mkdir(join(DATA_PATH, folder))
 
