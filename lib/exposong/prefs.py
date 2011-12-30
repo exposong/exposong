@@ -69,7 +69,7 @@ themes are stored.")
             g_title.set_active(True)
 
         g_ccli = table.attach_entry(config.get("songs","ccli"),
-                                    label="CCLI License #")
+                                    label=_("CCLI License #"))
         songbooks = [sbook.name for t in exposong.main.main.library
                      if t[0].get_type() == "song"
                      for sbook in t[0].song.props.songbooks]
