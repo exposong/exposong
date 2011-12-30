@@ -1,0 +1,12 @@
+[patterns]
+**.py = native
+**.txt = native
+**.po = native
+**.mo = BIN
+**.html = native
+**.css = native
+MANIFEST.in = native
+**.xcf = BIN
+**.jpg = BIN
+**.png = BIN
+**.vbs = CRLF
