@@ -35,7 +35,7 @@ import shutil
 import sys
 import traceback
 from optparse import OptionParser, OptionGroup
-from os.path import abspath, join, pardir, expanduser
+from os.path import abspath, join, normpath, pardir, expanduser
 
 
 # Tell Windows that I am my own application, and not just python:
@@ -216,7 +216,7 @@ if not os.path.exists(DATA_PATH):
         log.error('Could not access Data Path "%s".', DATA_PATH)
 for folder in ('pres', 'pres/res', 'sched', 'theme', 'theme/res'):
     if not os.path.exists(join(DATA_PATH, folder)):
-        os.mkdir(join(DATA_PATH, folder))
+        os.mkdir(normpath(join(DATA_PATH, folder)))
 
 # Import this last.
 from exposong.main import run
