@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# vim: ts=4 expandtab ai:
 
 # A native Python implementation of the SWORD Project Bible Reader
 # Currently only ztext Bible modules are implemented.
@@ -99,6 +100,16 @@ class ZModule(object):
                 yield (book, chapter, verse,
                        self.text_for_index(book.testament,
                                            book.get_index_for_ref(chapter, verse)))
+
+    def all_verses_in_chapter(self, book, chapter):
+        if not isinstance(book, Book): book = find_book(book)
+        verses = book.chapter_lengths[chapter-1]
+
+        for verse in range(verses):
+            verse = verse+1
+            yield (book, chapter, verse,
+                   self.text_for_index(book.testament,
+                                       book.get_index_for_ref(chapter, verse)))
         
 
 if __name__=='__main__':
