@@ -103,6 +103,7 @@ class ZModule(object):
 
     def all_verses_in_chapter(self, book, chapter):
         if not isinstance(book, Book): book = find_book(book)
+	if book is None: raise Exception("No book was found.")
         verses = book.chapter_lengths[chapter-1]
 
         for verse in range(verses):
