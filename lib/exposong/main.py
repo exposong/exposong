@@ -19,6 +19,7 @@
 import gtk
 import gtk.gdk
 import gobject
+import operator
 import os
 import os.path
 import time
@@ -420,10 +421,9 @@ class Main (gtk.Window):
         yield True
         
         #Add schedules from plugins
-        #TODO: This won't work anymore when we allow to deactivate plugins.
-        # I did this to have a fixed order in the schedlist
-        plugins = [exposong.plugins.lyric.Presentation,
-                   exposong.plugins.pres.Presentation]
+        plugins = exposong.plugins.get_plugins_by_capability(
+                exposong.plugins._abstract.Presentation)
+        plugins.sort(key=operator.methodcaller('pres_weight'))
         
         splash.splash.incr_total(len(plugins))
         for plugin in plugins:

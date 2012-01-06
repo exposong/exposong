@@ -156,6 +156,11 @@ class Presentation:
         raise NotImplementedError
     
     @staticmethod
+    def pres_weight():
+        "Return the presentation type."
+        return 100
+    
+    @staticmethod
     def get_edit_dialog_title():
         return _("New Presentation")
     

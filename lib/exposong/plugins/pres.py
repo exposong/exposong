@@ -839,6 +839,11 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
     def get_description():
         "Return the description of the plugin."
         return 'A text presentation type.'
+    
+    @staticmethod
+    def pres_weight():
+        "Return the presentation type."
+        return 20
 
 
 class SlideEdit(gtk.Dialog):

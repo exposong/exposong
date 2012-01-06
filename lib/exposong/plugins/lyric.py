@@ -1106,6 +1106,11 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         'Return the pixbuf icon.'
         return type_icon
     
+    @staticmethod
+    def pres_weight():
+        "Return the presentation type."
+        return 10
+    
     @classmethod
     def merge_menu(cls, uimanager):
         'Merge new values with the uimanager.'
