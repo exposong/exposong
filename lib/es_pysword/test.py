@@ -18,9 +18,14 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), os.path.pardir))
 import pysword
 module = pysword.ZModule("kjv")
 
-vss = []
-for vs in module.all_verses_in_chapter("Psalms",119):
-	vss.append( "%s %s:%s   %s" % (vs[0].name, vs[1], vs[2], vformat.verse_unescape(vs[3])))
+def test_verse_retrieve():
+    vss = []
+    for vs in module.all_verses_in_chapter("Psalms",119):
+    	vss.append( "%s %s:%s   %s" % (vs[0].name, vs[1], vs[2], vformat.verse_unescape(vs[3])))
+    print "\n\n".join(vss)
+    print "\n\n\n"
 
-print "\n\n".join(vss)
-print "\n\n\n"
+def test_book_gen():
+    print "\n".join(repr(m) for m in module)
+
+test_book_gen()

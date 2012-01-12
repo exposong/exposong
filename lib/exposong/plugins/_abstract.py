@@ -132,13 +132,14 @@ class Presentation:
     
     def __init__(self, filename=''):
         self._title = ''
+        self.slides = []
         if self.__class__ is Presentation:
             raise NotImplementedError("This class cannot be instantiated.")
     
     @classmethod
     def is_type(cls, fl):
         "Test to see if this file is the correct type."
-        raise NotImplementedError
+        return False
     
     @staticmethod
     def get_type_name():

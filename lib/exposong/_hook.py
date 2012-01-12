@@ -60,6 +60,16 @@ class Toolbar(object):
         'Remove merged items from the toolbar.'
         raise NotImplementedError
 
+class LoadPres(object):
+    '''
+    Subclasses of this class can load presentations that are not represented
+    in the data/pres/ directory.
+    '''
+    @classmethod
+    def load_presentations(cls, library):
+        'Load presentations into the library.'
+        raise NotImplementedError
+
 ### Internal Functions ###
 
 def get_hooks(class_):

@@ -24,6 +24,8 @@ from exposong import gui, theme
 from exposong.glob import *
 from exposong.plugins import Plugin, _abstract
 
+from es_pysword import pysword
+
 """
 Bible Slide Presentations.
 """
@@ -35,8 +37,12 @@ information = {
 type_icon = gtk.gdk.pixbuf_new_from_file_at_size(
         os.path.join(RESOURCE_PATH, 'icons', 'pres-bible.png'), 20, 14)
 
+#TODO Move to preferences
+bible = pysword.ZModule("kjv")
+
+
 class Presentation (Plugin, _abstract.Presentation,
-                    _abstract.Schedule):
+                    _abstract.Schedule, exposong._hook.LoadPres):
     """
     Bible Slide Presentations.
     """
@@ -58,12 +64,8 @@ class Presentation (Plugin, _abstract.Presentation,
             return self.verse
     
     def __init__(self, verses=''):
-        self.verses = verses
-    
-    @classmethod
-    def is_type(cls, fl):
-        "Test to see if this file is the correct type."
-        return False
+        _abstract.Presentation.__init__(self)
+        self._title = verses
     
     @staticmethod
     def get_type_name():
@@ -88,5 +90,12 @@ class Presentation (Plugin, _abstract.Presentation,
     def schedule_name(cls):
         "Return the string schedule name."
         return _('Bible Verses')
-
+    
+    @classmethod
+    def load_presentations(cls, library):
+        'Load presentations into the library.'
+        exposong.log.info("Loading Bible presentations")
+        for book in bible:
+            pres = cls(book.name)
+            library.append(pres)
 
