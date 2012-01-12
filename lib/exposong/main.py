@@ -387,10 +387,12 @@ class Main (gtk.Window):
                 self.load_pres(filenm)
                 yield True
             splash.splash.incr(1)
-        print exposong._hook.get_hooks(exposong._hook.LoadPres)
+        
+        # Load modules that hook into LoadPres
         for m in exposong._hook.get_hooks(exposong._hook.LoadPres):
-            m.load_presentations(self.library)
-            yield True
+            for pres in m.load_presentations():
+                self.library.append(pres)
+                yield True
         yield False
     
     def load_sched(self, filenm):

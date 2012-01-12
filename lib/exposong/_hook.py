@@ -66,8 +66,11 @@ class LoadPres(object):
     in the data/pres/ directory.
     '''
     @classmethod
-    def load_presentations(cls, library):
-        'Load presentations into the library.'
+    def load_presentations(cls):
+        'Load presentations into the library. Should be implemented as a generator, returning the presentation object each time.'
+        # Example:
+        #   For pres in presentations:
+        #       yield pres
         raise NotImplementedError
 
 ### Internal Functions ###

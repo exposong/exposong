@@ -24,7 +24,7 @@ from exposong import gui, theme
 from exposong.glob import *
 from exposong.plugins import Plugin, _abstract
 
-from es_pysword import pysword
+from es_pysword import pysword, vformat
 
 """
 Bible Slide Presentations.
@@ -53,15 +53,20 @@ class Presentation (Plugin, _abstract.Presentation,
         """
         def __init__(self, pres, verse='', text=''):
             self.pres = pres
-            self.verse = verse
+            self.title = verse
             self.text = text
         
         def get_body(self):
-            return self.text
+            return [theme.Text(self.text, align=theme.CENTER,
+                    valign=theme.MIDDLE, margin=0.02)]
         
         def get_footer(self):
+            return [theme.Text(self.footer_text(), align=theme.CENTER, 
+                    valign=theme.MIDDLE, margin=0.02)]
+        
+        def footer_text(self):
             # TODO Version and Copyright
-            return self.verse
+            return self.title
     
     def __init__(self, verses=''):
         _abstract.Presentation.__init__(self)
@@ -92,10 +97,22 @@ class Presentation (Plugin, _abstract.Presentation,
         return _('Bible Verses')
     
     @classmethod
-    def load_presentations(cls, library):
+    def load_presentations(cls):
         'Load presentations into the library.'
+        # This takes a while, so I limit it to 5 books and verses for now.
         exposong.log.info("Loading Bible presentations")
+        y = 0
         for book in bible:
             pres = cls(book.name)
-            library.append(pres)
+            print book.name
+            x = 0
+            y += 1
+            for vs in bible.all_verses_in_book(book):
+                x += 1
+                pres.slides.append(pres.Slide(pres,
+                                              "{0.name} {1}:{2}".format(*vs),
+                                              vformat.verse_unescape(vs[3])))
+                if x > 5: break
+            yield pres
+            if y > 5: break
 
