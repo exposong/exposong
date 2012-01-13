@@ -19,13 +19,16 @@ import pysword
 module = pysword.ZModule("kjv")
 
 def test_verse_retrieve():
-    vss = []
-    for vs in module.all_verses_in_chapter("Psalms",119):
-    	vss.append( "%s %s:%s   %s" % (vs[0].name, vs[1], vs[2], vformat.verse_unescape(vs[3])))
-    print "\n\n".join(vss)
-    print "\n\n\n"
+    chapter = ""
+    for vs in module.all_verses_in_book("Genesis"):
+        if vs[1] != chapter:
+            chapter = vs[1]
+            print vs[1]
+    	x = ( "%s %s:%s   %s" % (vs[0].name, vs[1], vs[2], vformat.verse_unescape(vs[3])))
+    #print "\n\n".join(vss)
+    #print "\n\n\n"
 
 def test_book_gen():
     print "\n".join(repr(m) for m in module)
 
-test_book_gen()
+test_verse_retrieve()

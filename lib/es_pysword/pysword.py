@@ -111,7 +111,7 @@ class ZModule(object):
             yield (book, chapter, verse,
                    self.text_for_index(book.testament,
                                        book.get_index_for_ref(chapter, verse)))
-    def __iter__(self):
+    def books(self):
         'Iterates over all books.'
         global testaments
         for t, books in testaments.iteritems():

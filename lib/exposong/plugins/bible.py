@@ -20,7 +20,7 @@ import gtk
 
 import exposong._hook
 from exposong import RESOURCE_PATH, DATA_PATH
-from exposong import gui, theme
+from exposong import gui, theme, splash
 from exposong.glob import *
 from exposong.plugins import Plugin, _abstract
 
@@ -101,18 +101,16 @@ class Presentation (Plugin, _abstract.Presentation,
         'Load presentations into the library.'
         # This takes a while, so I limit it to 5 books and verses for now.
         exposong.log.info("Loading Bible presentations")
-        y = 0
-        for book in bible:
+        splash.splash.incr_total(66)
+        for book in bible.books():
             pres = cls(book.name)
-            print book.name
             x = 0
-            y += 1
             for vs in bible.all_verses_in_book(book):
                 x += 1
                 pres.slides.append(pres.Slide(pres,
                                               "{0.name} {1}:{2}".format(*vs),
                                               vformat.verse_unescape(vs[3])))
-                if x > 5: break
+                if x > 2: break
+            splash.splash.incr(1)
             yield pres
-            if y > 5: break
 
