@@ -1,4 +1,5 @@
 glob:*.pyc
+glob:*~
 glob:*.orig
 glob:.cache
 glob:.project
