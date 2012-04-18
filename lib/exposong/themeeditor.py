@@ -574,6 +574,13 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         self._set_changed()
         itr = self._bg_model.append((exposong.theme.RadialGradientBackground(),))
         self._activate_bg(itr)
+        
+    def _bg_radial_delete_point(self, button, i):
+        'Delete a point from the current gradient background'
+        self._get_active_bg().stops.pop(i)
+        self._bg_radial_colors.pop(i)
+        self._bg_radial_delete_buttons.pop(i)
+        self._on_bg_radial()
     
     def _on_bg_radial(self, widget=None):
         'Create the widgets for editing radial backgrounds'
@@ -585,23 +592,37 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         table.attach_section_title(_("Radial Gradient"))
         self._bg_radial_colors = []
         self._bg_radial_lengths = []
+        self._bg_radial_delete_buttons = []
         loc = 0.1
         if len(bg.stops) == 0:
             for i in range(2):
                 self._bg_gradient_add_point(update=False)
         for i in range(len(bg.stops)):
+            # Color Button
             self._bg_radial_colors.append(table.attach_widget(
-                    gtk.ColorButton(), label=_("Color %d"%i)))
+                    gtk.ColorButton(), label=_("Color %d")%i,
+                                          yoptions=gtk.SHRINK))
             self._bg_radial_colors[i].set_use_alpha(True)
             self._bg_radial_colors[i].connect('color-set', self._on_bg_radial_changed)
+            # Delete Buttons only if more than two points exits
+            if len(bg.stops)>2:
+                del_button = gtk.Button(None)
+                img = gtk.Image()
+                img.set_from_stock(gtk.STOCK_DELETE, gtk.ICON_SIZE_BUTTON)
+                del_button.set_image(img)
+                del_button.connect('clicked', self._bg_radial_delete_point, i)
+                self._bg_radial_delete_buttons.append(del_button)
+                table.attach(del_button, 2, 3, table.y-1, table.y+1, xoptions=gtk.SHRINK, yoptions=gtk.FILL)
+            # Position HScale
             self._bg_radial_lengths.append(table.attach_widget(
                     gtk.HScale(gtk.Adjustment(50,0,100,1,10,0)), label=_("Position")))
             self._bg_radial_lengths[i].set_digits(0)
             self._bg_radial_lengths[i].connect('change-value', self._on_bg_radial_changed)
-            table.attach_hseparator()
-        add = table.attach_widget(gtk.Button(_("Add Point"), gtk.STOCK_ADD), "")
+            table.attach_hseparator(yoptions=gtk.SHRINK)
+        add = table.attach_widget(gtk.Button(_("Add Point")))
         add.connect('clicked', self._bg_gradient_add_point)
         
+        # Length HScale 
         self._bg_radial_length = table.attach_widget(
                 gtk.HScale(gtk.Adjustment(1,1,100,1,10,0)), label=_("Length"))
         self._bg_radial_length.set_digits(0)
