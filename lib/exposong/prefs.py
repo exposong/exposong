@@ -77,8 +77,7 @@ themes are stored.")
         g_songbook = table.attach_combo(songbooks,
                                         config.get("songs","songbook"),
                                         label=_("Songbook"))
-        table.attach_comment(_("Songbooks in Songs are automatically \
-added to this list."))
+        table.attach_comment(_("Choose a Songbook to be displayed in the footer."))
         
         notebook.append_page(table, gtk.Label( _("General") ))
         
