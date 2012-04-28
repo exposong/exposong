@@ -152,6 +152,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
                                    gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
                                    _('Are you sure you want to delete "%s"?') %
                                    item.title)
+        dialog.set_default_response(gtk.RESPONSE_YES)
         dialog.set_title( _("Delete Schedule?") )
         resp = dialog.run()
         dialog.hide()

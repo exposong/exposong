@@ -65,6 +65,7 @@ class Help(exposong._hook.Menu, object):
         elif new_version:
             dlg = gtk.MessageDialog(exposong.main.main, 0, gtk.MESSAGE_WARNING,
                                     gtk.BUTTONS_YES_NO, msg)
+            dialog.set_default_response(gtk.RESPONSE_YES)
             dlg.set_title(_("A New Version is Available"))
         else:
             dlg = gtk.MessageDialog(exposong.main.main, 0,

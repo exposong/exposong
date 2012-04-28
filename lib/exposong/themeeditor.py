@@ -715,6 +715,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         dialog = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
                                    gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO,
                                    msg)
+        dialog.set_default_response(gtk.RESPONSE_YES)
         dialog.set_title( _('Delete Background?') )
         resp = dialog.run()
         dialog.hide()

@@ -171,6 +171,7 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         dialog = gtk.MessageDialog(exposong.main.main, gtk.DIALOG_MODAL,
                                    gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
                                    msg % theme.get_title())
+        dialog.set_default_response(gtk.RESPONSE_YES)
         dialog.set_title(_("Delete Theme?"))
         resp = dialog.run()
         dialog.destroy()

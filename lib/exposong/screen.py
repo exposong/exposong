@@ -428,6 +428,7 @@ class Screen(exposong._hook.Menu):
             dialog = gtk.MessageDialog(exposong.main.main, gtk.DIALOG_MODAL,
                                        gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
                                        msg)
+            dialog.set_default_response(gtk.RESPONSE_YES)
             dialog.set_title( _("Set Logo?") )
             resp = dialog.run()
             dialog.destroy()
