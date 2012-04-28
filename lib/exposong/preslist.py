@@ -238,14 +238,15 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
             schmod = exposong.schedlist.schedlist.get_model()
             
             #Remove from custom schedules
-            itr = schmod.iter_children(exposong.schedlist.schedlist.custom_schedules)
+            itr = schmod.iter_children(None)
             while itr:
                 sched = schmod.get_value(itr, 0)
-                sched.remove_if(presentation=item.presentation)
+                if schmod.get_value(itr, 0) and not schmod.get_value(itr, 0).is_builtin():
+                    sched.remove_if(presentation=item.presentation)
                 itr = schmod.iter_next(itr)
             
             exposong.main.main.library.remove_if(presentation=item.presentation)
-            exposong.log.warning('Deleting "%s"', item.filename)
+            exposong.log.info('Deleting "%s"', item.filename)
             os.remove(os.path.join(DATA_PATH,"pres",item.filename))
             self.activate_pres()
             

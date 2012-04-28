@@ -48,6 +48,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
         self.model = gtk.TreeStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING,
                                    gobject.TYPE_STRING, gobject.TYPE_BOOLEAN)
         self.model.set_sort_column_id(2, gtk.SORT_ASCENDING)
+                
         self.set_model(self.model)
         self.set_enable_search(False)
         self.set_headers_visible(False)
@@ -94,8 +95,10 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
     def remove(self, item):
         'Remove the item from the model.'
         model = self.get_model()
-        itr = model.iter_children(self.custom_schedules)
-        while model.get_value(itr, 0).filename != item.filename:
+        itr = model.iter_children(None)
+        while not model.get_value(itr, 0) or\
+                model.get_value(itr, 0).is_builtin() or\
+                model.get_value(itr, 0).filename != item.filename:
             itr = model.iter_next(itr)
         self.get_model().remove(itr)
         self._add_to_schedule_menu()
@@ -195,9 +198,10 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
         'Create a new schedule.'
         name = _("New Schedule")
         curnames = []
-        itr = self.model.iter_children(self.custom_schedules)
+        
+        itr = self.model.iter_children(None)
         while itr:
-            if self.model.get_value(itr, 1).startswith(name):
+            if self.model.get_value(itr,1) and self.model.get_value(itr, 1).startswith(name):
                 curnames.append(self.model.get_value(itr, 1))
             itr = self.model.iter_next(itr)
         if len(curnames) == 0:
@@ -205,7 +209,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
         else:
             name += " "+str(int(curnames[len(curnames)-1][-2:]) + 1)
         sched = exposong.schedule.Schedule(name, builtin=False)
-        itrnew = self.append(self.custom_schedules, sched)
+        itrnew = self.append(None, sched)
         exposong.log.info('Creating New Schedule "%s".', name)
         pathnew = self.model.get_path(itrnew)
         self.expand_to_path(pathnew)
@@ -257,13 +261,12 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
     
     def _add_to_schedule_menu(self):
         "Creates the context menu 'Add to Schedule'"
-        if not hasattr(self, 'custom_schedules'):
-            return False
         model = self.get_model()
         scheds = []
-        itr = model.iter_children(self.custom_schedules)
+        itr = model.iter_children(None)
         while itr:
-            scheds.append((model.get_value(itr, 0), model.get_value(itr, 1)))
+            if model.get_value(itr, 0) and not model.get_value(itr, 0).is_builtin():
+                scheds.append((model.get_value(itr, 0), model.get_value(itr, 1)))
             itr = model.iter_next(itr)
         
         uimanager = exposong.main.main.uimanager

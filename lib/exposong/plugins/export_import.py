@@ -186,10 +186,11 @@ class ExportImport(Plugin, exposong._hook.Menu):
                                          os.path.join("pres/res", fn)))
             itr = library.iter_next(itr)
         model = exposong.schedlist.schedlist.get_model()
-        itr = model.iter_children(exposong.schedlist.schedlist.custom_schedules)
+        itr = model.iter_children(None)
         while itr:
-            fn = model.get_value(itr, 0).filename
-            lib_list.append((fn, os.path.join("sched", os.path.split(fn)[1])))
+            if model.get_value(itr, 0) and not model.get_value(itr, 0).is_builtin():
+                fn = model.get_value(itr, 0).filename
+                lib_list.append((fn, os.path.join("sched", os.path.split(fn)[1])))
             itr = model.iter_next(itr)
         return lib_list
     
@@ -318,7 +319,7 @@ class ExportImport(Plugin, exposong._hook.Menu):
         
         # Add to Custom Schedules
         model = exposong.schedlist.schedlist.get_model()
-        itr = model.iter_children(exposong.schedlist.schedlist.custom_schedules)
+        itr = model.iter_children(None)
         while itr:
             sched = model.get_value(itr, 0)
             scheditem = exposong.schedule.ScheduleItem(pres, "")

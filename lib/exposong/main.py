@@ -183,8 +183,8 @@ class Main (gtk.Window):
                 exposong.plugins._abstract.Presentation):
             tlist = [p for p in self.library if p[0].get_type() == ptype.get_type()]
             info.append("   * %s: %d" % (ptype.get_type().title(), len(tlist)))
-        info.append(" * Custom Schedules: %d" %
-                    sch.get_model().iter_n_children(sch.custom_schedules))
+        slist = [s for s in sch.get_model() if s[0] and not s[0].is_builtin()]
+        info.append(" * Custom Schedules: %d" %len(slist))
         info.append(" * Themes: %d" % len(exposong.themeselect.themeselect.liststore))
         exposong.log.info("\n".join(info))
         
@@ -411,7 +411,7 @@ class Main (gtk.Window):
             if root.tag == "schedule":
                 sched = Schedule(filename=filenm, builtin=False)
                 sched.load(root, self.library)
-                schedlist.schedlist.append(schedlist.schedlist.custom_schedules, sched)
+                schedlist.schedlist.append(None, sched)
             else:
                 exposong.log.error("%s is not a schedule file.",
                                    os.path.join(directory, filenm))
@@ -445,10 +445,7 @@ class Main (gtk.Window):
             schedlist.schedlist.get_model().get_iter_first())
         schedlist.schedlist.append(None, (None, None, 39, True))
         
-        #Add custom schedules from the data directory
-        schedlist.schedlist.custom_schedules = schedlist.schedlist.append(None,
-                (None, _("Custom Schedules"), 40, False))
-        
+        #Add custom schedules from the data directory        
         dir_list = os.listdir(directory)
         for filenm in dir_list:
             if filenm.endswith(".xml"):
@@ -469,9 +466,10 @@ class Main (gtk.Window):
     def _save_schedules(self):
         'Save all schedules to disk.'
         model = schedlist.schedlist.get_model()
-        sched = model.iter_children(schedlist.schedlist.custom_schedules)
+        sched = model.iter_children(None)
         while sched:
-            model.get_value(sched, 0).save()
+            if model.get_value(sched, 0) and not model.get_value(sched, 0).is_builtin():
+                model.get_value(sched, 0).save()
             sched = model.iter_next(sched)
     
     def disable_shortcuts(self, *args):
