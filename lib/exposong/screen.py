@@ -165,12 +165,10 @@ class Screen(exposong._hook.Menu):
         self._actions.get_action("Hide").set_visible(False)
         self.window.hide()
         self._set_menu_items_disabled()
-        self.__block_toggle = True
         for nm in ('Freeze', 'Background', 'Logo', 'Black Screen'):
             nmaction = self._actions.get_action(nm)
             if action != nmaction:
                 nmaction.set_active(False)
-        self.__block_toggle = False
         self.preview.queue_draw()
     
     def show(self, *args):
@@ -371,30 +369,16 @@ class Screen(exposong._hook.Menu):
     
     def _secondary_button_toggle(self, action=None, state=None):
         'Toggle a state button.'
-        try:
-            if self.__block_toggle:
-                return
-        except Exception:
-            pass
-        self.__block_toggle = True
         if state != None:
             action.set_active(True)
         for nm in ('Freeze', 'Background', 'Logo', 'Black Screen'):
             nmaction = self._actions.get_action(nm)
-            if action != nmaction:
-                nmaction.set_active(False)
+            if action and action.get_active() and action != nmaction:
+                nmaction.set_sensitive(False)
             else:
+                nmaction.set_sensitive(True)
                 self.draw()
         self.draw()
-        self.__block_toggle = False
-    
-    def to_black(self):
-        'Set the screen to black.'
-        self._secondary_button_toggle(self._actions.get_action('Black Screen'), True)
-    
-    def to_background(self):
-        'Set the screen to the current theme.'
-        self._secondary_button_toggle(self._actions.get_action('Background'), True)
     
     def to_logo(self, action=None):
         'Set the screen to the ExpoSong logo or a user-defined one.'
