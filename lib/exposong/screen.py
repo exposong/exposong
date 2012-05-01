@@ -241,11 +241,6 @@ class Screen(exposong._hook.Menu):
             # Select the first theme if nothing is set as the default.
             exposong.themeselect.themeselect.set_active(0)
             theme = exposong.themeselect.themeselect.get_active()
-        if not theme:
-            # Use a default black theme if no themes are available.
-            # TODO Since we have builtin themes, we should not have to have this
-            # anymore. Remove this after testing.
-            theme = exposong.theme.Theme()
         
         if widget is self.pres:
             if self._actions.get_action('Black Screen').get_active():
