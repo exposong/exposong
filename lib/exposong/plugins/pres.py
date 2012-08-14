@@ -192,10 +192,11 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         def _on_delete(self):
             "Called when the slide is to be deleted."
             for c in self._content:
-                print c
-                if hasattr(c, "src") and \
-                        c.src.startswith(os.path.join(IMAGE_PATH)):
-                    os.remove(c.src)
+                if hasattr(c, "src") and c.src.startswith(os.path.join(IMAGE_PATH)):
+                    try:
+                        os.remove(c.src)
+                    except OSError:
+                        pass
 
         @staticmethod
         def get_version():
