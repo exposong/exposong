@@ -232,7 +232,7 @@ class Main (gtk.Window):
         vbox.pack_start(prev_aspect, False, False, 0)
         
         exposong.log.debug("Rendering Secondary Buttons")
-        vbox.pack_start(screen.screen.get_button_bar_secondary(), False, False, 10)
+        vbox.pack_start(screen.screen.get_button_bar_secondary(), False, True, 10)
         
         label = gtk.Label()
         label.set_markup("<b>%s</b>" % _("Theme Selection"))

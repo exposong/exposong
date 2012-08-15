@@ -352,12 +352,12 @@ class Screen(exposong._hook.Menu):
     def get_button_bar_secondary(cls):
         "Return the presentation display widget."
         tb = gtk.Toolbar()
+        tb.set_show_arrow(False)
+        tb.set_orientation(gtk.ORIENTATION_VERTICAL)
+        tb.set_style(gtk.TOOLBAR_BOTH_HORIZ)
         # FIXME It would be nice to get rid of the shadow on the toolbars, but
         # they are read-only style properties.
-        tb.set_style(gtk.TOOLBAR_ICONS)
-        tb.set_icon_size(gtk.ICON_SIZE_LARGE_TOOLBAR)
         button = cls._actions.get_action('Black Screen').create_tool_item()
-        button.set_is_important(True)
         tb.add(button)
         button = cls._actions.get_action('Background').create_tool_item()
         tb.add(button)
