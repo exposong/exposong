@@ -227,6 +227,28 @@ class ExportImport(Plugin, exposong._hook.Menu):
         dlg.destroy()
     
     @classmethod
+    def export_song_list(cls, *args):
+        'Export an alphabetical song list'
+        songs = "";
+        for pres in exposong.main.main.library:
+            if pres[0].get_type()=="song":
+                songs += pres[0].song.props.titles[0].text + "\n"
+        
+        dlg = gtk.FileChooserDialog(_("Export Alphabetical Song List"),
+            exposong.main.main, gtk.FILE_CHOOSER_ACTION_SAVE,
+            (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
+             gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        dlg.set_do_overwrite_confirmation(True)
+        dlg.set_current_name(_("exposong_songs.txt"))
+        dlg.set_current_folder(os.path.expanduser("~"))
+        if dlg.run() == gtk.RESPONSE_ACCEPT:
+          fname = dlg.get_filename()
+          file = open(fname, "w")
+          file.write(songs)
+          file.close()
+        dlg.destroy()
+    
+    @classmethod
     def import_song_dialog(cls, *args):
         'Import OpenLyrics Song(s)'
         dlg = gtk.FileChooserDialog(_("Import Song(s) (OpenLyrics Format)"), exposong.main.main,
@@ -522,6 +544,8 @@ class ExportImport(Plugin, exposong._hook.Menu):
                         None, None, cls.import_song_dialog),
                 ('export-song', None, _("Current _Song"),
                         None, None, cls.export_song),
+                ('export-songlist', None, _("List of all Songs"),
+                        None, None, cls.export_song_list),
                 ('export-sched', None,
                         _("_Current Schedule with Presentations..."),
                         None, None, cls.export_sched),
@@ -554,6 +578,8 @@ class ExportImport(Plugin, exposong._hook.Menu):
                         <menuitem action="export-lib" />
                         <menuitem action="export-sched" />
                         <menuitem action="export-theme" />
+                        
+                        <menuitem action="export-songlist" />
                     </menu>
                 </menu>
             </menubar>
