@@ -98,7 +98,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
         itr = model.iter_children(None)
         while not model.get_value(itr, 0) or\
                 model.get_value(itr, 0).is_builtin() or\
-                model.get_value(itr, 0).filename != item.filename:
+                model.get_value(itr, 0) != item.get_model():
             itr = model.iter_next(itr)
         self.get_model().remove(itr)
         self._add_to_schedule_menu()
