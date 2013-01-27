@@ -697,7 +697,7 @@ class Section(_Element):
         el.attrib['font'] = self.font
         el.attrib['spacing'] = str(self.spacing)
         el.attrib['align'] = get_align_key(self.align)
-        el.attrib['align'] = get_valign_key(self.valign)
+        el.attrib['valign'] = get_valign_key(self.valign)
         el.attrib['x1'] = str(self.pos[0])
         el.attrib['y1'] = str(self.pos[1])
         el.attrib['x2'] = str(self.pos[2])
