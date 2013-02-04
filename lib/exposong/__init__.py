@@ -42,7 +42,10 @@ from os.path import abspath, join, normpath, pardir, expanduser
 if sys.platform == 'win32' and platform.version().split('.') > ['6','0']:
     import ctypes
     myappid = 'ExpoSong.%s' % exposong.version.__version__
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+    try:
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+    except AttributeError:
+        pass
 
 # Set up argument handling
 # TODO These cannot currently be translated, due to the required order. Do they
