@@ -77,20 +77,15 @@ def get_node_text(element, respect_whitespace=False):
 
 def title_to_filename(title):
     """
-    Returns a filename with letters and underscores only.
-    Non-ascii-characters are translated to its ascii-equivalent
+    Returns a filename with chars removed which are not allowed as filename
+    http://en.wikipedia.org/wiki/File_name#Reserved_characters_and_words
     """
-    title = unicodedata.normalize('NFD', unicode(title)).encode('ascii', 'ignore')
-    
-    new = ""
+    filename = ""
     for char in title:
-        if char.isalnum():
-            new += char
-        elif not new.endswith("_") and char not in "'\",.?":
-            new += "_"
-            
-    return new
-
+        if char not in "\/:<>\"|?*%+":
+            filename += char
+    
+    return filename
 
 def check_filename(title, filepath):
     '''
