@@ -30,6 +30,7 @@ from xml.sax.saxutils import escape, unescape
 import exposong.main
 import exposong.slidelist
 import exposong._hook
+import exposong_openlyrics.tools.convert_schema as convert_schema
 import undobuffer
 from exposong.glob import *
 from exposong import RESOURCE_PATH, DATA_PATH
@@ -205,10 +206,24 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             fl.close()
             
             self.song = openlyrics.Song(filename)
+            self.update_file_to_latest_version()
             for v in self.song.verses:
                 self.slides.append(self.Slide(self, v))
         else:
             self.song = openlyrics.Song()
+    
+    def update_file_to_latest_version(self):
+        'Checks if the OpenLyrics file is at the latest version. If not, update it.'
+        song_version = self.song.get_version().split(".")
+        latest_openlyrics_version = convert_schema.TARGET_OPENLYRICS_VER.split(".")
+        # Convert if major version differs OR (major is the same AND minor version differs)
+        if song_version[0] < latest_openlyrics_version[0] or\
+                (song_version[0] == latest_openlyrics_version[0] and\
+                 song_version[1] < latest_openlyrics_version[1]):
+            converter = convert_schema.OpenLyricsTree(self.filename)
+            converter.convert()
+            converter.save(self.filename)
+            self.__init__(self.filename)
     
     def get_order_string(self):
         'Return the verse order as a string'
