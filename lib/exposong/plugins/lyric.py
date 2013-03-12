@@ -1120,6 +1120,45 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         return 10
     
     @classmethod
+    def _on_open_song_by_songbook(cls, *args):
+        'Open Song by looking for Songbook and Entry'
+        dlg = gtk.MessageDialog(type=gtk.MESSAGE_WARNING, buttons=gtk.BUTTONS_OK_CANCEL,
+                                message_format=_("Please enter the Songbook and the Entry you want to open."))
+        vbox = dlg.get_message_area()
+        table = gui.Table(2)
+        
+        
+        songbooks = [sbook.name for t in exposong.main.main.library
+                     if t[0].get_type() == "song"
+                     for sbook in t[0].song.props.songbooks]
+        songbooks = sorted(set(songbooks))
+        songbook = gui.append_combo_entry(table, _('Songbook Name:'),
+                                          songbooks, None, 0)
+        entry = gui.append_entry(table, _('Entry:'), None, 1)
+        vbox.pack_start(table)
+        vbox.show_all()
+        not_found_lbl = gtk.Label(_("Entry not found."))
+        vbox.pack_start(not_found_lbl)
+        while dlg.run() == gtk.RESPONSE_OK:
+            if cls._find_song(songbook.get_active_text(), entry.get_text()):
+                break
+            else:
+                not_found_lbl.show()
+        dlg.destroy()
+        
+    @classmethod
+    def _find_song(cls, songbook, entry):
+        '''Looks for a Song which has the given songbook and entry.
+        Opens the Song and returns True, if found. Returns else, if not.'''
+        model = exposong.preslist.preslist.get_model()
+        for row in model:
+            for sbook in row[0].song.props.songbooks:
+                if sbook.name == songbook and sbook.entry == entry:
+                    exposong.preslist.preslist.set_cursor(row.path)
+                    return True
+        return False
+    
+    @classmethod
     def merge_menu(cls, uimanager):
         'Merge new values with the uimanager.'
         gtk.stock_add([("pres-song",_("_Song"), gtk.gdk.MOD1_MASK, 0,
@@ -1127,7 +1166,11 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         
         actiongroup = gtk.ActionGroup('exposong-song')
         actiongroup.add_actions([("pres-new-song", 'pres-song-new', _("New Song"), "<Ctrl>n",
-                                _("Create a new Song"), cls._on_pres_new)])
+                                _("Create a new Song"), cls._on_pres_new),
+                                ("open-song-by-songbook", 'open-song-by-songbook',
+                                 _("Open Song by Songbook"), "<Ctrl>o", _("Find Song by entering Songbook and entry"),
+                                 cls._on_open_song_by_songbook),
+                                ])
         uimanager.insert_action_group(actiongroup, -1)
         
         cls.menu_merge_id = uimanager.add_ui_from_string("""
@@ -1138,6 +1181,9 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                                 <menuitem action='pres-new-song' />
                             </placeholder>
                         </menu>
+                </menu>
+                <menu action="Presentation">
+                    <menuitem action='open-song-by-songbook' />
                 </menu>
             </menubar>
             """)
