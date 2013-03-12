@@ -942,7 +942,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                 else:
                     if edit:
                         model.set_value(itr, 0, songbook.get_active_text())
-                        model.set_value(itr, 1, entry.get_active_text())
+                        model.set_value(itr, 1, entry.get_text())
                     else:
                         self._fields['songbook'].append( (songbook.get_active_text(),
                                 entry.get_text()) )
