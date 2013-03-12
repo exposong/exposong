@@ -1,0 +1,23 @@
+exposong (0.8) unstable; urgency=low
+
+  * New ExpoSong release
+
+ -- Samuel Mehrbrodt <s.mehrbrodt@gmail.com>  Fri, 02 Dec 2011 23:46:37 +0100
+
+exposong (0.7.1) lucid; urgency=low
+
+  * New ExpoSong release
+
+ -- Samuel Mehrbrodt <s.mehrbrodt@gmail.com>  Tue, 26 Oct 2010 17:50:01 +0200
+
+exposong (0.7-2) lucid; urgency=low
+
+  * Removing unneeded dependency (gettext)
+
+ -- Samuel Mehrbrodt <s.mehrbrodt@gmail.com>  Tue, 14 Sep 2010 17:10:34 +0200
+
+exposong (0.7-1) unstable; urgency=low
+
+  * Initial release
+
+ -- Samuel Mehrbrodt <s.mehrbrodt@gmail.com>  Mon, 06 Sep 2010 18:36:01 +0200
