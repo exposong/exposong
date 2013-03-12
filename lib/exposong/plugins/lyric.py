@@ -101,7 +101,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                                             lines.lines[i]))
                 return '\n'.join(lineList)
             elif len(self.verse.lines) == 1:
-                return '\n'.join(str(l) for l in self.verse.lines[0].lines)
+                return str(self.verse.lines[0])
             else:
                 return ''
         
@@ -223,6 +223,8 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             converter = convert_schema.OpenLyricsTree(self.filename)
             converter.convert()
             converter.save(self.filename)
+            exposong.log.info("Converted File %s to OpenLyrics %s"%(self.filename,
+                                                                    convert_schema.TARGET_OPENLYRICS_VER))
             self.__init__(self.filename)
     
     def get_order_string(self):
@@ -371,11 +373,11 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         self._fields['variant'] = gui.append_entry(table, _("Variant:"),
                 self.song.props.variant, 0)
         self._fields['custom_version'] = gui.append_entry(table,
-                _("Custom Version:"), self.song.props.custom_version, 1)
+                _("Version:"), self.song.props.version, 1)
         # TODO Change release_date to calendar
         self._fields['rel_date'] = gui.append_entry(table,
                                                     _("Release Date:"),
-                                                    self.song.props.release_date,
+                                                    self.song.props.released,
                                                     2)
         vbox.pack_start(table, False, True)
         notebook.append_page(vbox, gtk.Label( _('Title')) )
@@ -448,10 +450,9 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         #Theme field
         vbox = gtk.VBox()
         self._fields['theme'] = gtk.ListStore(gobject.TYPE_STRING,
-                                              gobject.TYPE_STRING,
                                               gobject.TYPE_STRING)
         for theme in self.song.props.themes:
-            self._fields['theme'].append( (theme, theme.lang, theme.id) )
+            self._fields['theme'].append( (theme, theme.lang) )
         theme_list = gtk.TreeView(self._fields['theme'])
         theme_list.connect('row-activated', self._theme_dlg, True)
         theme_list.set_reorderable(True)
@@ -486,12 +487,6 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         col.pack_start(cell)
         col.set_resizable(True)
         col.add_attribute(cell, 'text', 1)
-        theme_list.append_column(col)
-        cell = gtk.CellRendererText()
-        col = gtk.TreeViewColumn( _('ID'))
-        col.pack_start(cell)
-        col.set_resizable(True)
-        col.add_attribute(cell, 'text', 2)
         theme_list.append_column(col)
         scroll = gtk.ScrolledWindow()
         scroll.add(theme_list)
@@ -693,7 +688,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         
         self.song.props.themes = []
         for row in self._fields['theme']:
-            self.song.props.themes.append(openlyrics.Theme(row[0], row[2], row[1]))
+            self.song.props.themes.append(openlyrics.Theme(row[0], row[1]))
         
         self.song.props.comments = self._fields['comments'].get_buffer().get_text(
                 *self._fields['comments'].get_buffer().get_bounds()).split('\n')
@@ -886,7 +881,6 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         themes = sorted(set(themes))
         theme_ = gui.append_combo_entry(table, _('Theme Name:'),
                                           themes, theme_value, 0)
-        #theme = gui.append_entry(table, _('Theme Name:'), theme_value, 0)
         lang = gui.append_language_combo(table, lang_value, 1)
         dialog.vbox.show_all()
         
@@ -904,7 +898,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                         model.set_value(itr, 1, lang.get_active_text())
                     else:
                         self._fields['theme'].append( (theme_.get_active_text(),
-                                lang.get_active_text(), "") )
+                                lang.get_active_text()) )
                     dialog.hide()
                     return True
             else:
