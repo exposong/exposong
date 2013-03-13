@@ -586,7 +586,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         label.set_alignment(0.5, 0.5)
         hbox.pack_start(label, False, True, 5)
         
-        self._fields['title'] = gtk.Entry(45)
+        self._fields['title'] = gtk.Entry(100)
         self._fields['title'].set_text(self.get_title())
         hbox.pack_start(self._fields['title'], True, True)
         vbox.pack_start(hbox, False, True)
