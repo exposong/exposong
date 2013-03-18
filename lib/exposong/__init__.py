@@ -113,8 +113,8 @@ _handler.setFormatter(_fmt)
 log.addHandler(_handler)
 
 # Logging to the Exposong Debug Window
-import gtk
-import pygtk
+from gi.repository import Gtk
+import gi
 import exposong.gtklogger
 exposong.gtklogger.handler = exposong.gtklogger.GTKHandler(logging.DEBUG)
 log.addHandler(exposong.gtklogger.handler)
@@ -136,7 +136,7 @@ def excepthook(type_, value, tb):
     exposong.log.error("".join(traceback.format_exception(type_, value, tb)))
 sys.excepthook = excepthook
 
-pygtk.require("2.0")
+#pyGtk.require("2.0")
 
 # Log some system information
 info = ["System Information",
@@ -196,9 +196,9 @@ log.debug('Data is located at "%s".', DATA_PATH)
 
 if options.reset:
     msg = _("Are you sure you want to empty the data folder? This cannot be undone.")
-    dlg = gtk.MessageDialog(type=gtk.MESSAGE_WARNING, buttons=gtk.BUTTONS_YES_NO,
+    dlg = Gtk.MessageDialog(type=Gtk.MessageType.WARNING, buttons=Gtk.ButtonsType.YES_NO,
                             message_format=msg)
-    if dlg.run() == gtk.RESPONSE_YES:
+    if dlg.run() == Gtk.ResponseType.YES:
         dlg.hide()
         shutil.rmtree(DATA_PATH)
     dlg.destroy()

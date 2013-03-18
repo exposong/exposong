@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import filecmp
-import gtk
+from gi.repository import Gtk
 import os
 import os.path
 import shutil
@@ -47,7 +47,7 @@ information = {
 }
 
 FILE_EXT = ".expo"
-_FILTER = gtk.FileFilter()
+_FILTER = Gtk.FileFilter()
 _FILTER.set_name("ExpoSong Archive")
 _FILTER.add_pattern("*.expo")
 _FILTER.add_pattern("*.tar.gz")
@@ -68,15 +68,15 @@ class ExportImport(Plugin, exposong._hook.Menu):
         'Export a Song'
         pres = exposong.preslist.preslist.get_active_item()
         
-        dlg = gtk.FileChooserDialog(_("Export Current Song"),
+        dlg = Gtk.FileChooserDialog(_("Export Current Song"),
                                     exposong.main.main,
-                                    gtk.FILE_CHOOSER_ACTION_SAVE,
-                                    (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+                                    Gtk.FileChooserAction.SAVE,
+                                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                                    Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
         dlg.set_do_overwrite_confirmation(True)
         dlg.set_current_folder(config.get("open-save-dialogs", "export-song"))
         dlg.set_current_name(os.path.basename(pres.filename))
-        if dlg.run() == gtk.RESPONSE_ACCEPT:
+        if dlg.run() == Gtk.ResponseType.ACCEPT:
             os.chdir(DATA_PATH)
             fname = dlg.get_filename()
             if not fname.endswith(".xml"):
@@ -93,16 +93,16 @@ class ExportImport(Plugin, exposong._hook.Menu):
         sched = exposong.schedlist.schedlist.get_active_item()
         if not sched:
             return False
-        dlg = gtk.FileChooserDialog(_("Export Current Schedule"),
+        dlg = Gtk.FileChooserDialog(_("Export Current Schedule"),
                                     exposong.main.main,
-                                    gtk.FILE_CHOOSER_ACTION_SAVE,
-                                    (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+                                    Gtk.FileChooserAction.SAVE,
+                                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                                    Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
         dlg.add_filter(_FILTER)
         dlg.set_do_overwrite_confirmation(True)
         dlg.set_current_folder(config.get("open-save-dialogs", "export-sched"))
         dlg.set_current_name(os.path.basename(title_to_filename(sched.title))+".expo")
-        if dlg.run() == gtk.RESPONSE_ACCEPT:
+        if dlg.run() == Gtk.ResponseType.ACCEPT:
             os.chdir(DATA_PATH)
             fname = dlg.get_filename()
             if not fname.endswith(".expo"):
@@ -144,15 +144,15 @@ class ExportImport(Plugin, exposong._hook.Menu):
     @classmethod
     def export_lib(cls, *args):
         'Export the full library to tar-compressed file.'
-        dlg = gtk.FileChooserDialog(_("Export Library"), exposong.main.main,
-                                    gtk.FILE_CHOOSER_ACTION_SAVE,
-                                    (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        dlg = Gtk.FileChooserDialog(_("Export Library"), exposong.main.main,
+                                    Gtk.FileChooserAction.SAVE,
+                                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                                    Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
         dlg.add_filter(_FILTER)
         dlg.set_do_overwrite_confirmation(True)
         dlg.set_current_name(_("exposong_library.expo"))
         dlg.set_current_folder(config.get("open-save-dialogs", "export-lib"))
-        if dlg.run() == gtk.RESPONSE_ACCEPT:
+        if dlg.run() == Gtk.ResponseType.ACCEPT:
             fname = dlg.get_filename()
             if not fname.endswith(".expo"):
                 fname += ".expo"
@@ -199,16 +199,16 @@ class ExportImport(Plugin, exposong._hook.Menu):
         'Export the active theme to tar-compressed file'
         cur_theme = exposong.themeselect.themeselect.get_active()
         
-        dlg = gtk.FileChooserDialog(_("Export Theme"), exposong.main.main,
-                                    gtk.FILE_CHOOSER_ACTION_SAVE,
-                                    (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        dlg = Gtk.FileChooserDialog(_("Export Theme"), exposong.main.main,
+                                    Gtk.FileChooserAction.SAVE,
+                                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                                    Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
         dlg.add_filter(_FILTER)
         dlg.set_do_overwrite_confirmation(True)
         dlg.set_current_folder(config.get("open-save-dialogs", "export-theme"))
         dlg.set_current_name(_("theme_%s.expo")%title_to_filename(
                                         os.path.basename(cur_theme.get_title())))
-        if dlg.run() == gtk.RESPONSE_ACCEPT:
+        if dlg.run() == Gtk.ResponseType.ACCEPT:
             fname = dlg.get_filename()
             if not fname.endswith(".expo"):
                 fname += ".expo"
@@ -234,14 +234,14 @@ class ExportImport(Plugin, exposong._hook.Menu):
             if pres[0].get_type()=="song":
                 songs += pres[0].song.props.titles[0].text + "\n"
         
-        dlg = gtk.FileChooserDialog(_("Export Alphabetical Song List"),
-            exposong.main.main, gtk.FILE_CHOOSER_ACTION_SAVE,
-            (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-             gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        dlg = Gtk.FileChooserDialog(_("Export Alphabetical Song List"),
+            exposong.main.main, Gtk.FileChooserAction.SAVE,
+            (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+             Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
         dlg.set_do_overwrite_confirmation(True)
         dlg.set_current_name(_("exposong_songs.txt"))
         dlg.set_current_folder(os.path.expanduser("~"))
-        if dlg.run() == gtk.RESPONSE_ACCEPT:
+        if dlg.run() == Gtk.ResponseType.ACCEPT:
           fname = dlg.get_filename()
           file = open(fname, "w")
           file.write(songs)
@@ -251,17 +251,17 @@ class ExportImport(Plugin, exposong._hook.Menu):
     @classmethod
     def import_song_dialog(cls, *args):
         'Import OpenLyrics Song(s)'
-        dlg = gtk.FileChooserDialog(_("Import Song(s) (OpenLyrics Format)"), exposong.main.main,
-                                    gtk.FILE_CHOOSER_ACTION_OPEN,
-                                    (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
-        _FILTER = gtk.FileFilter()
+        dlg = Gtk.FileChooserDialog(_("Import Song(s) (OpenLyrics Format)"), exposong.main.main,
+                                    Gtk.FileChooserAction.OPEN,
+                                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                                    Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
+        _FILTER = Gtk.FileFilter()
         _FILTER.set_name("OpenLyrics Song")
         _FILTER.add_pattern("*.xml")
         dlg.add_filter(_FILTER)
         dlg.set_select_multiple(True)
         dlg.set_current_folder(config.get("open-save-dialogs", "import-song"))
-        if dlg.run() == gtk.RESPONSE_ACCEPT:
+        if dlg.run() == Gtk.ResponseType.ACCEPT:
             dlg.hide()
             files = dlg.get_filenames()
             for f in files:
@@ -315,8 +315,8 @@ class ExportImport(Plugin, exposong._hook.Menu):
         if most_similar_song and (max_author_sim+max_title_sim)/2 > 0.6:
             msg = _('The Song "%(new_song)s" has similarities with this existing Song from your library: "%(existing_song)s".\
  What do you want to do?'%{'new_song':new_song.props.titles[0].text, 'existing_song':most_similar_song.song.props.titles[0].text})
-            dlg = gtk.MessageDialog(type=gtk.MESSAGE_QUESTION,
-                    buttons=gtk.BUTTONS_NONE,
+            dlg = Gtk.MessageDialog(type=Gtk.MessageType.QUESTION,
+                    buttons=Gtk.ButtonsType.NONE,
                     message_format=msg)
             btn = dlg.add_button(_("Replace existing Song"), 0)
             btn.connect("clicked", cls._import_replace_existing_song, most_similar_song.filename, filename)
@@ -377,13 +377,13 @@ class ExportImport(Plugin, exposong._hook.Menu):
     @classmethod
     def import_dialog(cls, *args):
         'Import a schedule, backgrounds or library.'
-        dlg = gtk.FileChooserDialog(_("Import"), exposong.main.main,
-                                    gtk.FILE_CHOOSER_ACTION_OPEN,
-                                    (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        dlg = Gtk.FileChooserDialog(_("Import"), exposong.main.main,
+                                    Gtk.FileChooserAction.OPEN,
+                                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                                    Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
         dlg.add_filter(_FILTER)
         dlg.set_current_folder(config.get("open-save-dialogs", "import-expo"))
-        if dlg.run() == gtk.RESPONSE_ACCEPT:
+        if dlg.run() == Gtk.ResponseType.ACCEPT:
             dlg.hide()
             cls.import_file(dlg.get_filename())
             config.set("open-save-dialogs", "import-expo", os.path.dirname(dlg.get_filename()))
@@ -535,7 +535,7 @@ class ExportImport(Plugin, exposong._hook.Menu):
     @classmethod
     def merge_menu(cls, uimanager):
         'Merge new values with the uimanager.'
-        actiongroup = gtk.ActionGroup('export-import')
+        actiongroup = Gtk.ActionGroup('export-import')
         actiongroup.add_actions([('import-expo', None,
                         _("_ExpoSong Data (.expo)..."), None,
                         _("Import a schedule, presentations or backgrounds"),

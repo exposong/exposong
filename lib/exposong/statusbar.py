@@ -16,15 +16,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import gtk
-import gobject
+from gi.repository import Gtk
+from gi.repository import GObject
 
 statusbar = None
 
-class timedStatusbar(gtk.Statusbar):
-    "A gtk.Statusbar supporting timeout for messages"
+class timedStatusbar(Gtk.Statusbar):
+    "A Gtk.Statusbar supporting timeout for messages"
     def __init__(self):
-        gtk.Statusbar.__init__(self)
+        super(Gtk.Statusbar, self).__init__()
         self.last_tag = None
     
     def output(self, msg, timeout=5):
@@ -37,12 +37,12 @@ class timedStatusbar(gtk.Statusbar):
     def _del_timer(self):
         "Delete the timer (when a new message is sent)"
         if self.last_tag:
-            gobject.source_remove(self.last_tag)
+            GObject.source_remove(self.last_tag)
     
     def _set_timer(self, timeout):
         "Sets a timer to a message"
         if timeout > 0:
-            self.last_tag = gobject.timeout_add(timeout*1000, self._clear)
+            self.last_tag = GObject.timeout_add(timeout*1000, self._clear)
     
     def _clear(self):
         "Clears the statusbar"

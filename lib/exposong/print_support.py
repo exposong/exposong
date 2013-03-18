@@ -14,10 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import gtk
+from gi.repository import Gtk
 import datetime
 import locale
-import pango
+from gi.repository import Pango
 
 import exposong.preslist
 import exposong.main
@@ -41,11 +41,11 @@ class Print(exposong._hook.Menu):
     
     def _get_page_setup(self):
         'Returns the PageSetup object to be used by all Pages'
-        ps = gtk.PageSetup()
-        ps.set_left_margin(20, gtk.UNIT_MM)
-        ps.set_right_margin(20, gtk.UNIT_MM)
-        ps.set_top_margin(20, gtk.UNIT_MM)
-        ps.set_bottom_margin(20, gtk.UNIT_MM)
+        ps = Gtk.PageSetup()
+        ps.set_left_margin(20, Gtk.UNIT_MM)
+        ps.set_right_margin(20, Gtk.UNIT_MM)
+        ps.set_top_margin(20, Gtk.UNIT_MM)
+        ps.set_bottom_margin(20, Gtk.UNIT_MM)
         return ps
     
     def print_presentation(self, *args):
@@ -53,11 +53,11 @@ class Print(exposong._hook.Menu):
         if not exposong.preslist.preslist.get_active_item().can_print():
             # TODO Error Dialog
             return False
-        print_op = gtk.PrintOperation()
+        print_op = Gtk.PrintOperation()
         print_op.set_default_page_setup(self._get_page_setup())
         print_op.set_n_pages(1)
         print_op.connect("draw_page", self._presentation_markup)
-        print_op.run(gtk.PRINT_OPERATION_ACTION_PRINT_DIALOG, None)
+        print_op.run(Gtk.PRINT_OPERATION_ACTION_PRINT_DIALOG, None)
     
     def _presentation_markup(self, operation=None, context=None, page_nr=None):
         "Create the page layout for a presentation."
@@ -66,18 +66,18 @@ class Print(exposong._hook.Menu):
         if markup == NotImplemented:
             return False
         
-        page_width = context.get_width() * pango.SCALE
-        page_height = context.get_height() * pango.SCALE
+        page_width = context.get_width() * Pango.SCALE
+        page_height = context.get_height() * Pango.SCALE
         self.pangolayout = context.create_pango_layout()
         self.pangolayout.set_width(int(page_width))
         self.pangolayout.set_indent(0)
-        self.pangolayout.set_wrap(pango.WRAP_WORD)
+        self.pangolayout.set_wrap(Pango.WrapMode.WORD)
         
         size = 12000
         self.pangolayout.set_markup(markup % {'fontsize': size})
         while self.pangolayout.get_size()[1] > page_height:
             size *= 0.95
-            self.pangolayout.set_indent(-int(size / 1000 * pango.SCALE * 20))
+            self.pangolayout.set_indent(-int(size / 1000 * Pango.SCALE * 20))
             self.pangolayout.set_markup(markup % {'fontsize': int(size)})
         
         cairo_context = context.get_cairo_context()
@@ -88,7 +88,7 @@ class Print(exposong._hook.Menu):
     def merge_menu(cls, uimanager):
         "Merge new values with the uimanager."
         self = cls()
-        actiongroup = gtk.ActionGroup('print')
+        actiongroup = Gtk.ActionGroup('print')
         actiongroup.add_actions([
                 ('print-song', None,
                  _("_Print Song"),

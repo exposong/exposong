@@ -16,8 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import gtk
-import gtk.gdk
+from gi.repository import Gtk
 import re
 from xml.etree import cElementTree as etree
 
@@ -91,7 +90,7 @@ class Presentation:
             raise NotImplementedError
         
         def set_attributes(self, layout):
-            'Set attributes on a pango.Layout object.'
+            'Set attributes on a Pango.Layout object.'
             return NotImplemented
         
         def header_text(self):
@@ -168,7 +167,7 @@ class Presentation:
     def slide_column(self, col):
         'Sets the column for slidelist.'
         col.clear()
-        text_cr = gtk.CellRendererText()
+        text_cr = Gtk.CellRendererText()
         col.pack_start(text_cr, False)
         col.add_attribute(text_cr, 'markup', 1)
     
@@ -210,16 +209,16 @@ class Presentation:
     def edit(self):
         'Run the edit edit_dialog for the presentation.'
         # TODO Slides need to be deep copied so that "Cancel" actually works.
-        edit_dialog = gtk.Dialog(_("New Presentation"), exposong.main.main,
-                                 gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                                 (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                                 gtk.STOCK_SAVE, gtk.RESPONSE_ACCEPT))
+        edit_dialog = Gtk.Dialog(_("New Presentation"), exposong.main.main,
+                                 Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                 (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                                 Gtk.STOCK_SAVE, Gtk.ResponseType.ACCEPT))
         edit_dialog.set_default_size(500, 500)
         if(self.get_title()):
             edit_dialog.set_title(_('Editing "%s"') % self.get_title())
         else:
             edit_dialog.set_title(self.get_edit_dialog_title())
-        notebook = gtk.Notebook()
+        notebook = Gtk.Notebook()
         edit_dialog.vbox.pack_start(notebook, True, True, 6)
         
         self._fields = dict()
@@ -229,7 +228,7 @@ class Presentation:
         notebook.show_all()
         
         while True:
-            if edit_dialog.run() == gtk.RESPONSE_ACCEPT:
+            if edit_dialog.run() == Gtk.ResponseType.ACCEPT:
                 if self._is_editing_complete(edit_dialog):
                     self._edit_save()
                     self.to_xml()

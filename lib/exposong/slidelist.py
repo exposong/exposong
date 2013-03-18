@@ -20,8 +20,8 @@
 The SlideList class displays the slides for the currently select presentation.
 """
 
-import gtk
-import gobject
+from gi.repository import Gtk
+from gi.repository import GObject
 
 import exposong.screen
 import exposong.statusbar
@@ -30,7 +30,7 @@ from exposong import config
 slidelist = None #will hold instance of SlideList
 slide_scroll = None
 
-class SlideList(gtk.TreeView, exposong._hook.Menu):
+class SlideList(Gtk.TreeView, exposong._hook.Menu):
     '''
     The slides of a presentation.
     '''
@@ -45,16 +45,16 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
         # Used to stop or reset the timer if the presentation or slide changes.
         self.__timer = 0
 
-        gtk.TreeView.__init__(self)
+        super(Gtk.TreeView, self).__init__()
         self.set_size_request(250, -1)
         self.set_enable_search(False)
         
-        self.column1 = gtk.TreeViewColumn(_("Slides"))
+        self.column1 = Gtk.TreeViewColumn(_("Slides"))
         self.column1.set_resizable(False)
         self.append_column(self.column1)
         
-        self.set_model(gtk.ListStore(gobject.TYPE_PYOBJECT, #Slide object
-                                     gobject.TYPE_STRING))  #Slide markup
+        self.set_model(Gtk.ListStore(GObject.TYPE_PYOBJECT, #Slide object
+                                     GObject.TYPE_STRING))  #Slide markup
         self.get_selection().connect("changed", self._on_slide_activate)
     
     def set_presentation(self, pres):
@@ -183,7 +183,7 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
         if not exposong.screen.screen.is_running():
             return False
         if self.pres and self.pres.get_timer():
-            gobject.timeout_add(self.pres.get_timer()*1000, self._set_timer,
+            GObject.timeout_add(self.pres.get_timer()*1000, self._set_timer,
                                 self.__timer)
     
     def _set_timer(self, t):
@@ -215,7 +215,7 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
     def merge_menu(cls, uimanager):
         'Merge new values with the uimanager.'
         global slidelist
-        cls._actions = gtk.ActionGroup('slidelist')
+        cls._actions = Gtk.ActionGroup('slidelist')
         cls._actions.add_actions([
                 ('pres-slide-prev', None, _("Previous Slide"), "Page_Up", None,
                         slidelist.prev_slide),
@@ -253,8 +253,8 @@ class SlideList(gtk.TreeView, exposong._hook.Menu):
     @classmethod
     def get_order_checkbutton(cls):
         "Return the 'Use Order' checkbox"
-        cb = gtk.CheckButton()
-        cls._actions.get_action('pres-show-in-order').connect_proxy(cb)
+        cb = Gtk.CheckButton()
+        #cls._actions.get_action('pres-show-in-order').connect_proxy(cb)
         return cb
     
     @staticmethod

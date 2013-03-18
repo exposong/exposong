@@ -16,8 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import gtk
-import gtk.gdk
+from gi.repository import Gtk
 
 from exposong import gui
 from exposong import DATA_PATH
@@ -29,7 +28,7 @@ import exposong.main
 Dialog for changing settings in ExpoSong.
 '''
 
-class PrefsDialog(gtk.Dialog):
+class PrefsDialog(Gtk.Dialog):
     '''
     Dialog to configure user preferences.
     '''
@@ -39,11 +38,11 @@ class PrefsDialog(gtk.Dialog):
         
         parent: the primary window that the dialog will be centered on.
         """
-        gtk.Dialog.__init__(self, _("Preferences"), parent, 0,
-                            (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                            gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        super(Gtk.Dialog, self, _("Preferences"), parent, 0,
+                            (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                            Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT)).__init__()
         self.set_default_size(350, 410)
-        notebook = gtk.Notebook()
+        notebook = Gtk.Notebook()
         self.vbox.pack_start(notebook, True, True, 5)
         
         #General Page
@@ -79,7 +78,7 @@ themes are stored.")
                                         label=_("Songbook"))
         table.attach_comment(_("Choose a Songbook to be displayed in the footer."))
         
-        notebook.append_page(table, gtk.Label( _("General") ))
+        notebook.append_page(table, Gtk.Label(label= _("General") ))
         
         #Screen Page
         table = gui.ESTable(9, auto_inc_y=True)
@@ -125,10 +124,10 @@ themes are stored.")
         table.attach_section_title(_("Position"))
         p_monitor = table.attach_combo(monitor_name, sel, label=_("Monitor"))
         
-        notebook.append_page(table, gtk.Label(_("Screen")))
+        notebook.append_page(table, Gtk.Label(label=_("Screen")))
         
         self.show_all()
-        if self.run() == gtk.RESPONSE_ACCEPT:
+        if self.run() == Gtk.ResponseType.ACCEPT:
             if config.has_option("general", "data-path"):
                 curpath = config.get("general", "data-path")
             else:
@@ -136,8 +135,8 @@ themes are stored.")
             if g_data.get_current_folder() != curpath:
                 config.set("general", "data-path", g_data.get_current_folder())
                 msg = _("You will have to restart ExpoSong so that the new data folder will be used.")
-                dlg = gtk.MessageDialog(self, gtk.DIALOG_DESTROY_WITH_PARENT,
-                        gtk.MESSAGE_INFO, gtk.BUTTONS_OK, msg)
+                dlg = Gtk.MessageDialog(self, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                        Gtk.MessageType.INFO, Gtk.ButtonsType.OK, msg)
                 dlg.run()
                 dlg.destroy()
             
@@ -169,7 +168,7 @@ themes are stored.")
     
     def _on_toggle(self, button, target):
         'Enables or disables target if button is set.'
-        if isinstance(target, gtk.Widget):
+        if isinstance(target, Gtk.Widget):
             target.set_sensitive(button.get_active())
         elif isinstance(target, (tuple, list)):
             for t in target:

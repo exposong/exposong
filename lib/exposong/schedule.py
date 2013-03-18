@@ -16,8 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import gtk
-import gtk.gdk
+from gi.repository import Gtk
 import os.path
 from xml.etree import cElementTree as etree
 
@@ -36,7 +35,7 @@ class Schedule:
         'Initialize the Schedule.'
         self.title = title
         if model == None:
-            self._model = gtk.ListStore(*preslist.PresList.get_model_args())
+            self._model = Gtk.ListStore(*preslist.PresList.get_model_args())
         else:
             self._model = model
         
@@ -49,7 +48,7 @@ class Schedule:
         if builtin:
             mod = self.get_model(True)
             mod.set_sort_func(0, self._column_sort)
-            mod.set_sort_column_id(0, gtk.SORT_ASCENDING)
+            mod.set_sort_column_id(0, Gtk.SortType.ASCENDING)
         else:
             if filename:
                 exposong.log.info('Adding custom schedule "%s".',
@@ -154,7 +153,7 @@ class Schedule:
     def get_model(self, getliststore=False):
         'Return the filtered ListModel'
         mod = self._model
-        if getliststore and not isinstance(mod, gtk.ListStore):
+        if getliststore and not isinstance(mod, Gtk.ListStore):
             mod = mod.get_model()
         return mod
     
@@ -203,7 +202,7 @@ class Schedule:
         'Get the attribute from the model if possible.'
         if hasattr(self._model, name):
             return getattr(self._model, name)
-        if isinstance(self._model, gtk.TreeModelFilter):
+        if isinstance(self._model, Gtk.TreeModelFilter):
             if hasattr(self._model.get_model(), name):
                 return getattr(self._model.get_model(), name)
 

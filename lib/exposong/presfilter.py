@@ -28,8 +28,8 @@
 The PresFilter class will allow the user to search the presentations by text.
 """
 
-import gtk
-import gobject
+from gi.repository import Gtk
+from gi.repository import GObject
 import re
 
 import exposong.main
@@ -38,7 +38,7 @@ import exposong.preslist
 presfilter = None # will hold PresFilter instance
 blacklist = "[.,'?!]" # [ and ] are part of the regex
 
-class PresFilter(gtk.Entry, exposong._hook.Menu):
+class PresFilter(Gtk.Entry, exposong._hook.Menu):
     """
     This provides an interface that will allow the user to search the
     presentations by text.
@@ -47,15 +47,15 @@ class PresFilter(gtk.Entry, exposong._hook.Menu):
     and uses a different background colour when the search is active.    
     """
 
-    __gsignals__ = {'terms-changed':(gobject.SIGNAL_RUN_FIRST,
-                                    gobject.TYPE_NONE,
-                                    (gobject.TYPE_STRING,))}
+    __gsignals__ = {'terms-changed':(GObject.SignalFlags.RUN_FIRST,
+                                    None,
+                                    (GObject.TYPE_STRING,))}
 
     SEARCH_TIMEOUT = 200
     
     def __init__(self):
         "Initialize the PresFilter."
-        gtk.Entry.__init__(self)
+        super(Gtk.Entry, self).__init__()
         
         self._handler_changed = self.connect_after("changed",
                                                    self._on_changed)
@@ -65,14 +65,8 @@ class PresFilter(gtk.Entry, exposong._hook.Menu):
         self.connect("focus-out-event", exposong.main.main.enable_shortcuts)
         self.connect("terms-changed", self.filter)
         
-        # Make sure icons are supported by GTK version
-        self.use_icons = gtk.gtk_version[0] >= 2 and gtk.gtk_version[1] > 16
-        if self.use_icons:
-            self.set_icon_from_stock(gtk.ENTRY_ICON_PRIMARY, gtk.STOCK_FIND)
-            self.connect("icon-press", self._on_icon_pressed)
-        
         # Do not draw a yellow bg if an a11y theme is used
-        settings = gtk.settings_get_default()
+        settings = Gtk.Settings.get_default()
         theme = settings.get_property("gtk-theme-name")
         self._a11y = (theme.startswith("HighContrast") or
                         theme.startswith("LowContrast"))
@@ -90,18 +84,18 @@ class PresFilter(gtk.Entry, exposong._hook.Menu):
         Emit the terms-changed signal without any time out when the clear
         button was clicked
         """
-        if icon == gtk.ENTRY_ICON_SECONDARY:
+        if icon == Gtk.EntryIconPosition.SECONDARY:
             # clear with no signal and emit manually to avoid the
             # search-timeout
             self.clear_with_no_signal()
             self.grab_focus()
             self.emit("terms-changed", "")
-        elif icon == gtk.ENTRY_ICON_PRIMARY:
+        elif icon == Gtk.EntryIconPosition.PRIMARY:
             self.grab_focus()
 
     def _on_key_pressed(self, widget, event):
         "Detect a keypress in the text box. Clear the text on 'Escape'."
-        if event.keyval == gtk.keysyms.Escape:
+        if event.keyval == Gdk.KEY_Escape:
             self.clear_with_no_signal()
             self.emit("terms-changed", "")
 
@@ -128,29 +122,28 @@ class PresFilter(gtk.Entry, exposong._hook.Menu):
         """
         self._check_style()
         if self._timeout_id > 0:
-            gobject.source_remove(self._timeout_id)
-        self._timeout_id = gobject.timeout_add(self.SEARCH_TIMEOUT,
+            GObject.source_remove(self._timeout_id)
+        self._timeout_id = GObject.timeout_add(self.SEARCH_TIMEOUT,
                                                  self._emit_terms_changed)
 
     def _check_style(self):
         "Use a different background color if a search is active."
         # show/hide icon
-        if self.use_icons:
-            if self.get_text() != "":
-                self.set_icon_from_stock(gtk.ENTRY_ICON_SECONDARY, gtk.STOCK_CLEAR)
-            else:
-                self.set_icon_from_stock(gtk.ENTRY_ICON_SECONDARY, None)
+        if self.get_text() != "":
+            self.set_icon_from_stock(Gtk.EntryIconPosition.SECONDARY, Gtk.STOCK_CLEAR)
+        else:
+            self.set_icon_from_stock(Gtk.EntryIconPosition.SECONDARY, None)
         # Based on the Rhythmbox code
-        yellowish = gtk.gdk.Color(63479, 63479, 48830)
-        black = gtk.gdk.Color(0, 0, 0)
+        yellowish = Gdk.Color(63479, 63479, 48830)
+        black = Gdk.Color(0, 0, 0)
         if self._a11y == True:
             return
         if self.get_text() == "":
-            self.modify_base(gtk.STATE_NORMAL, None)
-            self.modify_text(gtk.STATE_NORMAL, None)
+            self.modify_base(Gtk.StateType.NORMAL, None)
+            self.modify_text(Gtk.StateType.NORMAL, None)
         else:
-            self.modify_base(gtk.STATE_NORMAL, yellowish)
-            self.modify_text(gtk.STATE_NORMAL, black)
+            self.modify_base(Gtk.StateType.NORMAL, yellowish)
+            self.modify_text(Gtk.StateType.NORMAL, black)
             
     def filter(self, *args):
         'Filters preslist by the keywords.'
@@ -190,9 +183,9 @@ class PresFilter(gtk.Entry, exposong._hook.Menu):
     def merge_menu(cls, uimanager):
         'Merge new values with the uimanager.'
         global presfilter
-        cls._actions = gtk.ActionGroup('presfilter')
+        cls._actions = Gtk.ActionGroup('presfilter')
         cls._actions.add_actions([
-                ('Search', gtk.STOCK_FIND, _('_Find Presentation'), "<Ctrl>f",
+                ('Search', Gtk.STOCK_FIND, _('_Find Presentation'), "<Ctrl>f",
                         _('Search for a presentation'), presfilter.focus),
                 ])
         

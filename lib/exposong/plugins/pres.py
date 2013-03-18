@@ -17,16 +17,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import copy
-import gtk
 try:
     import gtkspell
 except Exception:
     pass
-import gobject
 import os, os.path
-import pango
 import re
 import shutil
+import cairo
+
+from gi.repository import Gtk, GObject, Pango, Gdk, GdkPixbuf
 from xml.etree import cElementTree as etree
 from xml.sax.saxutils import escape, unescape
 
@@ -49,7 +49,7 @@ information = {
         'description': __doc__,
         'required': False,
 }
-type_icon = gtk.gdk.pixbuf_new_from_file_at_size(
+type_icon = GdkPixbuf.Pixbuf.new_from_file_at_size(
         os.path.join(RESOURCE_PATH, 'icons', 'pres-exposong.png'), 20, 14)
 
 class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
@@ -125,12 +125,12 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
             editor = SlideEdit(parent, self)
             while True:
                 ans = editor.run()
-                if ans == gtk.RESPONSE_ACCEPT:
+                if ans == Gtk.ResponseType.ACCEPT:
                     if editor.changed:
                         self.title = editor.get_slide_title()
                         self._content = editor.slide_content
                     ret = 1
-                elif ans == gtk.RESPONSE_APPLY: #Close and new
+                elif ans == Gtk.ResponseType.APPLY: #Close and new
                     if editor.changed:
                         self.title = editor.get_slide_title()
                         self._content = editor.slide_content
@@ -296,108 +296,108 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
     def _edit_tabs(self, notebook, parent):
         "Tabs for the dialog."
         self._on_edit_confirm = []
-        vbox = gtk.VBox()
+        vbox = Gtk.VBox()
         vbox.set_border_width(4)
         vbox.set_spacing(7)
-        hbox = gtk.HBox()
+        hbox = Gtk.HBox()
         
-        label = gtk.Label(_("Title:"))
+        label = Gtk.Label(label=_("Title:"))
         label.set_alignment(0.5, 0.5)
         hbox.pack_start(label, False, True, 5)
         
-        self._fields['title'] = gtk.Entry(45)
+        self._fields['title'] = Gtk.Entry(45)
         self._fields['title'].set_text(self.get_title())
         hbox.pack_start(self._fields['title'], True, True)
         vbox.pack_start(hbox, False, True)
         
-        self._fields['slides'] = gtk.ListStore(gobject.TYPE_PYOBJECT, str)
+        self._fields['slides'] = Gtk.ListStore(GObject.TYPE_PYOBJECT, str)
         # Add the slides
         for sl in self.get_slide_list(True):
             self._fields['slides'].append(sl)
         self._fields['slides'].connect("row-changed", self._on_slide_added)
         
-        self._slide_list = gtk.TreeView(self._fields['slides'])
+        self._slide_list = Gtk.TreeView(self._fields['slides'])
         self._slide_list.set_enable_search(False)
         self._slide_list.set_reorderable(True)
         # Double click to edit
         self._slide_list.connect("row-activated", self._slide_dlg, True)
-        col = gtk.TreeViewColumn( _("Slide") )
+        col = Gtk.TreeViewColumn( _("Slide") )
         col.set_resizable(False)
         self.slide_column(col)
         self._slide_list.append_column(col)
         
-        toolbar = gtk.Toolbar()
-        btn = gtk.MenuToolButton(gtk.STOCK_ADD)
+        toolbar = Gtk.Toolbar()
+        btn = Gtk.MenuToolButton(Gtk.STOCK_ADD)
         btn.connect('clicked', gui.edit_treeview_row_btn, self._slide_list,
                     self._slide_dlg)
         # Template types
         btn.set_menu(self._get_predefined_slides_menu())
         toolbar.insert(btn, -1)
-        btn = gtk.ToolButton(gtk.STOCK_EDIT)
+        btn = Gtk.ToolButton(Gtk.STOCK_EDIT)
         btn.connect('clicked', gui.edit_treeview_row_btn, self._slide_list,
                     self._slide_dlg, True)
         toolbar.insert(btn, -1)
-        btn = gtk.ToolButton(gtk.STOCK_DELETE)
+        btn = Gtk.ToolButton(Gtk.STOCK_DELETE)
         btn.connect("clicked", self._on_slide_delete, self._slide_list, parent)
         toolbar.insert(btn, -1)
-        toolbar.insert(gtk.SeparatorToolItem(), -1)
+        toolbar.insert(Gtk.SeparatorToolItem(), -1)
         
         vbox.pack_start(toolbar, False, True)
         
-        scroll = gtk.ScrolledWindow()
+        scroll = Gtk.ScrolledWindow()
         scroll.add(self._slide_list)
-        scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         scroll.set_size_request(400, 250)
-        scroll.set_shadow_type(gtk.SHADOW_IN)
+        scroll.set_shadow_type(Gtk.ShadowType.IN)
         vbox.pack_start(scroll, True, True)
         
         vbox.show_all()
-        notebook.insert_page(vbox, gtk.Label(_("Edit")), 0)
+        notebook.insert_page(vbox, Gtk.Label(label=_("Edit")), 0)
         self._fields['title'].grab_focus()
         
         # TODO Ordering Lists
-        #vbox = gtk.VBox()
-        #notebook.insert_page(vbox, gtk.Label(_("Order")), 1)
+        #vbox = Gtk.VBox()
+        #notebook.insert_page(vbox, Gtk.Label(label=_("Order")), 1)
         
         # Meta information
-        vbox = gtk.VBox()
+        vbox = Gtk.VBox()
         
-        tree = gtk.TreeView()
-        self._fields['meta'] = gtk.ListStore(str, str)
+        tree = Gtk.TreeView()
+        self._fields['meta'] = Gtk.ListStore(str, str)
         for k,v in self._meta.iteritems():
             self._fields['meta'].append((k,v))
         tree.set_model(self._fields['meta'])
         tree.connect('row-activated', self._meta_dlg, True)
-        cell = gtk.CellRendererText()
-        col = gtk.TreeViewColumn( _('Name'))
-        col.pack_start(cell)
+        cell = Gtk.CellRendererText()
+        col = Gtk.TreeViewColumn( _('Name'))
+        col.pack_start(cell, True, True, 0)
         col.set_resizable(True)
         col.add_attribute(cell, 'text', 0)
         tree.append_column(col)
-        cell = gtk.CellRendererText()
-        col = gtk.TreeViewColumn( _('Value'))
-        col.pack_start(cell)
+        cell = Gtk.CellRendererText()
+        col = Gtk.TreeViewColumn( _('Value'))
+        col.pack_start(cell, True, True, 0)
         col.set_resizable(True)
         col.add_attribute(cell, 'text', 1)
         tree.append_column(col)
-        scroll = gtk.ScrolledWindow()
+        scroll = Gtk.ScrolledWindow()
         scroll.add(tree)
-        scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         scroll.set_size_request(400, 250)
-        scroll.set_shadow_type(gtk.SHADOW_IN)
+        scroll.set_shadow_type(Gtk.ShadowType.IN)
         #Toolbar
-        toolbar = gtk.Toolbar()
-        button = gtk.ToolButton(gtk.STOCK_ADD)
+        toolbar = Gtk.Toolbar()
+        button = Gtk.ToolButton(Gtk.STOCK_ADD)
         button.connect('clicked', gui.edit_treeview_row_btn, tree,
                        self._meta_dlg)
         toolbar.insert(button, -1)
-        button = gtk.ToolButton(gtk.STOCK_EDIT)
+        button = Gtk.ToolButton(Gtk.STOCK_EDIT)
         button.connect('clicked', gui.edit_treeview_row_btn, tree,
                        self._meta_dlg, True)
         tree.get_selection().connect('changed', gui.treesel_disable_widget,
                                      button)
         toolbar.insert(button, -1)
-        button = gtk.ToolButton(gtk.STOCK_DELETE)
+        button = Gtk.ToolButton(Gtk.STOCK_DELETE)
         button.connect('clicked', gui.del_treeview_row, tree)
         tree.get_selection().connect('changed', gui.treesel_disable_widget,
                                      button)
@@ -406,19 +406,19 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         tree.get_selection().emit('changed')
         
         vbox.pack_start(scroll, True, True)
-        notebook.append_page(vbox, gtk.Label(_('Information')))
+        notebook.append_page(vbox, Gtk.Label(label=_('Information')))
         
-        timer = gtk.VBox()
+        timer = Gtk.VBox()
         timer.set_border_width(8)
         timer.set_spacing(7)
         
         # Might be used later if more things get on this tab
-        #label = gtk.Label()
+        #label = Gtk.Label()
         #label.set_markup(_("<b>Timer</b>"))
         #label.set_alignment(0.0, 0.5)
         #timer.pack_start(label, False)
         
-        self._fields['timer_on'] = gtk.CheckButton(_("Use Timer"))
+        self._fields['timer_on'] = Gtk.CheckButton(_("Use Timer"))
         self._fields['timer_on'].set_active(self._timer is not None)
         self._fields['timer_on'].connect("toggled",
                 lambda chk: self._fields['timer'].set_sensitive(chk.get_active()))
@@ -428,36 +428,36 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                 lambda chk: self._fields['timer_seconds'].set_sensitive(chk.get_active()))
         timer.pack_start(self._fields['timer_on'], False)
         
-        self._fields['timer_seconds'] = gtk.Label(_("Seconds Per Slide"))
+        self._fields['timer_seconds'] = Gtk.Label(label=_("Seconds Per Slide"))
         self._fields['timer_seconds'].set_sensitive(self._timer is not None)
-        hbox = gtk.HBox()
+        hbox = Gtk.HBox()
         hbox.set_spacing(18)
         hbox.pack_start(self._fields['timer_seconds'], False, False)
         
-        adjust = gtk.Adjustment(1, 1, 25, 1, 3, 0)
-        self._fields['timer'] = gtk.SpinButton(adjust, 1, 0)
+        adjust = Gtk.Adjustment(1, 1, 25, 1, 3, 0)
+        self._fields['timer'] = Gtk.SpinButton(adjust, 1, 0)
         self._fields['timer'].set_sensitive(self._timer is not None)
         if isinstance(self._timer, (int, float)):
             self._fields['timer'].set_value(self._timer)
         hbox.pack_start(self._fields['timer'], False, False)
         timer.pack_start(hbox, False)
         
-        self._fields['timer_loop'] = gtk.CheckButton(_("Loop Slides"))
+        self._fields['timer_loop'] = Gtk.CheckButton(_("Loop Slides"))
         self._fields['timer_loop'].set_active(self._timer_loop)
         self._fields['timer_loop'].set_sensitive(self._timer is not None)
         timer.pack_start(self._fields['timer_loop'], False, False)
         
-        notebook.append_page(timer, gtk.Label( _("Timer") ))
+        notebook.append_page(timer, Gtk.Label(label= _("Timer") ))
         
         _abstract.Presentation._edit_tabs(self, notebook, parent)
     
     def _meta_dlg(self, treeview, path, col, edit=False):
         "Add or edit a meta element."
-        dialog = gtk.Dialog(_("Presentation Information"),
+        dialog = Gtk.Dialog(_("Presentation Information"),
                             treeview.get_toplevel(),
-                            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                            (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                            gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+                            Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                            (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                            Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
         table = gui.ESTable(2, auto_inc_y=True)
         dialog.vbox.pack_start(table, True, True)
         
@@ -474,11 +474,11 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         dialog.vbox.show_all()
         
         while True:
-            if dialog.run() == gtk.RESPONSE_ACCEPT:
+            if dialog.run() == Gtk.ResponseType.ACCEPT:
                 if not key_entry.get_text():
-                    info_dialog = gtk.MessageDialog(treeview.get_toplevel(),
-                                                    gtk.DIALOG_DESTROY_WITH_PARENT,
-                                                    gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
+                    info_dialog = Gtk.MessageDialog(treeview.get_toplevel(),
+                                                    Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                                    Gtk.MessageType.INFO, Gtk.ButtonsType.OK,
                                                     _("Please enter a Key."))
                     info_dialog.run()
                     info_dialog.destroy()
@@ -524,18 +524,18 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
     def _is_editing_complete(self, parent):
         "Test to see if all fields have been filled which are required."
         if self._fields['title'].get_text() == "":
-            info_dialog = gtk.MessageDialog(parent,
-                                            gtk.DIALOG_DESTROY_WITH_PARENT,
-                                            gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
+            info_dialog = Gtk.MessageDialog(parent,
+                                            Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                            Gtk.MessageType.INFO, Gtk.ButtonsType.OK,
                                             _("Please enter a Title."))
             info_dialog.run()
             info_dialog.destroy()
             return False
         if len(self._fields['slides']) == 0:
             msg = _('The presentation must have at least one slide.')
-            info_dialog = gtk.MessageDialog(parent,
-                                            gtk.DIALOG_DESTROY_WITH_PARENT,
-                                            gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
+            info_dialog = Gtk.MessageDialog(parent,
+                                            Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                            Gtk.MessageType.INFO, Gtk.ButtonsType.OK,
                                             msg)
             info_dialog.run()
             info_dialog.destroy()
@@ -576,14 +576,14 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         if not itr:
             return False
         msg = _('Are you sure you want to delete this slide? This cannot be undone.')
-        dialog = gtk.MessageDialog(exposong.main.main, gtk.DIALOG_MODAL,
-                                   gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
+        dialog = Gtk.MessageDialog(exposong.main.main, Gtk.DialogFlags.MODAL,
+                                   Gtk.MessageType.WARNING, Gtk.ButtonsType.YES_NO,
                                    msg)
-        dialog.set_default_response(gtk.RESPONSE_YES)
+        dialog.set_default_response(Gtk.ResponseType.YES)
         dialog.set_title( _('Delete Slide?') )
         resp = dialog.run()
         dialog.hide()
-        if resp == gtk.RESPONSE_YES:
+        if resp == Gtk.ResponseType.YES:
             self._on_edit_confirm.append(model.get_value(itr, 0)._on_delete)
             model.remove(itr)
 
@@ -591,31 +591,31 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
     
     def _get_predefined_slides_menu(self):
         "Returns a menu of predefined slide types."
-        menu = gtk.Menu()
+        menu = Gtk.Menu()
         
         #Text Types
-        action = gtk.Action('add-text-slide', _('Text Slide'),
+        action = Gtk.Action('add-text-slide', _('Text Slide'),
                             _('Create a slide with text only.'), None)
         action.connect('activate', self._on_add_text_slide)
         menu.append(action.create_menu_item())
         
-        menu.append(gtk.SeparatorMenuItem())
+        menu.append(Gtk.SeparatorMenuItem())
         
         #Image Types
-        action = gtk.Action('add-image-slide', _('Image Slide'),
+        action = Gtk.Action('add-image-slide', _('Image Slide'),
                             _('Create a slide with an image only.'), None)
         action.connect('activate', self._on_add_image_slide)
         menu.append(action.create_menu_item())
         
-        action = gtk.Action('add-image-caption-slide',
+        action = Gtk.Action('add-image-caption-slide',
                             _('Image Slide With Caption'),
                             _('Create an image slide with a caption.'), None)
         action.connect('activate', self._on_add_image_caption_slide)
         menu.append(action.create_menu_item())
         
-        menu.append(gtk.SeparatorMenuItem())
+        menu.append(Gtk.SeparatorMenuItem())
         
-        action = gtk.Action('bulk-add-image-slide', _('Multiple Image Slides'),
+        action = Gtk.Action('bulk-add-image-slide', _('Multiple Image Slides'),
                             _('Add multiple image slides from image files.'),
                             None)
         action.connect('activate', self._on_add_bulk_image_slide)
@@ -662,24 +662,24 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
     
     def _on_add_bulk_image_slide(self, action):
         "Add multiple images from the filesystem."
-        fchooser = gtk.FileChooserDialog( _("Add Images"),
+        fchooser = Gtk.FileChooserDialog( _("Add Images"),
                 self._fields['title'].get_toplevel(),
-                gtk.FILE_CHOOSER_ACTION_OPEN,
-                (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                gtk.STOCK_ADD, gtk.RESPONSE_ACCEPT) )
+                Gtk.FileChooserAction.OPEN,
+                (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                Gtk.STOCK_ADD, Gtk.ResponseType.ACCEPT) )
         fchooser.set_current_folder(os.path.expanduser("~"))
         fchooser.set_select_multiple(True)
-        progress = gtk.ProgressBar()
+        progress = Gtk.ProgressBar()
         fchooser.set_extra_widget(progress)
         
-        filt = gtk.FileFilter()
+        filt = Gtk.FileFilter()
         filt.set_name( _("Image Types") )
         filt.add_pixbuf_formats()
         fchooser.add_filter(filt)
-        preview = gtk.Image()
+        preview = Gtk.Image()
         fchooser.set_preview_widget(preview)
         fchooser.connect("update-preview", gui.filechooser_preview, preview)
-        if fchooser.run() == gtk.RESPONSE_ACCEPT:
+        if fchooser.run() == Gtk.ResponseType.ACCEPT:
             files = fchooser.get_filenames()
             for fl in files:
                 sl = self.Slide(self)
@@ -689,10 +689,10 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
                 self._fields['slides'].append( (sl, sl.get_markup(True)) )
                 progress.set_fraction(progress.get_fraction() + 1.0/len(files))
                 #It may be better to use generator statements here.
-                #http://faq.pygtk.org/index.py?req=show&file=faq23.020.htp
+                #http://faq.pyGtk.org/index.py?req=show&file=faq23.020.htp
                 #This makes the progressbar change.
-                while gtk.events_pending():
-                    gtk.main_iteration()
+                while Gtk.events_pending():
+                    Gtk.main_iteration()
             
         fchooser.destroy()
     
@@ -786,10 +786,11 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
     @classmethod
     def merge_menu(cls, uimanager):
         "Merge new values with the uimanager."
-        gtk.stock_add([('pres-exposong',_('_ExpoSong Presentation'),
-                        gtk.gdk.MOD1_MASK, 0, 'pymserv')])
+        img = GdkPixbuf.Pixbuf.new_from_file(
+                os.path.join(RESOURCE_PATH, 'icons', 'pres-exposong.png'))
+        exposong.main.main.icon_factory.add('pres-exposong', Gtk.IconSet(img))
         
-        actiongroup = gtk.ActionGroup('exposong-pres')
+        actiongroup = Gtk.ActionGroup('exposong-pres')
         actiongroup.add_actions([('pres-new-exposong', 'pres-exposong-new',
                 _("New ExpoSong Presentation"), None, _("New ExpoSong Presentation"), cls._on_pres_new)])
         uimanager.insert_action_group(actiongroup, -1)
@@ -848,22 +849,22 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         return 20
 
 
-class SlideEdit(gtk.Dialog):
+class SlideEdit(Gtk.Dialog):
     """Create a new window for editing a single slide.
          Contains a title field, a toolbar and a TextView.
     """
     def __init__(self, parent, slide):
-        gtk.Dialog.__init__(self, _("Editing Slide"), parent,
-                            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
+        super(Gtk.Dialog, self, _("Editing Slide"), parent,
+                            Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT)
         
         # Slide Elements
-        lstore = gtk.ListStore(gobject.TYPE_PYOBJECT)
-        self._tree = gtk.TreeView(lstore)
+        lstore = Gtk.ListStore(GObject.TYPE_PYOBJECT)
+        self._tree = Gtk.TreeView(lstore)
         for e in slide._content:
             lstore.append((e,))
-        col = gtk.TreeViewColumn( _("Slide Element") )
-        text = gtk.CellRendererText()
-        text.set_property("ellipsize", pango.ELLIPSIZE_END)
+        col = Gtk.TreeViewColumn( _("Slide Element") )
+        text = Gtk.CellRendererText()
+        text.set_property("ellipsize", Pango.EllipsizeMode.END)
         col.pack_start(text, True)
         col.set_cell_data_func(text, self._set_slide_row_text)
         self._tree.append_column(col)
@@ -873,19 +874,19 @@ class SlideEdit(gtk.Dialog):
         self.set_border_width(4)
         self.vbox.set_spacing(7)
         
-        cancelbutton = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
+        cancelbutton = self.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT)
         cancelbutton.connect("clicked", self._quit_without_save)
-        newbutton = self.add_button(_("Save and New"), gtk.RESPONSE_APPLY)
-        newimg = gtk.Image()
-        newimg.set_from_stock(gtk.STOCK_NEW, gtk.ICON_SIZE_BUTTON)
+        newbutton = self.add_button(_("Save and New"), Gtk.ResponseType.APPLY)
+        newimg = Gtk.Image()
+        newimg.set_from_stock(Gtk.STOCK_NEW, Gtk.IconSize.BUTTON)
         newbutton.set_image(newimg)
         newbutton.connect("clicked", self._quit_with_save)
-        okbutton = self.add_button(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
+        okbutton = self.add_button(Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT)
         okbutton.connect("clicked", self._quit_with_save)
         
-        hbox = gtk.HBox()
+        hbox = Gtk.HBox()
         hbox.set_spacing(7)
-        vbox = gtk.VBox()
+        vbox = Gtk.VBox()
         vbox.set_spacing(7)
         
         self.connect("delete-event", self._quit_without_save)
@@ -898,20 +899,20 @@ class SlideEdit(gtk.Dialog):
         vbox.pack_start(self._get_title_box(), False, True)
         
         # Toolbar
-        gtk.stock_add([('add-text',_('Add Text'), gtk.gdk.MOD1_MASK, 0,
+        Gtk.stock_add([('add-text',_('Add Text'), Gdk.ModifierType.MOD1_MASK, 0,
                         'pymserv'),
-                       ("add-image",_('Add Image'), gtk.gdk.MOD1_MASK, 0,
+                       ("add-image",_('Add Image'), Gdk.ModifierType.MOD1_MASK, 0,
                         'pymserv')])
-        toolbar = gtk.Toolbar()
-        button = gtk.ToolButton(gtk.stock_lookup('add-text')[0])
+        toolbar = Gtk.Toolbar()
+        button = Gtk.ToolButton(Gtk.stock_lookup('add-text')[0])
         button.set_tooltip_markup(_('Add a new text element.'))
         button.connect('clicked', self._add_text, self._tree)
         toolbar.insert(button, -1)
-        button = gtk.ToolButton(gtk.stock_lookup('add-image')[0])
+        button = Gtk.ToolButton(Gtk.stock_lookup('add-image')[0])
         button.set_tooltip_markup(_('Add a new image element.'))
         button.connect('clicked', self._add_image, self._tree)
         toolbar.insert(button, -1)
-        button = gtk.ToolButton(gtk.STOCK_DELETE)
+        button = Gtk.ToolButton(Gtk.STOCK_DELETE)
         button.connect('clicked', self._delete_row, self._tree)
         self._tree.get_selection().connect('changed',
                                            gui.treesel_disable_widget, button)
@@ -921,11 +922,11 @@ class SlideEdit(gtk.Dialog):
         
         self._tree.get_selection().connect("changed", self._element_changed)
         
-        scroll = gtk.ScrolledWindow()
+        scroll = Gtk.ScrolledWindow()
         scroll.add(self._tree)
-        scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         scroll.set_size_request(280, 250)
-        scroll.set_shadow_type(gtk.SHADOW_IN)
+        scroll.set_shadow_type(Gtk.ShadowType.IN)
         vbox.pack_start(scroll, True, True)
         hbox.pack_start(vbox, False, True)
         
@@ -949,12 +950,12 @@ class SlideEdit(gtk.Dialog):
     
     def _get_title_box(self):
         "Gets the title entry field."
-        hbox = gtk.HBox()
-        self._title_label = gtk.Label(_('Title:'))
+        hbox = Gtk.HBox()
+        self._title_label = Gtk.Label(label=_('Title:'))
         self._title_label.set_alignment(0.5,0.5)
         hbox.pack_start(self._title_label, False, True)
         
-        self._title_entry = gtk.Entry()
+        self._title_entry = Gtk.Entry()
         self._title_entry.set_text(self.slide_title)
         hbox.pack_start(self._title_entry, True, True)
         return hbox
@@ -965,39 +966,39 @@ class SlideEdit(gtk.Dialog):
         if el is False:
             return
         
-        position = gtk.Expander(_("Element Position"))
+        position = Gtk.Expander(_("Element Position"))
         # Positional elements that are in all `theme._RenderableSection`s.
         table = gui.ESTable(5, 2)
         self._p = {}
         
-        help_ = gtk.image_new_from_stock(gtk.STOCK_HELP, gtk.ICON_SIZE_BUTTON)
+        help_ = Gtk.Image.new_from_stock(Gtk.STOCK_HELP, Gtk.IconSize.BUTTON)
         helppos = _("Positions are relative, with values between 0 and 1. \
 A value of 0 is on the far left or top, and a value of 1 is on the far right or bottom.")
         help_.set_tooltip_text(helppos)
         table.attach_widget(help_, None, x=2, y=0)
         
-        adjust = gtk.Adjustment(el.pos[0], 0.0, 1.0, 0.01, 0.10)
+        adjust = Gtk.Adjustment(el.pos[0], 0.0, 1.0, 0.01, 0.10)
         self._p['lf'] = table.attach_spinner(adjust, 0.02, 2, label=_('Left:'))
         self._p['lf'].set_numeric(True)
         self._p['lf'].connect('changed', self._on_change_pos)
         
-        adjust = gtk.Adjustment(el.pos[2], 0.0, 1.0, 0.01, 0.10)
+        adjust = Gtk.Adjustment(el.pos[2], 0.0, 1.0, 0.01, 0.10)
         self._p['rt'] = table.attach_spinner(adjust, 0.02, 2, label=_('Right:'), x=1)
         self._p['rt'].set_numeric(True)
         self._p['rt'].connect('changed', self._on_change_pos)
         
-        adjust = gtk.Adjustment(el.pos[1], 0.0, 1.0, 0.01, 0.10)
+        adjust = Gtk.Adjustment(el.pos[1], 0.0, 1.0, 0.01, 0.10)
         self._p['tp'] = table.attach_spinner(adjust, 0.02, 2, label=_('Top:'), y=1)
         self._p['tp'].set_numeric(True)
         self._p['tp'].connect('changed', self._on_change_pos)
         
-        adjust = gtk.Adjustment(el.pos[3], 0.0, 1.0, 0.01, 0.10)
+        adjust = Gtk.Adjustment(el.pos[3], 0.0, 1.0, 0.01, 0.10)
         self._p['bt'] = table.attach_spinner(adjust, 0.02, 2, label=_('Bottom:'),
                                              x=1, y=1)
         self._p['bt'].set_numeric(True)
         self._p['bt'].connect('changed', self._on_change_pos)
         
-        adjust = gtk.Adjustment(el.margin, 0.0, 1.0, 0.01, 0.05)
+        adjust = Gtk.Adjustment(el.margin, 0.0, 1.0, 0.01, 0.05)
         self._p['mg'] = table.attach_spinner(adjust, 0.01, 2, label=_('Margin:'),
                                              y=2, w=2)
         self._p['mg'].set_numeric(True)
@@ -1028,28 +1029,28 @@ A value of 0 is on the far left or top, and a value of 1 is on the far right or 
         if el is False:
             st = _("Select or add an item from the left to edit.")
             label = self._ctbl.attach_label(st, h=4,
-                                            xoptions=gtk.EXPAND|gtk.FILL,
-                                            yoptions=gtk.EXPAND|gtk.FILL)
+                                            xoptions=Gtk.AttachOptions.EXPAND|Gtk.AttachOptions.FILL,
+                                            yoptions=Gtk.AttachOptions.EXPAND|Gtk.AttachOptions.FILL)
             label.set_line_wrap(True)
             label.set_alignment(0.5, 0.5)
         elif isinstance(el, theme.Text):
             buffer_ = undobuffer.UndoableBuffer()
             
             # Toolbar
-            toolbar = gtk.Toolbar()
-            undo = gtk.ToolButton(gtk.STOCK_UNDO)
+            toolbar = Gtk.Toolbar()
+            undo = Gtk.ToolButton(Gtk.STOCK_UNDO)
             undo.connect('clicked', self._undo, buffer_)
             undo.set_sensitive(False)
             toolbar.insert(undo, -1)
-            redo = gtk.ToolButton(gtk.STOCK_REDO)
+            redo = Gtk.ToolButton(Gtk.STOCK_REDO)
             redo.connect('clicked', self._redo, buffer_)
             redo.set_sensitive(False)
             toolbar.insert(redo, -1)
             self._ctbl.attach_widget(toolbar,
-                                     yoptions=gtk.FILL)
+                                     yoptions=Gtk.AttachOptions.FILL)
             
-            text = gtk.TextView()
-            text.set_wrap_mode(gtk.WRAP_NONE)
+            text = Gtk.TextView()
+            text.set_wrap_mode(Gtk.WrapMode.NONE)
             buffer_.begin_not_undoable_action()
             
             buffer_.set_text(el.markup)
@@ -1062,31 +1063,31 @@ A value of 0 is on the far left or top, and a value of 1 is on the far right or 
                 gtkspell.Spell(text)
             except Exception:
                 pass
-            scroll = gtk.ScrolledWindow()
+            scroll = Gtk.ScrolledWindow()
             scroll.add(text)
-            scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+            scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
             scroll.set_size_request(250, -1)
-            scroll.set_shadow_type(gtk.SHADOW_IN)
+            scroll.set_shadow_type(Gtk.ShadowType.IN)
             self._ctbl.attach_widget(scroll, y=1, h=3,
-                                     yoptions=gtk.FILL|gtk.EXPAND)
+                                     yoptions=Gtk.AttachOptions.FILL|Gtk.AttachOptions.EXPAND)
         elif isinstance(el, theme.Image):
-            fc = gtk.FileChooserButton("Select Image")
+            fc = Gtk.FileChooserButton("Select Image")
             fc.set_size_request(250, -1)
-            fc.set_action(gtk.FILE_CHOOSER_ACTION_OPEN)
+            fc.set_action(Gtk.FileChooserAction.OPEN)
             if el.src:
                 fc.set_filename(el.src)
             
-            filt = gtk.FileFilter()
+            filt = Gtk.FileFilter()
             filt.add_pixbuf_formats()
             fc.set_filter(filt)
             
-            preview = gtk.Image()
+            preview = Gtk.Image()
             fc.set_preview_widget(preview)
             fc.connect("update-preview", gui.filechooser_preview, preview)
             fc.connect("file-set", self._on_image_changed)
             self._ctbl.attach_widget(fc)
             
-            self._image_preview = gtk.Image()
+            self._image_preview = Gtk.Image()
             self._ctbl.attach_widget(self._image_preview, y=1)
             gui.update_image_preview(self._image_preview, el.src)
             
@@ -1240,7 +1241,7 @@ A value of 0 is on the far left or top, and a value of 1 is on the far right or 
         "Returns the title of the current presentation."
         rend = model.get_value(titer, 0)
         if isinstance(rend, theme.Text):
-            text = pango.parse_markup(rend.markup)[1]
+            text = Pango.parse_markup(rend.markup)[1]
             cell.set_property('text', "Text: %s" % re.sub('\s+',' ',text))
         elif isinstance(rend, theme.Image):
             if rend.src:
@@ -1252,9 +1253,9 @@ A value of 0 is on the far left or top, and a value of 1 is on the far right or 
     def _quit_with_save(self, event, *args):
         "The user chose to save the slide."
         if self._get_title_value() == "":
-            info_dialog = gtk.MessageDialog(self,
-                    gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR,
-                    gtk.BUTTONS_OK, _("Please enter a Title."))
+            info_dialog = Gtk.MessageDialog(self,
+                    Gtk.DialogFlags.DESTROY_WITH_PARENT, Gtk.MessageType.ERROR,
+                    Gtk.ButtonsType.OK, _("Please enter a Title."))
             info_dialog.run()
             info_dialog.destroy()
             self._title_entry.grab_focus()
@@ -1262,17 +1263,17 @@ A value of 0 is on the far left or top, and a value of 1 is on the far right or 
         for itm in self._tree.get_model():
             itr = itm.iter
             if isinstance(itm[0], theme.Image) and not itm[0].src:
-                info_dialog = gtk.MessageDialog(self,
-                        gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR,
-                        gtk.BUTTONS_OK, _("The image's source was not set."))
+                info_dialog = Gtk.MessageDialog(self,
+                        Gtk.DialogFlags.DESTROY_WITH_PARENT, Gtk.MessageType.ERROR,
+                        Gtk.ButtonsType.OK, _("The image's source was not set."))
                 info_dialog.run()
                 info_dialog.destroy()
                 self._tree.get_selection().select_iter(itr)
                 return False
             if isinstance(itm[0], theme.Text) and not itm[0].markup:
-                info_dialog = gtk.MessageDialog(self,
-                        gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR,
-                        gtk.BUTTONS_OK, _("The text must have a value."))
+                info_dialog = Gtk.MessageDialog(self,
+                        Gtk.DialogFlags.DESTROY_WITH_PARENT, Gtk.MessageType.ERROR,
+                        Gtk.ButtonsType.OK, _("The text must have a value."))
                 info_dialog.run()
                 info_dialog.destroy()
                 self._tree.get_selection().select_iter(itr)
@@ -1295,11 +1296,11 @@ A value of 0 is on the far left or top, and a value of 1 is on the far right or 
         "Let the user know that there are changes."
         if self.changed:
             msg = _('Unsaved Changes exist. Do you want to continue without saving?')
-            dlg = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
-                    gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, msg)
+            dlg = Gtk.MessageDialog(self, Gtk.DialogFlags.MODAL,
+                    Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, msg)
             resp = dlg.run()
             dlg.destroy()
-            if resp == gtk.RESPONSE_NO:
+            if resp == Gtk.ResponseType.NO:
                 return False
         self.changed = False
         return True

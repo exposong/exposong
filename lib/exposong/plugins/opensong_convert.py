@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import gtk
+from gi.repository import Gtk
 import os
 
 from exposong_openlyrics.tools.opensong2openlyrics import OpenLyricsConverter
@@ -72,13 +72,13 @@ class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
     @classmethod
     def import_dialog(cls, action):
         'Show the file dialog for importing OpenSong files'
-        dlg = gtk.FileChooserDialog(_("Import OpenSong File(s)"),
-                exposong.main.main, gtk.FILE_CHOOSER_ACTION_OPEN,
-                (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK,
-                gtk.RESPONSE_ACCEPT))
+        dlg = Gtk.FileChooserDialog(_("Import OpenSong File(s)"),
+                exposong.main.main, Gtk.FileChooserAction.OPEN,
+                (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT, Gtk.STOCK_OK,
+                Gtk.ResponseType.ACCEPT))
         dlg.set_select_multiple(True)
         dlg.set_current_folder(config.get("open-save-dialogs", "opensong-import-dir"))
-        if dlg.run() == gtk.RESPONSE_ACCEPT:
+        if dlg.run() == Gtk.ResponseType.ACCEPT:
             dlg.hide()
             files = dlg.get_filenames()
             for f in files:
@@ -90,7 +90,7 @@ class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
     @classmethod
     def merge_menu(cls, uimanager):
         'Merge new values with the uimanager.'
-        actiongroup = gtk.ActionGroup('opensong-import-grp')
+        actiongroup = Gtk.ActionGroup('opensong-import-grp')
         actiongroup.add_actions([('import-opensong', None,
                 _('_OpenSong File(s) ...'), None,
                 _('Import a Lyric Presentation from OpenSong'),

@@ -20,12 +20,11 @@
 A widget to change the currently active theme.
 """
 
-import gobject
-import gtk
+from gi.repository import GObject
+from gi.repository import Gtk
 import os, os.path
-import pango
+from gi.repository import Pango
 import re
-from gtk.gdk import pixbuf_new_from_file as pb_new
 
 import exposong.main
 import exposong.screen
@@ -41,29 +40,29 @@ CELL_HEIGHT = 65
 CELL_ASPECT = 16.0 / 9
 
 
-class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
+class ThemeSelect(Gtk.ComboBox, exposong._hook.Menu, object):
     """
     A theme selection combo box for the main screen.
     """
     def __init__(self):
-        self.liststore = gtk.ListStore(gobject.TYPE_STRING,
-                                       gobject.TYPE_PYOBJECT)
-        cell = gtk.CellRendererPixbuf
+        self.liststore = Gtk.ListStore(GObject.TYPE_STRING,
+                                       GObject.TYPE_PYOBJECT)
+        cell = Gtk.CellRendererPixbuf
         
-        gtk.ComboBox.__init__(self, self.liststore)
+        super(Gtk.ComboBox, self).__init__()
         themerend = CellRendererTheme()
         themerend.slide = exposong.exampleslide._ExampleTextSlide()
         self.pack_start(themerend, False)
         self.add_attribute(themerend, 'theme', 1)
-        textrend = gtk.CellRendererText()
-        textrend.set_property("ellipsize", pango.ELLIPSIZE_END)
+        textrend = Gtk.CellRendererText()
+        textrend.set_property("ellipsize", Pango.EllipsizeMode.END)
         self.pack_start(textrend, True)
-        self.set_cell_data_func(textrend, self._get_theme_title)
+        self.set_cell_data_func(textrend, self._get_theme_title, None)
         self.connect("changed", self._theme_changed)
         self.liststore.set_sort_func(1, self._sort)
         
         task = self._load_themes()
-        gobject.idle_add(task.next, priority=gobject.PRIORITY_HIGH-10)
+        GObject.idle_add(task.next, priority=GObject.PRIORITY_HIGH-10)
     
     def get_active(self):
         "Get the currently selected theme."
@@ -103,9 +102,9 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
                 self.set_active_iter(itr)
             yield True
         task = self._load_theme_thumbs()
-        gobject.idle_add(task.next, priority=gobject.PRIORITY_LOW)
+        GObject.idle_add(task.next, priority=GObject.PRIORITY_LOW)
         yield True
-        self.liststore.set_sort_column_id(1, gtk.SORT_ASCENDING)
+        self.liststore.set_sort_column_id(1, Gtk.SortType.ASCENDING)
         yield False
     
     def _load_theme_thumbs(self):
@@ -168,14 +167,14 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
     def _delete_theme(self, *args):
         theme = self.get_active()
         msg = _('Are you sure you want to delete the theme "%s"?')
-        dialog = gtk.MessageDialog(exposong.main.main, gtk.DIALOG_MODAL,
-                                   gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
+        dialog = Gtk.MessageDialog(exposong.main.main, Gtk.DialogFlags.MODAL,
+                                   Gtk.MessageType.WARNING, Gtk.ButtonsType.YES_NO,
                                    msg % theme.get_title())
-        dialog.set_default_response(gtk.RESPONSE_YES)
+        dialog.set_default_response(Gtk.ResponseType.YES)
         dialog.set_title(_("Delete Theme?"))
         resp = dialog.run()
         dialog.destroy()
-        if resp == gtk.RESPONSE_YES:
+        if resp == Gtk.ResponseType.YES:
             os.remove(os.path.join(DATA_PATH, 'theme', theme.filename))
             for bg in theme.backgrounds:
                 if isinstance(bg, exposong.theme.ImageBackground):
@@ -208,13 +207,13 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         'Merge new values with the uimanager.'
         global themeselect
         
-        cls._actions = gtk.ActionGroup('theme')
+        cls._actions = Gtk.ActionGroup('theme')
         cls._actions.add_actions([
-                ('theme-new', gtk.STOCK_NEW, _('New Theme'), "",
+                ('theme-new', Gtk.STOCK_NEW, _('New Theme'), "",
                         _("Create a new theme using the Theme Editor"), themeselect.new_theme),
-                ('theme-edit', gtk.STOCK_EDIT, _('Edit Theme'), None,
+                ('theme-edit', Gtk.STOCK_EDIT, _('Edit Theme'), None,
                         _("Edit the current theme"), themeselect._edit_theme),
-                ('theme-delete', gtk.STOCK_DELETE, _("Delete Theme"), None,
+                ('theme-delete', Gtk.STOCK_DELETE, _("Delete Theme"), None,
                         _('Delete the current theme'), themeselect._delete_theme),
                 ])
         
@@ -250,11 +249,11 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
     @classmethod
     def get_button_bar(cls):
         "Return the presentation button widget."
-        tb = gtk.Toolbar()
+        tb = Gtk.Toolbar()
         # FIXME It would be nice to get rid of the shadow on the toolbars, but
         # they are read-only style properties.
-        tb.set_style(gtk.TOOLBAR_ICONS)
-        tb.set_icon_size(gtk.ICON_SIZE_SMALL_TOOLBAR)
+        tb.set_style(Gtk.ToolbarStyle.ICONS)
+        tb.set_icon_size(Gtk.IconSize.SMALL_TOOLBAR)
         button = cls._actions.get_action('theme-new').create_tool_item()
         button.set_is_important(True)
         tb.add(button)
@@ -267,16 +266,15 @@ class ThemeSelect(gtk.ComboBox, exposong._hook.Menu, object):
         return tb
 
 
-class CellRendererTheme(gtk.GenericCellRenderer):
+class CellRendererTheme(Gtk.CellRendererPixbuf):
     "A theme preview cell renderer."
     __gproperties__ = {
-                "theme": (gobject.TYPE_PYOBJECT, "Theme",
-                "Theme", gobject.PARAM_READWRITE),
-                "slide": (gobject.TYPE_PYOBJECT, "Slide",
-                "Slide", gobject.PARAM_READWRITE),
+                "theme": (GObject.TYPE_PYOBJECT, "Theme",
+                "Theme", GObject.PARAM_READWRITE),
+                "slide": (GObject.TYPE_PYOBJECT, "Slide",
+                "Slide", GObject.PARAM_READWRITE),
         }
     def __init__(self):
-        self.__gobject_init__()
         self.height = CELL_HEIGHT
         self.theme = None
         self.slide = None
@@ -322,7 +320,7 @@ class CellRendererTheme(gtk.GenericCellRenderer):
         
         width, height = size
         
-        self._pm[fname] = gtk.gdk.Pixmap(window, width, height)
+        self._pm[fname] = Gdk.Pixmap(window, width, height)
         
         cache_dir = os.path.join(DATA_PATH, ".cache", "theme")
         if not os.path.exists(cache_dir):
@@ -344,7 +342,7 @@ class CellRendererTheme(gtk.GenericCellRenderer):
             self.theme.render(ccontext, bounds, self.slide)
             if self.can_cache:
                 # Save the rendered image to cache
-                pb = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, True, 8, width,
+                pb = GdkPixbuf.Pixbuf(GdkPixbuf.Colorspace.RGB, True, 8, width,
                                     height)
                 pb.get_from_drawable(self._pm[fname],
                                      self._pm[fname].get_colormap(), 0, 0, 0, 0,
@@ -368,7 +366,7 @@ class CellRendererTheme(gtk.GenericCellRenderer):
         pm = self._get_pixmap(window, cell_position[2:4])
         if pm is None:
             return False
-        window.draw_drawable(widget.get_style().fg_gc[gtk.STATE_NORMAL],
+        window.draw_drawable(widget.get_style().fg_gc[Gtk.StateType.NORMAL],
                              pm, 0, 0, cell_area.x + x_offset,
                              cell_area.y + y_offset, width, height)
     
@@ -394,5 +392,5 @@ class CellRendererTheme(gtk.GenericCellRenderer):
     
     def do_get_property(self, pspec):
         return getattr(self, pspec.name)
-gobject.type_register(CellRendererTheme)
+GObject.type_register(CellRendererTheme)
 

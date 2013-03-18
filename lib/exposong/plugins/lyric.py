@@ -16,13 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import gtk
-import gtk.gdk
+from gi.repository import Gtk, Gdk, GObject, GdkPixbuf
 try:
     import gtkspell
 except ImportError:
     pass
-import gobject
 import re
 import os.path
 from xml.sax.saxutils import escape, unescape
@@ -49,7 +47,7 @@ information = {
         'description': __doc__,
         'required': False,
         }
-type_icon = gtk.gdk.pixbuf_new_from_file_at_size(
+type_icon = GdkPixbuf.Pixbuf.new_from_file_at_size(
         os.path.join(RESOURCE_PATH, 'icons', 'pres-song.png'), 20, 14)
 
 # TODO These do not remain in order, so when creating the pull-down, the items
@@ -106,7 +104,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                 return ''
         
         def set_attributes(self, layout):
-            'Set attributes on a pango.Layout object.'
+            'Set attributes on a Pango.Layout object.'
             #TODO
             pass
         
@@ -161,7 +159,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                 self._set_lines(editor.get_slide_text())
                 self.pres.rename_order(old_title, self.title)
                 ret = True
-            if ans == gtk.RESPONSE_APPLY:
+            if ans == Gtk.ResponseType.APPLY:
                 ret = 2
             return ret
         
@@ -323,28 +321,28 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
     def _edit_tabs(self, notebook, parent):
         'Run the edit dialog for the presentation.'
         #Title field
-        vbox = gtk.VBox()
-        self._fields['title_list'] = gtk.ListStore(gobject.TYPE_STRING,
-                gobject.TYPE_STRING)
+        vbox = Gtk.VBox()
+        self._fields['title_list'] = Gtk.ListStore(GObject.TYPE_STRING,
+                GObject.TYPE_STRING)
         for title in self.song.props.titles:
             self._fields['title_list'].append( (title, title.lang) )
-        title_list = gtk.TreeView(self._fields['title_list'])
+        title_list = Gtk.TreeView(self._fields['title_list'])
         title_list.connect('row-activated', self._title_dlg, True)
         title_list.set_reorderable(True)
         # TODO Add row-activated signal for editing.
         #Toolbar
-        toolbar = gtk.Toolbar()
-        button = gtk.ToolButton(gtk.STOCK_ADD)
+        toolbar = Gtk.Toolbar()
+        button = Gtk.ToolButton(Gtk.STOCK_ADD)
         button.connect('clicked', gui.edit_treeview_row_btn, title_list,
                        self._title_dlg)
         toolbar.insert(button, -1)
-        button = gtk.ToolButton(gtk.STOCK_EDIT)
+        button = Gtk.ToolButton(Gtk.STOCK_EDIT)
         button.connect('clicked', gui.edit_treeview_row_btn, title_list,
                        self._title_dlg, True)
         title_list.get_selection().connect('changed',
                                            gui.treesel_disable_widget, button)
         toolbar.insert(button, -1)
-        button = gtk.ToolButton(gtk.STOCK_DELETE)
+        button = Gtk.ToolButton(Gtk.STOCK_DELETE)
         button.connect('clicked', gui.del_treeview_row, title_list)
         title_list.get_selection().connect('changed',
                                            gui.treesel_disable_widget, button)
@@ -352,22 +350,22 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         vbox.pack_start(toolbar, False, True)
         title_list.get_selection().emit('changed')
         #Table
-        cell = gtk.CellRendererText()
-        col = gtk.TreeViewColumn( _('Title'))
-        col.pack_start(cell)
+        cell = Gtk.CellRendererText()
+        col = Gtk.TreeViewColumn( _('Title'))
+        col.pack_start(cell, True, True, 0)
         col.set_resizable(True)
         col.add_attribute(cell, 'text', 0)
         title_list.append_column(col)
-        cell = gtk.CellRendererText()
-        col = gtk.TreeViewColumn( _('Language'))
-        col.pack_start(cell)
+        cell = Gtk.CellRendererText()
+        col = Gtk.TreeViewColumn( _('Language'))
+        col.pack_start(cell, True, True, 0)
         col.set_resizable(True)
         col.add_attribute(cell, 'text', 1)
         title_list.append_column(col)
-        scroll = gtk.ScrolledWindow()
+        scroll = Gtk.ScrolledWindow()
         scroll.add(title_list)
-        scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
-        scroll.set_shadow_type(gtk.SHADOW_IN)
+        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.ALWAYS)
+        scroll.set_shadow_type(Gtk.ShadowType.IN)
         vbox.pack_start(scroll, True, True)
         table = gui.Table(3)
         self._fields['variant'] = gui.append_entry(table, _("Variant:"),
@@ -380,32 +378,32 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                                                     self.song.props.released,
                                                     2)
         vbox.pack_start(table, False, True)
-        notebook.append_page(vbox, gtk.Label( _('Title')) )
+        notebook.append_page(vbox, Gtk.Label(label= _('Title')) )
         
         #Ownership Tab
-        vbox = gtk.VBox()
-        self._fields['author'] = gtk.ListStore(gobject.TYPE_STRING,
-                                               gobject.TYPE_STRING,
-                                               gobject.TYPE_STRING)
+        vbox = Gtk.VBox()
+        self._fields['author'] = Gtk.ListStore(GObject.TYPE_STRING,
+                                               GObject.TYPE_STRING,
+                                               GObject.TYPE_STRING)
         for author in self.song.props.authors:
             self._fields['author'].append( (author, auth_types[author.type],
                                             author.lang) )
-        author_list = gtk.TreeView(self._fields['author'])
+        author_list = Gtk.TreeView(self._fields['author'])
         author_list.connect('row-activated', self._author_dlg, True)
         author_list.set_reorderable(True)
         #Toolbar
-        toolbar = gtk.Toolbar()
-        button = gtk.ToolButton(gtk.STOCK_ADD)
+        toolbar = Gtk.Toolbar()
+        button = Gtk.ToolButton(Gtk.STOCK_ADD)
         button.connect('clicked', gui.edit_treeview_row_btn, author_list,
                        self._author_dlg)
         toolbar.insert(button, -1)
-        button = gtk.ToolButton(gtk.STOCK_EDIT)
+        button = Gtk.ToolButton(Gtk.STOCK_EDIT)
         button.connect('clicked', gui.edit_treeview_row_btn, author_list,
                        self._author_dlg, True)
         author_list.get_selection().connect('changed', gui.treesel_disable_widget,
                                             button)
         toolbar.insert(button, -1)
-        button = gtk.ToolButton(gtk.STOCK_DELETE)
+        button = Gtk.ToolButton(Gtk.STOCK_DELETE)
         button.connect('clicked', gui.del_treeview_row, author_list)
         author_list.get_selection().connect('changed', gui.treesel_disable_widget,
                                             button)
@@ -413,25 +411,25 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         vbox.pack_start(toolbar, False, True)
         author_list.get_selection().emit('changed')
         #Table
-        cell = gtk.CellRendererText()
-        col = gtk.TreeViewColumn( _('Author'), cell)
+        cell = Gtk.CellRendererText()
+        col = Gtk.TreeViewColumn( _('Author'), cell)
         col.set_resizable(True)
         col.add_attribute(cell, 'text', 0)
         author_list.append_column(col)
-        cell = gtk.CellRendererText()
-        col = gtk.TreeViewColumn( _('Type'), cell)
+        cell = Gtk.CellRendererText()
+        col = Gtk.TreeViewColumn( _('Type'), cell)
         col.set_resizable(True)
         col.add_attribute(cell, 'text', 1)
         author_list.append_column(col)
-        cell = gtk.CellRendererText()
-        col = gtk.TreeViewColumn( _('Language'), cell)
+        cell = Gtk.CellRendererText()
+        col = Gtk.TreeViewColumn( _('Language'), cell)
         col.set_resizable(True)
         col.add_attribute(cell, 'text', 2)
         author_list.append_column(col)
-        scroll = gtk.ScrolledWindow()
+        scroll = Gtk.ScrolledWindow()
         scroll.add(author_list)
-        scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
-        scroll.set_shadow_type(gtk.SHADOW_IN)
+        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.ALWAYS)
+        scroll.set_shadow_type(Gtk.ShadowType.IN)
         vbox.pack_start(scroll, True, True)
         table = gui.Table(3)
         self._fields['copyright'] = gui.append_entry(table, _('Copyright:'),
@@ -444,31 +442,31 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                                                      self.song.props.publisher,
                                                      2)
         vbox.pack_start(table, False, True)
-        notebook.append_page(vbox, gtk.Label( _('Ownership')) )
+        notebook.append_page(vbox, Gtk.Label(label= _('Ownership')) )
         
         
         #Theme field
-        vbox = gtk.VBox()
-        self._fields['theme'] = gtk.ListStore(gobject.TYPE_STRING,
-                                              gobject.TYPE_STRING)
+        vbox = Gtk.VBox()
+        self._fields['theme'] = Gtk.ListStore(GObject.TYPE_STRING,
+                                              GObject.TYPE_STRING)
         for theme in self.song.props.themes:
             self._fields['theme'].append( (theme, theme.lang) )
-        theme_list = gtk.TreeView(self._fields['theme'])
+        theme_list = Gtk.TreeView(self._fields['theme'])
         theme_list.connect('row-activated', self._theme_dlg, True)
         theme_list.set_reorderable(True)
         #Toolbar
-        toolbar = gtk.Toolbar()
-        button = gtk.ToolButton(gtk.STOCK_ADD)
+        toolbar = Gtk.Toolbar()
+        button = Gtk.ToolButton(Gtk.STOCK_ADD)
         button.connect('clicked', gui.edit_treeview_row_btn, theme_list,
                        self._theme_dlg)
         toolbar.insert(button, -1)
-        button = gtk.ToolButton(gtk.STOCK_EDIT)
+        button = Gtk.ToolButton(Gtk.STOCK_EDIT)
         button.connect('clicked', gui.edit_treeview_row_btn, theme_list,
                        self._theme_dlg, True)
         theme_list.get_selection().connect('changed',
                                            gui.treesel_disable_widget, button)
         toolbar.insert(button, -1)
-        button = gtk.ToolButton(gtk.STOCK_DELETE)
+        button = Gtk.ToolButton(Gtk.STOCK_DELETE)
         button.connect('clicked', gui.del_treeview_row, theme_list)
         theme_list.get_selection().connect('changed',
                                            gui.treesel_disable_widget, button)
@@ -476,53 +474,53 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         vbox.pack_start(toolbar, False, True)
         theme_list.get_selection().emit('changed')
         #Table
-        cell = gtk.CellRendererText()
-        col = gtk.TreeViewColumn( _('Theme'))
-        col.pack_start(cell)
+        cell = Gtk.CellRendererText()
+        col = Gtk.TreeViewColumn( _('Theme'))
+        col.pack_start(cell, True, True, 0)
         col.set_resizable(True)
         col.add_attribute(cell, 'text', 0)
         theme_list.append_column(col)
-        cell = gtk.CellRendererText()
-        col = gtk.TreeViewColumn( _('Language'))
-        col.pack_start(cell)
+        cell = Gtk.CellRendererText()
+        col = Gtk.TreeViewColumn( _('Language'))
+        col.pack_start(cell, True, True, 0)
         col.set_resizable(True)
         col.add_attribute(cell, 'text', 1)
         theme_list.append_column(col)
-        scroll = gtk.ScrolledWindow()
+        scroll = Gtk.ScrolledWindow()
         scroll.add(theme_list)
-        scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
-        scroll.set_shadow_type(gtk.SHADOW_IN)
+        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.ALWAYS)
+        scroll.set_shadow_type(Gtk.ShadowType.IN)
         vbox.pack_start(scroll, True, True)
         
         table = gui.Table(1)
         self._fields['keywords'] = gui.append_entry(table, _("Keywords:"),
                                                     self.song.props.keywords, 0)
         vbox.pack_start(table, False, True)
-        notebook.append_page(vbox, gtk.Label( _('Theme')) )
+        notebook.append_page(vbox, Gtk.Label(label= _('Theme')) )
         
         #Songbook field
-        vbox = gtk.VBox()
-        self._fields['songbook'] = gtk.ListStore(gobject.TYPE_STRING,
-                                                 gobject.TYPE_STRING)
+        vbox = Gtk.VBox()
+        self._fields['songbook'] = Gtk.ListStore(GObject.TYPE_STRING,
+                                                 GObject.TYPE_STRING)
         for songbook in self.song.props.songbooks:
             self._fields['songbook'].append( (songbook.name, songbook.entry) )
-        songbook_list = gtk.TreeView(self._fields['songbook'])
+        songbook_list = Gtk.TreeView(self._fields['songbook'])
         songbook_list.connect('row-activated', self._songbook_dlg, True)
         songbook_list.set_reorderable(True)
         #Toolbar
-        toolbar = gtk.Toolbar()
-        button = gtk.ToolButton(gtk.STOCK_ADD)
+        toolbar = Gtk.Toolbar()
+        button = Gtk.ToolButton(Gtk.STOCK_ADD)
         button.connect('clicked', gui.edit_treeview_row_btn, songbook_list,
                        self._songbook_dlg)
         toolbar.insert(button, -1)
-        button = gtk.ToolButton(gtk.STOCK_EDIT)
+        button = Gtk.ToolButton(Gtk.STOCK_EDIT)
         button.connect('clicked', gui.edit_treeview_row_btn, songbook_list,
                        self._songbook_dlg, True)
         songbook_list.get_selection().connect('changed',
                                               gui.treesel_disable_widget,
                                               button)
         toolbar.insert(button, -1)
-        button = gtk.ToolButton(gtk.STOCK_DELETE)
+        button = Gtk.ToolButton(Gtk.STOCK_DELETE)
         button.connect('clicked', gui.del_treeview_row, songbook_list)
         songbook_list.get_selection().connect('changed',
                                               gui.treesel_disable_widget,
@@ -531,26 +529,26 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         vbox.pack_start(toolbar, False, True)
         songbook_list.get_selection().emit('changed')
         #Table
-        cell = gtk.CellRendererText()
-        col = gtk.TreeViewColumn( _('Songbook Name'))
-        col.pack_start(cell)
+        cell = Gtk.CellRendererText()
+        col = Gtk.TreeViewColumn( _('Songbook Name'))
+        col.pack_start(cell, True, True, 0)
         col.set_resizable(True)
         col.add_attribute(cell, 'text', 0)
         songbook_list.append_column(col)
-        cell = gtk.CellRendererText()
-        col = gtk.TreeViewColumn( _('Entry')) # As in songbook number
-        col.pack_start(cell)
+        cell = Gtk.CellRendererText()
+        col = Gtk.TreeViewColumn( _('Entry')) # As in songbook number
+        col.pack_start(cell, True, True, 0)
         col.set_resizable(True)
         col.add_attribute(cell, 'text', 1)
         songbook_list.append_column(col)
-        scroll = gtk.ScrolledWindow()
+        scroll = Gtk.ScrolledWindow()
         scroll.add(songbook_list)
-        scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
-        scroll.set_shadow_type(gtk.SHADOW_IN)
+        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.ALWAYS)
+        scroll.set_shadow_type(Gtk.ShadowType.IN)
         vbox.pack_start(scroll, True, True)
         
         table = gui.Table(4)
-        trans_adjustment = gtk.Adjustment(int(self.song.props.transposition),
+        trans_adjustment = Gtk.Adjustment(int(self.song.props.transposition),
                                           -12, 12)
         self._fields['transposition'] = gui.append_spinner(table,
                                                            _("Transposition:"),
@@ -567,73 +565,73 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         self._fields['key'] = gui.append_combo(table, _('Key:'), key_list,
                                                self.song.props.key, 3)
         vbox.pack_start(table, False, True)
-        notebook.append_page(vbox, gtk.Label( _('Music Info')) )
+        notebook.append_page(vbox, Gtk.Label(label= _('Music Info')) )
         
         #Other
         table = gui.Table(1)
         comments = '\n'.join(self.song.props.comments)
         self._fields['comments'] = gui.append_textview(table, _('Comments:'),
                                                        comments, 0)
-        notebook.append_page(table, gtk.Label(_("Other")))
+        notebook.append_page(table, Gtk.Label(label=_("Other")))
         
         # Add verses and slide order.
-        vbox = gtk.VBox()
+        vbox = Gtk.VBox()
         vbox.set_border_width(4)
         vbox.set_spacing(7)
-        hbox = gtk.HBox()
+        hbox = Gtk.HBox()
         
-        label = gtk.Label(_("Title:"))
+        label = Gtk.Label(label=_("Title:"))
         label.set_alignment(0.5, 0.5)
         hbox.pack_start(label, False, True, 5)
         
-        self._fields['title'] = gtk.Entry(100)
+        self._fields['title'] = Gtk.Entry(100)
         self._fields['title'].set_text(self.get_title())
         hbox.pack_start(self._fields['title'], True, True)
         vbox.pack_start(hbox, False, True)
         
-        self._fields['slides'] = gtk.ListStore(gobject.TYPE_PYOBJECT, str)
+        self._fields['slides'] = Gtk.ListStore(GObject.TYPE_PYOBJECT, str)
         # Add the slides
         for sl in self.get_slide_list(True):
             self._fields['slides'].append(sl)
         self._fields['slides'].connect("row-changed", self._on_slide_added)
         
-        self._slide_list = gtk.TreeView(self._fields['slides'])
+        self._slide_list = Gtk.TreeView(self._fields['slides'])
         self._slide_list.set_enable_search(False)
         self._slide_list.set_reorderable(True)
         # Double click to edit
         self._slide_list.connect("row-activated", self._slide_dlg, True)
-        col = gtk.TreeViewColumn( _("Slide") )
+        col = Gtk.TreeViewColumn( _("Slide") )
         col.set_resizable(False)
-        cell = gtk.CellRendererText()
+        cell = Gtk.CellRendererText()
         col.pack_start(cell, False)
         col.add_attribute(cell, 'markup', 1)
         self._slide_list.append_column(col)
         
-        toolbar = gtk.Toolbar()
-        btn = gtk.ToolButton(gtk.STOCK_ADD)
+        toolbar = Gtk.Toolbar()
+        btn = Gtk.ToolButton(Gtk.STOCK_ADD)
         btn.connect("clicked", gui.edit_treeview_row_btn, self._slide_list,
                        self._slide_dlg)
         toolbar.insert(btn, -1)
-        btn = gtk.ToolButton(gtk.STOCK_EDIT)
+        btn = Gtk.ToolButton(Gtk.STOCK_EDIT)
         btn.connect("clicked", gui.edit_treeview_row_btn, self._slide_list,
                        self._slide_dlg, True)
         toolbar.insert(btn, -1)
-        btn = gtk.ToolButton(gtk.STOCK_DELETE)
+        btn = Gtk.ToolButton(Gtk.STOCK_DELETE)
         btn.connect("clicked", self._on_slide_delete, self._slide_list, parent)
         toolbar.insert(btn, -1)
-        toolbar.insert(gtk.SeparatorToolItem(), -1)
+        toolbar.insert(Gtk.SeparatorToolItem(), -1)
         
         vbox.pack_start(toolbar, False, True)
         
-        scroll = gtk.ScrolledWindow()
+        scroll = Gtk.ScrolledWindow()
         scroll.add(self._slide_list)
-        scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         scroll.set_size_request(400, 250)
-        scroll.set_shadow_type(gtk.SHADOW_IN)
+        scroll.set_shadow_type(Gtk.ShadowType.IN)
         vbox.pack_start(scroll, True, True)
         
         vbox.show_all()
-        notebook.insert_page(vbox, gtk.Label(_("Edit")), 0)
+        notebook.insert_page(vbox, Gtk.Label(label=_("Edit")), 0)
         
         self._fields['title'].grab_focus()
         
@@ -736,22 +734,22 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         if not itr:
             return False
         msg = _('Are you sure you want to delete this slide? This cannot be undone.')
-        dialog = gtk.MessageDialog(exposong.main.main, gtk.DIALOG_MODAL,
-                                   gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
+        dialog = Gtk.MessageDialog(exposong.main.main, Gtk.DialogFlags.MODAL,
+                                   Gtk.MessageType.WARNING, Gtk.ButtonsType.YES_NO,
                                    msg)
-        dialog.set_default_response(gtk.RESPONSE_YES)
+        dialog.set_default_response(Gtk.ResponseType.YES)
         dialog.set_title( _('Delete Slide?') )
         resp = dialog.run()
         dialog.hide()
-        if resp == gtk.RESPONSE_YES:
+        if resp == Gtk.ResponseType.YES:
             model.remove(itr)
     
     def _title_dlg(self, treeview, path, col, edit=False):
         "Add or edit a title."
-        dialog = gtk.Dialog(_("New Title"), treeview.get_toplevel(),
-                            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                            (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                            gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        dialog = Gtk.Dialog(_("New Title"), treeview.get_toplevel(),
+                            Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                            (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                            Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
         table = gui.Table(2)
         dialog.vbox.pack_start(table, True, True)
         
@@ -770,12 +768,12 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         dialog.vbox.show_all()
         
         while True:
-            if dialog.run() == gtk.RESPONSE_ACCEPT:
+            if dialog.run() == Gtk.ResponseType.ACCEPT:
                 if not title.get_text():
-                    info_dialog = gtk.MessageDialog(treeview.get_toplevel(),
-                                                    gtk.DIALOG_DESTROY_WITH_PARENT,
-                                                    gtk.MESSAGE_INFO,
-                                                    gtk.BUTTONS_OK,
+                    info_dialog = Gtk.MessageDialog(treeview.get_toplevel(),
+                                                    Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                                    Gtk.MessageType.INFO,
+                                                    Gtk.ButtonsType.OK,
                                                     _("Please enter a Title."))
                     info_dialog.run()
                     info_dialog.destroy()
@@ -794,10 +792,10 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
     
     def _author_dlg(self, treeview, path, col, edit=False):
         "Add or edit an author."
-        dialog = gtk.Dialog(_("New Author"), treeview.get_toplevel(),
-                            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                            (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                            gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        dialog = Gtk.Dialog(_("New Author"), treeview.get_toplevel(),
+                            Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                            (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                            Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
         table = gui.Table(3)
         dialog.vbox.pack_start(table, True, True)
         
@@ -834,11 +832,11 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         dialog.vbox.show_all()
         
         while True:
-            if dialog.run() == gtk.RESPONSE_ACCEPT:
+            if dialog.run() == Gtk.ResponseType.ACCEPT:
                 if not author.get_active_text():
-                    info_dialog = gtk.MessageDialog(treeview.get_toplevel(),
-                                            gtk.DIALOG_DESTROY_WITH_PARENT,
-                                            gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
+                    info_dialog = Gtk.MessageDialog(treeview.get_toplevel(),
+                                            Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                            Gtk.MessageType.INFO, Gtk.ButtonsType.OK,
                                             _("Please enter an Author Name."))
                     info_dialog.run()
                     info_dialog.destroy()
@@ -860,10 +858,10 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
     
     def _theme_dlg(self, treeview, path, col, edit=False):
         "Add or edit a theme."
-        dialog = gtk.Dialog(_("New Theme"), treeview.get_toplevel(),\
-                gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,\
-                (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        dialog = Gtk.Dialog(_("New Theme"), treeview.get_toplevel(),\
+                Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,\
+                (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
         table = gui.Table(2)
         dialog.vbox.pack_start(table, True, True)
         
@@ -885,11 +883,11 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         dialog.vbox.show_all()
         
         while True:
-            if dialog.run() == gtk.RESPONSE_ACCEPT:
+            if dialog.run() == Gtk.ResponseType.ACCEPT:
                 if not theme_.get_active_text():
-                    info_dialog = gtk.MessageDialog(treeview.get_toplevel(),
-                            gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO,
-                            gtk.BUTTONS_OK, _("Please enter an Theme Name."))
+                    info_dialog = Gtk.MessageDialog(treeview.get_toplevel(),
+                            Gtk.DialogFlags.DESTROY_WITH_PARENT, Gtk.MessageType.INFO,
+                            Gtk.ButtonsType.OK, _("Please enter an Theme Name."))
                     info_dialog.run()
                     info_dialog.destroy()
                 else:
@@ -907,10 +905,10 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
     
     def _songbook_dlg(self, treeview, path, col, edit=False):
         "Add or edit a songbook."
-        dialog = gtk.Dialog(_("New songbook"), treeview.get_toplevel(),
-                gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK,
-                gtk.RESPONSE_ACCEPT))
+        dialog = Gtk.Dialog(_("New songbook"), treeview.get_toplevel(),
+                Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT, Gtk.STOCK_OK,
+                Gtk.ResponseType.ACCEPT))
         table = gui.Table(2)
         dialog.vbox.pack_start(table, True, True)
         
@@ -932,11 +930,11 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         dialog.vbox.show_all()
         
         while True:
-            if dialog.run() == gtk.RESPONSE_ACCEPT:
+            if dialog.run() == Gtk.ResponseType.ACCEPT:
                 if not songbook.get_active_text():
-                    info_dialog = gtk.MessageDialog(treeview.get_toplevel(),
-                            gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO,
-                            gtk.BUTTONS_OK, _("Please enter a Songbook."))
+                    info_dialog = Gtk.MessageDialog(treeview.get_toplevel(),
+                            Gtk.DialogFlags.DESTROY_WITH_PARENT, Gtk.MessageType.INFO,
+                            Gtk.ButtonsType.OK, _("Please enter a Songbook."))
                     info_dialog.run()
                     info_dialog.destroy()
                 else:
@@ -960,8 +958,8 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
     def _is_editing_complete(self, parent):
         "Test to see if all fields have been filled which are required."
         if len(self._fields['title_list']) == 0:
-            info_dialog = gtk.MessageDialog(parent, gtk.DIALOG_DESTROY_WITH_PARENT,
-                    gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
+            info_dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                    Gtk.MessageType.INFO, Gtk.ButtonsType.OK,
                     _("You must enter at least one title."))
             info_dialog.run()
             info_dialog.destroy()
@@ -1122,7 +1120,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
     @classmethod
     def _on_open_song_by_songbook(cls, *args):
         'Open Song by looking for Songbook and Entry'
-        dlg = gtk.MessageDialog(type=gtk.MESSAGE_WARNING, buttons=gtk.BUTTONS_OK_CANCEL,
+        dlg = Gtk.MessageDialog(type=Gtk.MessageType.WARNING, buttons=Gtk.ButtonsType.OK_CANCEL,
                                 message_format=_("Please enter the Songbook and the Entry you want to open."))
         vbox = dlg.get_message_area()
         table = gui.Table(2)
@@ -1135,11 +1133,11 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         songbook = gui.append_combo_entry(table, _('Songbook Name:'),
                                           songbooks, None, 0)
         entry = gui.append_entry(table, _('Entry:'), None, 1)
-        vbox.pack_start(table)
+        vbox.pack_start(table, True, True, 0)
         vbox.show_all()
-        not_found_lbl = gtk.Label(_("Entry not found."))
-        vbox.pack_start(not_found_lbl)
-        while dlg.run() == gtk.RESPONSE_OK:
+        not_found_lbl = Gtk.Label(label=_("Entry not found."))
+        vbox.pack_start(not_found_lbl, True, True, 0)
+        while dlg.run() == Gtk.ResponseType.OK:
             if cls._find_song(songbook.get_active_text(), entry.get_text()):
                 break
             else:
@@ -1161,10 +1159,11 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
     @classmethod
     def merge_menu(cls, uimanager):
         'Merge new values with the uimanager.'
-        gtk.stock_add([("pres-song",_("_Song"), gtk.gdk.MOD1_MASK, 0,
-                        "pymserv")])
+        img = GdkPixbuf.Pixbuf.new_from_file(
+                os.path.join(RESOURCE_PATH, 'icons', 'pres-song.png'))
+        exposong.main.main.icon_factory.add('pres-song', Gtk.IconSet(img))
         
-        actiongroup = gtk.ActionGroup('exposong-song')
+        actiongroup = Gtk.ActionGroup('exposong-song')
         actiongroup.add_actions([("pres-new-song", 'pres-song-new', _("New Song"), "<Ctrl>n",
                                 _("Create a new Song"), cls._on_pres_new),
                                 ("open-song-by-songbook", 'open-song-by-songbook',
@@ -1225,22 +1224,22 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         return "A Song presentation type."
 
 
-class SlideEdit(gtk.Dialog):
+class SlideEdit(Gtk.Dialog):
     'A slide editing dialog.'
     def __init__(self, parent, slide):
-        gtk.Dialog.__init__(self, _("Editing Slide"), parent,
-                            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT)
+        super(Gtk.Dialog, self, _("Editing Slide"), parent,
+                            Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT).__init__()
         
         self._build_menu()
         
-        cancelbutton = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
+        cancelbutton = self.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT)
         cancelbutton.connect("clicked", self._quit_without_save)
-        newbutton = self.add_button(_("Save and New"), gtk.RESPONSE_APPLY)
-        newimg = gtk.Image()
-        newimg.set_from_stock(gtk.STOCK_NEW, gtk.ICON_SIZE_BUTTON)
+        newbutton = self.add_button(_("Save and New"), Gtk.ResponseType.APPLY)
+        newimg = Gtk.Image()
+        newimg.set_from_stock(Gtk.STOCK_NEW, Gtk.IconSize.BUTTON)
         newbutton.set_image(newimg)
         newbutton.connect("clicked", self._quit_with_save)
-        okbutton = self.add_button(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
+        okbutton = self.add_button(Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT)
         okbutton.connect("clicked", self._quit_with_save)
         
         self.connect("delete-event", self._quit_without_save)
@@ -1257,41 +1256,41 @@ class SlideEdit(gtk.Dialog):
         self.vbox.pack_start(self._get_title_box(), False, True)
         
         # Toolbar
-        self._toolbar = gtk.Toolbar()
-        self.undo_btn = self._get_toolbar_item(gtk.ToolButton(gtk.STOCK_UNDO),
+        self._toolbar = Gtk.Toolbar()
+        self.undo_btn = self._get_toolbar_item(Gtk.ToolButton(Gtk.STOCK_UNDO),
                                                self._undo, False)
-        self.redo_btn = self._get_toolbar_item(gtk.ToolButton(gtk.STOCK_REDO),
+        self.redo_btn = self._get_toolbar_item(Gtk.ToolButton(Gtk.STOCK_REDO),
                                                self._redo, False)
         self.vbox.pack_start(self._toolbar, False, True)
         
         self._buffer = self._get_buffer()
         self._buffer.connect("changed", self._on_text_changed)
         
-        text = gtk.TextView()
-        text.set_wrap_mode(gtk.WRAP_NONE)
+        text = Gtk.TextView()
+        text.set_wrap_mode(Gtk.WrapMode.NONE)
         text.set_buffer(self._buffer)
         try:
             gtkspell.Spell(text)
         except Exception:
             pass
-        scroll = gtk.ScrolledWindow()
+        scroll = Gtk.ScrolledWindow()
         scroll.add(text)
-        scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         scroll.set_size_request(450, 250)
-        scroll.set_shadow_type(gtk.SHADOW_IN)
+        scroll.set_shadow_type(Gtk.ShadowType.IN)
         self.vbox.pack_start(scroll, True, True)
         
         self.vbox.show_all()
     
     def _build_menu(self):
-        self.uimanager = gtk.UIManager()
+        self.uimanager = Gtk.UIManager()
         self.add_accel_group(self.uimanager.get_accel_group())
-        self._actions = gtk.ActionGroup('main')
+        self._actions = Gtk.ActionGroup('main')
         self._actions.add_actions([
                 ('Edit', None, '_Edit' ),
-                ("edit-undo", gtk.STOCK_UNDO, "Undo",
+                ("edit-undo", Gtk.STOCK_UNDO, "Undo",
                     "<Ctrl>z", "Undo the last operation", self._undo),
-                ("edit-redo", gtk.STOCK_REDO, "Redo",
+                ("edit-redo", Gtk.STOCK_REDO, "Redo",
                     "<Ctrl>y", "Redo the last operation", self._redo)
                 ])
         self.uimanager.insert_action_group(self._actions, 0)
@@ -1304,29 +1303,29 @@ class SlideEdit(gtk.Dialog):
                 </menubar>''')
     
     def _get_title_box(self):
-        hbox = gtk.HBox()
-        label = gtk.Label(_("Name:"))
+        hbox = Gtk.HBox()
+        label = Gtk.Label(label=_("Name:"))
         label.set_alignment(0.5,0.5)
         hbox.pack_start(label, False, True, 1)
         
-        title_list = gtk.ListStore(str, str)
-        self._title_entry = gtk.ComboBox(title_list)
+        title_list = Gtk.ListStore(str, str)
+        self._title_entry = Gtk.ComboBox(title_list)
         if not self.slide_title:
             self.slide_title = "v"
         for (abbr, name) in verse_names.iteritems():
             itr = title_list.append( (abbr, name) )
             if self.slide_title[0] == abbr:
                 self._title_entry.set_active_iter(itr)
-        cell = gtk.CellRendererText()
+        cell = Gtk.CellRendererText()
         self._title_entry.pack_start(cell, True)
         self._title_entry.add_attribute(cell, 'text', 1)
         hbox.pack_start(self._title_entry, True, True, 1)
         
-        label = gtk.Label(" "+_("Index:"))
+        label = Gtk.Label(label=" "+_("Index:"))
         label.set_alignment(0.5,0.5)
         hbox.pack_start(label, False, True, 1)
         
-        self._title_num = gtk.Entry(4)
+        self._title_num = Gtk.Entry(4)
         self._title_num.set_text(self.slide_title[1:])
         self._title_num.set_width_chars(4)
         hbox.pack_start(self._title_num, False, True, 1)
@@ -1371,11 +1370,11 @@ class SlideEdit(gtk.Dialog):
     def _ok_to_continue(self):
         if self._buffer.can_undo or self._get_title_value() != self.slide_title:
             msg = _('Unsaved Changes exist. Do you want to continue without saving?')
-            dlg = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
-                    gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, msg)
+            dlg = Gtk.MessageDialog(self, Gtk.DialogFlags.MODAL,
+                    Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, msg)
             resp = dlg.run()
             dlg.destroy()
-            if resp == gtk.RESPONSE_NO:
+            if resp == Gtk.ResponseType.NO:
                 return False
         self.changed = False
         return True
@@ -1397,9 +1396,9 @@ class SlideEdit(gtk.Dialog):
     
     def _quit_with_save(self, event, *args):
         if self._get_title_value() == "":
-            info_dialog = gtk.MessageDialog(self,
-                    gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO,
-                    gtk.BUTTONS_OK, _("Please enter a Title."))
+            info_dialog = Gtk.MessageDialog(self,
+                    Gtk.DialogFlags.DESTROY_WITH_PARENT, Gtk.MessageType.INFO,
+                    Gtk.ButtonsType.OK, _("Please enter a Title."))
             info_dialog.run()
             info_dialog.destroy()
             self._title_entry.grab_focus()

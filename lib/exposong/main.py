@@ -16,14 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import gtk
-import gtk.gdk
-import gobject
+from gi.repository import Gtk, Gdk, GdkPixbuf
+from gi.repository import GObject
 import operator
 import os
 import os.path
 import time
-from gtk.gdk import pixbuf_new_from_file as pb_new
 from xml.etree import cElementTree as etree
 
 import exposong.about
@@ -42,7 +40,7 @@ main = None
 keys_to_disable = ("Black Screen",)
 
 
-class Main (gtk.Window):
+class Main (Gtk.Window):
     '''
     Primary user interface.
     '''
@@ -51,6 +49,9 @@ class Main (gtk.Window):
         # Define this instance in the global scope. This has to be done
         global main
         main = self
+        
+        self.icon_factory = None # Hold our custom Icons
+        
         exposong.log.debug("Loading Main:")
         splash.splash = splash.SplashScreen(self)
         
@@ -59,20 +60,21 @@ class Main (gtk.Window):
         exposong.plugins.load_plugins()
         
         exposong.log.debug("Initializing the main window.")
-        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-        gtk.window_set_default_icon_list(
-                pb_new(os.path.join(RESOURCE_PATH, 'es128.png')),
-                pb_new(os.path.join(RESOURCE_PATH, 'es64.png')),
-                pb_new(os.path.join(RESOURCE_PATH, 'es48.png')),
-                pb_new(os.path.join(RESOURCE_PATH, 'es32.png')),
-                pb_new(os.path.join(RESOURCE_PATH, 'es16.png')))
+        super(Gtk.Window, self).__init__()
+        Gtk.Window.set_default_icon_list([
+                GdkPixbuf.Pixbuf.new_from_file(os.path.join(RESOURCE_PATH, 'es128.png')),
+                GdkPixbuf.Pixbuf.new_from_file(os.path.join(RESOURCE_PATH, 'es64.png')),
+                GdkPixbuf.Pixbuf.new_from_file(os.path.join(RESOURCE_PATH, 'es48.png')),
+                GdkPixbuf.Pixbuf.new_from_file(os.path.join(RESOURCE_PATH, 'es32.png')),
+                GdkPixbuf.Pixbuf.new_from_file(os.path.join(RESOURCE_PATH, 'es16.png'))
+                ])
         self.set_title("ExpoSong")
         self.connect("configure_event", self._on_configure_event)
         self.connect("window_state_event", self._on_window_state_event)
         self.connect("destroy", self._quit)
         
         ##  GUI
-        win_v = gtk.VBox()
+        win_v = Gtk.VBox()
         self._create_icons()
         
         #These have to be initialized for the menus to render properly
@@ -89,31 +91,31 @@ class Main (gtk.Window):
         
         exposong.log.debug("Creating the menus.")
         menu = self._create_menu()
-        win_v.pack_start(menu, False)
+        win_v.pack_start(menu, False, False, 0)
         
         exposong.log.debug("Laying out the toolbar, schedlist and preslist.")
         ## Main Window Area
-        win_h_mn = gtk.HBox()
-        self.win_h = gtk.HPaned()
+        win_h_mn = Gtk.HBox()
+        self.win_h = Gtk.HPaned()
         ### Main left area
-        left_vbox = gtk.VBox()
-        self.win_lft = gtk.VPaned()
+        left_vbox = Gtk.VBox()
+        self.win_lft = Gtk.VPaned()
         #### Schedule
-        sched_v = gtk.VBox()
-        sched_v.pack_start(self._create_toolbar(), False, False)
-        sched_v.pack_start(gtk.HSeparator(), False, False)
-        schedule_scroll = gtk.ScrolledWindow()
+        sched_v = Gtk.VBox()
+        sched_v.pack_start(self._create_toolbar(), False, False, 0)
+        sched_v.pack_start(Gtk.HSeparator(), False, False, 0)
+        schedule_scroll = Gtk.ScrolledWindow()
         schedule_scroll.add(schedlist.schedlist)
-        schedule_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        sched_v.pack_start(schedule_scroll)
+        schedule_scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        sched_v.pack_start(schedule_scroll, True, True, 0)
         self.win_lft.pack1(sched_v, False, False)
         
         #### Presentation List
-        preslist_scroll = gtk.ScrolledWindow()
+        preslist_scroll = Gtk.ScrolledWindow()
         preslist_scroll.add(preslist.preslist)
-        preslist_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        preslist_scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         self.win_lft.pack2(preslist_scroll, False, False)
-        left_vbox.pack_start(self.win_lft, True, True)
+        left_vbox.pack_start(self.win_lft, True, True, 0)
         left_vbox.pack_start(presfilter.presfilter, False, True, 2)
         
         left_vbox.show_all()
@@ -122,46 +124,46 @@ class Main (gtk.Window):
         exposong.log.debug("Laying out the slidelist.")
         ### Main right area
         #### Slide List
-        slidelist.slide_scroll = gtk.ScrolledWindow()
+        slidelist.slide_scroll = Gtk.ScrolledWindow()
         slidelist.slide_scroll.add(slidelist.slidelist)
-        slidelist.slide_scroll.set_policy(gtk.POLICY_AUTOMATIC,
-                                          gtk.POLICY_AUTOMATIC)
+        slidelist.slide_scroll.set_policy(Gtk.PolicyType.AUTOMATIC,
+                                          Gtk.PolicyType.AUTOMATIC)
         
-        slide_v = gtk.VBox()
-        slide_v.pack_start(slidelist.slide_scroll, True, True)
-        slide_v.pack_start(gtk.HSeparator(), False, False)
+        slide_v = Gtk.VBox()
+        slide_v.pack_start(slidelist.slide_scroll, True, True, 0)
+        slide_v.pack_start(Gtk.HSeparator(), False, False, 0)
         slide_v.pack_start(slidelist.slidelist.get_order_checkbutton(), False, True, 3)
         self.win_h.pack2(slide_v, False, False)
         win_h_mn.pack_start(self.win_h, True, True, 0)
         
         win_h_mn.pack_start(self._pane_right(), False, True, 10)
-        win_v.pack_start(win_h_mn, True)
+        win_v.pack_start(win_h_mn, True, False, 0)
         
         ## Status bar
         exposong.log.debug("Loading the status bar.")
         statusbar.statusbar = statusbar.timedStatusbar()
-        win_v.pack_end(statusbar.statusbar, False)
+        win_v.pack_end(statusbar.statusbar, False, False, 0)
         
         ## Printing
         exposong.log.debug("Enabling Print Support")
         print_support.Print()
         
-        gtk.settings_get_default().set_long_property('gtk-button-images', True,
+        Gtk.Settings.get_default().set_long_property('gtk-button-images', True,
                                                      'main:__init__')
         task = self.build_schedule()
-        gobject.idle_add(task.next)
+        GObject.idle_add(task.next)
         
         win_v.show_all()
         self.add(win_v)
         
         self.restore_window()
-        gobject.idle_add(self.restore_panes,
-                         priority=gobject.PRIORITY_HIGH_IDLE + 2)
+        GObject.idle_add(self.restore_panes,
+                         priority=GObject.PRIORITY_HIGH_IDLE + 2)
         # Need to call twice because some in some themes
         # the left divider would move down at each start
-        gobject.idle_add(self.restore_panes)
+        GObject.idle_add(self.restore_panes)
         # All custom schedules should load after the presentations.
-        gobject.idle_add(self._ready, priority=gobject.PRIORITY_LOW)
+        GObject.idle_add(self._ready, priority=GObject.PRIORITY_LOW)
         exposong.log.debug("Loading Main completed.")
     
     def _ready(self):
@@ -171,8 +173,8 @@ class Main (gtk.Window):
         # Prepares all button visibility by hiding the screen.
         screen.screen.hide()
         statusbar.statusbar.output(_("Ready"))
-        while gtk.events_pending():
-            gtk.main_iteration()
+        while Gtk.events_pending():
+            Gtk.main_iteration()
         splash.splash.destroy()
         
         # Log some ExpoSong statistics
@@ -198,43 +200,43 @@ class Main (gtk.Window):
     
     def _create_icons(self):
         'Load custom application icons.'
-        factory = gtk.IconFactory()
+        self.icon_factory = Gtk.IconFactory()
         for fl in os.listdir(os.path.join(RESOURCE_PATH, 'icons')):
             try:
                 # SVG doesn't work on Windows
                 nm = os.path.splitext(fl)[0]
                 pb = pb_new(os.path.join(RESOURCE_PATH, 'icons', fl))
-                ico = gtk.IconSet(pb)
-                factory.add(nm, ico)
+                ico = Gtk.IconSet(pb)
+                self.icon_factory.add(nm, ico)
             except:
                 pass
-        factory.add_default()
+        self.icon_factory.add_default()
     
     def _pane_right(self):
         "Render the right pane with the preview screen and other settings."
         exposong.log.debug("Laying out the preview area.")
         #### Preview and Presentation Buttons
-        vbox = gtk.VBox()
-        vbox.pack_start(gtk.VSeparator(), False, True, 10)
+        vbox = Gtk.VBox()
+        vbox.pack_start(Gtk.VSeparator(), False, True, 10)
         exposong.log.debug("Rendering Main Buttons")
         vbox.pack_start(screen.screen.get_button_bar_main(), False, False, 0)
         
         exposong.log.debug("Rendering Preview")
-        label = gtk.Label()
+        label = Gtk.Label()
         label.set_markup("<b>%s</b>" % _("Preview"))
         label.set_alignment(0.0, 1.0)
         vbox.pack_start(label, False, True, 4)
         # Wrap the pres_preview it so that the aspect ratio is kept
-        prev_aspect = gtk.AspectFrame(None, 0.5, 0.5,
-                                      exposong.screen.screen.aspect, False)
-        prev_aspect.set_shadow_type(gtk.SHADOW_NONE)
+        #prev_aspect = Gtk.AspectFrame(None, 0.5, 0.5, exposong.screen.screen.aspect, False)
+        prev_aspect = Gtk.AspectFrame()
+        prev_aspect.set_shadow_type(Gtk.ShadowType.NONE)
         prev_aspect.add(screen.screen.preview)
         vbox.pack_start(prev_aspect, False, False, 0)
         
         exposong.log.debug("Rendering Secondary Buttons")
         vbox.pack_start(screen.screen.get_button_bar_secondary(), False, True, 10)
         
-        label = gtk.Label()
+        label = Gtk.Label()
         label.set_markup("<b>%s</b>" % _("Theme Selection"))
         label.set_alignment(0.0, 1.0)
         vbox.pack_start(label, False, True, 4)
@@ -242,29 +244,29 @@ class Main (gtk.Window):
         vbox.pack_start(exposong.themeselect.themeselect.get_button_bar(), False, True, 0)
         
         exposong.log.debug("Rendering Notification")
-        label = gtk.Label()
+        label = Gtk.Label()
         label.set_markup("<b>%s</b>" % _("Notify"))
         label.set_alignment(0.0, 1.0)
         vbox.pack_start(label, False, True, 4)
         exposong.notify.notify = exposong.notify.Notify()
-        vbox.pack_start(exposong.notify.notify, False, True)
+        vbox.pack_start(exposong.notify.notify, False, True, 0)
         
         return vbox
     
     def _create_menu(self):
         'Set up the menus and popup menus.'
-        self.uimanager = gtk.UIManager()
+        self.uimanager = Gtk.UIManager()
         self.add_accel_group(self.uimanager.get_accel_group())
         
-        self.main_actions = gtk.ActionGroup('main')
+        self.main_actions = Gtk.ActionGroup('main')
         self.main_actions.add_actions([
                 ('File', None, _('_File')),
                 ('Edit', None, _('_Edit')),
                 ('Presentation', None, _('P_resentation')),
                 ('pres-controls', None, _("Presentation _Controls")),
                 ('Help', None, _('_Help')),
-                ('Quit', gtk.STOCK_QUIT, None, None, None, self._quit),
-                ('Preferences', gtk.STOCK_PREFERENCES,
+                ('Quit', Gtk.STOCK_QUIT, None, None, None, self._quit),
+                ('Preferences', Gtk.STOCK_PREFERENCES,
                         None, None, None, self._on_prefs),
                 ('file-new', None, _("_New"), "", ""),
                 ('file-import', None, _("_Import"), "",
@@ -274,10 +276,10 @@ class Main (gtk.Window):
                 ('edit-pres', None, _("Current Presentation"), "", ""),
                 ('edit-schedule', None, _("_Schedule"), "", ""),
                 ('edit-theme', None, _("_Theme")),
-                ('About', gtk.STOCK_ABOUT, None, None, None, self._on_about),
+                ('About', Gtk.STOCK_ABOUT, None, None, None, self._on_about),
                 ])
         self.main_actions.add_actions([
-                ('view-log', gtk.STOCK_PROPERTIES, _('View _Log'), None,
+                ('view-log', Gtk.STOCK_PROPERTIES, _('View _Log'), None,
                         _("Show the event log"),
                         exposong.gtklogger.handler.show_window)], self)
         self.uimanager.insert_action_group(self.main_actions, 0)
@@ -343,7 +345,7 @@ class Main (gtk.Window):
         for mod in exposong._hook.get_hooks(exposong._hook.Toolbar):
             mod.merge_toolbar(self.uimanager)
         tb = self.uimanager.get_widget('/Toolbar')
-        tb.set_style(gtk.TOOLBAR_ICONS)
+        tb.set_style(Gtk.ToolbarStyle.ICONS)
         return tb
     
     def load_pres(self, filenm):
@@ -423,7 +425,7 @@ class Main (gtk.Window):
         directory = os.path.join(DATA_PATH, "sched")
         self.library = Schedule(_("Library"))
         task = self.build_pres_list()
-        gobject.idle_add(task.next, priority=gobject.PRIORITY_DEFAULT_IDLE - 10)
+        GObject.idle_add(task.next, priority=GObject.PRIORITY_DEFAULT_IDLE - 10)
         yield True
         
         #Add schedules from plugins
@@ -489,11 +491,11 @@ class Main (gtk.Window):
             return
         msg = _("It seems you have no presentations yet created.\n\n\
 Visit the following URL to download free Songs and Themes:")
-        dialog = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
-                                   gtk.MESSAGE_INFO, gtk.BUTTONS_CLOSE,
+        dialog = Gtk.MessageDialog(self, Gtk.DialogFlags.MODAL,
+                                   Gtk.MessageType.INFO, Gtk.ButtonsType.CLOSE,
                                    msg)
         dialog.set_title(_("Example Content"))
-        btn = gtk.LinkButton("http://exposong.org/extras", "exposong.org/extras")
+        btn = Gtk.LinkButton("http://exposong.org/extras", "exposong.org/extras")
         dialog.get_content_area().pack_start(btn, False, True)
         btn.show()
         resp = dialog.run()
@@ -519,7 +521,7 @@ Visit the following URL to download free Songs and Themes:")
         
     def _on_window_state_event(self, widget, event, *args):
         'Sees if window is maximized or not and sets it in the config'
-        maximized = (event.new_window_state == gtk.gdk.WINDOW_STATE_MAXIMIZED)
+        maximized = (event.new_window_state == Gdk.WindowState.MAXIMIZED)
         config.config.set("main_window", "maximized", str(maximized))
 
     def restore_window(self):
@@ -559,9 +561,9 @@ Visit the following URL to download free Songs and Themes:")
         self._save_schedules()
         self.save_state()
         config.config.write()
-        gtk.main_quit()
+        Gtk.main_quit()
 
 
 def run():
     Main()
-    gtk.main()
+    Gtk.main()

@@ -15,8 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import gtk
-import gtk.gdk
+from gi.repository import Gtk
 
 from exposong_openlyrics import openlyrics
 
@@ -161,18 +160,18 @@ class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
     @classmethod
     def import_dialog(cls, action):
         "Show the file dialog for importing SongSelect Lyrics"
-        dlg = gtk.FileChooserDialog(_("Import SongSelect Lyrics"),
+        dlg = Gtk.FileChooserDialog(_("Import SongSelect Lyrics"),
                                     exposong.main.main,
-                                    gtk.FILE_CHOOSER_ACTION_OPEN,
-                                    (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+                                    Gtk.FileChooserAction.OPEN,
+                                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                                    Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
         dlg.set_select_multiple(True)
-        filter_ = gtk.FileFilter()
+        filter_ = Gtk.FileFilter()
         filter_.set_name(_("SongSelect File (%s)") % ".usr")
         filter_.add_pattern("*.usr")
         dlg.add_filter(filter_)
         dlg.set_current_folder(config.get("open-save-dialogs", "songselect-import-dir"))
-        if dlg.run() == gtk.RESPONSE_ACCEPT:
+        if dlg.run() == Gtk.ResponseType.ACCEPT:
             dlg.hide()
             files = dlg.get_filenames()
             for f in files:
@@ -184,7 +183,7 @@ class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
     @classmethod
     def merge_menu(cls, uimanager):
         "Merge new values with the uimanager."
-        actiongroup = gtk.ActionGroup('songselect-import-grp')
+        actiongroup = Gtk.ActionGroup('songselect-import-grp')
         actiongroup.add_actions([('import-songselect', None,
                                   _("_SongSelect Lyrics ..."), None,
                                   _("Converts a SongSelect file to OpenLyrics"),

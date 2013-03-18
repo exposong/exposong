@@ -56,17 +56,17 @@ class SingleInstance(object):
     
     def serve(self):
         "Open the port, and listen for commands."
-        import gobject
+        from gi.repository import GObject
         try:
             self.socket.bind((HOST, PORT))
         except socket.error:
             raise ExposongInstanceError
         self.socket.listen(4)
-        gobject.timeout_add(int(TIMEOUT*1000), self.listen)
+        GObject.timeout_add(int(TIMEOUT*1000), self.listen)
     
     def listen(self):
         "Attempt to detect any attempted communications."
-        import gobject
+        from gi.repository import GObject
         try:
             inready, n1, n2 = select.select([self.socket], [], [], TIMEOUT)
         except socket.error, e:
@@ -83,7 +83,7 @@ class SingleInstance(object):
                 except socket.error:
                     pass
                 client.close()
-        gobject.timeout_add(int(TIMEOUT*1000), self.listen)
+        GObject.timeout_add(int(TIMEOUT*1000), self.listen)
     
     def handle_request(self, conn, data):
         "Handles received data from listen()."
@@ -162,9 +162,9 @@ class SingleInstance(object):
         except:
             self.reopen()
             exposong.log.error("ExpoSong is not running. Could not send command.")
-            import gtk
+            from gi.repository import Gtk
             msg = _('ExpoSong is not running.')
-            dlg = gtk.MessageDialog(type=gtk.MESSAGE_WARNING, buttons=gtk.BUTTONS_OK,
+            dlg = Gtk.MessageDialog(type=Gtk.MessageType.WARNING, buttons=Gtk.ButtonsType.OK,
                                     message_format=msg)
             dlg.run()
             dlg.destroy()
@@ -172,14 +172,14 @@ class SingleInstance(object):
     
     def is_running(self):
         "Send something to another instance."
-        import gtk
+        from gi.repository import Gtk
         self.socket.settimeout(TIMEOUT*3)
         self.socket.connect((HOST, PORT))
         if self._send('Is ExpoSong?', True) != 'Yes':
             return False
         
         msg = _('ExpoSong is already running.')
-        dlg = gtk.MessageDialog(type=gtk.MESSAGE_WARNING, buttons=gtk.BUTTONS_OK,
+        dlg = Gtk.MessageDialog(type=Gtk.MessageType.WARNING, buttons=Gtk.ButtonsType.OK,
                                 message_format=msg)
         dlg.run()
         dlg.destroy()

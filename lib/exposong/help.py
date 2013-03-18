@@ -18,7 +18,7 @@
 
 import os
 import time
-import gtk
+from gi.repository import Gtk
 import webbrowser
 import urllib, urllib2
 
@@ -59,17 +59,17 @@ class Help(exposong._hook.Menu, object):
         
         if err:
             statusbar.statusbar.output(msg)
-            dlg = gtk.MessageDialog(exposong.main.main, 0,
-                                    gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE, msg)
+            dlg = Gtk.MessageDialog(exposong.main.main, 0,
+                                    Gtk.MessageType.ERROR, Gtk.ButtonsType.CLOSE, msg)
             dlg.set_title(_("An Error Occurred"))
         elif new_version:
-            dlg = gtk.MessageDialog(exposong.main.main, 0, gtk.MESSAGE_WARNING,
-                                    gtk.BUTTONS_YES_NO, msg)
-            dialog.set_default_response(gtk.RESPONSE_YES)
+            dlg = Gtk.MessageDialog(exposong.main.main, 0, Gtk.MessageType.WARNING,
+                                    Gtk.ButtonsType.YES_NO, msg)
+            dialog.set_default_response(Gtk.ResponseType.YES)
             dlg.set_title(_("A New Version is Available"))
         else:
-            dlg = gtk.MessageDialog(exposong.main.main, 0,
-                                    gtk.MESSAGE_INFO, gtk.BUTTONS_OK, msg)
+            dlg = Gtk.MessageDialog(exposong.main.main, 0,
+                                    Gtk.MessageType.INFO, Gtk.ButtonsType.OK, msg)
             dlg.set_title(_("ExpoSong is Up to Date"))
         
         if not err:
@@ -79,7 +79,7 @@ class Help(exposong._hook.Menu, object):
         if 'auto_check' in kw and not new_version:
             return
         
-        if dlg.run() == gtk.RESPONSE_YES:
+        if dlg.run() == Gtk.ResponseType.YES:
             webbrowser.open("http://exposong.org/download/")
         dlg.destroy()
     
@@ -248,7 +248,7 @@ lines, or with many colors make the text difficult to read.'))
     def merge_menu(cls, uimanager):
         'Merge new values with the uimanager.'
         self = exposong.help.help
-        cls._actions = gtk.ActionGroup('help')
+        cls._actions = Gtk.ActionGroup('help')
         cls._actions.add_actions([
                 ('UsageGuide', None, _("Usage Guide"), None, None, self.show),
                 ('CheckUpdate', None, _("Check for New _Version"), None, None,

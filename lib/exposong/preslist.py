@@ -21,10 +21,7 @@ Manages the presentations from the current schedule.
 """
 
 import os
-import gtk
-import gtk.gdk
-import gobject
-import pango
+from gi.repository import Gtk, Gdk, GObject, Pango
 
 import exposong._hook
 import exposong.slidelist
@@ -35,27 +32,27 @@ from exposong import DATA_PATH, RESOURCE_PATH
 # Will hold the PresList instance
 preslist = None
 
-class PresList(gtk.TreeView, exposong._hook.Menu):
+class PresList(Gtk.TreeView, exposong._hook.Menu):
     """
     Manage the presentation list from the currently selected schedule.
     """
     def __init__(self):
         "Create the presentation interface."
-        gtk.TreeView.__init__(self)
+        super(Gtk.TreeView, self).__init__()
         self.set_size_request(-1, 250)
         self.prev_selection = None
         
-        pixbufrend = gtk.CellRendererPixbuf()
-        textrend = gtk.CellRendererText()
-        textrend.set_property("ellipsize", pango.ELLIPSIZE_END)
-        column = gtk.TreeViewColumn( _("Presentations") )
+        pixbufrend = Gtk.CellRendererPixbuf()
+        textrend = Gtk.CellRendererText()
+        textrend.set_property("ellipsize", Pango.EllipsizeMode.END)
+        column = Gtk.TreeViewColumn( _("Presentations") )
         column.set_resizable(False)
         column.pack_start(pixbufrend, False)
         column.set_cell_data_func(pixbufrend, self._get_row_icon)
         column.pack_start(textrend, True)
         column.set_cell_data_func(textrend, self._get_row_text)
         column.set_property('spacing', 4)
-        pixbufrend = gtk.CellRendererPixbuf()
+        pixbufrend = Gtk.CellRendererPixbuf()
         column.pack_start(pixbufrend, False)
         column.set_cell_data_func(pixbufrend, self._get_timer_icon)
         self.append_column(column)
@@ -66,9 +63,9 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         self.connect("button-release-event", self._on_pres_rt_click)
         self.connect("drag-data-get", self._on_drag_get)
         self.connect("drag-data-received", self._on_pres_drag_received)
-        self.enable_model_drag_source(gtk.gdk.BUTTON1_MASK,
+        self.enable_model_drag_source(Gdk.ModifierType.BUTTON1_MASK,
                 exposong.schedlist.DRAGDROP_SCHEDULE,
-                gtk.gdk.ACTION_DEFAULT | gtk.gdk.ACTION_MOVE)
+                Gdk.DragAction.DEFAULT | Gdk.DragAction.MOVE)
         
     def _on_pres_added(self, model, path, itr):
         "Select the recently added schedule."
@@ -100,14 +97,14 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
     
     def get_model(self, liststore=False):
         "Get the model (schedule) that contains the items."
-        model = gtk.TreeView.get_model(self)
-        while liststore and isinstance(model, (gtk.TreeModelFilter, gtk.TreeModelSort)):
+        model = Gtk.TreeView.get_model(self)
+        while liststore and isinstance(model, (Gtk.TreeModelFilter, Gtk.TreeModelSort)):
             model = model.get_model()
         return model
     
     def get_filter_model(self):
         'Return the filtered model if filter is active, else the unfiltered model.'
-        return gtk.TreeView.get_model(self)
+        return Gtk.TreeView.get_model(self)
     
     def next_pres(self, *args):
         'Go to the next presentation.'
@@ -151,7 +148,7 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
             exposong.slidelist.slidelist.set_presentation(None)
             self.prev_selection = None
         
-        exposong.slidelist.slide_scroll.emit('scroll-child', gtk.SCROLL_START, False)
+        exposong.slidelist.slide_scroll.emit('scroll-child', Gtk.SCROLL_START, False)
         
         self._actions.get_action("pres-edit").set_sensitive(self.has_selection())
         pres_delete = self._actions.get_action("pres-delete")
@@ -207,15 +204,15 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         else:
             # Assumes that if there's no drop info, it's at the end of the list
             path_to = path_mv + 1
-            position = gtk.TREE_VIEW_DROP_BEFORE
+            position = Gtk.TreeViewDropPosition.BEFORE
             itr_to = None
         itr_mv = sched.get_iter(path_mv)
         
-        if position is gtk.TREE_VIEW_DROP_AFTER or\
-                position is gtk.TREE_VIEW_DROP_INTO_OR_AFTER:
+        if position is Gtk.TreeViewDropPosition.AFTER or\
+                position is Gtk.TreeViewDropPosition.INTO_OR_AFTER:
             sched.move_after(itr_mv, itr_to)
-        elif position is gtk.TREE_VIEW_DROP_BEFORE or\
-                position is gtk.TREE_VIEW_DROP_INTO_OR_BEFORE:
+        elif position is Gtk.TreeViewDropPosition.BEFORE or\
+                position is Gtk.TreeViewDropPosition.INTO_OR_BEFORE:
             sched.move_before(itr_mv, itr_to)
         
         context.finish(True, False)
@@ -227,14 +224,14 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
             return False
         
         msg = _('Are you sure you want to delete "%s" from your library?')
-        dialog = gtk.MessageDialog(exposong.main.main, gtk.DIALOG_MODAL,
-                                   gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
+        dialog = Gtk.MessageDialog(exposong.main.main, Gtk.DialogFlags.MODAL,
+                                   Gtk.MessageType.WARNING, Gtk.ButtonsType.YES_NO,
                                    msg % item.get_title())
-        dialog.set_default_response(gtk.RESPONSE_YES)
+        dialog.set_default_response(Gtk.ResponseType.YES)
         dialog.set_title( _("Delete Presentation?") )
         resp = dialog.run()
         dialog.destroy()
-        if resp == gtk.RESPONSE_YES:
+        if resp == Gtk.ResponseType.YES:
             item.on_delete()
             schmod = exposong.schedlist.schedlist.get_model()
             
@@ -268,7 +265,7 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         'Returns a timer icon if the timer is set.'
         if not hasattr(self, "_timer_icon"):
             fl = os.path.join(RESOURCE_PATH, 'timer.png')
-            self._timer_icon = gtk.gdk.pixbuf_new_from_file_at_size(fl, 20, 14)
+            self._timer_icon = GdkPixbuf.Pixbuf.new_from_file_at_size(fl, 20, 14)
         pres = model.get_value(titer, 0)
         if pres.get_timer():
             cell.set_property('pixbuf', self._timer_icon)
@@ -285,9 +282,9 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
         if event.button != 3:
             return
         actions = self._actions
-        menu = gtk.Menu()
+        menu = Gtk.Menu()
         sch = actions.get_action('pres-add-to-schedule').create_menu_item()
-        menu2 = gtk.Menu()
+        menu2 = Gtk.Menu()
         sch.set_submenu(menu2)
         menu.append(sch)
         for action in exposong.schedlist.schedlist.get_add_sched_actions():
@@ -304,25 +301,25 @@ class PresList(gtk.TreeView, exposong._hook.Menu):
     @staticmethod
     def get_model_args():
         "Get the arguments for the model."
-        return (gobject.TYPE_PYOBJECT,)
+        return (GObject.TYPE_PYOBJECT,)
     
     @classmethod
     def merge_menu(cls, uimanager):
         "Create menu items."
         global preslist
-        cls._actions = gtk.ActionGroup('preslist')
+        cls._actions = Gtk.ActionGroup('preslist')
         cls._actions.add_actions([
-                ('pres-add-to-schedule', gtk.STOCK_ADD, _("_Add to Schedule"),
+                ('pres-add-to-schedule', Gtk.STOCK_ADD, _("_Add to Schedule"),
                         None, _("Add the Selected Presentation to a Schedule"),
                         None),
-                ('pres-edit', gtk.STOCK_EDIT, None, None,
+                ('pres-edit', Gtk.STOCK_EDIT, None, None,
                         _("Edit the currently selected presentation"),
                         preslist._on_pres_edit),
-                ('pres-remove-from-schedule', gtk.STOCK_REMOVE,
+                ('pres-remove-from-schedule', Gtk.STOCK_REMOVE,
                         _("_Remove from Schedule"), "Delete",
                         _("Remove the presentation from schedule"),
                         preslist._on_pres_remove_from_schedule),
-                ('pres-delete', gtk.STOCK_DELETE, None, "Delete",
+                ('pres-delete', Gtk.STOCK_DELETE, None, "Delete",
                         _("Delete the presentation"), preslist._on_pres_delete),
                 ('pres-prev', None, _("Previous Presentation"), "<Ctrl>Page_Up",
                         None, preslist.prev_pres),

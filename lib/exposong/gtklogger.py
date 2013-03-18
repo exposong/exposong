@@ -21,15 +21,15 @@ A widget to handle logged data for easy user access and filtering.
 """
 
 import logging
-import gobject
-import gtk
+from gi.repository import GObject
+from gi.repository import Gtk
 import os.path
 
 _SEV_LEVELS = ['CRITICAL','ERROR','WARNING','INFO','DEBUG']
 
 class GTKHandler (logging.Handler, object):
     def __init__(self, level=logging.NOTSET):
-        self.liststore = gtk.ListStore(*([object] + [str] * 6))
+        self.liststore = Gtk.ListStore(*([object] + [str] * 6))
         self.scroll = None
         logging.Handler.__init__(self, level)
         # \x1e is an ASCII character for "Field divider", which prevents getting
@@ -43,7 +43,7 @@ class GTKHandler (logging.Handler, object):
     def emit(self, record):
         r2 = self.format(record).split("\x1e")
         self.liststore.append([record] + r2 + self._get_color(r2[1]))
-        gobject.timeout_add(150, self.scroll_to_end)
+        GObject.timeout_add(150, self.scroll_to_end)
     
     def _get_color(self, levelname):
         'Return the colors to be used in the table for `levelname`'
@@ -60,16 +60,16 @@ class GTKHandler (logging.Handler, object):
     
     def show_window(self, action, topwindow):
         "Display the log."
-        win = gtk.Dialog("Event Log", None, 0,
-                         (gtk.STOCK_SAVE, gtk.RESPONSE_ACCEPT,
-                         gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+        win = Gtk.Dialog("Event Log", None, 0,
+                         (Gtk.STOCK_SAVE, Gtk.ResponseType.ACCEPT,
+                         Gtk.STOCK_CLOSE, Gtk.ResponseType.CLOSE))
         win.set_transient_for(topwindow)
         win.set_default_size(600, 400)
         win.connect("destroy", self._destroy)
         win.connect("response", self._destroy)
-        hbox = gtk.HBox()
-        hbox.pack_start(gtk.Label(_("Filter Severity:")), False, True, 4)
-        combo = gtk.combo_box_new_text()
+        hbox = Gtk.HBox()
+        hbox.pack_start(Gtk.Label(_("Filter Severity:", True, True, 0)), False, True, 4)
+        combo = Gtk.ComboBoxText()
         for opt in _SEV_LEVELS:
             combo.append_text(opt)
         combo.set_active(3)
@@ -79,27 +79,27 @@ class GTKHandler (logging.Handler, object):
         list_.set_visible_func(self._row_filter, combo)
         win.vbox.pack_start(hbox, False, True, 4)
         
-        treeview = gtk.TreeView()
-        cell = gtk.CellRendererText()
-        col = gtk.TreeViewColumn(_('Time'))
-        col.pack_start(cell)
+        treeview = Gtk.TreeView()
+        cell = Gtk.CellRendererText()
+        col = Gtk.TreeViewColumn(_('Time'))
+        col.pack_start(cell, True, True, 0)
         col.set_resizable(True)
         col.add_attribute(cell, 'text', 1)
         col.add_attribute(cell, 'background', 5)
         col.add_attribute(cell, 'foreground', 6)
         treeview.append_column(col)
-        cell = gtk.CellRendererText()
-        col = gtk.TreeViewColumn( _('Severity'))
-        col.pack_start(cell)
+        cell = Gtk.CellRendererText()
+        col = Gtk.TreeViewColumn( _('Severity'))
+        col.pack_start(cell, True, True, 0)
         col.set_resizable(True)
         col.add_attribute(cell, 'text', 2)
         col.add_attribute(cell, 'background', 5)
         col.add_attribute(cell, 'foreground', 6)
         treeview.append_column(col)
         # Skipping "module:linenum". May want to have it added later.
-        cell = gtk.CellRendererText()
-        col = gtk.TreeViewColumn( _('Message'))
-        col.pack_start(cell)
+        cell = Gtk.CellRendererText()
+        col = Gtk.TreeViewColumn( _('Message'))
+        col.pack_start(cell, True, True, 0)
         col.set_resizable(True)
         col.add_attribute(cell, 'text', 4)
         col.add_attribute(cell, 'background', 5)
@@ -108,23 +108,23 @@ class GTKHandler (logging.Handler, object):
         
         treeview.set_model(list_)
         
-        self.scroll = gtk.ScrolledWindow()
-        self.scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        self.scroll = Gtk.ScrolledWindow()
+        self.scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         self.scroll.add(treeview)
         self.scroll.show_all()
         win.vbox.pack_start(self.scroll, True, True, 4)
         
         win.show_all()
-        gobject.timeout_add(150, self.scroll_to_end)
+        GObject.timeout_add(150, self.scroll_to_end)
     
     def scroll_to_end(self):
         "Scroll the list to the most recent log entry."
         if self.scroll:
-            self.scroll.emit('scroll-child', gtk.SCROLL_END, False)
+            self.scroll.emit('scroll-child', Gtk.SCROLL_END, False)
     
     def _destroy(self, win, response_id=None):
         "Close the window."
-        if response_id == gtk.RESPONSE_ACCEPT:
+        if response_id == Gtk.ResponseType.ACCEPT:
             if not self._save(win):
                 return
         self.scroll = None
@@ -141,20 +141,20 @@ class GTKHandler (logging.Handler, object):
     
     def _refilter(self, list_):
         "Call to force it to refilter the TreeFilter."
-        gobject.timeout_add(150, self.scroll_to_end)
+        GObject.timeout_add(150, self.scroll_to_end)
         list_.refilter()
     
     def _save(self, toplevel):
         "Save the log to file."
-        dlg = gtk.FileChooserDialog("Save Log File", toplevel,
-                                    gtk.FILE_CHOOSER_ACTION_SAVE,
-                                    (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                                    gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        dlg = Gtk.FileChooserDialog("Save Log File", toplevel,
+                                    Gtk.FileChooserAction.SAVE,
+                                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                                    Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
         # Could be ".log" file, but ".txt" is Windows friendly.
         dlg.set_current_name(u"exposong-log.txt")
         dlg.set_current_folder(os.path.expanduser("~"))
         dlg.set_do_overwrite_confirmation(True)
-        if dlg.run() == gtk.RESPONSE_ACCEPT:
+        if dlg.run() == Gtk.ResponseType.ACCEPT:
             dlg.hide()
             outfile = dlg.get_filename()
             out = open(outfile, "w")

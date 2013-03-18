@@ -22,8 +22,7 @@ initialize the window and set up a few things, but most of the rendering is
 done by the theme.
 """
 
-import gobject
-import gtk
+from gi.repository import Gtk, Gdk, GObject
 import os
 
 import exposong.main
@@ -62,14 +61,14 @@ class Screen(exposong._hook.Menu):
         self.aspect = 4 / 3
         self._size = None
         
-        self.window = gtk.Window(gtk.WINDOW_POPUP)
+        self.window = Gtk.Window(Gtk.WindowType.POPUP)
         
-        self.pres = gtk.DrawingArea()
-        self.pres.connect("expose-event", self._expose_screen)
+        self.pres = Gtk.DrawingArea()
+        self.pres.connect("draw", self._expose_screen)
         self.window.add(self.pres)
         
-        self.preview = gtk.DrawingArea()
-        self.preview.connect("expose-event", self._expose_screen)
+        self.preview = Gtk.DrawingArea()
+        self.preview.connect("draw", self._expose_screen)
         
         
         # Themes being used for the preview when black, background or logo  is active
@@ -189,7 +188,7 @@ class Screen(exposong._hook.Menu):
     
     def is_viewable(self):
         "Return true if the screen is currently visible."
-        state = self.pres.window and self.pres.window.is_viewable()
+        state = self.pres.get_window() and self.pres.get_window().is_viewable()
         if state is None:
             return False
         return state
@@ -204,17 +203,17 @@ class Screen(exposong._hook.Menu):
     
     def _draw(self, widget):
         'Render `widget`.'
-        if not widget.window or not widget.window.is_viewable():
+        if not widget.get_window() or not widget.get_window().is_viewable():
             return False
         
-        if self.pres.window and self.pres.window.get_size() != self._size:
+        if self.pres.get_window() and self.pres.get_window().get_size() != self._size:
             exposong.log.error('The screen sizes are inconsistent. '
                                + 'Screen: "%s"; Stored: "%s".',
                                self.pres.window.get_size(), self._size)
             self._size = self.pres.window.get_size()
         
-        ccontext = widget.window.cairo_create()
-        bounds = widget.window.get_size()
+        ccontext = widget.get_window().cairo_create()
+        bounds = widget.get_window().get_size()
         if widget is self.preview:
             if self.pres.window:
                 #Scale if the presentation window size is available
@@ -244,7 +243,7 @@ class Screen(exposong._hook.Menu):
             if self._actions.get_action('Black Screen').get_active():
                 exposong.theme.Theme.render_color(ccontext, bounds, '#000')
             elif self._actions.get_action('Logo').get_active():
-                logoclr = gtk.gdk.Color(*config.getcolor('screen', 'logo_bg'))
+                logoclr = Gdk.Color(*config.getcolor('screen', 'logo_bg'))
                 exposong.theme.Theme.render_color(ccontext, bounds, logoclr.to_string())
                 self.__logo_img.draw(ccontext, bounds, None)
             elif self._actions.get_action('Background').get_active():
@@ -283,31 +282,31 @@ class Screen(exposong._hook.Menu):
     def merge_menu(cls, uimanager):
         'Create menu items.'
         global screen
-        gtk.stock_add([
-            ("screen-black",_("_Black"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
-            ("screen-bg",_("Bac_kground"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
-            ("screen-logo",_("Lo_go"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
-            ("screen-freeze",_("_Freeze"), gtk.gdk.MOD1_MASK, 0, "pymserv"),
-            ])
-        cls._actions = gtk.ActionGroup('screen')
+        #Gtk.stock_add([
+        #    ("screen-black",_("_Black"), Gdk.ModifierType.MOD1_MASK, 0, "pymserv"),
+        #    ("screen-bg",_("Bac_kground"), Gdk.ModifierType.MOD1_MASK, 0, "pymserv"),
+        #    ("screen-logo",_("Lo_go"), Gdk.ModifierType.MOD1_MASK, 0, "pymserv"),
+        #    ("screen-freeze",_("_Freeze"), Gdk.ModifierType.MOD1_MASK, 0, "pymserv"),
+        #    ])
+        cls._actions = Gtk.ActionGroup('screen')
         cls._actions.add_actions([
-                ('Present', gtk.STOCK_MEDIA_PLAY, _('Start _Presentation'), "F5",
+                ('Present', Gtk.STOCK_MEDIA_PLAY, _('Start _Presentation'), "F5",
                         _("Show the presentation screen"), screen.show),
-                ('Hide', gtk.STOCK_MEDIA_STOP, _('_Exit Presentation'), "Escape",
+                ('Hide', Gtk.STOCK_MEDIA_STOP, _('_Exit Presentation'), "Escape",
                         _("Hide the presentation screen"), screen.hide),
-                #('Pause', gtk.STOCK_MEDIA_PAUSE, None, None,
+                #('Pause', Gtk.STOCK_MEDIA_PAUSE, None, None,
                 #        _('Pause a timed slide.'), screen.pause),
                 ])
         cls._actions.add_toggle_actions([
-                ('Black Screen', 'screen-black', _('_Black Screen'), "b",
+                ('Black Screen', Gtk.STOCK_DIALOG_QUESTION, _('_Black Screen'), "b",
                         _("Show a black screen."),
                         screen._secondary_button_toggle),
-                ('Background', 'screen-bg', _('Bac_kground'), None,
+                ('Background', Gtk.STOCK_DIALOG_QUESTION, _('Bac_kground'), None,
                         _("Show only the background."),
                         screen._secondary_button_toggle),
-                ('Logo', 'screen-logo', _('Lo_go'), "<Ctrl>g",
+                ('Logo', Gtk.STOCK_DIALOG_QUESTION, _('Lo_go'), "<Ctrl>g",
                         _("Display the logo."), screen.to_logo),
-                ('Freeze', 'screen-freeze', _('_Freeze'), None ,
+                ('Freeze', Gtk.STOCK_DIALOG_QUESTION, _('_Freeze'), None ,
                         _("Freeze the screen."),
                         screen._secondary_button_toggle),
                 ])
@@ -335,11 +334,11 @@ class Screen(exposong._hook.Menu):
     @classmethod
     def get_button_bar_main(cls):
         "Return the presentation button widget."
-        tb = gtk.Toolbar()
+        tb = Gtk.Toolbar()
         # FIXME It would be nice to get rid of the shadow on the toolbars, but
         # they are read-only style properties.
-        tb.set_style(gtk.TOOLBAR_BOTH_HORIZ)
-        tb.set_icon_size(gtk.ICON_SIZE_SMALL_TOOLBAR)
+        tb.set_style(Gtk.ToolbarStyle.BOTH_HORIZ)
+        tb.set_icon_size(Gtk.IconSize.SMALL_TOOLBAR)
         button = cls._actions.get_action('Present').create_tool_item()
         button.set_is_important(True)
         tb.add(button)
@@ -351,18 +350,18 @@ class Screen(exposong._hook.Menu):
     @classmethod
     def get_button_bar_secondary(cls):
         "Return the presentation display widget."
-        tb = gtk.Toolbar()
+        tb = Gtk.Toolbar()
         tb.set_show_arrow(False)
         
         #For screens smaller than 650px high (Netbooks usually) display these buttons horizontally
         scr_geom = exposong.main.main.get_screen().get_monitor_geometry(0)
         if scr_geom.height>650:
-            tb.set_orientation(gtk.ORIENTATION_VERTICAL)
-            tb.set_style(gtk.TOOLBAR_BOTH_HORIZ)
+            tb.set_orientation(Gtk.Orientation.VERTICAL)
+            tb.set_style(Gtk.ToolbarStyle.BOTH_HORIZ)
         else:
-            tb.set_orientation(gtk.ORIENTATION_HORIZONTAL)
-            tb.set_style(gtk.TOOLBAR_ICONS)
-            tb.set_icon_size(gtk.ICON_SIZE_LARGE_TOOLBAR)
+            tb.set_orientation(Gtk.Orientation.HORIZONTAL)
+            tb.set_style(Gtk.ToolbarStyle.ICONS)
+            tb.set_icon_size(Gtk.IconSize.LARGE_TOOLBAR)
         
         # FIXME It would be nice to get rid of the shadow on the toolbars, but
         # they are read-only style properties.
@@ -413,14 +412,14 @@ class Screen(exposong._hook.Menu):
         else:
             self._secondary_button_toggle(None)
             msg = _('No Logo set. Do you want to choose a Logo now?')
-            dialog = gtk.MessageDialog(exposong.main.main, gtk.DIALOG_MODAL,
-                                       gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
+            dialog = Gtk.MessageDialog(exposong.main.main, Gtk.DialogFlags.MODAL,
+                                       Gtk.MessageType.WARNING, Gtk.ButtonsType.YES_NO,
                                        msg)
-            dialog.set_default_response(gtk.RESPONSE_YES)
+            dialog.set_default_response(Gtk.ResponseType.YES)
             dialog.set_title( _("Set Logo?") )
             resp = dialog.run()
             dialog.destroy()
-            if resp == gtk.RESPONSE_YES:
+            if resp == Gtk.ResponseType.YES:
                 exposong.prefs.PrefsDialog(exposong.main.main)
                 if os.path.isfile(config.get("screen", "logo")):
                     self.to_logo()

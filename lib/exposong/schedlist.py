@@ -21,9 +21,7 @@ The ScheduleList class provides a list of builtin and custom schedules that the
 user can select.
 """
 
-import gtk
-import gtk.gdk
-import gobject
+from gi.repository import Gtk, Gdk, GObject
 import os
 
 import exposong.main
@@ -34,28 +32,28 @@ from exposong import DATA_PATH
 from exposong import statusbar
 
 schedlist = None
-DRAGDROP_SCHEDULE = [("text/treeview-path", gtk.TARGET_SAME_APP, 4121)]
+DRAGDROP_SCHEDULE = [("text/treeview-path", Gtk.TargetFlags.SAME_APP, 4121)]
 
-class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
+class ScheduleList(Gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
     '''
     A TreeView of presentation schedules.
     '''
     def __init__(self):
         "Initialize the interface of the schedule."
-        gtk.TreeView.__init__(self)
+        super(Gtk.TreeView, self).__init__()
         self.set_size_request(200, 80)
         #Columns: Schedule, Name, Sort, is_separator
-        self.model = gtk.TreeStore(gobject.TYPE_PYOBJECT, gobject.TYPE_STRING,
-                                   gobject.TYPE_STRING, gobject.TYPE_BOOLEAN)
-        self.model.set_sort_column_id(2, gtk.SORT_ASCENDING)
+        self.model = Gtk.TreeStore(GObject.TYPE_PYOBJECT, GObject.TYPE_STRING,
+                                   GObject.TYPE_STRING, GObject.TYPE_BOOLEAN)
+        self.model.set_sort_column_id(2, Gtk.SortType.ASCENDING)
                 
         self.set_model(self.model)
         self.set_enable_search(False)
         self.set_headers_visible(False)
-        self.set_row_separator_func(self._row_separator)
+        self.set_row_separator_func(self._row_separator, None)
         
-        sched_rend = gtk.CellRendererText()
-        column = gtk.TreeViewColumn( _("Schedules"), sched_rend, text=1)
+        sched_rend = Gtk.CellRendererText()
+        column = Gtk.TreeViewColumn( _("Schedules"), sched_rend, text=1)
         
         sched_rend.connect("editing-started",
                 exposong.main.main.disable_shortcuts)
@@ -68,11 +66,11 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
         self.append_column(column)
         self.get_selection().connect("changed", self._on_schedule_activate)
         
-        self.enable_model_drag_dest(DRAGDROP_SCHEDULE, gtk.gdk.ACTION_DEFAULT)
+        self.enable_model_drag_dest(DRAGDROP_SCHEDULE, Gdk.DragAction.DEFAULT)
         self.connect("button-release-event", self._on_rt_click)
         self.connect("drag-drop", self._on_pres_drop)
         self.connect("drag-data-received", self._on_sched_drag_received)
-        #self.set_drag_dest_row((1,), gtk.TREE_VIEW_DROP_INTO_OR_BEFORE)
+        #self.set_drag_dest_row((1,), Gtk.TreeViewDropPosition.INTO_OR_BEFORE)
 
     def append(self, parent, row, sort=None):
         'Add an item to the list.'
@@ -125,7 +123,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
                 preslist.columns_autosize()
                 if sched.is_reorderable():
                     preslist.enable_model_drag_dest(DRAGDROP_SCHEDULE,
-                                                    gtk.gdk.ACTION_DEFAULT)
+                                                    Gdk.DragAction.DEFAULT)
                 else:
                     preslist.unset_rows_drag_dest()
                     exposong.presfilter.presfilter.filter()
@@ -146,17 +144,17 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
         if not item or item.is_builtin():
             return False
         win = self
-        while not isinstance(win, gtk.Window):
+        while not isinstance(win, Gtk.Window):
             win = win.get_parent()
-        dialog = gtk.MessageDialog(win, gtk.DIALOG_MODAL,
-                                   gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
+        dialog = Gtk.MessageDialog(win, Gtk.DialogFlags.MODAL,
+                                   Gtk.MessageType.WARNING, Gtk.ButtonsType.YES_NO,
                                    _('Are you sure you want to delete "%s"?') %
                                    item.title)
-        dialog.set_default_response(gtk.RESPONSE_YES)
+        dialog.set_default_response(Gtk.ResponseType.YES)
         dialog.set_title( _("Delete Schedule?") )
         resp = dialog.run()
         dialog.hide()
-        if resp == gtk.RESPONSE_YES:
+        if resp == Gtk.ResponseType.YES:
             exposong.log.info('Deleting custom schedule "%s".', item.title)
             if item.filename and os.path.isfile(item.filename):
                 os.remove(os.path.join(DATA_PATH, "sched",item.filename))
@@ -248,7 +246,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
         'The user right clicked in the schedule area.'
         if event.button == 3:
             if widget.get_active_item() and not widget.get_active_item().is_builtin():
-                menu = gtk.Menu()
+                menu = Gtk.Menu()
                 menu.append(self._actions.get_action('sched-rename').create_menu_item())
                 menu.append(self._actions.get_action('sched-delete').create_menu_item())
                 menu.show_all()
@@ -276,7 +274,7 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
             uimanager.remove_action_group(self._sched_actiongroup)
             uimanager.remove_ui(self._sched_mergeid)
         
-        self._sched_actiongroup = gtk.ActionGroup('addtosched')
+        self._sched_actiongroup = Gtk.ActionGroup('addtosched')
         str_ = _("Add to Schedule %s")
         self._sched_actiongroup.add_actions(
                 [('pres-add-%s' % s[1], None, s[1], None,
@@ -300,15 +298,15 @@ class ScheduleList(gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
     def merge_menu(cls, uimanager):
         "Create menu items."
         global schedlist
-        gtk.stock_add([("sched-new",_("New Schedule"), gtk.gdk.MOD1_MASK, 0,
-                      "pymserv")])
-        cls._actions = gtk.ActionGroup('schedlist')
+        #Gtk.stock_add([("sched-new",_("New Schedule"), Gdk.ModifierType.MOD1_MASK, 0,
+        #              "pymserv")])
+        cls._actions = Gtk.ActionGroup('schedlist')
         cls._actions.add_actions([
-                ('sched-new', 'sched-new', _("New Schedule"), "",
+                ('sched-new', Gtk.STOCK_DIALOG_QUESTION, _("New Schedule"), "",
                         _("Create a new schedule"), schedlist._on_new),
                 ('sched-rename', None, _("_Rename Schedule"), None,
                         _("Rename the selected schedule"), schedlist._on_rename),
-                ('sched-delete', gtk.STOCK_DELETE, _("Delete Schedule"), None,
+                ('sched-delete', Gtk.STOCK_DELETE, _("Delete Schedule"), None,
                         _("Delete the currently selected schedule"),
                         schedlist._on_sched_delete ),
                 ])

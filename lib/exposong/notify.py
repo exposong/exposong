@@ -16,8 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import gtk
-import pango
+from gi.repository import Gtk
+from gi.repository import Pango
 
 import exposong.main
 import exposong.screen
@@ -28,16 +28,16 @@ The Notify class will give the user a GUI to alert the audience of any
 necessary news/events. An example of usage is for nursury alerts.
 """
 
-class Notify(gtk.HBox):
+class Notify(Gtk.HBox):
     """
     A GUI that will allow the user to alert the audience.
     """
     def __init__(self):
         "Initialize the notification interface."
-        gtk.HBox.__init__(self)
+        super(Gtk.HBox, self).__init__()
         self._text = ""
         
-        self.notify = gtk.Entry(45)
+        self.notify = Gtk.Entry()
         self._handler_changed = self.notify.connect_after("changed",
                                                           self._on_changed)
         self.notify.set_width_chars(15) #Prevent it from expanding wider than the preview
@@ -51,30 +51,14 @@ class Notify(gtk.HBox):
         self.pack_start(self.notify, True, True, 0)
         
         # Do not draw a yellow bg if an a11y theme is used
-        settings = gtk.settings_get_default()
+        settings = Gtk.Settings.get_default()
         theme = settings.get_property("gtk-theme-name")
         self._a11y = (theme.startswith("HighContrast") or
                         theme.startswith("LowContrast"))
         
         # Make sure icons are supported by GTK version
-        self._button_icons = gtk.gtk_version[0] >= 2 and gtk.gtk_version[1] > 16
-        if self._button_icons:
-            self.notify.set_icon_from_stock(gtk.ENTRY_ICON_PRIMARY, gtk.STOCK_APPLY)
-            self.notify.connect("icon-press", self._on_icon_pressed)
-        else:
-            notify_clear = gtk.Button()
-            img = gtk.Image()
-            img.set_from_stock(gtk.STOCK_CLEAR, gtk.ICON_SIZE_BUTTON)
-            notify_clear.set_image(img)
-            notify_clear.connect("clicked", self._on_clear)
-            self.pack_start(notify_clear, False, True, 0)
-            
-            notify_save = gtk.Button()
-            img = gtk.Image()
-            img.set_from_stock(gtk.STOCK_OK, gtk.ICON_SIZE_BUTTON)
-            notify_save.set_image(img)
-            notify_save.connect("clicked", self._on_save)
-            self.pack_start(notify_save, False, True, 0)
+        self.notify.set_icon_from_stock(Gtk.EntryIconPosition.PRIMARY, Gtk.STOCK_APPLY)
+        self.notify.connect("icon-press", self._on_icon_pressed)
     
     def draw(self, ccontext, bounds):
         "Draw the notification to the screen if available."
@@ -85,11 +69,11 @@ class Notify(gtk.HBox):
         layout.set_text(self._text)
         
         sz = int(h / 12.0)
-        layout.set_font_description(pango.FontDescription(
+        layout.set_font_description(Pango.FontDescription(
                                     "Sans Bold " + str(sz)))
         while layout.get_pixel_size()[0] > w * 0.6:
             sz = int(sz * 0.89)
-            layout.set_font_description(pango.FontDescription(
+            layout.set_font_description(Pango.FontDescription(
                                         "Sans Bold "+str(sz)))
         nbounds = layout.get_pixel_size()
         pad = sz/14.0
@@ -109,9 +93,9 @@ class Notify(gtk.HBox):
         Emit the terms-changed signal without any time out when the clear
         button was clicked.
         """
-        if icon == gtk.ENTRY_ICON_SECONDARY:
+        if icon == Gtk.EntryIconPosition.SECONDARY:
             self._on_clear(None)
-        elif icon == gtk.ENTRY_ICON_PRIMARY:
+        elif icon == Gtk.EntryIconPosition.PRIMARY:
             self._on_save(None)
     
     def _on_changed(self, widget):
@@ -120,7 +104,7 @@ class Notify(gtk.HBox):
 
     def _on_key_pressed(self, widget, event):
         "Detect a keypress in the text box. Clear the text on 'Escape'."
-        if event.keyval == gtk.keysyms.Escape:
+        if event.keyval == Gdk.KEY_Escape:
             self.clear_with_no_signal()
             self.emit("terms-changed", "")
 
@@ -141,23 +125,22 @@ class Notify(gtk.HBox):
     def _check_style(self):
         "Use a different background color if a search is active."
         # show/hide icon
-        if self._button_icons:
-            if self.notify.get_text() != "":
-                self.notify.set_icon_from_stock(gtk.ENTRY_ICON_SECONDARY,
-                                                gtk.STOCK_CLEAR)
-            else:
-                self.notify.set_icon_from_stock(gtk.ENTRY_ICON_SECONDARY, None)
+        if self.notify.get_text() != "":
+            self.notify.set_icon_from_stock(Gtk.EntryIconPosition.SECONDARY,
+                                            Gtk.STOCK_CLEAR)
+        else:
+            self.notify.set_icon_from_stock(Gtk.EntryIconPosition.SECONDARY, None)
         # Based on the Rhythmbox code
-        yellowish = gtk.gdk.Color(63479, 63479, 48830)
-        black = gtk.gdk.Color(0, 0, 0)
+        yellowish = Gdk.Color(63479, 63479, 48830)
+        black = Gdk.Color(0, 0, 0)
         if self._a11y == True:
             return
         if self.notify.get_text() == "":
-            self.notify.modify_base(gtk.STATE_NORMAL, None)
-            self.notify.modify_text(gtk.STATE_NORMAL, None)
+            self.notify.modify_base(Gtk.StateType.NORMAL, None)
+            self.notify.modify_text(Gtk.StateType.NORMAL, None)
         else:
-            self.notify.modify_base(gtk.STATE_NORMAL, yellowish)
-            self.notify.modify_text(gtk.STATE_NORMAL, black)
+            self.notify.modify_base(Gtk.StateType.NORMAL, yellowish)
+            self.notify.modify_text(Gtk.StateType.NORMAL, black)
             
     def _on_activate(self, *args):
         "The user clicked enter on the entry."

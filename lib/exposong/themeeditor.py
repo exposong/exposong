@@ -16,12 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import gtk
+from gi.repository import Gtk
 import sys
 import os
 import shutil
 import random
-import gobject
+from gi.repository import GObject
 
 import exposong.theme
 import exposong.exampleslide
@@ -32,12 +32,12 @@ from exposong.glob import title_to_filename, find_freefile, check_filename
 
 BACKGROUND_TYPES = [_("Image"),  _("Color"), _("Gradient"), _("Radial Gradient")]
 
-class ThemeEditor(gtk.Window):
+class ThemeEditor(Gtk.Window):
     """
     Provides a simple interface for creating and editing themes
     """
     def __init__(self, parent, theme_):
-        gtk.Window.__init__(self)
+        super(self)
         self.connect("delete_event", self._close)
         self.set_transient_for(parent)
         self.set_title(_("ExpoSong Theme Editor"))
@@ -52,8 +52,8 @@ class ThemeEditor(gtk.Window):
     
     def _do_layout(self):
         'Builds the GUI'
-        main_h = gtk.HBox()
-        main_v = gtk.VBox()
+        main_h = Gtk.HBox()
+        main_v = Gtk.VBox()
         
         # Title entry
         title_table = gui.ESTable(1)
@@ -61,55 +61,55 @@ class ThemeEditor(gtk.Window):
                                                      label=_("Theme Name"))
         main_v.pack_start(title_table, False, False)
         
-        self._notebook = gtk.Notebook()
+        self._notebook = Gtk.Notebook()
         self._notebook.connect('switch-page', self._nb_page_changed)
         main_v.pack_start(self._notebook, True, True, 5)
         
         ######################
         # Page 1: Background #
         ######################
-        self._treeview_bgs = gtk.TreeView()
+        self._treeview_bgs = Gtk.TreeView()
         self._treeview_bgs.set_reorderable(True)
         
-        gtk.stock_add([('add-background-gradient',_('Add Gradient'), gtk.gdk.MOD1_MASK, 0,
+        Gtk.stock_add([('add-background-gradient',_('Add Gradient'), Gdk.ModifierType.MOD1_MASK, 0,
                 'pymserv'),
-                ('add-background-solid',_('Add Solid Color'), gtk.gdk.MOD1_MASK, 0,
+                ('add-background-solid',_('Add Solid Color'), Gdk.ModifierType.MOD1_MASK, 0,
                 'pymserv'),
-                ('add-background-radial',_('Add Radial Gradient'), gtk.gdk.MOD1_MASK, 0,
+                ('add-background-radial',_('Add Radial Gradient'), Gdk.ModifierType.MOD1_MASK, 0,
                 'pymserv'),
-               ("add-background-image",_('Add Image'), gtk.gdk.MOD1_MASK, 0,
+               ("add-background-image",_('Add Image'), Gdk.ModifierType.MOD1_MASK, 0,
                 'pymserv')])
         
         #Background Toolbar
-        toolbar = gtk.Toolbar()
-        btn = gtk.ToolButton(gtk.stock_lookup('add-background-image')[0])
+        toolbar = Gtk.Toolbar()
+        btn = Gtk.ToolButton(Gtk.stock_lookup('add-background-image')[0])
         btn.set_tooltip_markup(_("Add a new Image Background"))
         btn.connect('clicked', self._on_bg_image_new)
         toolbar.insert(btn, -1)
-        btn = gtk.ToolButton(gtk.stock_lookup('add-background-solid')[0])
+        btn = Gtk.ToolButton(Gtk.stock_lookup('add-background-solid')[0])
         btn.set_tooltip_markup(_("Add a new Solid Color Background"))
         btn.connect('clicked', self._on_bg_solid_new)
         toolbar.insert(btn, -1)
-        btn = gtk.ToolButton(gtk.stock_lookup('add-background-gradient')[0])
+        btn = Gtk.ToolButton(Gtk.stock_lookup('add-background-gradient')[0])
         btn.set_tooltip_markup(_("Add a new Gradient Background"))
         btn.connect('clicked', self._on_bg_gradient_new)
         toolbar.insert(btn, -1)
-        btn = gtk.ToolButton(gtk.stock_lookup('add-background-radial')[0])
+        btn = Gtk.ToolButton(Gtk.stock_lookup('add-background-radial')[0])
         btn.set_tooltip_markup(_("Add a new Radial Gradient Background"))
         btn.connect('clicked', self._on_bg_radial_new)
         toolbar.insert(btn, -1)
-        button = gtk.ToolButton(gtk.STOCK_DELETE)
+        button = Gtk.ToolButton(Gtk.STOCK_DELETE)
         button.connect('clicked', self._on_delete_bg)
         toolbar.insert(button, -1)
         
         # Background Treeview Columns
-        self._bg_model = gtk.ListStore(gobject.TYPE_PYOBJECT)
-        self._column_bgs = gtk.TreeViewColumn(_("Backgrounds"))
-        textrend = gtk.CellRendererText()
-        self._column_bgs.pack_start(textrend)
+        self._bg_model = Gtk.ListStore(GObject.TYPE_PYOBJECT)
+        self._column_bgs = Gtk.TreeViewColumn(_("Backgrounds"))
+        textrend = Gtk.CellRendererText()
+        self._column_bgs.pack_start(textrend, True, True, 0)
         self._column_bgs.set_cell_data_func(textrend, self._bg_get_row_text)
-        colorrend = gtk.CellRendererText()
-        self._column_bgs.pack_start(colorrend)
+        colorrend = Gtk.CellRendererText()
+        self._column_bgs.pack_start(colorrend, True, True, 0)
         self._column_bgs.set_cell_data_func(colorrend, self._bg_get_row_color)
         self._treeview_bgs.append_column(self._column_bgs)
         self._treeview_bgs.set_size_request(90,200)
@@ -118,46 +118,46 @@ class ThemeEditor(gtk.Window):
         self._bg_model.connect("row-changed", self._on_bgs_reordered)
         self._treeview_bgs.get_selection().connect("changed", self._on_bg_changed)
         
-        bg_left = gtk.VBox()
+        bg_left = Gtk.VBox()
         gui.append_comment(bg_left, _("Backgrounds will be drawn starting with \
 the first element in this list moving to the last one."), 0)
         bg_left.pack_start(toolbar, False, True, gui.WIDGET_SPACING)
-        scroll = gtk.ScrolledWindow()
+        scroll = Gtk.ScrolledWindow()
         scroll.add(self._treeview_bgs)
-        scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         bg_left.pack_start(scroll, True, True, gui.WIDGET_SPACING)
         
         self._bg_edit_table = gui.ESTable(15, row_spacing=10, auto_inc_y=True)
-        scroll_bg_edit = gtk.ScrolledWindow()
-        scroll_bg_edit.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroll_bg_edit = Gtk.ScrolledWindow()
+        scroll_bg_edit.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         scroll_bg_edit.add_with_viewport(self._bg_edit_table)
 
-        bgbox = gtk.HBox()
+        bgbox = Gtk.HBox()
         bgbox.pack_start(bg_left, False, True, 0)
-        bgbox.pack_start(gtk.VSeparator(), False, False, 15)
-        bgbox.pack_start(scroll_bg_edit)
-        self._notebook.append_page(bgbox, gtk.Label(_("Background")))
+        bgbox.pack_start(Gtk.VSeparator(), False, False, 15)
+        bgbox.pack_start(scroll_bg_edit, True, True, 0)
+        self._notebook.append_page(bgbox, Gtk.Label(label=_("Background")))
         
 
         ########### Notebook Page 2: Body Text #################################
         self.body_widgets = {}
-        body_h = gtk.HBox()
+        body_h = Gtk.HBox()
         body_h.pack_start(self._get_section_left(self._on_body_changed,
                                                  self.body_widgets))
-        body_h.pack_start(gtk.VSeparator())
+        body_h.pack_start(Gtk.VSeparator())
         body_h.pack_start(self._get_section_right(self._on_body_changed,
                                                   self.body_widgets))
-        self._notebook.append_page(body_h, gtk.Label(_("Body Text")))
+        self._notebook.append_page(body_h, Gtk.Label(label=_("Body Text")))
        
         ############ Notebook Page 3: Footer Text ##############################
         self.footer_widgets = {}
-        footer_h = gtk.HBox()
+        footer_h = Gtk.HBox()
         footer_h.pack_start(self._get_section_left(self._on_footer_changed,
                                                    self.footer_widgets))
-        footer_h.pack_start(gtk.VSeparator())
+        footer_h.pack_start(Gtk.VSeparator())
         footer_h.pack_start(self._get_section_right(self._on_footer_changed,
                                                     self.footer_widgets))
-        self._notebook.append_page(footer_h, gtk.Label(_("Footer Text")))
+        self._notebook.append_page(footer_h, Gtk.Label(label=_("Footer Text")))
         
         table_meta = gui.ESTable(4, auto_inc_y=True)
         #Key names for meta must comply with the keys in the <meta> tag in the theme file
@@ -168,30 +168,30 @@ the first element in this list moving to the last one."), 0)
         self._meta['description'] = table_meta.attach_entry("", label=_("Description"))
         self._meta['tags'] = table_meta.attach_entry("", label=_("Tags"))
         table_meta.attach_comment(_("Separate tags with commas"))
-        self._notebook.append_page(table_meta, gtk.Label(_("Metadata")))
+        self._notebook.append_page(table_meta, Gtk.Label(label=_("Metadata")))
         
-        main_h.pack_start(main_v)
+        main_h.pack_start(main_v, True, True, 0)
         
         ############  Preview  ########################
         table_right = gui.ESTable(3, auto_inc_y=True)
         table_right.attach_section_title(_("Preview"))
-        self._preview = gtk.DrawingArea()
+        self._preview = Gtk.DrawingArea()
         self._preview.set_size_request(300, int(300*0.75))
         self._preview.connect('expose-event', self._expose)
         table_right.attach_widget(self._preview)
         self._pos_expander = table_right.attach_widget(self._get_position())
         self._pos_expander.set_sensitive(False)
-        h = gtk.HBox()
-        btn_revert = gtk.Button("", gtk.STOCK_REVERT_TO_SAVED)
+        h = Gtk.HBox()
+        btn_revert = Gtk.Button("", Gtk.STOCK_REVERT_TO_SAVED)
         btn_revert.connect('clicked', self._revert_changes)
-        btn_save = gtk.Button("", gtk.STOCK_SAVE)
+        btn_save = Gtk.Button("", Gtk.STOCK_SAVE)
         btn_save.connect('clicked', self._save_changes)
-        h.pack_start(btn_revert)
-        h.pack_start(btn_save)
+        h.pack_start(btn_revert, True, True, 0)
+        h.pack_start(btn_save, True, True, 0)
         table_right.attach_hseparator()
         table_right.attach_widget(h)
 
-        main_h.pack_end(table_right)
+        main_h.pack_end(table_right, True, True, 0)
         self.add(main_h)
         self.show_all()
         self._set_changed(False)
@@ -202,7 +202,7 @@ the first element in this list moving to the last one."), 0)
     
     def _expose(self, widget, event):
         'Renders the preview widget the first time'
-        ccontext = widget.window.cairo_create()
+        ccontext = widget.get_window().cairo_create()
         bounds = widget.get_size_request()
         #ccontext.scale(float(400)/bounds[0],
         #                float(300)/bounds[1])
@@ -214,13 +214,13 @@ the first element in this list moving to the last one."), 0)
         "Returns a table with the left part of the section edit controls"
         table = gui.ESTable(8, row_spacing=10, auto_inc_y=True)
         widgets['font_title'] = table.attach_section_title(_("Font"))
-        widgets['font_button'] = table.attach_widget(gtk.FontButton(),
+        widgets['font_button'] = table.attach_widget(Gtk.FontButton(),
                                                      label=_("Type and Size"))
         widgets['font_button'].connect('font-set', cb)
         widgets['font_comment'] = table.attach_comment(
             _("Note that the font size might be scaled down if it doesn't fit."))
-        widgets['font_color'] = table.attach_widget(gtk.ColorButton(
-                gtk.gdk.Color(0,0,0)), label=_("Color"))
+        widgets['font_color'] = table.attach_widget(Gtk.ColorButton(
+                Gdk.Color(0,0,0)), label=_("Color"))
         widgets['font_color'].connect('color-set', cb)
         widgets['alignment_title'] = table.attach_section_title(_("Alignment"))
         widgets['alignment_horizontal'] = table.attach_combo((_("Left"),
@@ -231,7 +231,7 @@ the first element in this list moving to the last one."), 0)
                 _("Bottom")), _("Middle"), label=_("Vertical Text Alignment"))
         widgets['alignment_vertical'].connect('changed', cb)
         widgets['line_spacing'] = table.attach_spinner(
-            gtk.Adjustment(1.0, 1.0, 3.0, 0.1, 1, 0), 0.0, 1, label=_("Line Spacing"))
+            Gtk.Adjustment(1.0, 1.0, 3.0, 0.1, 1, 0), 0.0, 1, label=_("Line Spacing"))
         widgets['line_spacing'].connect('value-changed', cb)
         return table
     
@@ -242,23 +242,23 @@ the first element in this list moving to the last one."), 0)
         widgets['shadow_apply'] = table.attach_checkbutton(_("Apply Shadow"))
         widgets['shadow_apply'].connect('toggled', cb)
         widgets['shadow_color'] = table.attach_widget(
-                gtk.ColorButton(gtk.gdk.Color(0,0,0)), label=_("Color"))
+                Gtk.ColorButton(Gdk.Color(0,0,0)), label=_("Color"))
         widgets['shadow_color'].set_use_alpha(True)
         widgets['shadow_color'].connect('color-set', cb)
         widgets['shadow_x_offset'] = table.attach_spinner(
-                gtk.Adjustment(0.5, -1.0, 1.0, 0.1, 0.5, 0), 0.0, 1, label=_("x-Offset"))
+                Gtk.Adjustment(0.5, -1.0, 1.0, 0.1, 0.5, 0), 0.0, 1, label=_("x-Offset"))
         widgets['shadow_x_offset'].connect('value-changed', cb)
         widgets['shadow_y_offset'] = table.attach_spinner(
-                gtk.Adjustment(0.5, -1.0, 1.0, 0.1, 0.5, 0), 0.0, 1, label=_("y-Offset"))
+                Gtk.Adjustment(0.5, -1.0, 1.0, 0.1, 0.5, 0), 0.0, 1, label=_("y-Offset"))
         widgets['shadow_y_offset'].connect('value-changed', cb)
         widgets['shadow_comment'] = table.attach_comment(_("Shadow offsets are measured \
 in percentage of font height. So an offset of 0.5 for point 12 font is 6 points."))
         widgets['outline_title'] = table.attach_section_title(_("Text Outline"))
         widgets['outline_size'] = table.attach_spinner(
-                gtk.Adjustment(0.0, 0.0, 3.0, 1.0, 1.0, 0), label=_("Size (Pixel)"))
+                Gtk.Adjustment(0.0, 0.0, 3.0, 1.0, 1.0, 0), label=_("Size (Pixel)"))
         widgets['outline_size'].connect('value-changed', cb)
         widgets['outline_color'] = table.attach_widget(
-                gtk.ColorButton(gtk.gdk.Color(0,0,0)), label=_("Color"))
+                Gtk.ColorButton(Gdk.Color(0,0,0)), label=_("Color"))
         widgets['outline_color'].connect('color-set', cb)
         return table
     
@@ -347,16 +347,16 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
     def _on_bg_image_new(self, widget=None):
         'Add a new background image'
         self._set_changed()
-        fchooser = gtk.FileChooserDialog( _("Add Images"), self,
-                gtk.FILE_CHOOSER_ACTION_OPEN,
-                (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                gtk.STOCK_ADD, gtk.RESPONSE_ACCEPT) )
+        fchooser = Gtk.FileChooserDialog( _("Add Images"), self,
+                Gtk.FileChooserAction.OPEN,
+                (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                Gtk.STOCK_ADD, Gtk.ResponseType.ACCEPT) )
         fchooser.set_current_folder(config.get("open-save-dialogs", "themeeditor-add-bg-image"))
-        filt = gtk.FileFilter()
+        filt = Gtk.FileFilter()
         filt.set_name( _("Image Types") )
         filt.add_pixbuf_formats()
         fchooser.add_filter(filt)
-        if fchooser.run() == gtk.RESPONSE_ACCEPT:
+        if fchooser.run() == Gtk.ResponseType.ACCEPT:
             fchooser.hide()
             img = fchooser.get_filename()
             newpath = os.path.join(DATA_PATH, 'theme', 'res', os.path.basename(img))
@@ -377,13 +377,13 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         table.attach_section_title(_("Image Background"))
         self._bg_image_filech = table.attach_filechooser(label=_("Image"))
         self._bg_image_filech.connect("file-set", self._on_bg_image_changed)
-        self._bg_image_radio_mode_fit = gtk.RadioButton(None, _("Fit"))
+        self._bg_image_radio_mode_fit = Gtk.RadioButton(None, _("Fit"))
         self._bg_image_radio_mode_fit.connect('toggled', self._on_bg_image_changed)
-        self._bg_image_radio_mode_fill = gtk.RadioButton(
+        self._bg_image_radio_mode_fill = Gtk.RadioButton(
                 self._bg_image_radio_mode_fit, _("Fill"))
-        h = gtk.HBox()
-        h.pack_start(self._bg_image_radio_mode_fill)
-        h.pack_start(self._bg_image_radio_mode_fit)
+        h = Gtk.HBox()
+        h.pack_start(self._bg_image_radio_mode_fill, True, True, 0)
+        h.pack_start(self._bg_image_radio_mode_fit, True, True, 0)
         table.attach_widget(h, label=_("Mode"))
         table.show_all()
         self._load_bg_image()
@@ -406,7 +406,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         """
         self._set_changed()
         bg = self._get_active_bg()
-        if isinstance(widget, gtk.FileChooserButton): #New image
+        if isinstance(widget, Gtk.FileChooserButton): #New image
             img = widget.get_filename()
             newpath = os.path.join(DATA_PATH, 'theme', 'res', os.path.basename(img))
             if newpath != img:
@@ -422,7 +422,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
     def _on_bg_solid_new(self, widget=None):
         'Add a new solid color background'
         self._set_changed()
-        col = gtk.gdk.Color(random.randint(0,65535),random.randint(0,65535),
+        col = Gdk.Color(random.randint(0,65535),random.randint(0,65535),
                             random.randint(0,65535)).to_string()
         itr = self._bg_model.append((exposong.theme.ColorBackground(color=col),))
         self._activate_bg(itr)
@@ -435,7 +435,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         
         table.attach_section_title(_("Color Background"))
         self._bg_solid_color_button = table.attach_widget(
-                gtk.ColorButton(), label=_("Color"))
+                Gtk.ColorButton(), label=_("Color"))
         self._bg_solid_color_button.set_use_alpha(True)
         self._bg_solid_color_button.connect('color-set', self._on_bg_solid_changed)
         table.show_all()
@@ -454,7 +454,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
     def _load_bg_solid(self):
         'Loads solid background settings from the theme'
         bg = self._get_active_bg()
-        self._bg_solid_color_button.set_color(gtk.gdk.color_parse(bg.color))
+        self._bg_solid_color_button.set_color(Gdk.color_parse(bg.color))
         self._bg_solid_color_button.set_alpha(int(bg.alpha*65535))
     
     def _on_bg_gradient_new(self, widget=None):
@@ -481,32 +481,32 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         for i in range(len(bg.stops)):
             # Color Button
             self._bg_gradient_colors.append(table.attach_widget(
-                    gtk.ColorButton(), label=_("Color %d"%i), yoptions=gtk.SHRINK))
+                    Gtk.ColorButton(), label=_("Color %d"%i), yoptions=Gtk.AttachOptions.SHRINK))
             self._bg_gradient_colors[i].set_use_alpha(True)
             self._bg_gradient_colors[i].connect('color-set',
                                                 self._on_bg_gradient_changed)
             # Delete Button only when more than two points exist
             if len(bg.stops)>2:
-                del_button = gtk.Button(None)
-                img = gtk.Image()
-                img.set_from_stock(gtk.STOCK_DELETE, gtk.ICON_SIZE_BUTTON)
+                del_button = Gtk.Button(None)
+                img = Gtk.Image()
+                img.set_from_stock(Gtk.STOCK_DELETE, Gtk.IconSize.BUTTON)
                 del_button.set_image(img)
                 del_button.connect('clicked', self._bg_gradient_delete_point, i)
                 self._bg_gradient_delete_buttons.append(del_button)
-                table.attach(del_button, 2, 3, table.y-1, table.y+1, xoptions=gtk.SHRINK, yoptions=gtk.FILL)
+                table.attach(del_button, 2, 3, table.y-1, table.y+1, xoptions=Gtk.AttachOptions.SHRINK, yoptions=Gtk.AttachOptions.FILL)
             # Position HScale
             self._bg_gradient_lengths.append(table.attach_widget(
-                    gtk.HScale(gtk.Adjustment(50,0,100,1,10,0)), label=_("Position"), yoptions=gtk.SHRINK))
+                    Gtk.HScale(Gtk.Adjustment(50,0,100,1,10,0)), label=_("Position"), yoptions=Gtk.AttachOptions.SHRINK))
             self._bg_gradient_lengths[i].set_digits(0)
             self._bg_gradient_lengths[i].connect('change-value',
                                                  self._on_bg_gradient_changed)
-            table.attach_hseparator(yoptions=gtk.SHRINK)
-        add = table.attach_widget(gtk.Button(_("Add Point")))
+            table.attach_hseparator(yoptions=Gtk.AttachOptions.SHRINK)
+        add = table.attach_widget(Gtk.Button(_("Add Point")))
         add.connect('clicked', self._bg_gradient_add_point)
         
         # TODO Move HScale as helper function to ESTable
-        self._bg_gradient_angle = table.attach_widget(gtk.HScale(
-                gtk.Adjustment(0,0,360,1,10,0)), label=_("Angle"))
+        self._bg_gradient_angle = table.attach_widget(Gtk.HScale(
+                Gtk.Adjustment(0,0,360,1,10,0)), label=_("Angle"))
         self._bg_gradient_angle.set_digits(0)
         self._bg_gradient_angle.connect('change-value', self._on_bg_gradient_changed)
         table.show_all()
@@ -528,7 +528,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         else:
             loc = 0.1
             col = '#fff'
-        col = gtk.gdk.Color(random.randint(0,65535),random.randint(0,65535),
+        col = Gdk.Color(random.randint(0,65535),random.randint(0,65535),
                             random.randint(0,65535)).to_string()
         if loc > 0.9:
             loc -= random.uniform(0.1, 0.8)
@@ -562,7 +562,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         'Loads the gradient background settings from the theme'
         bg = self._get_active_bg()
         for i in range(len(bg.stops)):
-            self._bg_gradient_colors[i].set_color(gtk.gdk.color_parse(bg.stops[i].color))
+            self._bg_gradient_colors[i].set_color(Gdk.color_parse(bg.stops[i].color))
             self._bg_gradient_colors[i].set_alpha(int(bg.stops[i].alpha*65535))
         for i in range(len(bg.stops)):
             self._bg_gradient_lengths[i].set_value(bg.stops[i].location*100)
@@ -600,40 +600,40 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         for i in range(len(bg.stops)):
             # Color Button
             self._bg_radial_colors.append(table.attach_widget(
-                    gtk.ColorButton(), label=_("Color %d")%i,
-                                          yoptions=gtk.SHRINK))
+                    Gtk.ColorButton(), label=_("Color %d")%i,
+                                          yoptions=Gtk.AttachOptions.SHRINK))
             self._bg_radial_colors[i].set_use_alpha(True)
             self._bg_radial_colors[i].connect('color-set', self._on_bg_radial_changed)
             # Delete Buttons only if more than two points exits
             if len(bg.stops)>2:
-                del_button = gtk.Button(None)
-                img = gtk.Image()
-                img.set_from_stock(gtk.STOCK_DELETE, gtk.ICON_SIZE_BUTTON)
+                del_button = Gtk.Button(None)
+                img = Gtk.Image()
+                img.set_from_stock(Gtk.STOCK_DELETE, Gtk.IconSize.BUTTON)
                 del_button.set_image(img)
                 del_button.connect('clicked', self._bg_radial_delete_point, i)
                 self._bg_radial_delete_buttons.append(del_button)
-                table.attach(del_button, 2, 3, table.y-1, table.y+1, xoptions=gtk.SHRINK, yoptions=gtk.FILL)
+                table.attach(del_button, 2, 3, table.y-1, table.y+1, xoptions=Gtk.AttachOptions.SHRINK, yoptions=Gtk.AttachOptions.FILL)
             # Position HScale
             self._bg_radial_lengths.append(table.attach_widget(
-                    gtk.HScale(gtk.Adjustment(50,0,100,1,10,0)), label=_("Position")))
+                    Gtk.HScale(Gtk.Adjustment(50,0,100,1,10,0)), label=_("Position")))
             self._bg_radial_lengths[i].set_digits(0)
             self._bg_radial_lengths[i].connect('change-value', self._on_bg_radial_changed)
-            table.attach_hseparator(yoptions=gtk.SHRINK)
-        add = table.attach_widget(gtk.Button(_("Add Point")))
+            table.attach_hseparator(yoptions=Gtk.AttachOptions.SHRINK)
+        add = table.attach_widget(Gtk.Button(_("Add Point")))
         add.connect('clicked', self._bg_gradient_add_point)
         
         # Length HScale 
         self._bg_radial_length = table.attach_widget(
-                gtk.HScale(gtk.Adjustment(1,1,100,1,10,0)), label=_("Length"))
+                Gtk.HScale(Gtk.Adjustment(1,1,100,1,10,0)), label=_("Length"))
         self._bg_radial_length.set_digits(0)
         self._bg_radial_length.connect('change-value', self._on_bg_radial_changed)
         self._bg_radial_pos_h = table.attach_widget(
-                gtk.HScale(gtk.Adjustment(0,0,100,1,10,0)),
+                Gtk.HScale(Gtk.Adjustment(0,0,100,1,10,0)),
                 label=_("Horizontal Position"))
         self._bg_radial_pos_h.set_digits(0)
         self._bg_radial_pos_h.connect('change-value', self._on_bg_radial_changed)
         self._bg_radial_pos_v = table.attach_widget(
-                gtk.HScale(gtk.Adjustment(0,0,100,1,10,0)), label=_("Vertical Position"))
+                Gtk.HScale(Gtk.Adjustment(0,0,100,1,10,0)), label=_("Vertical Position"))
         self._bg_radial_pos_v.set_digits(0)
         self._bg_radial_pos_v.connect('change-value', self._on_bg_radial_changed)
         
@@ -660,7 +660,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         'Loads the radial background settings from the theme'
         bg = self._get_active_bg()
         for i in range(len(bg.stops)):
-            self._bg_radial_colors[i].set_color(gtk.gdk.color_parse(bg.stops[i].color))
+            self._bg_radial_colors[i].set_color(Gdk.color_parse(bg.stops[i].color))
             self._bg_radial_colors[i].set_alpha(int(bg.stops[i].alpha*65535))
         for i in range(len(bg.stops)):
             self._bg_radial_lengths[i].set_value(bg.stops[i].location*100)
@@ -678,9 +678,9 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
     
     def _on_bgs_reordered(self, model, path, itr=None, new_order=None):
         'Called when a background in the list is being dragged to another position'
-        gobject.idle_add(self._update_bg_list_from_model)
+        GObject.idle_add(self._update_bg_list_from_model)
         self._set_changed()
-        gobject.idle_add(self.draw)
+        GObject.idle_add(self.draw)
     
     def _update_bg_list_from_model(self):
         'Updates the theme background list according to the model'
@@ -712,14 +712,14 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         if not itr:
             return False
         msg = _("Are you sure you want to delete this background?")
-        dialog = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
-                                   gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO,
+        dialog = Gtk.MessageDialog(self, Gtk.DialogFlags.MODAL,
+                                   Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO,
                                    msg)
-        dialog.set_default_response(gtk.RESPONSE_YES)
+        dialog.set_default_response(Gtk.ResponseType.YES)
         dialog.set_title( _('Delete Background?') )
         resp = dialog.run()
         dialog.hide()
-        if resp == gtk.RESPONSE_YES:
+        if resp == Gtk.ResponseType.YES:
             model.remove(itr)
             self._update_bg_list_from_model()
             self.draw()
@@ -751,27 +751,27 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
     ###########################
     def _get_position(self):
         "Return the element positioning settings."
-        position = gtk.Expander(_("Element Position"))
+        position = Gtk.Expander(_("Element Position"))
         # Positional elements for backgrounds
         table = gui.ESTable(5,2)
         self._p = {}
         
-        adjust = gtk.Adjustment(0, 0.0, 1.0, 0.01, 0.10)
+        adjust = Gtk.Adjustment(0, 0.0, 1.0, 0.01, 0.10)
         self._p['lf'] = table.attach_spinner(adjust, 0.02, 2, label=_('Left:'))
         self._p['lf'].set_numeric(True)
         self._p['lf'].connect('changed', self._on_change_pos)
         
-        adjust = gtk.Adjustment(0, 0.0, 1.0, 0.01, 0.10)
+        adjust = Gtk.Adjustment(0, 0.0, 1.0, 0.01, 0.10)
         self._p['rt'] = table.attach_spinner(adjust, 0.02, 2, label=_('Right:'), x=1)
         self._p['rt'].set_numeric(True)
         self._p['rt'].connect('changed', self._on_change_pos)
         
-        adjust = gtk.Adjustment(0, 0.0, 1.0, 0.01, 0.10)
+        adjust = Gtk.Adjustment(0, 0.0, 1.0, 0.01, 0.10)
         self._p['tp'] = table.attach_spinner(adjust, 0.02, 2, label=_('Top:'), y=1)
         self._p['tp'].set_numeric(True)
         self._p['tp'].connect('changed', self._on_change_pos)
         
-        adjust = gtk.Adjustment(0, 0.0, 1.0, 0.01, 0.10)
+        adjust = Gtk.Adjustment(0, 0.0, 1.0, 0.01, 0.10)
         self._p['bt'] = table.attach_spinner(adjust, 0.02, 2,
                                              label=_('Bottom:'), x=1, y=1)
         self._p['bt'].set_numeric(True)
@@ -918,7 +918,7 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         ####################### Sections: Body ################################
         body = self.theme.get_body()
         self.body_widgets['font_button'].set_font_name(body.font)
-        self.body_widgets['font_color'].set_color(gtk.gdk.Color(body.color))
+        self.body_widgets['font_color'].set_color(Gdk.Color(body.color))
         if body.align == exposong.theme.LEFT:
             self.body_widgets['alignment_horizontal'].set_active(0)
         elif body.align == exposong.theme.CENTER:
@@ -933,17 +933,17 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
             self.body_widgets['shadow_apply'].set_active(True)
         else:
             self._on_shadow_widgets_set_sensitive(self.body_widgets, False)
-        self.body_widgets['shadow_color'].set_color(gtk.gdk.Color(body.shadow_color))
+        self.body_widgets['shadow_color'].set_color(Gdk.Color(body.shadow_color))
         self.body_widgets['shadow_color'].set_alpha(int(body.shadow_opacity*65535))
         self.body_widgets['shadow_x_offset'].set_value(body.shadow_offset[0])
         self.body_widgets['shadow_y_offset'].set_value(body.shadow_offset[1])
         self.body_widgets['outline_size'].set_value(body.outline_size)
-        self.body_widgets['outline_color'].set_color(gtk.gdk.Color(body.outline_color))
+        self.body_widgets['outline_color'].set_color(Gdk.Color(body.outline_color))
         
         ##################### Sections: Footer ################################
         footer = self.theme.get_footer()
         self.footer_widgets['font_button'].set_font_name(footer.font)
-        self.footer_widgets['font_color'].set_color(gtk.gdk.Color(footer.color))
+        self.footer_widgets['font_color'].set_color(Gdk.Color(footer.color))
         if footer.align == exposong.theme.LEFT:
             self.footer_widgets['alignment_horizontal'].set_active(0)
         elif footer.align == exposong.theme.CENTER:
@@ -958,14 +958,14 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
             self.footer_widgets['shadow_apply'].set_active(True)
         else:
             self._on_shadow_widgets_set_sensitive(self.footer_widgets, False)
-        self.footer_widgets['shadow_color'].set_color(gtk.gdk.Color(footer.shadow_color))
+        self.footer_widgets['shadow_color'].set_color(Gdk.Color(footer.shadow_color))
         self.footer_widgets['shadow_color'].set_alpha(int(body.shadow_opacity*65535))
         if footer.shadow_offset:
             self.footer_widgets['shadow_x_offset'].set_value(footer.shadow_offset[0])
             self.footer_widgets['shadow_y_offset'].set_value(footer.shadow_offset[1])
         self.footer_widgets['outline_size'].set_value(footer.outline_size)
         self.footer_widgets['outline_color'].set_color(
-                gtk.gdk.Color(footer.outline_color))
+                Gdk.Color(footer.outline_color))
         
         ##################### Metadata ########################################
         for key, value in self.theme.meta.iteritems():
@@ -1007,25 +1007,25 @@ in percentage of font height. So an offset of 0.5 for point 12 font is 6 points.
         if self._changed:
             msg = _("Unsaved Changes will be lost if you close the Editor. \
 Do you want to save?")
-            dialog = gtk.MessageDialog(self, gtk.DIALOG_MODAL,
-                                       gtk.MESSAGE_QUESTION, gtk.BUTTONS_NONE,
+            dialog = Gtk.MessageDialog(self, Gtk.DialogFlags.MODAL,
+                                       Gtk.MessageType.QUESTION, Gtk.ButtonsType.NONE,
                                        msg)
             dialog.set_title( _("Unsaved changes") )
-            dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
-            dialog.add_button(gtk.STOCK_NO, gtk.RESPONSE_NO)
-            dialog.add_button(gtk.STOCK_SAVE, gtk.RESPONSE_OK)
+            dialog.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
+            dialog.add_button(Gtk.STOCK_NO, Gtk.ResponseType.NO)
+            dialog.add_button(Gtk.STOCK_SAVE, Gtk.ResponseType.OK)
             dialog.show_all()
             resp = dialog.run()
-            if resp == gtk.RESPONSE_NO:
+            if resp == Gtk.ResponseType.NO:
                 self.theme.revert()
-            elif resp == gtk.RESPONSE_CANCEL:
+            elif resp == Gtk.ResponseType.CANCEL:
                 dialog.destroy()
                 return True
-            elif resp == gtk.RESPONSE_OK:
+            elif resp == Gtk.ResponseType.OK:
                 self._save_changes()
             dialog.destroy()
         self.destroy()
         global __name__
         if __name__ == "__main__":
-            gtk.main_quit()
+            Gtk.main_quit()
 

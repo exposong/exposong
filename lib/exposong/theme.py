@@ -20,7 +20,7 @@
 Themes define the layout of a presentation screen.
 
 The points will be based on percentages (0.0 - 1.0) to be compatible with all
-screen sizes. Colors can be anything parsable by gtk.gdk.color_parse()
+screen sizes. Colors can be anything parsable by Gdk.color_parse()
 [http://library.gnome.org/devel/pygtk/stable/class-gdkcolor.html#function-gdk--color-parse].
 
 Themes will support a flexible background layout system. Images, gradients, and
@@ -37,22 +37,20 @@ Margins are measured in Pixels.
 """
 
 import cairo
-import gobject
-import gtk
-import gtk.gdk
+from gi.repository import GObject, Gtk, Gdk
+
 import math
 import operator
 import os.path
-import pango
-from gtk.gdk import pixbuf_new_from_file as pb_new
+from gi.repository import Pango
 from xml.etree import cElementTree as etree
 
 import exposong.main
 from exposong import DATA_PATH
 
-LEFT = pango.ALIGN_LEFT
-CENTER = pango.ALIGN_CENTER
-RIGHT = pango.ALIGN_RIGHT
+LEFT = Pango.Alignment.LEFT
+CENTER = Pango.Alignment.CENTER
+RIGHT = Pango.Alignment.RIGHT
 TOP = 0
 MIDDLE = 1
 BOTTOM = 2
@@ -216,7 +214,7 @@ class Theme(object):
     @classmethod
     def render_color(cls, ccontext, bounds, color):
         "Render a solid color on the screen."
-        clr = gtk.gdk.color_parse(color)
+        clr = Gdk.color_parse(color)
         solid = cairo.SolidPattern(clr.red / 65535.0, clr.green / 65535.0,
                                    clr.blue / 65535.0)
         if len(bounds) == 2:
@@ -353,7 +351,7 @@ class ColorBackground(_Background, _Renderable):
         "Render the background to the context."
         _Renderable.draw(self, ccontext, bounds)
         
-        color = gtk.gdk.color_parse(self.color)
+        color = Gdk.color_parse(self.color)
         solid = cairo.SolidPattern(color.red / 65535.0, color.green / 65535.0,
                                    color.blue / 65535.0, self.alpha)
         ccontext.rectangle(*self.rpos[:2] +
@@ -425,7 +423,7 @@ class RadialGradientBackground(_Background, _Renderable):
         gradient = cairo.RadialGradient(rcpos[0], rcpos[1], 0.0,
                                         rcpos[0], rcpos[1], length)
         for stop in self.stops:
-            clr = gtk.gdk.color_parse(stop.color)
+            clr = Gdk.color_parse(stop.color)
             gradient.add_color_stop_rgba(stop.location, clr.red / 65535.0,
                                         clr.green / 65535.0, clr.blue / 65535.0,
                                         stop.alpha)
@@ -499,7 +497,7 @@ class GradientBackground(_Background, _Renderable):
         gradient = cairo.LinearGradient(*map(_subtract, cent, offset) +
                                         map(_add, cent, offset))
         for stop in self.stops:
-            clr = gtk.gdk.color_parse(stop.color)
+            clr = Gdk.color_parse(stop.color)
             gradient.add_color_stop_rgba(stop.location, clr.red / 65535.0,
                                         clr.green / 65535.0, clr.blue / 65535.0,
                                         stop.alpha)
@@ -588,7 +586,7 @@ class ImageBackground(_Background, _Renderable):
         if not self._original:
             try:
                 self._original = pb_new(self.get_filename())
-            except gobject.GError:
+            except GObject.GError:
                 exposong.log.error('Could not find "%s".', self.src)
                 return False
         
@@ -773,7 +771,7 @@ class Text(_RenderableSection):
     A textual area that will be rendered to the screen.
     
     The text can be formatted according to the Pango Markup Language
-    (http://www.pygtk.org/docs/pygtk/pango-markup-language.html).
+    (http://www.pyGtk.org/docs/pygtk/pango-markup-language.html).
     """
     def __init__(self, markup, align=None, valign=None, margin=0,
                  pos=None):
@@ -786,11 +784,11 @@ class Text(_RenderableSection):
         screen_height = (self.rpos[3] + self.margin) / self.pos[3]
         
         layout = ccontext.create_layout()
-        layout.set_width(int(self.rpos[2] - self.rpos[0])*pango.SCALE)
+        layout.set_width(int(self.rpos[2] - self.rpos[0])*Pango.SCALE)
         if section.font:
-            font_descr = pango.FontDescription(section.font)
+            font_descr = Pango.FontDescription(section.font)
         else:
-            font_descr = pango.FontDescription("Sans 48")
+            font_descr = Pango.FontDescription("Sans 48")
         font_descr.set_size(int(font_descr.get_size() * screen_height / 768))
         layout.set_font_description(font_descr)
         layout.set_spacing(int((section.spacing - 1.0) * font_descr.get_size()))
@@ -825,11 +823,11 @@ class Text(_RenderableSection):
                   layout.get_pixel_size()[1] / 2
         
         if section.shadow_color:
-            clr = gtk.gdk.color_parse(section.shadow_color)
+            clr = Gdk.color_parse(section.shadow_color)
             ccontext.set_source_rgba(clr.red / 65535.0, clr.green / 65535.0,
                                      clr.blue / 65535.0,
                                      section.shadow_opacity * 0.05)
-            sz = font_descr.get_size() / pango.SCALE
+            sz = font_descr.get_size() / Pango.SCALE
             center = [self.rpos[0] + sz * section.shadow_offset[0],
                              top + sz * section.shadow_offset[1]]
             for x in range(-2, 3, 1):
@@ -837,7 +835,7 @@ class Text(_RenderableSection):
                     ccontext.move_to(center[0]+x, center[1]+y)
                     ccontext.show_layout(layout)
         if section.outline_color:
-            clr = gtk.gdk.color_parse(section.outline_color)
+            clr = Gdk.color_parse(section.outline_color)
             ccontext.set_source_rgb(clr.red / 65535.0, clr.green / 65535.0,
                                     clr.blue / 65535.0)
             offset = int(section.outline_size)
@@ -846,7 +844,7 @@ class Text(_RenderableSection):
                     ccontext.move_to(self.rpos[0]+x, top+y)
                     ccontext.show_layout(layout)
         
-        clr = gtk.gdk.color_parse(section.color)
+        clr = Gdk.color_parse(section.color)
         ccontext.set_source_rgba(clr.red / 65535.0, clr.green / 65535.0,
                                  clr.blue / 65535.0, 1.0)
         ccontext.move_to(self.rpos[0], top)
@@ -872,7 +870,7 @@ class Image(_RenderableSection):
         if not self._original:
             try:
                 self._original = pb_new(self.src)
-            except gobject.GError:
+            except GObject.GError:
                 exposong.log.error('Could not find "%s".', self.src)
                 return False
         
@@ -1061,14 +1059,14 @@ def scale_image(pb, size, aspect=None):
             scale = scaleW
         w = int(pb.get_width() * scale)
         h = int(pb.get_height() * scale)
-        npb = gtk.gdk.Pixbuf(pb.get_colorspace(), pb.get_has_alpha(),
+        npb = GdkPixbuf.Pixbuf(pb.get_colorspace(), pb.get_has_alpha(),
                              pb.get_bits_per_sample(),
                              int(w), int(h))
 
         pb.scale(npb, 0, 0, w, h, 0, 0, scale, scale,
-                 gtk.gdk.INTERP_BILINEAR)
+                 GdkPixbuf.InterpType.BILINEAR)
     elif aspect == ASPECT_FILL:
-        npb = gtk.gdk.Pixbuf(pb.get_colorspace(), pb.get_has_alpha(),
+        npb = GdkPixbuf.Pixbuf(pb.get_colorspace(), pb.get_has_alpha(),
                              pb.get_bits_per_sample(),
                              int(size[0]), int(size[1]))
         w, h = map(int, size)
@@ -1082,10 +1080,10 @@ def scale_image(pb, size, aspect=None):
         h = int(pb.get_height() * scale)
         
         pb.scale(npb, 0, 0, int(size[0]), int(size[1]), int(size[0] - w) / 2,
-                 int(size[1] - h) / 2, scale, scale, gtk.gdk.INTERP_BILINEAR)
+                 int(size[1] - h) / 2, scale, scale, GdkPixbuf.InterpType.BILINEAR)
     else:
         npb = pb.scale_simple(int(size[0]), int(size[1]),
-                              gtk.gdk.INTERP_BILINEAR)
+                              GdkPixbuf.InterpType.BILINEAR)
     return npb
 
 def _product(*args):
