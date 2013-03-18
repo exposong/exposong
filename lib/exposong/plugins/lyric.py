@@ -1410,4 +1410,3 @@ class SlideEdit(gtk.Dialog):
     def _quit_without_save(self, event, *args):
         if self._ok_to_continue():
             self.destroy()
-
