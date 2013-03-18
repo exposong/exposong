@@ -249,7 +249,7 @@ class Presentation:
                 dialog.set_title( _("Cancel?") )
                 resp = dialog.run()
                 dialog.destroy()
-                if resp== gtk.RESPONSE_YES:
+                if resp == gtk.RESPONSE_YES:
                     del(self._fields)
                     edit_dialog.destroy()  
                     return False

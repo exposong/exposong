@@ -1235,7 +1235,7 @@ class SlideEdit(gtk.Dialog):
         
         cancelbutton = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
         cancelbutton.connect("clicked", self._quit_without_save)
-        newbutton = self.add_button(_("Save and New"), gtk.RESPONSE_APPLY)
+        newbutton = self.add_button(_("Save and _New"), gtk.RESPONSE_APPLY)
         newimg = gtk.Image()
         newimg.set_from_stock(gtk.STOCK_NEW, gtk.ICON_SIZE_BUTTON)
         newbutton.set_image(newimg)
