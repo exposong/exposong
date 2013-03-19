@@ -21,7 +21,7 @@ Manages the presentations from the current schedule.
 """
 
 import os
-from gi.repository import Gtk, Gdk, GObject, Pango
+from gi.repository import Gtk, Gdk, GObject, Pango, GdkPixbuf
 
 import exposong._hook
 import exposong.slidelist
@@ -148,8 +148,6 @@ class PresList(Gtk.TreeView, exposong._hook.Menu):
             exposong.slidelist.slidelist.set_presentation(None)
             self.prev_selection = None
         
-        exposong.slidelist.slide_scroll.emit('scroll-child', Gtk.SCROLL_START, False)
-        
         self._actions.get_action("pres-edit").set_sensitive(self.has_selection())
         pres_delete = self._actions.get_action("pres-delete")
         pres_remove = self._actions.get_action("pres-remove-from-schedule")
@@ -256,12 +254,12 @@ class PresList(Gtk.TreeView, exposong._hook.Menu):
             return False
         model.remove(itr)
     
-    def _get_row_icon(self, column, cell, model, titer):
+    def _get_row_icon(self, column, cell, model, titer, custom_data):
         'Returns the icon of the current presentation.'
         pres = model.get_value(titer, 0)
         cell.set_property('pixbuf', pres.get_icon())
     
-    def _get_timer_icon(self, column, cell, model, titer):
+    def _get_timer_icon(self, column, cell, model, titer, custom_data):
         'Returns a timer icon if the timer is set.'
         if not hasattr(self, "_timer_icon"):
             fl = os.path.join(RESOURCE_PATH, 'timer.png')
@@ -272,7 +270,7 @@ class PresList(Gtk.TreeView, exposong._hook.Menu):
         else:
             cell.set_property('pixbuf', None)
     
-    def _get_row_text(self, column, cell, model, titer):
+    def _get_row_text(self, column, cell, model, titer, custom_data):
         'Returns the title of the current presentation.'
         pres = model.get_value(titer, 0)
         cell.set_property('text', pres.get_title())

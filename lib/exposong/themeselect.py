@@ -20,10 +20,9 @@
 A widget to change the currently active theme.
 """
 
-from gi.repository import GObject
-from gi.repository import Gtk
+from gi.repository import GObject, Gtk, Gdk, Pango
+import cairo
 import os, os.path
-from gi.repository import Pango
 import re
 
 import exposong.main
@@ -47,7 +46,6 @@ class ThemeSelect(Gtk.ComboBox, exposong._hook.Menu, object):
     def __init__(self):
         self.liststore = Gtk.ListStore(GObject.TYPE_STRING,
                                        GObject.TYPE_PYOBJECT)
-        cell = Gtk.CellRendererPixbuf
         
         super(Gtk.ComboBox, self).__init__()
         themerend = CellRendererTheme()
@@ -61,6 +59,7 @@ class ThemeSelect(Gtk.ComboBox, exposong._hook.Menu, object):
         self.connect("changed", self._theme_changed)
         self.liststore.set_sort_func(1, self._sort)
         
+        self.set_model(self.liststore)
         task = self._load_themes()
         GObject.idle_add(task.next, priority=GObject.PRIORITY_HIGH-10)
     
@@ -115,11 +114,11 @@ class ThemeSelect(Gtk.ComboBox, exposong._hook.Menu, object):
         yield True
         for row in self.liststore:
             cell.theme = row[1]
-            cell._get_pixmap(self.window, size)
+            cell._get_pixmap(self.get_window(), size)
             yield True
         yield False
     
-    def _get_theme_title(self, column, cell, model, titer):
+    def _get_theme_title(self, column, cell, model, titer, custom_data):
         "Set the title."
         thm = model.get_value(titer, 1)
         if thm:
@@ -189,9 +188,9 @@ class ThemeSelect(Gtk.ComboBox, exposong._hook.Menu, object):
         cell = self.get_cells()[0]
         cell.theme = theme
         size = (int(CELL_HEIGHT * CELL_ASPECT), CELL_HEIGHT)
-        cell._get_pixmap(self.window, size, False)
+        cell._get_pixmap(self.get_window(), size, False)
     
-    def _sort(self, model, itr1, itr2):
+    def _sort(self, model, itr1, itr2, custom_data):
         "Sort the themes in the list."
         th1 = model.get_value(itr1, 1)
         th2 = model.get_value(itr2, 1)
@@ -275,6 +274,7 @@ class CellRendererTheme(Gtk.CellRendererPixbuf):
                 "Slide", GObject.PARAM_READWRITE),
         }
     def __init__(self):
+        super(Gtk.CellRendererPixbuf, self).__init__()
         self.height = CELL_HEIGHT
         self.theme = None
         self.slide = None
@@ -320,19 +320,19 @@ class CellRendererTheme(Gtk.CellRendererPixbuf):
         
         width, height = size
         
-        self._pm[fname] = Gdk.Pixmap(window, width, height)
+        #self._pm[fname] = Gdk.Pixmap(window, width, height)
+        self._pm[fname] = cairo.ImageSurface(cairo.FORMAT_RGB24, width, height)
         
         cache_dir = os.path.join(DATA_PATH, ".cache", "theme")
         if not os.path.exists(cache_dir):
             os.makedirs(cache_dir)
         cpath = os.path.join(cache_dir, fname)
         
-        ccontext = self._pm[fname].cairo_create()
+        ccontext = cairo.Context(self._pm[fname])
         if cache and os.path.exists(cpath):
             # Load the image from memory, or disk if available
             exposong.log.debug('Loading theme thumbnail "%s".', fname)
-            pb = pb_new(cpath)
-            ccontext.set_source_pixbuf(pb, 0, 0)
+            ccontext = cairo.Context(cairo.ImageSurface.create_from_png(cpath))
             ccontext.paint()
         else:
             exposong.log.debug('Generating theme thumbnail "%s".', fname)

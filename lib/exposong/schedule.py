@@ -188,7 +188,7 @@ class Schedule:
             self.get_model(True).set_sort_func(0, self._column_sort)
     
     @staticmethod
-    def _column_sort(treemodel, iter1, iter2):
+    def _column_sort(treemodel, iter1, iter2, custom_data):
         c1 = treemodel.get_value(iter1,0).get_title()
         c2 = treemodel.get_value(iter2,0).get_title()
         if c1 < c2:

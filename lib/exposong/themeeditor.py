@@ -16,12 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk
+from gi.repository import Gtk, GObject
 import sys
 import os
 import shutil
 import random
-from gi.repository import GObject
 
 import exposong.theme
 import exposong.exampleslide
@@ -124,12 +123,10 @@ the first element in this list moving to the last one."), 0)
         bg_left.pack_start(toolbar, False, True, gui.WIDGET_SPACING)
         scroll = Gtk.ScrolledWindow()
         scroll.add(self._treeview_bgs)
-        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         bg_left.pack_start(scroll, True, True, gui.WIDGET_SPACING)
         
         self._bg_edit_table = gui.ESTable(15, row_spacing=10, auto_inc_y=True)
         scroll_bg_edit = Gtk.ScrolledWindow()
-        scroll_bg_edit.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         scroll_bg_edit.add_with_viewport(self._bg_edit_table)
 
         bgbox = Gtk.HBox()

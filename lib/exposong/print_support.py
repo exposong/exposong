@@ -14,10 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Pango
 import datetime
 import locale
-from gi.repository import Pango
 
 import exposong.preslist
 import exposong.main

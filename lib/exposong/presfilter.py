@@ -28,8 +28,7 @@
 The PresFilter class will allow the user to search the presentations by text.
 """
 
-from gi.repository import Gtk
-from gi.repository import GObject
+from gi.repository import Gtk, GObject
 import re
 
 import exposong.main

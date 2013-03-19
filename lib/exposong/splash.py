@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk, Gdk, GdkPixbuf
 import os.path
 
 import exposong
@@ -41,9 +41,9 @@ class SplashScreen(Gtk.Window, object):
         self.set_modal(True)
         
         # TODO This takes a while to show... not sure why.
-        #img = cairo.ImageSurface.create_from_png(os.path.join(RESOURCE_PATH, 'exposong.png'))
-        #img.show_all()
-        #vbox.pack_start(img, True, True, 0)
+        img = Gtk.Image.new_from_file(os.path.join(RESOURCE_PATH, 'exposong.png'))
+        img.show_all()
+        vbox.pack_start(img, True, True, 0)
         
         self._progress.set_text(_('Loading, Please Wait.'))
         self._progress.set_fraction(0.0)

@@ -22,7 +22,7 @@ initialize the window and set up a few things, but most of the rendering is
 done by the theme.
 """
 
-from gi.repository import Gtk, Gdk, GObject
+from gi.repository import Gtk, Gdk, GObject, GdkPixbuf
 import os
 
 import exposong.main
@@ -45,6 +45,9 @@ def c2dec(color):
         return tuple(c2dec(x) for x in color)
     else:
         return color / 65535.0
+
+def get_widget_size(widget):
+    return (widget.get_width(), widget.get_height())
 
 #This will be the instance variable for Screen once Main runs.
 screen = None
@@ -206,18 +209,18 @@ class Screen(exposong._hook.Menu):
         if not widget.get_window() or not widget.get_window().is_viewable():
             return False
         
-        if self.pres.get_window() and self.pres.get_window().get_size() != self._size:
+        if self.pres.get_window() and get_widget_size(self.pres.get_window()) != self._size:
             exposong.log.error('The screen sizes are inconsistent. '
                                + 'Screen: "%s"; Stored: "%s".',
-                               self.pres.window.get_size(), self._size)
-            self._size = self.pres.window.get_size()
+                               get_widget_size(self.pres.get_window()), self._size)
+            self._size = get_widget_size(self.pres.get_window())
         
         ccontext = widget.get_window().cairo_create()
-        bounds = widget.get_window().get_size()
+        bounds = get_widget_size(widget.get_window())
         if widget is self.preview:
-            if self.pres.window:
+            if self.pres.get_window():
                 #Scale if the presentation window size is available
-                bounds = self.pres.window.get_size()
+                bounds = get_widget_size(self.pres.get_window())
             elif self._size:
                 bounds = self._size
             if bounds:
@@ -282,12 +285,18 @@ class Screen(exposong._hook.Menu):
     def merge_menu(cls, uimanager):
         'Create menu items.'
         global screen
-        #Gtk.stock_add([
-        #    ("screen-black",_("_Black"), Gdk.ModifierType.MOD1_MASK, 0, "pymserv"),
-        #    ("screen-bg",_("Bac_kground"), Gdk.ModifierType.MOD1_MASK, 0, "pymserv"),
-        #    ("screen-logo",_("Lo_go"), Gdk.ModifierType.MOD1_MASK, 0, "pymserv"),
-        #    ("screen-freeze",_("_Freeze"), Gdk.ModifierType.MOD1_MASK, 0, "pymserv"),
-        #    ])
+        img = GdkPixbuf.Pixbuf.new_from_file(
+                os.path.join(RESOURCE_PATH, 'icons', 'screen-black.png'))
+        exposong.main.main.icon_factory.add('screen-black', Gtk.IconSet(img))
+        img = GdkPixbuf.Pixbuf.new_from_file(
+                os.path.join(RESOURCE_PATH, 'icons', 'screen-bg.png'))
+        exposong.main.main.icon_factory.add('screen-bg', Gtk.IconSet(img))
+        img = GdkPixbuf.Pixbuf.new_from_file(
+                os.path.join(RESOURCE_PATH, 'icons', 'screen-logo.png'))
+        exposong.main.main.icon_factory.add('screen-logo', Gtk.IconSet(img))
+        img = GdkPixbuf.Pixbuf.new_from_file(
+                os.path.join(RESOURCE_PATH, 'icons', 'screen-freeze.png'))
+        exposong.main.main.icon_factory.add('screen-freeze', Gtk.IconSet(img))
         cls._actions = Gtk.ActionGroup('screen')
         cls._actions.add_actions([
                 ('Present', Gtk.STOCK_MEDIA_PLAY, _('Start _Presentation'), "F5",
@@ -298,15 +307,15 @@ class Screen(exposong._hook.Menu):
                 #        _('Pause a timed slide.'), screen.pause),
                 ])
         cls._actions.add_toggle_actions([
-                ('Black Screen', Gtk.STOCK_DIALOG_QUESTION, _('_Black Screen'), "b",
+                ('Black Screen', 'screen-black', _('_Black Screen'), "b",
                         _("Show a black screen."),
                         screen._secondary_button_toggle),
-                ('Background', Gtk.STOCK_DIALOG_QUESTION, _('Bac_kground'), None,
+                ('Background', 'screen-bg', _('Bac_kground'), None,
                         _("Show only the background."),
                         screen._secondary_button_toggle),
-                ('Logo', Gtk.STOCK_DIALOG_QUESTION, _('Lo_go'), "<Ctrl>g",
+                ('Logo', 'screen-logo', _('Lo_go'), "<Ctrl>g",
                         _("Display the logo."), screen.to_logo),
-                ('Freeze', Gtk.STOCK_DIALOG_QUESTION, _('_Freeze'), None ,
+                ('Freeze', 'screen-freeze', _('_Freeze'), None ,
                         _("Freeze the screen."),
                         screen._secondary_button_toggle),
                 ])

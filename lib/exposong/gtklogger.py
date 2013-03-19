@@ -21,8 +21,7 @@ A widget to handle logged data for easy user access and filtering.
 """
 
 import logging
-from gi.repository import GObject
-from gi.repository import Gtk
+from gi.repository import GObject, Gtk
 import os.path
 
 _SEV_LEVELS = ['CRITICAL','ERROR','WARNING','INFO','DEBUG']
@@ -68,7 +67,7 @@ class GTKHandler (logging.Handler, object):
         win.connect("destroy", self._destroy)
         win.connect("response", self._destroy)
         hbox = Gtk.HBox()
-        hbox.pack_start(Gtk.Label(_("Filter Severity:", True, True, 0)), False, True, 4)
+        hbox.pack_start(Gtk.Label(_("Filter Severity:")), False, True, 4)
         combo = Gtk.ComboBoxText()
         for opt in _SEV_LEVELS:
             combo.append_text(opt)
@@ -109,7 +108,6 @@ class GTKHandler (logging.Handler, object):
         treeview.set_model(list_)
         
         self.scroll = Gtk.ScrolledWindow()
-        self.scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         self.scroll.add(treeview)
         self.scroll.show_all()
         win.vbox.pack_start(self.scroll, True, True, 4)

@@ -20,8 +20,7 @@
 The SlideList class displays the slides for the currently select presentation.
 """
 
-from gi.repository import Gtk
-from gi.repository import GObject
+from gi.repository import Gtk, GObject
 
 import exposong.screen
 import exposong.statusbar
@@ -89,6 +88,7 @@ class SlideList(Gtk.TreeView, exposong._hook.Menu):
         men = slist.get_iter_first() is not None
         self._actions.get_action("pres-slide-next").set_sensitive(men)
         self._actions.get_action("pres-slide-prev").set_sensitive(men)
+        self._scroll_to_top()
     
     def update(self):
         '''When something in the presentation has changed, reset the slidelist and
@@ -108,6 +108,10 @@ class SlideList(Gtk.TreeView, exposong._hook.Menu):
                     p = row.path
                     break
             self.set_cursor(p)
+    
+    def _scroll_to_top(self):
+        slide_scroll.get_hadjustment().set_value(0)
+        slide_scroll.get_vadjustment().set_value(0)
     
     def get_active_item(self):
         'Return the selected `Slide` object.'

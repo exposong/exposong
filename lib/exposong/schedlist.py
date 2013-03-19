@@ -21,14 +21,14 @@ The ScheduleList class provides a list of builtin and custom schedules that the
 user can select.
 """
 
-from gi.repository import Gtk, Gdk, GObject
+from gi.repository import Gtk, Gdk, GObject, GdkPixbuf
 import os
 
 import exposong.main
 import exposong._hook
 import exposong.preslist
 import exposong.schedule
-from exposong import DATA_PATH
+from exposong import DATA_PATH, RESOURCE_PATH
 from exposong import statusbar
 
 schedlist = None
@@ -82,13 +82,15 @@ class ScheduleList(Gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
             ret = self.model.append(parent, (row, row.title, sort, False))
         elif isinstance(row, tuple):
             ret = self.model.append(parent, row)
-        elif not row: #Separator
-            return self.model.append(parent, (None, None, sort, True))
         else:
             exposong.log.warning("Schedule cannot append this item: %r" % row)
             return
         self._add_to_schedule_menu()
         return ret
+    
+    def append_separator(self):
+        'Add a separator at the current position'
+        self.model.append(None, (None, None, None, True))
     
     def remove(self, item):
         'Remove the item from the model.'
@@ -219,14 +221,14 @@ class ScheduleList(Gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
         (path, focus) = self.get_cursor()
         self.set_cursor(path, focus, True)
     
-    def _cell_data_func(self, column, cell, model, iter1):
+    def _cell_data_func(self, column, cell, model, iter1, custom_data):
         'Set whether the cell is editable or not.'
         sched = model.get_value(iter1, 0)
         cell.set_property('editable',
                           isinstance(sched, exposong.schedule.Schedule)
                           and sched.is_builtin() is False)
     
-    def _row_separator(self, model, itr):
+    def _row_separator(self, model, itr, custom_data):
         "Determines wheter the current row should be a separator"
         return model.get_value(itr, 3)
     
@@ -298,11 +300,12 @@ class ScheduleList(Gtk.TreeView, exposong._hook.Menu, exposong._hook.Toolbar):
     def merge_menu(cls, uimanager):
         "Create menu items."
         global schedlist
-        #Gtk.stock_add([("sched-new",_("New Schedule"), Gdk.ModifierType.MOD1_MASK, 0,
-        #              "pymserv")])
+        img = GdkPixbuf.Pixbuf.new_from_file(
+                os.path.join(RESOURCE_PATH, 'icons', 'sched-new.png'))
+        exposong.main.main.icon_factory.add('sched-new', Gtk.IconSet(img))
         cls._actions = Gtk.ActionGroup('schedlist')
         cls._actions.add_actions([
-                ('sched-new', Gtk.STOCK_DIALOG_QUESTION, _("New Schedule"), "",
+                ('sched-new', 'sched-new', _("New Schedule"), "",
                         _("Create a new schedule"), schedlist._on_new),
                 ('sched-rename', None, _("_Rename Schedule"), None,
                         _("Rename the selected schedule"), schedlist._on_rename),

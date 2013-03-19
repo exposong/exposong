@@ -364,7 +364,6 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         title_list.append_column(col)
         scroll = Gtk.ScrolledWindow()
         scroll.add(title_list)
-        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.ALWAYS)
         scroll.set_shadow_type(Gtk.ShadowType.IN)
         vbox.pack_start(scroll, True, True)
         table = gui.Table(3)
@@ -428,7 +427,6 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         author_list.append_column(col)
         scroll = Gtk.ScrolledWindow()
         scroll.add(author_list)
-        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.ALWAYS)
         scroll.set_shadow_type(Gtk.ShadowType.IN)
         vbox.pack_start(scroll, True, True)
         table = gui.Table(3)
@@ -488,7 +486,6 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         theme_list.append_column(col)
         scroll = Gtk.ScrolledWindow()
         scroll.add(theme_list)
-        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.ALWAYS)
         scroll.set_shadow_type(Gtk.ShadowType.IN)
         vbox.pack_start(scroll, True, True)
         
@@ -543,7 +540,6 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         songbook_list.append_column(col)
         scroll = Gtk.ScrolledWindow()
         scroll.add(songbook_list)
-        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.ALWAYS)
         scroll.set_shadow_type(Gtk.ShadowType.IN)
         vbox.pack_start(scroll, True, True)
         
@@ -625,7 +621,6 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         
         scroll = Gtk.ScrolledWindow()
         scroll.add(self._slide_list)
-        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         scroll.set_size_request(400, 250)
         scroll.set_shadow_type(Gtk.ShadowType.IN)
         vbox.pack_start(scroll, True, True)
@@ -1164,7 +1159,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         exposong.main.main.icon_factory.add('pres-song', Gtk.IconSet(img))
         
         actiongroup = Gtk.ActionGroup('exposong-song')
-        actiongroup.add_actions([("pres-new-song", 'pres-song-new', _("New Song"), "<Ctrl>n",
+        actiongroup.add_actions([("pres-new-song", 'pres-song', _("New Song"), "<Ctrl>n",
                                 _("Create a new Song"), cls._on_pres_new),
                                 ("open-song-by-songbook", 'open-song-by-songbook',
                                  _("Open Song by Songbook"), "<Ctrl>o", _("Find Song by entering Songbook and entry"),
@@ -1275,7 +1270,6 @@ class SlideEdit(Gtk.Dialog):
             pass
         scroll = Gtk.ScrolledWindow()
         scroll.add(text)
-        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         scroll.set_size_request(450, 250)
         scroll.set_shadow_type(Gtk.ShadowType.IN)
         self.vbox.pack_start(scroll, True, True)

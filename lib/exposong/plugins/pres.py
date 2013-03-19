@@ -346,7 +346,6 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         
         scroll = Gtk.ScrolledWindow()
         scroll.add(self._slide_list)
-        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         scroll.set_size_request(400, 250)
         scroll.set_shadow_type(Gtk.ShadowType.IN)
         vbox.pack_start(scroll, True, True)
@@ -382,7 +381,6 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         tree.append_column(col)
         scroll = Gtk.ScrolledWindow()
         scroll.add(tree)
-        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         scroll.set_size_request(400, 250)
         scroll.set_shadow_type(Gtk.ShadowType.IN)
         #Toolbar
@@ -791,7 +789,7 @@ class Presentation (Plugin, _abstract.Presentation, exposong._hook.Menu,
         exposong.main.main.icon_factory.add('pres-exposong', Gtk.IconSet(img))
         
         actiongroup = Gtk.ActionGroup('exposong-pres')
-        actiongroup.add_actions([('pres-new-exposong', 'pres-exposong-new',
+        actiongroup.add_actions([('pres-new-exposong', 'pres-exposong',
                 _("New ExpoSong Presentation"), None, _("New ExpoSong Presentation"), cls._on_pres_new)])
         uimanager.insert_action_group(actiongroup, -1)
         
@@ -924,7 +922,6 @@ class SlideEdit(Gtk.Dialog):
         
         scroll = Gtk.ScrolledWindow()
         scroll.add(self._tree)
-        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         scroll.set_size_request(280, 250)
         scroll.set_shadow_type(Gtk.ShadowType.IN)
         vbox.pack_start(scroll, True, True)
@@ -1065,7 +1062,6 @@ A value of 0 is on the far left or top, and a value of 1 is on the far right or 
                 pass
             scroll = Gtk.ScrolledWindow()
             scroll.add(text)
-            scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
             scroll.set_size_request(250, -1)
             scroll.set_shadow_type(Gtk.ShadowType.IN)
             self._ctbl.attach_widget(scroll, y=1, h=3,

@@ -16,8 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk
-from gi.repository import Pango
+from gi.repository import Gtk, Pango
 
 import exposong.main
 import exposong.screen
@@ -56,7 +55,6 @@ class Notify(Gtk.HBox):
         self._a11y = (theme.startswith("HighContrast") or
                         theme.startswith("LowContrast"))
         
-        # Make sure icons are supported by GTK version
         self.notify.set_icon_from_stock(Gtk.EntryIconPosition.PRIMARY, Gtk.STOCK_APPLY)
         self.notify.connect("icon-press", self._on_icon_pressed)
     

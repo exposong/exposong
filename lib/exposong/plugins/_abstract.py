@@ -350,7 +350,7 @@ class Schedule:
         raise NotImplementedError
     
     @classmethod
-    def schedule_filter(cls, model, itr):
+    def schedule_filter(cls, model, itr, custom_data):
         "Called on each presentation, and return True if it can be added."
         if model.get_value(itr, 0) != None:
             return model.get_value(itr, 0).presentation.__class__ is cls

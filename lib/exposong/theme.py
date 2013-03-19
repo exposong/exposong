@@ -37,12 +37,11 @@ Margins are measured in Pixels.
 """
 
 import cairo
-from gi.repository import GObject, Gtk, Gdk
+from gi.repository import GObject, Gtk, Gdk, Pango
 
 import math
 import operator
 import os.path
-from gi.repository import Pango
 from xml.etree import cElementTree as etree
 
 import exposong.main

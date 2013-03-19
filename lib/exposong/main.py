@@ -16,8 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk, Gdk, GdkPixbuf
-from gi.repository import GObject
+from gi.repository import Gtk, Gdk, GdkPixbuf, GObject
 import operator
 import os
 import os.path
@@ -106,14 +105,12 @@ class Main (Gtk.Window):
         sched_v.pack_start(Gtk.HSeparator(), False, False, 0)
         schedule_scroll = Gtk.ScrolledWindow()
         schedule_scroll.add(schedlist.schedlist)
-        schedule_scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         sched_v.pack_start(schedule_scroll, True, True, 0)
         self.win_lft.pack1(sched_v, False, False)
         
         #### Presentation List
         preslist_scroll = Gtk.ScrolledWindow()
         preslist_scroll.add(preslist.preslist)
-        preslist_scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         self.win_lft.pack2(preslist_scroll, False, False)
         left_vbox.pack_start(self.win_lft, True, True, 0)
         left_vbox.pack_start(presfilter.presfilter, False, True, 2)
@@ -126,8 +123,6 @@ class Main (Gtk.Window):
         #### Slide List
         slidelist.slide_scroll = Gtk.ScrolledWindow()
         slidelist.slide_scroll.add(slidelist.slidelist)
-        slidelist.slide_scroll.set_policy(Gtk.PolicyType.AUTOMATIC,
-                                          Gtk.PolicyType.AUTOMATIC)
         
         slide_v = Gtk.VBox()
         slide_v.pack_start(slidelist.slide_scroll, True, True, 0)
@@ -142,7 +137,7 @@ class Main (Gtk.Window):
         ## Status bar
         exposong.log.debug("Loading the status bar.")
         statusbar.statusbar = statusbar.timedStatusbar()
-        win_v.pack_end(statusbar.statusbar, False, False, 0)
+        win_v.pack_end(statusbar.statusbar, False, True, 0)
         
         ## Printing
         exposong.log.debug("Enabling Print Support")
@@ -445,7 +440,8 @@ class Main (Gtk.Window):
         
         schedlist.schedlist.get_selection().select_iter(
             schedlist.schedlist.get_model().get_iter_first())
-        schedlist.schedlist.append(None, (None, None, 39, True))
+        #Separator
+        schedlist.schedlist.append_separator()
         
         #Add custom schedules from the data directory        
         dir_list = os.listdir(directory)
