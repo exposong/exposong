@@ -27,6 +27,7 @@ class SplashScreen(Gtk.Window, object):
     Show a splash screen for ExpoSong.
     """
     def __init__(self, parent):
+        super(Gtk.Window, self).__init__()
         self._num = 0.0
         self._den = 0
         self._progress = Gtk.ProgressBar()

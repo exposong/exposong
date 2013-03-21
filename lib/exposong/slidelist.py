@@ -35,6 +35,7 @@ class SlideList(Gtk.TreeView, exposong._hook.Menu):
     '''
     def __init__(self):
         "Create the interface."
+        super(Gtk.TreeView, self).__init__()
         self.pres = None
         self.pres_type = None
         
@@ -43,8 +44,7 @@ class SlideList(Gtk.TreeView, exposong._hook.Menu):
         self.__pres_mv = 0
         # Used to stop or reset the timer if the presentation or slide changes.
         self.__timer = 0
-
-        super(Gtk.TreeView, self).__init__()
+        
         self.set_size_request(250, -1)
         self.set_enable_search(False)
         

@@ -132,7 +132,7 @@ class Main (Gtk.Window):
         win_h_mn.pack_start(self.win_h, True, True, 0)
         
         win_h_mn.pack_start(self._pane_right(), False, True, 10)
-        win_v.pack_start(win_h_mn, True, False, 0)
+        win_v.pack_start(win_h_mn, True, True, 0)
         
         ## Status bar
         exposong.log.debug("Loading the status bar.")
