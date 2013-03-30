@@ -315,8 +315,8 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         if exposong.presfilter.matches(word, self.song.props.publisher):
             exposong.log.debug("Matches song publisher")
             return True
-        if exposong.presfilter.matches(word, self.song.props.custom_version):
-            exposong.log.debug("Matches song custome version")
+        if exposong.presfilter.matches(word, self.song.props.version):
+            exposong.log.debug("Matches song version")
             return True
         return False
     
