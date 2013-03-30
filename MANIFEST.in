@@ -1,0 +1,5 @@
+include *.txt
+include setup.py
+recursive-include share/exposong/res *.png
+recursive-include share/exposong/i18n *
+recursive-include share/exposong/help *
