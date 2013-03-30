@@ -51,7 +51,11 @@ class LyricConvert(_abstract.ConvertPresentation, exposong._hook.Menu, Plugin):
         """
         Should return True if this file should be converted.
         """
-        fl = open(filename, 'r')
+        try:
+            fl = open(filename, 'r')
+        except IOError:
+            return False
+        
         match = r'Type=SongSelect Import File'
         lncnt = 0
         for ln in fl:
