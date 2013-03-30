@@ -60,6 +60,7 @@ class Config(ConfigParser.SafeConfigParser):
         self.add_section("songs")
 
         self.set("general", "data-path", "")
+        self.set("general", "converted-old-formats", "False")
         
         self.set("open-save-dialogs", "songselect-import-dir", os.path.expanduser("~"))
         self.set("open-save-dialogs", "exposong_legacy-import-dir", os.path.expanduser("~"))

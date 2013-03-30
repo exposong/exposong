@@ -242,9 +242,17 @@ class Presentation:
                     exposong.log.info(msg, self.get_type(), self.get_title())
                     return True
             else:
-                del(self._fields)
-                edit_dialog.destroy()  
-                return False
+                msg = _('Are you sure you want to cancel?')
+                dialog = gtk.MessageDialog(edit_dialog, gtk.DIALOG_MODAL,
+                                           gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO,
+                                           msg)
+                dialog.set_title( _("Cancel?") )
+                resp = dialog.run()
+                dialog.destroy()
+                if resp == gtk.RESPONSE_YES:
+                    del(self._fields)
+                    edit_dialog.destroy()  
+                    return False
     
     def _edit_tabs(self, notebook, parent):
         'Tabs for the dialog.'

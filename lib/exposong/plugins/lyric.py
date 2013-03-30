@@ -30,6 +30,7 @@ from xml.sax.saxutils import escape, unescape
 import exposong.main
 import exposong.slidelist
 import exposong._hook
+import exposong_openlyrics.tools.convert_schema as convert_schema
 import undobuffer
 from exposong.glob import *
 from exposong import RESOURCE_PATH, DATA_PATH
@@ -100,7 +101,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                                             lines.lines[i]))
                 return '\n'.join(lineList)
             elif len(self.verse.lines) == 1:
-                return '\n'.join(str(l) for l in self.verse.lines[0].lines)
+                return str(self.verse.lines[0])
             else:
                 return ''
         
@@ -205,10 +206,26 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             fl.close()
             
             self.song = openlyrics.Song(filename)
+            self.update_file_to_latest_version()
             for v in self.song.verses:
                 self.slides.append(self.Slide(self, v))
         else:
             self.song = openlyrics.Song()
+    
+    def update_file_to_latest_version(self):
+        'Checks if the OpenLyrics file is at the latest version. If not, update it.'
+        song_version = self.song.get_version().split(".")
+        latest_openlyrics_version = convert_schema.TARGET_OPENLYRICS_VER.split(".")
+        # Convert if major version differs OR (major is the same AND minor version differs)
+        if song_version[0] < latest_openlyrics_version[0] or\
+                (song_version[0] == latest_openlyrics_version[0] and\
+                 song_version[1] < latest_openlyrics_version[1]):
+            converter = convert_schema.OpenLyricsTree(self.filename)
+            converter.convert()
+            converter.save(self.filename)
+            exposong.log.info("Converted File %s to OpenLyrics %s"%(self.filename,
+                                                                    convert_schema.TARGET_OPENLYRICS_VER))
+            self.__init__(self.filename)
     
     def get_order_string(self):
         'Return the verse order as a string'
@@ -356,11 +373,11 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         self._fields['variant'] = gui.append_entry(table, _("Variant:"),
                 self.song.props.variant, 0)
         self._fields['custom_version'] = gui.append_entry(table,
-                _("Custom Version:"), self.song.props.custom_version, 1)
+                _("Version:"), self.song.props.version, 1)
         # TODO Change release_date to calendar
         self._fields['rel_date'] = gui.append_entry(table,
                                                     _("Release Date:"),
-                                                    self.song.props.release_date,
+                                                    self.song.props.released,
                                                     2)
         vbox.pack_start(table, False, True)
         notebook.append_page(vbox, gtk.Label( _('Title')) )
@@ -433,10 +450,9 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         #Theme field
         vbox = gtk.VBox()
         self._fields['theme'] = gtk.ListStore(gobject.TYPE_STRING,
-                                              gobject.TYPE_STRING,
                                               gobject.TYPE_STRING)
         for theme in self.song.props.themes:
-            self._fields['theme'].append( (theme, theme.lang, theme.id) )
+            self._fields['theme'].append( (theme, theme.lang) )
         theme_list = gtk.TreeView(self._fields['theme'])
         theme_list.connect('row-activated', self._theme_dlg, True)
         theme_list.set_reorderable(True)
@@ -471,12 +487,6 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         col.pack_start(cell)
         col.set_resizable(True)
         col.add_attribute(cell, 'text', 1)
-        theme_list.append_column(col)
-        cell = gtk.CellRendererText()
-        col = gtk.TreeViewColumn( _('ID'))
-        col.pack_start(cell)
-        col.set_resizable(True)
-        col.add_attribute(cell, 'text', 2)
         theme_list.append_column(col)
         scroll = gtk.ScrolledWindow()
         scroll.add(theme_list)
@@ -576,7 +586,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         label.set_alignment(0.5, 0.5)
         hbox.pack_start(label, False, True, 5)
         
-        self._fields['title'] = gtk.Entry(45)
+        self._fields['title'] = gtk.Entry(100)
         self._fields['title'].set_text(self.get_title())
         hbox.pack_start(self._fields['title'], True, True)
         vbox.pack_start(hbox, False, True)
@@ -678,7 +688,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         
         self.song.props.themes = []
         for row in self._fields['theme']:
-            self.song.props.themes.append(openlyrics.Theme(row[0], row[2], row[1]))
+            self.song.props.themes.append(openlyrics.Theme(row[0], row[1]))
         
         self.song.props.comments = self._fields['comments'].get_buffer().get_text(
                 *self._fields['comments'].get_buffer().get_bounds()).split('\n')
@@ -871,7 +881,6 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         themes = sorted(set(themes))
         theme_ = gui.append_combo_entry(table, _('Theme Name:'),
                                           themes, theme_value, 0)
-        #theme = gui.append_entry(table, _('Theme Name:'), theme_value, 0)
         lang = gui.append_language_combo(table, lang_value, 1)
         dialog.vbox.show_all()
         
@@ -889,7 +898,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                         model.set_value(itr, 1, lang.get_active_text())
                     else:
                         self._fields['theme'].append( (theme_.get_active_text(),
-                                lang.get_active_text(), "") )
+                                lang.get_active_text()) )
                     dialog.hide()
                     return True
             else:
@@ -933,7 +942,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                 else:
                     if edit:
                         model.set_value(itr, 0, songbook.get_active_text())
-                        model.set_value(itr, 1, entry.get_active_text())
+                        model.set_value(itr, 1, entry.get_text())
                     else:
                         self._fields['songbook'].append( (songbook.get_active_text(),
                                 entry.get_text()) )
@@ -1152,6 +1161,45 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         return False
     
     @classmethod
+    def _on_open_song_by_songbook(cls, *args):
+        'Open Song by looking for Songbook and Entry'
+        dlg = gtk.MessageDialog(type=gtk.MESSAGE_WARNING, buttons=gtk.BUTTONS_OK_CANCEL,
+                                message_format=_("Please enter the Songbook and the Entry you want to open."))
+        vbox = dlg.get_message_area()
+        table = gui.Table(2)
+        
+        
+        songbooks = [sbook.name for t in exposong.main.main.library
+                     if t[0].get_type() == "song"
+                     for sbook in t[0].song.props.songbooks]
+        songbooks = sorted(set(songbooks))
+        songbook = gui.append_combo_entry(table, _('Songbook Name:'),
+                                          songbooks, None, 0)
+        entry = gui.append_entry(table, _('Entry:'), None, 1)
+        vbox.pack_start(table)
+        vbox.show_all()
+        not_found_lbl = gtk.Label(_("Entry not found."))
+        vbox.pack_start(not_found_lbl)
+        while dlg.run() == gtk.RESPONSE_OK:
+            if cls._find_song(songbook.get_active_text(), entry.get_text()):
+                break
+            else:
+                not_found_lbl.show()
+        dlg.destroy()
+        
+    @classmethod
+    def _find_song(cls, songbook, entry):
+        '''Looks for a Song which has the given songbook and entry.
+        Opens the Song and returns True, if found. Returns else, if not.'''
+        model = exposong.preslist.preslist.get_model()
+        for row in model:
+            for sbook in row[0].song.props.songbooks:
+                if sbook.name == songbook and sbook.entry == entry:
+                    exposong.preslist.preslist.set_cursor(row.path)
+                    return True
+        return False
+    
+    @classmethod
     def merge_menu(cls, uimanager):
         'Merge new values with the uimanager.'
         gtk.stock_add([("pres-song",_("_Song"), gtk.gdk.MOD1_MASK, 0,
@@ -1228,7 +1276,7 @@ class SlideEdit(gtk.Dialog):
         
         cancelbutton = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
         cancelbutton.connect("clicked", self._quit_without_save)
-        newbutton = self.add_button(_("Save and New"), gtk.RESPONSE_APPLY)
+        newbutton = self.add_button(_("Save and _New"), gtk.RESPONSE_APPLY)
         newimg = gtk.Image()
         newimg.set_from_stock(gtk.STOCK_NEW, gtk.ICON_SIZE_BUTTON)
         newbutton.set_image(newimg)
@@ -1403,4 +1451,3 @@ class SlideEdit(gtk.Dialog):
     def _quit_without_save(self, event, *args):
         if self._ok_to_continue():
             self.destroy()
-
