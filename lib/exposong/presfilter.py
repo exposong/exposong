@@ -51,7 +51,7 @@ class PresFilter(gtk.Entry, exposong._hook.Menu):
                                     gobject.TYPE_NONE,
                                     (gobject.TYPE_STRING,))}
 
-    SEARCH_TIMEOUT = 200
+    SEARCH_TIMEOUT = 300
     
     def __init__(self):
         "Initialize the PresFilter."
