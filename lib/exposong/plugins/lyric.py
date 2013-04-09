@@ -325,7 +325,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         self._fields['title_list'] = Gtk.ListStore(GObject.TYPE_STRING,
                 GObject.TYPE_STRING)
         for title in self.song.props.titles:
-            self._fields['title_list'].append( (title, title.lang) )
+            self._fields['title_list'].append( (title.text, title.lang) )
         title_list = Gtk.TreeView(self._fields['title_list'])
         title_list.connect('row-activated', self._title_dlg, True)
         title_list.set_reorderable(True)
@@ -347,25 +347,25 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         title_list.get_selection().connect('changed',
                                            gui.treesel_disable_widget, button)
         toolbar.insert(button, -1)
-        vbox.pack_start(toolbar, False, True)
+        vbox.pack_start(toolbar, False, True, 0)
         title_list.get_selection().emit('changed')
         #Table
         cell = Gtk.CellRendererText()
         col = Gtk.TreeViewColumn( _('Title'))
-        col.pack_start(cell, True, True, 0)
+        col.pack_start(cell, True)
         col.set_resizable(True)
         col.add_attribute(cell, 'text', 0)
         title_list.append_column(col)
         cell = Gtk.CellRendererText()
         col = Gtk.TreeViewColumn( _('Language'))
-        col.pack_start(cell, True, True, 0)
+        col.pack_start(cell, False)
         col.set_resizable(True)
         col.add_attribute(cell, 'text', 1)
         title_list.append_column(col)
         scroll = Gtk.ScrolledWindow()
         scroll.add(title_list)
         scroll.set_shadow_type(Gtk.ShadowType.IN)
-        vbox.pack_start(scroll, True, True)
+        vbox.pack_start(scroll, True, True, 0)
         table = gui.Table(3)
         self._fields['variant'] = gui.append_entry(table, _("Variant:"),
                 self.song.props.variant, 0)
@@ -376,7 +376,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                                                     _("Release Date:"),
                                                     self.song.props.released,
                                                     2)
-        vbox.pack_start(table, False, True)
+        vbox.pack_start(table, False, True, 0)
         notebook.append_page(vbox, Gtk.Label(label= _('Title')) )
         
         #Ownership Tab
@@ -385,7 +385,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                                                GObject.TYPE_STRING,
                                                GObject.TYPE_STRING)
         for author in self.song.props.authors:
-            self._fields['author'].append( (author, auth_types[author.type],
+            self._fields['author'].append( (str(author), auth_types[author.type],
                                             author.lang) )
         author_list = Gtk.TreeView(self._fields['author'])
         author_list.connect('row-activated', self._author_dlg, True)
@@ -407,7 +407,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         author_list.get_selection().connect('changed', gui.treesel_disable_widget,
                                             button)
         toolbar.insert(button, -1)
-        vbox.pack_start(toolbar, False, True)
+        vbox.pack_start(toolbar, False, True, 0)
         author_list.get_selection().emit('changed')
         #Table
         cell = Gtk.CellRendererText()
@@ -428,7 +428,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         scroll = Gtk.ScrolledWindow()
         scroll.add(author_list)
         scroll.set_shadow_type(Gtk.ShadowType.IN)
-        vbox.pack_start(scroll, True, True)
+        vbox.pack_start(scroll, True, True, 0)
         table = gui.Table(3)
         self._fields['copyright'] = gui.append_entry(table, _('Copyright:'),
                                                      self.song.props.copyright,
@@ -439,7 +439,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         self._fields['publisher'] = gui.append_entry(table, _("Publisher:"),
                                                      self.song.props.publisher,
                                                      2)
-        vbox.pack_start(table, False, True)
+        vbox.pack_start(table, False, True, 0)
         notebook.append_page(vbox, Gtk.Label(label= _('Ownership')) )
         
         
@@ -448,7 +448,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         self._fields['theme'] = Gtk.ListStore(GObject.TYPE_STRING,
                                               GObject.TYPE_STRING)
         for theme in self.song.props.themes:
-            self._fields['theme'].append( (theme, theme.lang) )
+            self._fields['theme'].append( (str(theme), theme.lang) )
         theme_list = Gtk.TreeView(self._fields['theme'])
         theme_list.connect('row-activated', self._theme_dlg, True)
         theme_list.set_reorderable(True)
@@ -469,30 +469,30 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         theme_list.get_selection().connect('changed',
                                            gui.treesel_disable_widget, button)
         toolbar.insert(button, -1)
-        vbox.pack_start(toolbar, False, True)
+        vbox.pack_start(toolbar, False, True, 0)
         theme_list.get_selection().emit('changed')
         #Table
         cell = Gtk.CellRendererText()
         col = Gtk.TreeViewColumn( _('Theme'))
-        col.pack_start(cell, True, True, 0)
+        col.pack_start(cell, True)
         col.set_resizable(True)
         col.add_attribute(cell, 'text', 0)
         theme_list.append_column(col)
         cell = Gtk.CellRendererText()
         col = Gtk.TreeViewColumn( _('Language'))
-        col.pack_start(cell, True, True, 0)
+        col.pack_start(cell, False)
         col.set_resizable(True)
         col.add_attribute(cell, 'text', 1)
         theme_list.append_column(col)
         scroll = Gtk.ScrolledWindow()
         scroll.add(theme_list)
         scroll.set_shadow_type(Gtk.ShadowType.IN)
-        vbox.pack_start(scroll, True, True)
+        vbox.pack_start(scroll, True, True, 0)
         
         table = gui.Table(1)
         self._fields['keywords'] = gui.append_entry(table, _("Keywords:"),
                                                     self.song.props.keywords, 0)
-        vbox.pack_start(table, False, True)
+        vbox.pack_start(table, False, True, 0)
         notebook.append_page(vbox, Gtk.Label(label= _('Theme')) )
         
         #Songbook field
@@ -523,25 +523,25 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                                               gui.treesel_disable_widget,
                                               button)
         toolbar.insert(button, -1)
-        vbox.pack_start(toolbar, False, True)
+        vbox.pack_start(toolbar, False, True, 0)
         songbook_list.get_selection().emit('changed')
         #Table
         cell = Gtk.CellRendererText()
         col = Gtk.TreeViewColumn( _('Songbook Name'))
-        col.pack_start(cell, True, True, 0)
+        col.pack_start(cell, True)
         col.set_resizable(True)
         col.add_attribute(cell, 'text', 0)
         songbook_list.append_column(col)
         cell = Gtk.CellRendererText()
         col = Gtk.TreeViewColumn( _('Entry')) # As in songbook number
-        col.pack_start(cell, True, True, 0)
+        col.pack_start(cell, True)
         col.set_resizable(True)
         col.add_attribute(cell, 'text', 1)
         songbook_list.append_column(col)
         scroll = Gtk.ScrolledWindow()
         scroll.add(songbook_list)
         scroll.set_shadow_type(Gtk.ShadowType.IN)
-        vbox.pack_start(scroll, True, True)
+        vbox.pack_start(scroll, True, True, 0)
         
         table = gui.Table(4)
         trans_adjustment = Gtk.Adjustment(int(self.song.props.transposition),
@@ -560,7 +560,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                     'E', 'F', 'F#', 'Gb', 'G', 'G#')
         self._fields['key'] = gui.append_combo(table, _('Key:'), key_list,
                                                self.song.props.key, 3)
-        vbox.pack_start(table, False, True)
+        vbox.pack_start(table, False, True, 0)
         notebook.append_page(vbox, Gtk.Label(label= _('Music Info')) )
         
         #Other
@@ -580,10 +580,10 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         label.set_alignment(0.5, 0.5)
         hbox.pack_start(label, False, True, 5)
         
-        self._fields['title'] = Gtk.Entry(100)
+        self._fields['title'] = Gtk.Entry()
         self._fields['title'].set_text(self.get_title())
-        hbox.pack_start(self._fields['title'], True, True)
-        vbox.pack_start(hbox, False, True)
+        hbox.pack_start(self._fields['title'], True, True, 0)
+        vbox.pack_start(hbox, False, True, 0)
         
         self._fields['slides'] = Gtk.ListStore(GObject.TYPE_PYOBJECT, str)
         # Add the slides
@@ -617,13 +617,13 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         toolbar.insert(btn, -1)
         toolbar.insert(Gtk.SeparatorToolItem(), -1)
         
-        vbox.pack_start(toolbar, False, True)
+        vbox.pack_start(toolbar, False, True, 0)
         
         scroll = Gtk.ScrolledWindow()
         scroll.add(self._slide_list)
         scroll.set_size_request(400, 250)
         scroll.set_shadow_type(Gtk.ShadowType.IN)
-        vbox.pack_start(scroll, True, True)
+        vbox.pack_start(scroll, True, True, 0)
         
         vbox.show_all()
         notebook.insert_page(vbox, Gtk.Label(label=_("Edit")), 0)
@@ -642,7 +642,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                                                        vorder, 0)
         txt = _("Use the Slide names in brackets to modify the order")
         self._fields['verse_order'].set_tooltip_text(txt)
-        notebook.get_nth_page(0).pack_start(table, False, True)
+        notebook.get_nth_page(0).pack_start(table, False, True, 0)
         table.show_all()
     
     def _edit_save(self):
@@ -746,7 +746,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                             (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
                             Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
         table = gui.Table(2)
-        dialog.vbox.pack_start(table, True, True)
+        dialog.vbox.pack_start(table, True, True, 0)
         
         model = treeview.get_model()
         title_value = lang_value = None
@@ -792,7 +792,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                             (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
                             Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
         table = gui.Table(3)
-        dialog.vbox.pack_start(table, True, True)
+        dialog.vbox.pack_start(table, True, True, 0)
         
         model = treeview.get_model()
         author_value = type_value = lang_value = None
@@ -858,7 +858,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                 (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
                 Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
         table = gui.Table(2)
-        dialog.vbox.pack_start(table, True, True)
+        dialog.vbox.pack_start(table, True, True, 0)
         
         model = treeview.get_model()
         theme_value = lang_value = None
@@ -905,7 +905,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                 (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT, Gtk.STOCK_OK,
                 Gtk.ResponseType.ACCEPT))
         table = gui.Table(2)
-        dialog.vbox.pack_start(table, True, True)
+        dialog.vbox.pack_start(table, True, True, 0)
         
         model = treeview.get_model()
         songbook_value = entry_value = None
@@ -1248,7 +1248,7 @@ class SlideEdit(Gtk.Dialog):
         self.vbox.set_spacing(7)
         
         # Title
-        self.vbox.pack_start(self._get_title_box(), False, True)
+        self.vbox.pack_start(self._get_title_box(), False, True, 0)
         
         # Toolbar
         self._toolbar = Gtk.Toolbar()
@@ -1256,7 +1256,7 @@ class SlideEdit(Gtk.Dialog):
                                                self._undo, False)
         self.redo_btn = self._get_toolbar_item(Gtk.ToolButton(Gtk.STOCK_REDO),
                                                self._redo, False)
-        self.vbox.pack_start(self._toolbar, False, True)
+        self.vbox.pack_start(self._toolbar, False, True, 0)
         
         self._buffer = self._get_buffer()
         self._buffer.connect("changed", self._on_text_changed)
@@ -1272,7 +1272,7 @@ class SlideEdit(Gtk.Dialog):
         scroll.add(text)
         scroll.set_size_request(450, 250)
         scroll.set_shadow_type(Gtk.ShadowType.IN)
-        self.vbox.pack_start(scroll, True, True)
+        self.vbox.pack_start(scroll, True, True, 0)
         
         self.vbox.show_all()
     
@@ -1319,7 +1319,8 @@ class SlideEdit(Gtk.Dialog):
         label.set_alignment(0.5,0.5)
         hbox.pack_start(label, False, True, 1)
         
-        self._title_num = Gtk.Entry(4)
+        self._title_num = Gtk.Entry()
+        self._title_num.set_max_length(4)
         self._title_num.set_text(self.slide_title[1:])
         self._title_num.set_width_chars(4)
         hbox.pack_start(self._title_num, False, True, 1)

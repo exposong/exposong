@@ -502,7 +502,7 @@ class Title(object):
         """
         Return a string representation.
         """
-        return unicode(self).encode('UTF-8') 
+        return unicode(self).encode('UTF-8')
     
     def __unicode__(self):
         """

@@ -206,11 +206,12 @@ def Table(rows):
     table.set_border_width(6)
     return table
 
-def append_entry(table, label, value, top, max_len=0):
+def append_entry(table, label, value, top, max_len=-1):
     'Adds a text entry widget to a table and returns it.'
     set_label(table, label, top)
     
-    entry = Gtk.Entry(max_len)
+    entry = Gtk.Entry()
+    entry.set_max_length(max_len)
     if value:
         entry.set_text(value)
     table.attach(entry, 2, 4, top, top+1, Gtk.AttachOptions.EXPAND|Gtk.AttachOptions.FILL, 0, WIDGET_SPACING)
@@ -293,7 +294,8 @@ def append_spinner(table, label, adjustment, top):
     'Adds a spinner widget to a table and returns it.'
     set_label(table, label, top)
     
-    spinner = Gtk.SpinButton(adjustment, 2.0)
+    spinner = Gtk.SpinButton()
+    spinner.set_adjustment(adjustment)
     table.attach(spinner, 2, 4, top, top+1, Gtk.AttachOptions.EXPAND|Gtk.AttachOptions.FILL, 0, WIDGET_SPACING)
     return spinner
 
