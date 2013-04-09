@@ -37,7 +37,7 @@ Margins are measured in Pixels.
 """
 
 import cairo
-from gi.repository import GObject, Gtk, Gdk, Pango
+from gi.repository import GObject, Gtk, Gdk, Pango, PangoCairo
 
 import math
 import operator
@@ -778,16 +778,17 @@ class Text(_RenderableSection):
         self.markup = markup
     
     def draw(self, ccontext, bounds, section, expand={}):
-        "Render to a Cairo Context."
+        "Render to a Cairo Context using a Pango Layout for the text."
         _RenderableSection.draw(self, ccontext, bounds, section, expand)
         screen_height = (self.rpos[3] + self.margin) / self.pos[3]
         
-        layout = ccontext.create_layout()
+        layout = PangoCairo.create_layout(ccontext)
         layout.set_width(int(self.rpos[2] - self.rpos[0])*Pango.SCALE)
         if section.font:
             font_descr = Pango.FontDescription(section.font)
         else:
             font_descr = Pango.FontDescription("Sans 48")
+
         font_descr.set_size(int(font_descr.get_size() * screen_height / 768))
         layout.set_font_description(font_descr)
         layout.set_spacing(int((section.spacing - 1.0) * font_descr.get_size()))
@@ -832,7 +833,7 @@ class Text(_RenderableSection):
             for x in range(-2, 3, 1):
                 for y in range(-2, 3, 1):
                     ccontext.move_to(center[0]+x, center[1]+y)
-                    ccontext.show_layout(layout)
+                    PangoCairo.show_layout(ccontext, layout)
         if section.outline_color:
             clr = Gdk.color_parse(section.outline_color)
             ccontext.set_source_rgb(clr.red / 65535.0, clr.green / 65535.0,
@@ -841,13 +842,13 @@ class Text(_RenderableSection):
             for x in range(-offset, offset + 1, 1):
                 for y in range(-offset, offset + 1, 1):
                     ccontext.move_to(self.rpos[0]+x, top+y)
-                    ccontext.show_layout(layout)
+                    PangoCairo.show_layout(ccontext, layout)
         
         clr = Gdk.color_parse(section.color)
         ccontext.set_source_rgba(clr.red / 65535.0, clr.green / 65535.0,
                                  clr.blue / 65535.0, 1.0)
         ccontext.move_to(self.rpos[0], top)
-        ccontext.show_layout(layout)
+        PangoCairo.show_layout(ccontext, layout)
 
 
 class Image(_RenderableSection):
