@@ -83,7 +83,6 @@ class Config(ConfigParser.SafeConfigParser):
         self.set("updates", "last_check", "")
         
         self.set("songs", "ccli", "")
-        self.set("songs", "songbook", "")
         self.set("songs", "show_in_order", "True")
         self.set("songs", "title_slide", "False")
         

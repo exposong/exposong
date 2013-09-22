@@ -70,14 +70,6 @@ themes are stored.")
 
         g_ccli = table.attach_entry(config.get("songs","ccli"),
                                     label=_("CCLI License #"))
-        songbooks = [sbook.name for t in exposong.main.main.library
-                     if t[0].get_type() == "song"
-                     for sbook in t[0].song.props.songbooks]
-        songbooks = sorted(set(songbooks))
-        g_songbook = table.attach_combo(songbooks,
-                                        config.get("songs","songbook"),
-                                        label=_("Songbook"))
-        table.attach_comment(_("Choose a Songbook to be displayed in the footer."))
         
         notebook.append_page(table, gtk.Label( _("General") ))
         
@@ -145,8 +137,6 @@ themes are stored.")
                 config.set("songs", "title_slide", str(g_title.get_active()))
                 exposong.slidelist.slidelist.update()
             config.set("songs", "ccli", g_ccli.get_text())
-            if g_songbook.get_active_text():
-                config.set("songs", "songbook", g_songbook.get_active_text())
             config.set("updates", "check_for_updates", str(g_update.get_active()))
             
             if p_logo.get_filename() != None:
