@@ -166,6 +166,10 @@ class Main (gtk.Window):
     
     def _ready(self):
         "Called when ExpoSong is fully loaded."
+        
+        #Fill Songbook Selector
+        exposong.plugins.lyric.Presentation.fill_songbook_combo()
+        
         self.show_all()
         self._autocheck_for_update()
         # Prepares all button visibility by hiding the screen.
@@ -240,6 +244,13 @@ class Main (gtk.Window):
         vbox.pack_start(label, False, True, 4)
         vbox.pack_start(exposong.themeselect.themeselect, False, True, 0)
         vbox.pack_start(exposong.themeselect.themeselect.get_button_bar(), False, True, 0)
+        
+        exposong.log.debug("Rendering 'Go to Song'")
+        label = gtk.Label()
+        label.set_markup("<b>%s</b>" % _("Go to Song"))
+        label.set_alignment(0.0, 1.0)
+        vbox.pack_start(label, False, True, 4)
+        vbox.pack_start(exposong.plugins.lyric.Presentation.get_open_by_songbook(), False,True)
         
         exposong.log.debug("Rendering Notification")
         label = gtk.Label()

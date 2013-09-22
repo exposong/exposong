@@ -34,7 +34,7 @@ import exposong_openlyrics.tools.convert_schema as convert_schema
 import undobuffer
 from exposong.glob import *
 from exposong import RESOURCE_PATH, DATA_PATH
-from exposong import gui, theme
+from exposong import gui, theme, statusbar
 from exposong.plugins import Plugin, _abstract
 from exposong.config import config
 from exposong_openlyrics import openlyrics
@@ -1121,83 +1121,60 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
     
     __last_selected_songbook = ""
     @classmethod
-    def _on_open_song_by_songbook(cls, *args):
+    def get_open_by_songbook(cls):
         'Open Song by looking for Songbook and Entry'
-        dlg = gtk.MessageDialog(type=gtk.MESSAGE_WARNING, buttons=gtk.BUTTONS_OK_CANCEL,
-                                message_format=_("Please enter the Songbook and the Entry you want to open."))
-        vbox = dlg.get_message_area()
-        table = gui.Table(2)
+        vbox = gtk.VBox()
+        hbox = gtk.HBox();
+        cls._songbook_combo = gtk.ComboBoxEntry()
+        model = gtk.ListStore(gobject.TYPE_STRING)
+        cls._songbook_combo.set_model(model)
+        cls._songbook_combo.set_text_column(0)
+        completion = gtk.EntryCompletion()
+        completion.set_model(model)
+        completion.set_minimum_key_length(1)
+        completion.set_text_column(0)
+        cls._songbook_combo.child.set_completion(completion)
         
-        
+        entry = gtk.Entry()
+        entry.connect('activate', cls._find_song, cls._songbook_combo, entry)
+        hbox.pack_start(entry)
+        btn = gtk.Button(_('Find'))
+        btn.connect('clicked', cls._find_song, cls._songbook_combo, entry)
+        hbox.add(btn)
+        hbox.show_all()
+        vbox.pack_start(cls._songbook_combo)
+        vbox.pack_start(hbox)
+        return vbox
+    
+    @classmethod
+    def fill_songbook_combo(cls):
         songbooks = [sbook.name for t in exposong.main.main.library
                      if t[0].get_type() == "song"
                      for sbook in t[0].song.props.songbooks]
         songbooks = sorted(set(songbooks))
-        songbook = gui.append_combo_entry(table, _('Songbook Name:'),
-                                          songbooks, cls.__last_selected_songbook, 0)
-        entry = gui.append_entry(table, _('Entry:'), None, 1)
-        vbox.pack_start(table)
-        vbox.show_all()
-        not_found_lbl = gtk.Label(_("Entry not found."))
-        vbox.pack_start(not_found_lbl)
-        while dlg.run() == gtk.RESPONSE_OK:
-            cls.__last_selected_songbook = songbook.get_active_text()
-            if cls._find_song(songbook.get_active_text(), entry.get_text()):
-                break
-            else:
-                not_found_lbl.show()
-        dlg.destroy()
+        model = cls._songbook_combo.get_model()
+        for s in songbooks:
+            model.append((s,))
+        cls._songbook_combo.set_active(0)
+    
     
     @classmethod
-    def _find_song(cls, songbook, entry):
+    def _find_song(cls, widget, songbook_combo, entry):
         '''Looks for a Song which has the given songbook and entry.
         Opens the Song and returns True, if found. Returns else, if not.'''
         model = exposong.preslist.preslist.get_model()
         for row in model:
             for sbook in row[0].song.props.songbooks:
-                if sbook.name.lower() == songbook.lower() and sbook.entry.lower() == entry.lower():
+                if sbook.name.lower() == songbook_combo.get_active_text().lower() and \
+                    sbook.entry.lower() == entry.get_text().lower():
                     exposong.preslist.preslist.set_cursor(row.path)
                     return True
+        statusbar.statusbar.output(_("Song not found"))
         return False
     
     @classmethod
-    def _on_open_song_by_songbook(cls, *args):
-        'Open Song by looking for Songbook and Entry'
-        dlg = gtk.MessageDialog(type=gtk.MESSAGE_WARNING, buttons=gtk.BUTTONS_OK_CANCEL,
-                                message_format=_("Please enter the Songbook and the Entry you want to open."))
-        vbox = dlg.get_message_area()
-        table = gui.Table(2)
-        
-        
-        songbooks = [sbook.name for t in exposong.main.main.library
-                     if t[0].get_type() == "song"
-                     for sbook in t[0].song.props.songbooks]
-        songbooks = sorted(set(songbooks))
-        songbook = gui.append_combo_entry(table, _('Songbook Name:'),
-                                          songbooks, None, 0)
-        entry = gui.append_entry(table, _('Entry:'), None, 1)
-        vbox.pack_start(table)
-        vbox.show_all()
-        not_found_lbl = gtk.Label(_("Entry not found."))
-        vbox.pack_start(not_found_lbl)
-        while dlg.run() == gtk.RESPONSE_OK:
-            if cls._find_song(songbook.get_active_text(), entry.get_text()):
-                break
-            else:
-                not_found_lbl.show()
-        dlg.destroy()
-        
-    @classmethod
-    def _find_song(cls, songbook, entry):
-        '''Looks for a Song which has the given songbook and entry.
-        Opens the Song and returns True, if found. Returns else, if not.'''
-        model = exposong.preslist.preslist.get_model()
-        for row in model:
-            for sbook in row[0].song.props.songbooks:
-                if sbook.name == songbook and sbook.entry == entry:
-                    exposong.preslist.preslist.set_cursor(row.path)
-                    return True
-        return False
+    def _on_open_song_by_songbook(cls):
+        print "jo"
     
     @classmethod
     def merge_menu(cls, uimanager):
@@ -1207,10 +1184,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         
         actiongroup = gtk.ActionGroup('exposong-song')
         actiongroup.add_actions([("pres-new-song", 'pres-song-new', _("New Song"), "<Ctrl>n",
-                                _("Create a new Song"), cls._on_pres_new),
-                                ("open-song-by-songbook", 'open-song-by-songbook',
-                                 _("Open Song by Songbook"), "<Ctrl>o", _("Find Song by entering Songbook and entry"),
-                                 cls._on_open_song_by_songbook),
+                                _("Create a new Song"), cls._on_pres_new)
                                 ])
         uimanager.insert_action_group(actiongroup, -1)
         
@@ -1222,9 +1196,6 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
                                 <menuitem action='pres-new-song' />
                             </placeholder>
                         </menu>
-                </menu>
-                <menu action="Presentation">
-                    <menuitem action='open-song-by-songbook' />
                 </menu>
             </menubar>
             """)
