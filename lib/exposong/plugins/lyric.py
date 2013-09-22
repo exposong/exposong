@@ -1173,10 +1173,6 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         return False
     
     @classmethod
-    def _on_open_song_by_songbook(cls):
-        print "jo"
-    
-    @classmethod
     def merge_menu(cls, uimanager):
         'Merge new values with the uimanager.'
         gtk.stock_add([("pres-song",_("_Song"), gtk.gdk.MOD1_MASK, 0,
