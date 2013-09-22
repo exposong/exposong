@@ -1119,7 +1119,6 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         "Return the presentation type."
         return 10
     
-    __last_selected_songbook = ""
     @classmethod
     def get_open_by_songbook(cls):
         'Open Song by looking for Songbook and Entry'
