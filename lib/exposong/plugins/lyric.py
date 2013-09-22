@@ -127,17 +127,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
         
         def get_footer(self):
             'Return a list of renderable theme items.'
-            f = [theme.Text(self.footer_text())]
-            for s in self.pres.song.props.songbooks:
-                if s.name == config.get("songs","songbook"):
-                    f.append(theme.Text("<big>%s</big>\n<small>%s</small>" % \
-                             (s.entry, s.name) ))
-                    break
-            return f
-        
-        def footer_text(self):
-            'Get the footer ownership information for the centered footer.'
-            jn = ['"%s"' % self.pres.title]
+            jn = []
             # TODO List only translators for the current translation.
             author = self.pres.get_authors_string()
             if len(author) > 0:
@@ -145,9 +135,12 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             if len(self.pres.song.props.copyright):
                 jn.append(u"\xA9 %s" % \
                           escape(self.pres.song.props.copyright))
+            for s in self.pres.song.props.songbooks:
+                jn.append("%s #%s" % (s.name, s.entry))
             if config.get("songs", "ccli"):
                 jn.append(_("CCLI License # %s") % escape(config.get("songs", "ccli")))
-            return '\n'.join(jn)
+            
+            return [theme.Text('\n'.join(jn))]
         
         def _edit_window(self, parent):
             'Open the Slide Editor'
@@ -1031,7 +1024,7 @@ class Presentation (_abstract.Presentation, Plugin, exposong._hook.Menu,
             same = False
             for auth in authlist:
                 if auth[0] == auth_type:
-                    auth[1] = "%s / %s"% (auth[1], str(a))
+                    auth[1] = "%s, %s"% (auth[1], str(a))
                     same = True
             if not same:
                 for auth in authlist:
