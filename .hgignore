@@ -1,0 +1,10 @@
+glob:*.pyc
+glob:*~
+glob:*.orig
+glob:.cache
+glob:.project
+glob:.pydevproject
+glob:*.kpf
+glob:*.komodoproject
+glob:build/*
+glob:dist/*
