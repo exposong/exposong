@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: exposong\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-10-27 21:00+0200\n"
-"PO-Revision-Date: 2011-10-29 09:50+0000\n"
+"PO-Revision-Date: 2012-01-16 09:43+0000\n"
 "Last-Translator: abuyop <Unknown>\n"
 "Language-Team: Malay <ms@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-10-30 05:22+0000\n"
-"X-Generator: Launchpad (build 14197)\n"
+"X-Launchpad-Export-Date: 2012-01-17 05:09+0000\n"
+"X-Generator: Launchpad (build 14676)\n"
 
 #: lib/exposong/about.py:37
 #, python-format
@@ -350,7 +350,7 @@ msgstr "Ctrl+F"
 
 #: lib/exposong/help.py:213
 msgid "Quit"
-msgstr "Berhenti"
+msgstr "Keluar"
 
 #: lib/exposong/help.py:213
 msgid "Ctrl+Q"
@@ -440,7 +440,7 @@ msgstr "Import pakej .expo atau format lain"
 
 #: lib/exposong/main.py:270
 msgid "_Export"
-msgstr "_Export"
+msgstr "_Eksport"
 
 #: lib/exposong/main.py:270
 msgid "Export a .expo package"

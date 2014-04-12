@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: exposong\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-10-27 21:00+0200\n"
-"PO-Revision-Date: 2011-11-03 18:13+0000\n"
-"Last-Translator: Muhammet Kara <Unknown>\n"
+"PO-Revision-Date: 2012-04-08 11:15+0000\n"
+"Last-Translator: kulkke <Unknown>\n"
 "Language-Team: Turkish <tr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-11-04 05:33+0000\n"
-"X-Generator: Launchpad (build 14231)\n"
+"X-Launchpad-Export-Date: 2012-04-09 05:02+0000\n"
+"X-Generator: Launchpad (build 15060)\n"
 
 #: lib/exposong/about.py:37
 #, python-format
@@ -27,7 +27,9 @@ msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
 "  Burak Ilgıcıoğlu https://launchpad.net/~buraki\n"
-"  Muhammet Kara https://launchpad.net/~muhammet-k"
+"  Ebubekir KARUL https://launchpad.net/~onlycodetr\n"
+"  Muhammet Kara https://launchpad.net/~muhammet-k\n"
+"  kulkke https://launchpad.net/~kulkke"
 
 #: lib/exposong/exampleslide.py:49
 #, python-format
@@ -73,7 +75,7 @@ msgstr "Yardım dosyası Web Tarayıcıda açıldı"
 
 #: lib/exposong/help.py:56
 msgid "Checking for updates ..."
-msgstr "Güncellemeler Denetleniyor"
+msgstr "Güncellemeler Denetleniyor..."
 
 #: lib/exposong/help.py:64
 msgid "An Error Occurred"
@@ -342,6 +344,7 @@ msgstr "Yeni _Sürümü Denetle"
 msgid ""
 "Are you sure you want to empty the data folder? This cannot be undone."
 msgstr ""
+"Veri dosyasını boşaltmak istediğinizden emin misiniz? Bu geri alınamaz."
 
 #: lib/exposong/_instance.py:157
 msgid "ExpoSong is not running."
@@ -1276,7 +1279,7 @@ msgstr ""
 
 #: lib/exposong/plugins/lyric.py:70
 msgid "Miscellaneous"
-msgstr ""
+msgstr "Çeşitli"
 
 #: lib/exposong/plugins/lyric.py:243 lib/exposong/plugins/lyric.py:341
 #: lib/exposong/plugins/lyric.py:368
@@ -1492,7 +1495,7 @@ msgstr "Slayt Düzenleniyor"
 
 #: lib/exposong/plugins/lyric.py:1175 lib/exposong/plugins/pres.py:849
 msgid "Save and New"
-msgstr ""
+msgstr "Kaydet ve Yeni"
 
 #: lib/exposong/plugins/lyric.py:1245 lib/exposong/plugins/pres.py:462
 msgid "Name:"
@@ -1560,11 +1563,11 @@ msgstr ""
 
 #: lib/exposong/plugins/pres.py:463
 msgid "Value:"
-msgstr ""
+msgstr "Değer:"
 
 #: lib/exposong/plugins/pres.py:472
 msgid "Please enter a Key."
-msgstr ""
+msgstr "Lütfen bir Anahtar girin."
 
 #: lib/exposong/plugins/pres.py:522
 msgid "The presentation must have at least one slide."
@@ -1625,7 +1628,7 @@ msgstr ""
 
 #: lib/exposong/plugins/pres.py:872
 msgid "Add Text"
-msgstr ""
+msgstr "Metin Ekle"
 
 #: lib/exposong/plugins/pres.py:878
 msgid "Add a new text element."

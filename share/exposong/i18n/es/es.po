@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: exposong\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-10-27 21:00+0200\n"
-"PO-Revision-Date: 2011-10-31 15:55+0000\n"
-"Last-Translator: VPablo <villumar@gmail.com>\n"
+"PO-Revision-Date: 2012-07-02 15:57+0000\n"
+"Last-Translator: Adolfo Jayme Barrientos <fitoschido@gmail.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-11-01 05:10+0000\n"
-"X-Generator: Launchpad (build 14197)\n"
+"X-Launchpad-Export-Date: 2012-07-03 05:56+0000\n"
+"X-Generator: Launchpad (build 15531)\n"
 
 #: lib/exposong/about.py:37
 #, python-format
@@ -26,13 +26,15 @@ msgstr "Copyright %s"
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
+"  Adolfo Jayme Barrientos https://launchpad.net/~fitoschido\n"
 "  Alejandro Navarro https://launchpad.net/~alexnmoya\n"
-"  Erick https://launchpad.net/~eochoa\n"
-"  Fitoschido https://launchpad.net/~fitoschido\n"
+"  Erick https://launchpad.net/~eochoa-deactivatedaccount\n"
 "  Florencia Mincucci https://launchpad.net/~flomincucci\n"
-"  Guillermo_Cristancho https://launchpad.net/~gacd8\n"
+"  Guillermo_Cristancho https://launchpad.net/~nanull89\n"
 "  Jorge Luis Gomez https://launchpad.net/~squall884\n"
+"  Leonzero https://launchpad.net/~leonzerofromchile\n"
 "  Monkey https://launchpad.net/~monkey-libre\n"
+"  Nacho Perea https://launchpad.net/~nacho.perea\n"
 "  VPablo https://launchpad.net/~villumar\n"
 "  sebikul https://launchpad.net/~sebikul"
 
@@ -1174,7 +1176,7 @@ msgstr "Eliminar el tema actual"
 
 #: lib/exposong/plugins/_abstract.py:203
 msgid "New Presentation"
-msgstr "Nueva Presentacion"
+msgstr "Presentación nueva"
 
 #: lib/exposong/plugins/_abstract.py:209 lib/exposong/plugins/pres.py:459
 #, python-format

@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: exposong\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-10-27 21:00+0200\n"
-"PO-Revision-Date: 2010-12-26 22:04+0000\n"
-"Last-Translator: Niclas Nilsson <Unknown>\n"
+"PO-Revision-Date: 2012-02-19 18:26+0000\n"
+"Last-Translator: Rikard Edgren <Unknown>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-10-28 05:39+0000\n"
-"X-Generator: Launchpad (build 14197)\n"
+"X-Launchpad-Export-Date: 2012-02-20 05:48+0000\n"
+"X-Generator: Launchpad (build 14833)\n"
 
 #: lib/exposong/about.py:37
 #, python-format
@@ -25,11 +25,14 @@ msgstr "Copyright %s"
 #: lib/exposong/about.py:42 lib/exposong/about.py:43
 msgid "translator-credits"
 msgstr ""
+"Launchpad Contributions:\n"
+"  Niclas Nilsson https://launchpad.net/~thenajnth\n"
+"  Rikard Edgren https://launchpad.net/~rikard-edgren"
 
 #: lib/exposong/exampleslide.py:49
 #, python-format
 msgid "Written by: %s"
-msgstr ""
+msgstr "Skriven av: %s"
 
 #: lib/exposong/exampleslide.py:50
 #, python-format
@@ -42,15 +45,15 @@ msgstr ""
 
 #: lib/exposong/gtklogger.py:84
 msgid "Time"
-msgstr ""
+msgstr "Tid"
 
 #: lib/exposong/gtklogger.py:92
 msgid "Severity"
-msgstr ""
+msgstr "Allvarlighetsgrad"
 
 #: lib/exposong/gtklogger.py:101
 msgid "Message"
-msgstr ""
+msgstr "Meddelande"
 
 #: lib/exposong/gui.py:134 lib/exposong/gui.py:145 lib/exposong/gui.py:245
 msgid "Choose File"
@@ -74,11 +77,11 @@ msgstr ""
 
 #: lib/exposong/help.py:64
 msgid "An Error Occurred"
-msgstr ""
+msgstr "Ett fel uppstod"
 
 #: lib/exposong/help.py:68
 msgid "A New Version is Available"
-msgstr ""
+msgstr "En ny version är tillgänglig"
 
 #: lib/exposong/help.py:72
 msgid "ExpoSong is Up to Date"
@@ -111,7 +114,7 @@ msgstr ""
 
 #: lib/exposong/help.py:132
 msgid "About"
-msgstr ""
+msgstr "Om"
 
 #: lib/exposong/help.py:133
 msgid ""
@@ -432,7 +435,7 @@ msgstr "Bibliotek"
 
 #: lib/exposong/main.py:443
 msgid "Custom Schedules"
-msgstr ""
+msgstr "Egna scheman"
 
 #: lib/exposong/main.py:485
 msgid ""
@@ -1214,15 +1217,15 @@ msgstr "Importera gamla ExpoSong-filer"
 
 #: lib/exposong/plugins/legacy_format_convert.py:188
 msgid "ExpoSong Legacy File"
-msgstr ""
+msgstr "Gammal ExpoSong-fil"
 
 #: lib/exposong/plugins/legacy_format_convert.py:206
 msgid "_ExpoSong Legacy File(s) ..."
-msgstr ""
+msgstr "_ExpoSong gamla fil(er) ..."
 
 #: lib/exposong/plugins/legacy_format_convert.py:207
 msgid "Import a Lyric Presentation from ExpoSong before 0.7"
-msgstr ""
+msgstr "Importera en textpresentation från ExpoSong innan 0.7"
 
 #: lib/exposong/plugins/lyric.py:47
 msgid "Song"
@@ -1250,7 +1253,7 @@ msgstr "Vers"
 
 #: lib/exposong/plugins/lyric.py:64
 msgid "Pre-Chorus"
-msgstr ""
+msgstr "Brygga"
 
 #: lib/exposong/plugins/lyric.py:65
 msgid "Chorus"
@@ -1284,11 +1287,11 @@ msgstr "Språk"
 
 #: lib/exposong/plugins/lyric.py:358
 msgid "Variant:"
-msgstr ""
+msgstr "Variant:"
 
 #: lib/exposong/plugins/lyric.py:361
 msgid "Custom Version:"
-msgstr ""
+msgstr "Egen version:"
 
 #: lib/exposong/plugins/lyric.py:364
 msgid "Release Date:"
@@ -1332,7 +1335,7 @@ msgstr "Namn sångbok"
 
 #: lib/exposong/plugins/lyric.py:533
 msgid "Entry"
-msgstr ""
+msgstr "Nummer"
 
 #: lib/exposong/plugins/lyric.py:548
 msgid "Transposition:"
@@ -1356,7 +1359,7 @@ msgstr "Text"
 
 #: lib/exposong/plugins/lyric.py:559
 msgid "Key:"
-msgstr ""
+msgstr "Tangent:"
 
 #: lib/exposong/plugins/lyric.py:562
 msgid "Music Info"
@@ -1417,7 +1420,7 @@ msgstr "Ny upphovsman"
 #: lib/exposong/plugins/lyric.py:800
 #, python-format
 msgid "Editing Author \"%s\""
-msgstr ""
+msgstr "Redigera upphovsman \"%s\""
 
 #: lib/exposong/plugins/lyric.py:816
 msgid "Author Name:"
@@ -1515,7 +1518,7 @@ msgstr "_OpenSong fil(er) ..."
 
 #: lib/exposong/plugins/opensong_convert.py:96
 msgid "Import a Lyric Presentation from OpenSong"
-msgstr ""
+msgstr "Importera en sångtext från OpenSong"
 
 #: lib/exposong/plugins/pres.py:48
 msgid "ExpoSong Presentation"

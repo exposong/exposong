@@ -8,25 +8,26 @@ msgstr ""
 "Project-Id-Version: exposong\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-10-27 21:00+0200\n"
-"PO-Revision-Date: 2011-10-31 06:31+0000\n"
-"Last-Translator: Ivan S <ivan90112@gmail.com>\n"
+"PO-Revision-Date: 2012-08-22 14:53+0000\n"
+"Last-Translator: Sigit Irmawan <Unknown>\n"
 "Language-Team: Indonesian <id@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-11-01 05:10+0000\n"
-"X-Generator: Launchpad (build 14197)\n"
+"X-Launchpad-Export-Date: 2012-08-28 07:27+0000\n"
+"X-Generator: Launchpad (build 15864)\n"
 
 #: lib/exposong/about.py:37
 #, python-format
 msgid "Copyright %s"
-msgstr ""
+msgstr "Hak Cipta %s"
 
 #: lib/exposong/about.py:42 lib/exposong/about.py:43
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
-"  Ivan S https://launchpad.net/~ivan90112"
+"  Ivan S. https://launchpad.net/~ivan90112\n"
+"  Sigit Irmawan https://launchpad.net/~manja0911"
 
 #: lib/exposong/exampleslide.py:49
 #, python-format
