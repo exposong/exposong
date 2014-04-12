@@ -44,9 +44,9 @@ msgid "Written by: %s"
 msgstr "Geschrieben von: %s"
 
 #: lib/exposong/exampleslide.py:44
-#, fuzzy, python-format
+#, python-format
 msgid "Copyright: %s"
-msgstr "Copyright %s"
+msgstr "Copyright: %s"
 
 #: lib/exposong/gtklogger.py:71
 msgid "Filter Severity:"
@@ -184,7 +184,6 @@ msgstr ""
 "ebenso möglich sein."
 
 #: lib/exposong/help.py:159
-#, fuzzy
 msgid ""
 "The <b>Song</b> presentation type is for song lyrics. The slides can be "
 "verses, choruses, or other lyrics parts, and can contain indexes (such as "
@@ -192,11 +191,11 @@ msgid ""
 "songbook number, copyright and CCLI number, which may be displayed on the "
 "screen with the Lyric."
 msgstr ""
-"Die Lieder-Präsentation ist für Liedtexte gedacht. Die Folien können "
+"Lieder können "
 "Strophen, Chorusse oder andere Liedteile sein und Zahlen enthalten (wie z.B. "
 "Strophe 1, Strophe 2). Liedtexte können auch Metadaten wie Autor, "
-"Liederbuchnummer,Copyright und CCLI-Nummer enthalten, welche auf dem "
-"Bildschirm zusammen mit dem Liedtext angezeigt werden können."
+"Liederbuchnummer, Copyright und CCLI-Nummer enthalten, welche auf dem "
+"Bildschirm zusammen mit dem Liedtext angezeigt werden."
 
 #: lib/exposong/help.py:164
 msgid ""
@@ -418,7 +417,7 @@ msgstr "Design-Auswahl"
 
 #: lib/exposong/main.py:250
 msgid "Go to Song"
-msgstr ""
+msgstr "Lied öffnen"
 
 #: lib/exposong/main.py:257 lib/exposong/prefs.py:85
 msgid "Notify"
@@ -539,7 +538,7 @@ msgstr "Titelfolie einfügen"
 
 #: lib/exposong/prefs.py:72
 msgid "CCLI License #"
-msgstr ""
+msgstr "CCLI-Lizenz #"
 
 #: lib/exposong/prefs.py:74
 msgid "General"
@@ -1144,13 +1143,12 @@ msgid "Editing \"%s\""
 msgstr "Bearbeite \"%s\""
 
 #: lib/exposong/plugins/_abstract.py:245
-#, fuzzy
 msgid "Are you sure you want to cancel?"
-msgstr "Sind Sie sicher, dass Sie »%s« löschen wollen?"
+msgstr "Ohne Speichern schließen?"
 
 #: lib/exposong/plugins/_abstract.py:249
 msgid "Cancel?"
-msgstr ""
+msgstr "Abbrechen?"
 
 #: lib/exposong/plugins/export_import.py:44
 msgid "Export/Import Functions"
@@ -1183,11 +1181,11 @@ msgstr "design_%s.expo"
 
 #: lib/exposong/plugins/export_import.py:237
 msgid "Export Alphabetical Song List"
-msgstr ""
+msgstr "Alphabetische Liedliste exportieren"
 
 #: lib/exposong/plugins/export_import.py:242
 msgid "exposong_songs.txt"
-msgstr ""
+msgstr "exposong_lieder.txt"
 
 #: lib/exposong/plugins/export_import.py:254
 msgid "Import Song(s) (OpenLyrics Format)"
@@ -1302,7 +1300,7 @@ msgstr "Verschiedenes"
 #: lib/exposong/plugins/lyric.py:141 lib/exposong/plugins/lyric.py:1040
 #, python-format
 msgid "CCLI License # %s"
-msgstr ""
+msgstr "CCLI-Lizenznummer # %s"
 
 #: lib/exposong/plugins/lyric.py:251 lib/exposong/plugins/lyric.py:340
 #: lib/exposong/plugins/lyric.py:367
@@ -1319,9 +1317,8 @@ msgid "Variant:"
 msgstr "Variante:"
 
 #: lib/exposong/plugins/lyric.py:360
-#, fuzzy
 msgid "Version:"
-msgstr "Geänderte Version:"
+msgstr "Version:"
 
 #: lib/exposong/plugins/lyric.py:363
 msgid "Release Date:"
@@ -1517,18 +1514,16 @@ msgid "_Song"
 msgstr "_Liedtext"
 
 #: lib/exposong/plugins/lyric.py:1166
-#, fuzzy
 msgid "Create a new Song"
-msgstr "Neue Präsentation erstellen"
+msgstr "Neues Lied erstellen"
 
 #: lib/exposong/plugins/lyric.py:1222 lib/exposong/plugins/pres.py:856
 msgid "Editing Slide"
 msgstr "Folie bearbeiten"
 
 #: lib/exposong/plugins/lyric.py:1229
-#, fuzzy
 msgid "Save and _New"
-msgstr "Speichern und Neu"
+msgstr "Speichern und _Neu"
 
 #: lib/exposong/plugins/lyric.py:1299 lib/exposong/plugins/pres.py:472
 msgid "Name:"
