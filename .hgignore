@@ -8,3 +8,4 @@ glob:*.kpf
 glob:*.komodoproject
 glob:build/*
 glob:dist/*
+glob:data/*
