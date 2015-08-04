@@ -5,6 +5,11 @@ Version 0.8
 
 Copyright (C) 2008-2011 Exposong.org
 
+EOL Announcement
+----------------
+
+As of 1/8/2014, we will no longer continue to support or further develop ExpoSong. We suggest [OpenLP](http://www.openlp.org/) as it has a good number of contributers, and is active and growing. It also lets you import your ExpoSong songs. Thank you for your interest in our project, and good luck in your future endeavors.
+
 About
 -----
 
